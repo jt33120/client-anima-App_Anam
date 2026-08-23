@@ -19,6 +19,32 @@ export const VIDE_TITRE = "Rien n’a encore été nommé.";
 export const VIDE_CORPS = "C’est normal, ça vient en parlant.";
 
 /**
+ * CE QU'EST L'ARBRE, DIT SUR L'ÉCRAN VIDE (retour du 2026-08-23).
+ *
+ * ══ LE CONSTAT ═══════════════════════════════════════════════════════════════════════════════════
+ *
+ * « L'arbre : quand vide, explique ce en quoi consiste l'arbre. » L'écran disait « rien n'a encore
+ * été nommé » — ce qui suppose qu'on sache DÉJÀ ce qui se nomme, et pourquoi ça pousserait. Sur le
+ * seul écran où la personne n'a rien à regarder, on lui parlait comme si elle connaissait la règle
+ * du jeu. C'est l'endroit où il y a le plus de place pour l'expliquer, et le seul moment où elle en
+ * a besoin.
+ *
+ * ⚠️ TROIS PHRASES, ET AUCUNE NE PROMET RIEN. Ni « tu verras », ni « ton arbre deviendra », ni
+ * combien il en faut : FR-057 refuse le teasing, FR-031 refuse le compte, et un futur promis sur un
+ * écran vide est la définition de la carotte. On décrit un MÉCANISME — ce qui fait naître une
+ * branche, ce qu'elle devient, qui décide — au présent.
+ *
+ * ⚠️ ET CE N'EST PAS LA VOIX D'ANAM. Registre produit, comme `VIDE_OU_NAISSENT_LES_BRANCHES` juste
+ * en dessous et pour la même raison : Anam ne présente pas le produit, elle parle à quelqu'un. Lui
+ * faire réciter le fonctionnement de son propre monde en ferait une notice.
+ */
+export const VIDE_CE_QU_EST_L_ARBRE = [
+  "Le tronc, c’est ton socle : ce qui était déjà là à ta naissance, et qui ne change pas.",
+  "Une branche naît quand quelque chose revient dans tes échanges avec Anam et qu’elle te propose de le nommer — jamais sur l’instant, et jamais sans que tu aies dit oui.",
+  "Ensuite elle vit : elle prend des feuilles à mesure que tu y reviens, et c’est toi, pas Anam, qui décides le jour où elle est en pleine lumière.",
+] as const;
+
+/**
  * Story 3.3 (AC6) — LA PHRASE SOBRE, et la seule surface commerciale de toute la région arbre.
  *
  * Registre PRODUIT, jamais la voix d'Anam : Anam ne vend rien (3.2), et lui faire dire une phrase de

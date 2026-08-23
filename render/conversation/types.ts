@@ -166,7 +166,17 @@ export type OuvertureData =
   /** Story 6.4 (AC1) — le geste de pause. Une phrase, rien d'autre — et surtout AUCUN nombre, alors
    *  que c'est la seule ouverture qui naît d'un compte : les deux compteurs meurent côté serveur,
    *  et le rendu ne peut donc pas afficher « 7 séances cette semaine » (FR-031). */
-  | { readonly type: "pause"; readonly phrase: string };
+  | { readonly type: "pause"; readonly phrase: string }
+  /**
+   * Retour du 2026-08-23 — C'EST ANAM QUI PARLE LA PREMIÈRE.
+   *
+   * ⚠️ LA DERNIÈRE DE L'UNION, ET C'EST UN ORDRE DE PRIORITÉ. Les cinq ouvertures ci-dessus
+   * naissent d'un ÉVÉNEMENT (une branche à proposer, un socle qui vient de se compléter, une
+   * pause à suggérer) : elles ont quelque chose à dire, et elles passent avant. Celle-ci est ce
+   * qu'Anam dit quand il n'y a rien de particulier — c'est-à-dire presque toujours, et le tout
+   * premier jour. Elle ne s'ajoute pas aux autres : elle prend la place laissée vide.
+   */
+  | { readonly type: "premiere-parole"; readonly phrase: string };
 
 /**
  * UN TOUR RETROUVÉ AU RECHARGEMENT (QA tour 1, T3).

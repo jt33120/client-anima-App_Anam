@@ -498,6 +498,17 @@
 
 /* Story 5.6 (T9) — le tronc dans l'ÉTAT VIDE, qui n'a pas de canevas (FR-088, dette de la 3.3).
    Hauteur bornée : c'est le décor de l'écran, pas son sujet — le texte reste ce qu'on lit d'abord. */
+/* Les trois phrases qui disent ce qu'est l'arbre. Groupées, à la mesure de lecture, et un cran plus
+   serrées que le reste : c'est un paragraphe, pas trois annonces. */
+.videExplication {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  max-width: var(--mesure);
+  margin: var(--esp-4) auto 0;
+  text-align: left;
+}
+
 .troncSeul {
   display: block;
   width: 100%;
@@ -513,7 +524,18 @@
    solution de repli, pas une mise en page. 70 px rendus ici suffisent à ce que tout tienne sur un
    iPhone 14, où il en manquait 54. */
 @media (max-height: 720px) {
-  .troncSeul {
+  /* Les trois phrases qui disent ce qu'est l'arbre. Groupées, à la mesure de lecture, et un cran plus
+   serrées que le reste : c'est un paragraphe, pas trois annonces. */
+.videExplication {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  max-width: var(--mesure);
+  margin: var(--esp-4) auto 0;
+  text-align: left;
+}
+
+.troncSeul {
     max-height: 110px;
   }
 }

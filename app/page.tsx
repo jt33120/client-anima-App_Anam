@@ -14,6 +14,9 @@ import { marquerHypotheseDite } from "@/app/_enneagramme/marquer-hypothese";
 import { marquerSeuilFranchi } from "@/app/_seuil/marquer-franchissement";
 import { creerDepotSeuil } from "@/lib/data/depot-seuil";
 import { premierPassage } from "@/lib/domain/premier-passage";
+import { phraseDOuverture } from "@/lib/domain/ouverture-seance";
+import { lirePrenom } from "@/lib/data/lire-prenom";
+import { lireFaitsRetenus } from "@/lib/data/lire-memoire";
 import { ETAPES, SUIVANT, TERMINER, QUITTER } from "@/lib/domain/copie-guide";
 
 /**
@@ -88,7 +91,8 @@ export default async function Page() {
   // RÉELLE de l'arbre. Story 5.6 : la bibliothèque du socle. Les trois sous JWT, en parallèle ;
   // jamais un 500 qui bloquerait l'ouverture de la scène — chacune a son repli sûr.
   const maintenant = new Date();
-  const [ouverture, projection, bibliotheque, historique, seuilFranchiLe] = await Promise.all([
+  const [ouverture, projection, bibliotheque, historique, seuilFranchiLe, prenom, aDejaParle] =
+    await Promise.all([
     chargerOuverture(supabase, user.id),
     chargerProjectionArbre(supabase, user.id, theme),
     // La bibliothèque n'est pas un chemin critique : une panne rend `null`, et la scène s'ouvre
@@ -106,11 +110,45 @@ export default async function Page() {
     // reste. Repli sur `null` (donc « jamais franchi », donc le texte est redit) : se répéter est
     // un accroc, ne jamais présenter le lieu est le constat H4 qui revient.
     creerDepotSeuil(supabase).lireFranchiLe().catch(() => null),
+    // Retour du 2026-08-23 — de quoi qu'Anam OUVRE la séance. Deux lectures minuscules, dans le
+    // même aller-retour que le reste : le prénom, et l'existence (pas le contenu) d'un souvenir.
+    lirePrenom(supabase, user.id).catch(() => null),
+    // ⚠️ `1`, PAS 200. On ne veut savoir QUE s'il en existe : une donnée d'article 9 qu'on ne
+    // demande pas est une donnée qui ne traverse aucune couche.
+    lireFaitsRetenus(supabase, 1).then((f) => f.length > 0).catch(() => false),
   ]);
+  /* ── C'EST ANAM QUI PARLE LA PREMIÈRE (retour du 2026-08-23) ───────────────────────────────────
+   *
+   * ⚠️ SEULEMENT S'IL N'Y A RIEN D'AUTRE À OUVRIR, ET SEULEMENT SI LE FIL EST VIDE. Les cinq
+   * ouvertures d'événement (proposition, invitation, socle, hypothèse, pause) ont quelque chose de
+   * précis à dire : elles passent avant, et les empiler ferait parler Anam deux fois d'affilée
+   * avant qu'on ait dit un mot. Et si le fil porte déjà des tours — la fenêtre de `lireFilRecent`
+   * n'est pas écoulée —, la séance est EN COURS : la rouvrir serait se présenter au milieu d'une
+   * phrase.
+   *
+   * Le prénom et les branches viennent de lectures déjà faites ci-dessus : aucun aller-retour de
+   * plus. `nom` est absent d'une branche dont le nom n'a pas encore été donné — elle n'entre alors
+   * pas dans l'ouverture, faute de mot à rendre.
+   */
+  const ouvertureFinale =
+    ouverture ??
+    (historique.length === 0
+      ? {
+          type: "premiere-parole" as const,
+          phrase: phraseDOuverture({
+            prenom,
+            branchesVivantes: projection.branches
+              .filter((b) => b.etat !== "rayonnement" && b.nom)
+              .map((b) => b.nom as string),
+            dejaVenue: aDejaParle || projection.branches.length > 0,
+          }),
+        }
+      : null);
+
   return (
     <SceneDom
       projection={projection}
-      ouverture={ouverture}
+      ouverture={ouvertureFinale}
       bibliotheque={bibliotheque}
       historique={historique}
       onSocleAnnonce={marquerAnnonceSocleDite}

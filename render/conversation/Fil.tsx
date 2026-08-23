@@ -39,20 +39,41 @@ import s from "./conversation.module.css";
  *
  * Le signal était donc au bon endroit pour le produit, et au mauvais endroit pour elle.
  *
- * ── CE QUI N'A PAS CHANGÉ, ET NE DOIT PAS ──────────────────────────────────────────────────────
+ * ── CE QUI A CHANGÉ LE 2026-08-23, ET CE QUI TIENT ENCORE ──────────────────────────────────────
  *
- * ⚠️ AUCUNE ANIMATION CYCLIQUE. « Jamais trois points qui rebondissent » est une décision de la
- * Story 2.2, pas un détail de style : un indicateur nerveux dit « la machine calcule ». Ici on
- * répète le MÊME geste (le trait s'épaissit, une fois) à l'endroit où l'oeil se trouve. Le glyphe
- * PARAÎT — et le fait qu'il soit apparu EST le signe.
+ * « L'icône de chargement est moche, je veux une fleur de lotus scintillante. » Le glyphe
+ * tronc/branche était le bon SIGNE (« Anam est là ») au mauvais moment : à l'endroit exact où une
+ * réponse intime va paraître, il ressemblait à un fragment de schéma. Le lotus dit la même chose et
+ * le dit mieux — il s'ouvre, ce qui est exactement ce qui se passe.
+ *
+ * ⚠️ ET « SCINTILLANT » N'EST PAS « TROIS POINTS QUI REBONDISSENT ». La décision de la Story 2.2
+ * tient toujours, et elle vise une chose précise : un indicateur NERVEUX dit « la machine calcule »
+ * juste avant qu'Anam parle. Le scintillement ici est LENT (4,2 s par cycle), DÉCALÉ pétale par
+ * pétale, et il ne se déplace pas — c'est la même grammaire que les étoiles de la scène, qui
+ * scintillent depuis la Story 1.7 sans que personne n'y ait jamais lu de l'impatience. Sous
+ * `prefers-reduced-motion`, il est FIXE : la fleur paraît, et le fait qu'elle soit apparue reste
+ * le signe.
  */
 function AnamPrepare() {
   return (
     <div className={`${s.attente} fondu-texte`} aria-hidden>
-      <svg className={s.attenteSigne} viewBox="0 0 24 24" focusable="false">
-        <path d="M12 22 V7" />
-        <path d="M12 12.5 L7 8.5" />
-        <path d="M12 14.5 L17 9.5" />
+      {/* Le lotus, vu de face : quatre pétales extérieurs, deux intérieurs, un cœur. Tracé à la
+          main plutôt qu'importé — c'est le seul glyphe animé du produit, et il doit partager la
+          grammaire de trait de l'arbre (`stroke-linecap: round`, pas de remplissage sauf le cœur). */}
+      <svg className={s.lotus} viewBox="0 0 48 48" focusable="false">
+        <g className={s.lotusPetales}>
+          <path className={s.petale} style={{ "--retard-petale": "0ms" } as React.CSSProperties}
+            d="M24 38 C 8 32 4 22 6 15 C 14 17 21 26 24 38 Z" />
+          <path className={s.petale} style={{ "--retard-petale": "1400ms" } as React.CSSProperties}
+            d="M24 38 C 40 32 44 22 42 15 C 34 17 27 26 24 38 Z" />
+          <path className={s.petale} style={{ "--retard-petale": "700ms" } as React.CSSProperties}
+            d="M24 38 C 14 30 12 19 17 11 C 23 16 26 27 24 38 Z" />
+          <path className={s.petale} style={{ "--retard-petale": "2100ms" } as React.CSSProperties}
+            d="M24 38 C 34 30 36 19 31 11 C 25 16 22 27 24 38 Z" />
+          <path className={s.petale} style={{ "--retard-petale": "2800ms" } as React.CSSProperties}
+            d="M24 38 C 21 28 21 16 24 8 C 27 16 27 28 24 38 Z" />
+        </g>
+        <path className={s.lotusEau} d="M9 39 C 15 41 33 41 39 39" />
       </svg>
     </div>
   );

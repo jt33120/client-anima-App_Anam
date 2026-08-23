@@ -13,7 +13,12 @@
  * ni la fenêtre de détresse, ni le nombre de branches — il ne peut donc rien en dire.
  */
 
-import { VIDE_TITRE, VIDE_CORPS, VIDE_OU_NAISSENT_LES_BRANCHES } from "./copie-arbre";
+import {
+  VIDE_TITRE,
+  VIDE_CORPS,
+  VIDE_CE_QU_EST_L_ARBRE,
+  VIDE_OU_NAISSENT_LES_BRANCHES,
+} from "./copie-arbre";
 import BoutonTronc from "./BoutonTronc";
 import TroncSeul from "./Tronc";
 import s from "./arbre.module.css";
@@ -52,6 +57,19 @@ export default function EtatVideArbre({ direOuNaissentLesBranches, onOuvrirTronc
       <TroncSeul enReserve={Boolean(onOuvrirTronc)} />
       <p className={s.videTitre}>{VIDE_TITRE}</p>
       <p className={s.videCorps}>{VIDE_CORPS}</p>
+
+      {/* ⚠️ CE QU'EST L'ARBRE, ICI ET NULLE PART AILLEURS (retour du 2026-08-23). Cet écran est le
+          seul du produit où il n'y a rien à regarder — donc le seul où il y a la place de
+          l'expliquer, et le seul moment où quelqu'un en a besoin. Dès qu'une branche existe, le
+          dessin explique tout seul et ces trois phrases disparaissent avec l'état vide : aucune
+          persistance, aucun « ne plus afficher », rien à fermer. */}
+      <div className={s.videExplication}>
+        {VIDE_CE_QU_EST_L_ARBRE.map((phrase) => (
+          <p className={s.videCorps} key={phrase}>
+            {phrase}
+          </p>
+        ))}
+      </div>
       {/* Un `<p>` nu, dans le flux, sans bouton ni lien ni fermeture : la phrase n'est pas une bannière,
           elle fait partie de l'écran. Rien à cliquer, donc rien à refuser. */}
       {direOuNaissentLesBranches && <p className={s.videCorps}>{VIDE_OU_NAISSENT_LES_BRANCHES}</p>}

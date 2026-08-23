@@ -54,8 +54,18 @@ function jourDe(valeur: unknown): string | null {
   return m ? m[1] : null;
 }
 
-export async function lireFaitsRetenus(supabase: SupabaseClient): Promise<readonly FaitRetenu[]> {
-  const { data, error } = await supabase.rpc("charger_faits_retenus", { p_max: MEMOIRE_FAITS_MAX });
+/**
+ * `max` est borné par `MEMOIRE_FAITS_MAX` et sert à ne PAS rapatrier 200 lignes d'article 9 quand
+ * l'appelant veut seulement savoir s'il en existe (l'ouverture de séance, 2026-08-23). Une donnée
+ * sensible qu'on ne demande pas est une donnée qui ne traverse aucune couche.
+ */
+export async function lireFaitsRetenus(
+  supabase: SupabaseClient,
+  max: number = MEMOIRE_FAITS_MAX,
+): Promise<readonly FaitRetenu[]> {
+  const { data, error } = await supabase.rpc("charger_faits_retenus", {
+    p_max: Math.min(Math.max(1, Math.trunc(max)), MEMOIRE_FAITS_MAX),
+  });
 
   // ⚠️ `error` DÉSTRUCTURÉ. Sans lui, `data` vaut `null` sur une 5xx PostgREST et l'écran afficherait
   // « Anam ne retient encore rien de précis sur toi. » à quelqu'un qui a trente lignes — le défaut

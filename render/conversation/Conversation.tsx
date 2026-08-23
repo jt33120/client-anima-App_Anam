@@ -68,6 +68,13 @@ function cleDOuverture(o?: OuvertureData | null): string | null {
       // Story 6.4 — au plus une par fenêtre d'apaisement (0055) : la clé n'a rien à distinguer, et
       // sa constance est exactement ce qui empêche un rafraîchissement de rejouer le tour.
       return "r:pause";
+    case "premiere-parole":
+      // ⚠️ LA CLÉ PORTE LA PHRASE, ET C'EST CE QUI EMPÊCHE ANAM DE SE RÉPÉTER. Elle n'a pas
+      // d'identifiant en base : deux séances successives produiraient une clé constante, donc un
+      // rafraîchissement rejouerait la même parole en tête d'un fil qui la contient déjà. La
+      // phrase change avec la matière (le prénom, la branche qu'on reprend) ; quand elle ne change
+      // pas, c'est qu'il n'y a rien de neuf à dire, et la reposer serait un doublon.
+      return `o:${o.phrase}`;
   }
 }
 
@@ -132,6 +139,12 @@ function toursDOuverture(o?: OuvertureData | null): Tour[] {
       // verrouillage, aucune minuterie, aucun écran "tu as assez utilisé l'app" »).
       //
       // Elle se lit, et elle s'en va avec le fil. Le composeur, lui, n'est jamais touché.
+      return [{ id: nouvelId(), role: "anam", texte: o.phrase, etat: "complet" }];
+    case "premiere-parole":
+      // Retour du 2026-08-23 — un TOUR D'ANAM ORDINAIRE, comme `socle-complete` et `pause`, et
+      // pour la même raison poussée d'un cran : ce doit être une PAROLE, pas un dispositif. Une
+      // carte d'accueil, un bandeau « bonjour » ou une bulle de bienvenue en feraient un décor
+      // qu'on apprend à ignorer. Elle se lit, on lui répond, et elle s'en va avec le fil.
       return [{ id: nouvelId(), role: "anam", texte: o.phrase, etat: "complet" }];
   }
 }
