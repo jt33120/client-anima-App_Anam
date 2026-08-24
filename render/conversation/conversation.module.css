@@ -30,66 +30,12 @@
   scroll-behavior: auto;
 }
 
-/* ── Le signe d'attente (Story 6.9, QA T13) : Anam prépare, là où l'œil se trouve ──────────────
-      Le glyphe de la surimpression, à taille lisible, aligné comme un tour d'Anam. Il PARAÎT (fondu
-      d'opacité, neutralisé en reduced-motion par `.fondu-texte`) et ne bouge plus.
-
-      ⚠️ AUCUNE ANIMATION CYCLIQUE — pas de `@keyframes`, pas de pulsation, pas de points. C'est la
-      décision de la Story 2.2, et elle vaut d'autant plus ici : un indicateur nerveux à l'endroit
-      exact où une réponse intime va paraître dirait « la machine calcule », juste avant qu'Anam
-      parle. Le trait épais est le MÊME état que celui de la surimpression, à la bonne échelle. */
-.attente {
-  flex: none;
-  display: flex;
-  align-items: center;
-  min-height: var(--cible-tactile);
-}
-/* ── LE LOTUS D'ATTENTE (retour du 2026-08-23) ─────────────────────────────────────────────────
-   « L'icône de chargement est moche, je veux une fleur de lotus scintillante. »
-
-   ⚠️ LENT, DÉCALÉ, IMMOBILE — ET C'EST CE QUI LE SÉPARE DE « TROIS POINTS QUI REBONDISSENT ».
-   4,2 s par cycle, un retard différent par pétale, aucune translation, aucun changement de taille.
-   C'est la grammaire des étoiles de la scène (`scintille`, story 1.7), pas celle d'un indicateur de
-   progression. Un cycle court ou un déplacement rendraient l'attente NERVEUSE juste avant qu'une
-   réponse intime paraisse — c'est la décision de la Story 2.2, et elle tient. */
-.lotus {
-  width: 34px;
-  height: 34px;
-  fill: none;
-  stroke: var(--arbre-branche);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.petale {
-  fill: color-mix(in srgb, var(--lueur) 18%, transparent);
-  animation: lotus-scintille 4200ms var(--courbe) infinite;
-  animation-delay: var(--retard-petale, 0ms);
-}
-/* L'eau : un trait sous la fleur, immobile. Il donne le sol — sans lui, le lotus flotte. */
-.lotusEau {
-  stroke: var(--bordure-forte);
-  opacity: 0.7;
-}
-@keyframes lotus-scintille {
-  0%,
-  100% {
-    opacity: 0.32;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-/* ⚠️ FIXE SOUS `prefers-reduced-motion`, JAMAIS ABSENT. La fleur PARAÎT (le fondu d'opacité de
-   `.fondu-texte` est lui-même neutralisé ailleurs), et le fait qu'elle soit apparue reste le
-   signe. Supprimer le glyphe rendrait l'attente muette pour qui refuse le mouvement — c'est-à-dire
-   exactement la personne à qui on doit le plus de repères. */
-@media (prefers-reduced-motion: reduce) {
-  .petale {
-    animation: none;
-    opacity: 0.7;
-  }
-}
+/* ── Le signe d'attente : il a DÉMÉNAGÉ (2026-08-24) ──────────────────────────────────────────
+   `.attente`, `.lotus`, `.petale`, `.lotusEau` et `@keyframes lotus-scintille` vivaient ici. Ils
+   sont maintenant dans `LotusAttente.module.css`, avec le dessin qu'ils animent — un module
+   d'animation ne doit pas pouvoir déteindre sur le reste du fil par un nom de classe partagé.
+   La règle de fond n'a pas bougé d'un iota : LENT, DÉCALÉ, AUCUN DÉPLACEMENT, et VISIBLE MAIS
+   FIXE sous `prefers-reduced-motion` (décision de la Story 2.2, jamais rouverte). */
 
 /* Voix d'Anam — Fraunces (t-anam), SANS fond / bulle / bordure. */
 .tourAnam {

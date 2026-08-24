@@ -9,6 +9,7 @@ import CarteAbonnement from "./CarteAbonnement";
 import PropositionBranche from "./PropositionBranche";
 import InvitationIntegration from "./InvitationIntegration";
 import HypotheseEnneagramme from "./HypotheseEnneagramme";
+import { AnamPrepare } from "./LotusAttente";
 import CarteTiree from "../lecture/CarteTiree";
 import Restitution from "../lecture/Restitution";
 import { estAncreEnBas } from "./composeur-clavier";
@@ -48,36 +49,19 @@ import s from "./conversation.module.css";
  *
  * ⚠️ ET « SCINTILLANT » N'EST PAS « TROIS POINTS QUI REBONDISSENT ». La décision de la Story 2.2
  * tient toujours, et elle vise une chose précise : un indicateur NERVEUX dit « la machine calcule »
- * juste avant qu'Anam parle. Le scintillement ici est LENT (4,2 s par cycle), DÉCALÉ pétale par
- * pétale, et il ne se déplace pas — c'est la même grammaire que les étoiles de la scène, qui
- * scintillent depuis la Story 1.7 sans que personne n'y ait jamais lu de l'impatience. Sous
+ * juste avant qu'Anam parle. Le signe ici est LENT (5,2 s par cycle), DÉCALÉ rang par rang, et
+ * AUCUNE forme ne se déplace — c'est la même grammaire que les étoiles de la scène, qui scintillent
+ * depuis la Story 1.7 sans que personne n'y ait jamais lu de l'impatience. Sous
  * `prefers-reduced-motion`, il est FIXE : la fleur paraît, et le fait qu'elle soit apparue reste
  * le signe.
+ *
+ * ── LE DESSIN VIENT D'AILLEURS (2026-08-24) ────────────────────────────────────────────────────
+ *
+ * Le lotus tracé ici à la main a été remplacé par celui de `LotusAttente` — neuf pétales sur trois
+ * rangs, aux tailles et inclinaisons TOUTES différentes. Ce n'est pas de la coquetterie : une
+ * rotation constante fait un glyphe géométrique, et c'est très exactement ce que le premier était.
+ * Le composant vit dans son propre module pour que son animation ne se mélange pas à celle du fil.
  */
-function AnamPrepare() {
-  return (
-    <div className={`${s.attente} fondu-texte`} aria-hidden>
-      {/* Le lotus, vu de face : quatre pétales extérieurs, deux intérieurs, un cœur. Tracé à la
-          main plutôt qu'importé — c'est le seul glyphe animé du produit, et il doit partager la
-          grammaire de trait de l'arbre (`stroke-linecap: round`, pas de remplissage sauf le cœur). */}
-      <svg className={s.lotus} viewBox="0 0 48 48" focusable="false">
-        <g className={s.lotusPetales}>
-          <path className={s.petale} style={{ "--retard-petale": "0ms" } as React.CSSProperties}
-            d="M24 38 C 8 32 4 22 6 15 C 14 17 21 26 24 38 Z" />
-          <path className={s.petale} style={{ "--retard-petale": "1400ms" } as React.CSSProperties}
-            d="M24 38 C 40 32 44 22 42 15 C 34 17 27 26 24 38 Z" />
-          <path className={s.petale} style={{ "--retard-petale": "700ms" } as React.CSSProperties}
-            d="M24 38 C 14 30 12 19 17 11 C 23 16 26 27 24 38 Z" />
-          <path className={s.petale} style={{ "--retard-petale": "2100ms" } as React.CSSProperties}
-            d="M24 38 C 34 30 36 19 31 11 C 25 16 22 27 24 38 Z" />
-          <path className={s.petale} style={{ "--retard-petale": "2800ms" } as React.CSSProperties}
-            d="M24 38 C 21 28 21 16 24 8 C 27 16 27 28 24 38 Z" />
-        </g>
-        <path className={s.lotusEau} d="M9 39 C 15 41 33 41 39 39" />
-      </svg>
-    </div>
-  );
-}
 
 export default function Fil({
   tours,

@@ -16,57 +16,115 @@ import type { ProjectionScene } from "@/lib/scene/projection";
 
 const VIDE: ProjectionScene = { tronc: { present: true }, branches: [] };
 
-const css = () =>
-  readFileSync(resolve(process.cwd(), "render/conversation/conversation.module.css"), "utf-8");
-const regle = (selecteur: string) => {
-  const src = css().replace(/\/\*[\s\S]*?\*\//g, "");
-  const i = src.indexOf(selecteur + " {");
-  expect(i, `${selecteur} a disparu de la feuille`).toBeGreaterThan(-1);
-  return src.slice(i, src.indexOf("}", i));
+const lire = (chemin: string) => readFileSync(resolve(process.cwd(), chemin), "utf-8");
+const sansCommentaires = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, "");
+
+const CSS = () => sansCommentaires(lire("render/conversation/LotusAttente.module.css"));
+const FIL = () => lire("render/conversation/Fil.tsx");
+const LOTUS = () => lire("render/conversation/LotusAttente.tsx");
+
+/** Le corps d'une `@keyframes` — tout ce qui vit entre son nom et sa dernière accolade. */
+const keyframes = (nom: string): string => {
+  const src = CSS();
+  const i = src.indexOf(`@keyframes ${nom}`);
+  expect(i, `@keyframes ${nom} a disparu`).toBeGreaterThan(-1);
+  const j = src.indexOf("\n}", i);
+  return src.slice(i, j + 2);
 };
+
+/** Toutes les `@keyframes` de la feuille, d'un bloc — pour les propriétés qui valent pour TOUTES. */
+const toutesLesKeyframes = (): string =>
+  [...CSS().matchAll(/@keyframes\s+([A-Za-z]+)/g)].map((m) => keyframes(m[1])).join("\n");
 
 describe("[LE LOTUS] scintillant, mais jamais nerveux", () => {
   it("il a remplacé le fragment tronc/branche à l'endroit où l'œil attend la réponse", () => {
-    const fil = readFileSync(resolve(process.cwd(), "render/conversation/Fil.tsx"), "utf-8");
-    expect(fil, "le glyphe d'attente n'est pas un lotus").toMatch(/s\.lotus/);
-    expect(fil.match(/className=\{s\.petale\}/g) ?? [], "un lotus sans pétales").not.toEqual([]);
+    // ⚠️ ON MESURE LE CHEMIN, PAS LE DESSIN. Le lotus a déjà changé de main une fois (tracé ici,
+    // puis livré par Claude Design) : une garde qui épelle des `d="M24 38 C…"` meurt au prochain
+    // dessin sans rien avoir protégé. Ce qui doit tenir, c'est qu'un lotus soit MONTÉ en fin de fil.
+    const fil = FIL();
+    expect(fil, "le signe d'attente ne vient plus de LotusAttente").toMatch(
+      /import\s*\{[^}]*AnamPrepare[^}]*\}\s*from\s*"\.\/LotusAttente"/,
+    );
+    expect(fil, "le signe d'attente n'est plus rendu quand Anam prépare").toMatch(
+      /\{prepare\s*&&\s*<AnamPrepare\s*\/>\}/,
+    );
+    // Et il reste MUET pour les lecteurs d'écran : l'attente est dite par la région aria-live du
+    // Fil (`ANNONCE_ATTENTE`), jamais deux fois.
+    expect(LOTUS(), "le glyphe décoratif n'est plus aria-hidden : l'attente serait dite deux fois")
+      .toMatch(/className=\{`\$\{s\.attente\}[^`]*`\}\s+aria-hidden/);
   });
 
   it("[LE CŒUR] le cycle est LENT et DÉCALÉ — c'est ce qui le sépare de trois points qui rebondissent", () => {
     // ⚠️ LA DÉCISION DE LA STORY 2.2 TIENT, elle vise un indicateur NERVEUX. On mesure donc la
-    // nervosité, pas la présence d'animation : un cycle court, ou des pétales synchrones, redonnent
+    // nervosité, pas la présence d'animation : un cycle court, ou des rangs synchrones, redonnent
     // exactement le battement qu'on refuse — juste avant qu'une réponse intime paraisse.
-    const bloc = regle(".petale");
-    const duree = Number(/animation:[^;]*?(\d+)ms/.exec(bloc)?.[1]);
-    expect(Number.isFinite(duree), "aucune durée d'animation lisible").toBe(true);
-    expect(duree, `cycle de ${duree} ms : c'est un battement, pas un scintillement`).toBeGreaterThanOrEqual(3000);
-    expect(bloc, "sans retard par pétale, la fleur clignote d'un bloc").toMatch(/animation-delay:\s*var\(--retard-petale/);
+    const css = CSS();
+    const cycles = [...css.matchAll(/--cycle:\s*(\d+)ms/g)].map((m) => Number(m[1]));
+    expect(cycles.length, "aucun cycle déclaré").toBeGreaterThan(0);
+    for (const c of cycles) {
+      expect(c, `cycle de ${c} ms : c'est un battement, pas un scintillement`).toBeGreaterThanOrEqual(3000);
+    }
 
-    const fil = readFileSync(resolve(process.cwd(), "render/conversation/Fil.tsx"), "utf-8");
-    const retards = [...fil.matchAll(/--retard-petale":\s*"(\d+)ms"/g)].map((m) => Number(m[1]));
-    expect(retards.length, "aucun retard posé sur les pétales").toBeGreaterThan(2);
-    expect(new Set(retards).size, "les pétales partagent leurs retards : ils scintillent ensemble").toBe(
-      retards.length,
-    );
+    // Les trois rangs s'allument du fond vers l'avant. S'ils partagent leur retard, la fleur
+    // clignote d'un bloc et la profondeur disparaît.
+    // ⚠️ UNE CLASSE EST DÉCLARÉE PLUSIEURS FOIS (épaisseur de trait ici, animation là) : lire le
+    // PREMIER bloc venu renvoie 0 pour les trois rangs et fait passer la garde pour une bonne
+    // raison qui n'existe pas. On rassemble donc TOUS les blocs de la classe.
+    const retard = (classe: string) => {
+      const blocs = [...css.matchAll(new RegExp(`\\.${classe}\\s*\\{([^}]*)\\}`, "g"))].map((m) => m[1]);
+      expect(blocs.length, `.${classe} a disparu de la feuille`).toBeGreaterThan(0);
+      const anime = blocs.find((b) => b.includes("animation:"));
+      expect(anime, `.${classe} ne s'anime plus du tout`).toBeDefined();
+      return Number(/animation-delay:\s*(\d+)ms/.exec(blocs.join("\n"))?.[1] ?? 0);
+    };
+    const retards = [retard("rangArriere"), retard("rangAvant"), retard("rangCoeur")];
+    expect(new Set(retards).size, `les rangs partagent leurs retards (${retards}) : ils s'allument ensemble`)
+      .toBe(retards.length);
   });
 
-  it("[LE CŒUR] rien ne se DÉPLACE, rien ne change de taille — seule l'opacité respire", () => {
-    // Une translation ou une mise à l'échelle transformerait le signe en indicateur de progression.
-    const src = css().replace(/\/\*[\s\S]*?\*\//g, "");
-    const anim = src.slice(src.indexOf("@keyframes lotus-scintille"));
-    const corps = anim.slice(0, anim.indexOf("\n}\n") + 3);
-    expect(corps, "le lotus bouge : ce n'est plus un scintillement").not.toMatch(
-      /transform|translate|scale|rotate|width|height/,
+  it("[LE CŒUR] RIEN NE SE DÉPLACE, et la fleur RESPIRE au lieu de battre", () => {
+    // Une translation ferait de l'attente un indicateur de progression. Une mise à l'échelle FRANCHE
+    // ferait une pulsation — le battement de la 2.2 sous un autre nom. Le souffle de la fleur est
+    // donc borné : ±5 % maximum. (Le halo, lui, est une LUEUR et non une forme : il a le droit de
+    // gonfler, c'est même tout le dessin.)
+    expect(toutesLesKeyframes(), "quelque chose se déplace : ce n'est plus un scintillement").not.toMatch(
+      /translate|\btop\b|\bleft\b|margin/,
+    );
+    const echelles = [...keyframes("lotusSouffle").matchAll(/scale\(([\d.]+)\)/g)].map((m) => Number(m[1]));
+    expect(echelles.length, "la fleur ne respire plus du tout").toBeGreaterThan(0);
+    for (const e of echelles) {
+      expect(e, `scale(${e}) : la fleur bat au lieu de respirer`).toBeGreaterThanOrEqual(0.95);
+      expect(e, `scale(${e}) : la fleur bat au lieu de respirer`).toBeLessThanOrEqual(1.05);
+    }
+  });
+
+  it("[LA FLUIDITÉ] aucun filtre n'est recalculé à chaque trame", () => {
+    // ⚠️ CETTE GARDE EST NÉE D'UN DÉFAUT PAYÉ. Un `filter: blur()` animé — ou seulement présent sur
+    // un élément dont une autre propriété s'anime — se recalcule à CHAQUE trame. Un blur plein écran
+    // a déjà fait tomber cette application à 4 images par seconde le 2026-08-23. Ici le flou est
+    // minuscule et STATIQUE : il est calculé une fois. Qu'il le reste.
+    expect(toutesLesKeyframes(), "un filtre est animé : il se recalcule à chaque trame").not.toMatch(
+      /filter|backdrop/,
     );
   });
 
   it("sous `prefers-reduced-motion`, il est FIXE mais jamais absent", () => {
     // Le supprimer rendrait l'attente muette pour qui refuse le mouvement — c'est-à-dire
     // exactement la personne à qui on doit le plus de repères.
-    const src = css().replace(/\/\*[\s\S]*?\*\//g, "");
-    const rm = src.slice(src.indexOf("@media (prefers-reduced-motion: reduce)"));
-    expect(rm).toMatch(/\.petale\s*\{[^}]*animation:\s*none/);
-    expect(rm, "l'opacité doit rester lisible, sinon la fleur disparaît").toMatch(/\.petale\s*\{[^}]*opacity:\s*0?\.[5-9]/);
+    const css = CSS();
+    const rm = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
+    expect(rm, "les animations tournent encore").toMatch(/animation:\s*none/);
+    expect(rm, "la fleur n'est plus posée : l'attente devient muette").toMatch(
+      /\.rang\s*\{[^}]*opacity:\s*0?\.[5-9]/,
+    );
+    // Et la fleur elle-même n'est jamais masquée : seuls les éclats, qui n'existent QUE par leur
+    // apparition, sont retirés plutôt que figés à mi-course.
+    const masques = [...rm.matchAll(/([^{}]+)\{[^}]*display:\s*none/g)].map((m) => m[1].trim());
+    for (const sel of masques) {
+      expect(sel, `${sel} masqué sous reduced-motion : la fleur disparaît`).not.toMatch(
+        /\.rang\b|\.fleur|\.halo|\.coeur/,
+      );
+    }
   });
 });
 

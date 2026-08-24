@@ -1,0 +1,134 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   LE LOTUS D'ATTENTE — pastel, dessine (variantes « rose ancien » et « eau claire »)
+   Remplace .lotus/.petale de conversation.module.css. Toute l'animation est ici :
+   le SVG ne porte que la geometrie et les couleurs.
+
+   LE PRINCIPE : une lumiere nait au coeur, gonfle a travers la fleur, reflue. Les trois
+   rangs de petales s'allument du fond vers l'avant (retards 210 -> 90 -> 0 ms), ce qui
+   donne la profondeur sans deplacer aucune forme. Les neuf petales ont des tailles et des
+   inclinaisons TOUTES differentes : c'est ce qui sort le glyphe de la geometrie.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.attente {
+  flex: none;
+  display: flex;
+  align-items: center;
+  min-height: var(--cible-tactile, 44px);
+}
+
+.lotus {
+  width: var(--taille-lotus, 34px);
+  height: var(--taille-lotus, 34px);
+  overflow: visible;
+  --courbe-lotus: cubic-bezier(0.42, 0, 0.32, 1);
+}
+.rose { --cycle: 4000ms; }
+.eau { --cycle: 5200ms; }
+
+/* Epaisseurs de trait : ici et pas en attribut, pour que .reduit puisse les remonter
+   a 34 px sans toucher au markup. */
+.rangArriere { stroke-width: 0.85; }
+.rangAvant { stroke-width: 0.95; }
+.rangCoeur { stroke-width: 0.8; }
+.nervures { stroke-width: 0.4; opacity: 0.5; }
+.eauTrait1 { stroke-width: 0.95; opacity: 0.55; }
+.eauTrait2 { stroke-width: 0.8; opacity: 0.38; }
+.eauTrait3 { stroke-width: 0.6; opacity: 0.26; }
+.grain { opacity: 0.05; mix-blend-mode: soft-light; }
+
+/* ── LE SOUFFLE ─────────────────────────────────────────────────────────────── */
+@keyframes lotusHalo {
+  0%, 100% { opacity: 0.05; transform: scale(0.45); }
+  45% { opacity: 1; transform: scale(1.02); }
+  72% { opacity: 0.28; transform: scale(1.2); }
+}
+@keyframes lotusVoile {
+  0%, 100% { opacity: 0.22; }
+  45% { opacity: 1; }
+  78% { opacity: 0.4; }
+}
+@keyframes lotusVoileTard {
+  0%, 100% { opacity: 0.14; }
+  52% { opacity: 0.95; }
+  82% { opacity: 0.3; }
+}
+@keyframes lotusSouffle {
+  0%, 100% { transform: scale(0.975); }
+  45% { transform: scale(1.025); }
+}
+@keyframes lotusCoeur {
+  0%, 100% { opacity: 0.35; transform: scale(0.7); }
+  44% { opacity: 1; transform: scale(1.15); }
+}
+@keyframes lotusReflet {
+  0%, 100% { opacity: 0.08; }
+  45% { opacity: 0.55; }
+}
+@keyframes lotusPoussiere {
+  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  40% { opacity: 0.9; transform: scale(1) rotate(25deg); }
+  68% { opacity: 0; transform: scale(0.7) rotate(40deg); }
+}
+
+.halo {
+  animation: lotusHalo var(--cycle) var(--courbe-lotus) infinite;
+  transform-origin: 24px 27px;
+}
+.fleur {
+  animation: lotusSouffle var(--cycle) var(--courbe-lotus) infinite;
+  transform-origin: 24px 34px;
+}
+.rangArriere {
+  animation: lotusVoileTard var(--cycle) var(--courbe-lotus) infinite;
+  animation-delay: 210ms;
+}
+.rangAvant {
+  animation: lotusVoile var(--cycle) var(--courbe-lotus) infinite;
+  animation-delay: 90ms;
+}
+.rangCoeur {
+  animation: lotusVoile var(--cycle) var(--courbe-lotus) infinite;
+}
+.coeur {
+  animation: lotusCoeur var(--cycle) var(--courbe-lotus) infinite;
+  transform-origin: 24px 32.4px;
+}
+.reflet {
+  animation: lotusReflet var(--cycle) var(--courbe-lotus) infinite;
+}
+.etincelles > * {
+  animation: lotusPoussiere var(--cycle) ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.e1 { animation-delay: 520ms; }
+.e2 { animation-delay: 1800ms; }
+.e3 { animation-delay: 1100ms; }
+.e4 { animation-delay: 2400ms; }
+.e5 { animation-delay: 3000ms; }
+.e6 { animation-delay: 2000ms; }
+
+/* ── 34 px : on enleve ce qui devient du bruit ───────────────────────────────── */
+.reduit .detail { display: none; }
+.reduit .rangArriere path:nth-child(2),
+.reduit .rangArriere path:nth-child(3) { display: none; }
+.reduit .rangArriere { stroke-width: 1.15; }
+.reduit .rangAvant { stroke-width: 1.2; }
+.reduit .rangCoeur { display: none; }
+.reduit .eauTrait1 { stroke-width: 1.15; }
+.reduit .eauTrait2 { stroke-width: 1; opacity: 0.35; }
+.reduit .coeur { filter: none; }
+
+/* FIXE SOUS prefers-reduced-motion, JAMAIS ABSENT (regle 3 du brief). La fleur reste
+   posee, lisible, dans son etat le plus clair : le fait qu'elle soit apparue est le
+   signe. Etincelles et reflet — qui n'existent que par leur apparition — sont retires
+   plutot que figes a mi-course. */
+@media (prefers-reduced-motion: reduce) {
+  .halo, .fleur, .rang, .coeur, .reflet, .etincelles > * {
+    animation: none !important;
+  }
+  .halo { opacity: 0.5; transform: scale(0.95); }
+  .rang { opacity: 0.85; }
+  .coeur { opacity: 0.8; transform: none; }
+  .etincelles, .reflet { display: none; }
+}
