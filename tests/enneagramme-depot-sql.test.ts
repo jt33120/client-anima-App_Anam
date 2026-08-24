@@ -9,6 +9,7 @@ import {
   reponsesDepuisJson,
 } from "@/lib/data/lire-enneagramme";
 import { ITEMS } from "@/lib/domain/enneagramme-items";
+import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
 import type { ReponseItem } from "@/lib/domain/enneagramme";
 
 /**
@@ -195,8 +196,22 @@ describe("[5.5/AC1] conclure le test court", () => {
     if (type.statut !== "calcule") return;
     expect(type.type).toBe(4);
     expect(type.origine).toBe("test");
-    // v1 : les neuf créneaux sont déclarés et aucun n'est écrit. L'écran le dit honnêtement.
-    expect(type.texte).toEqual({ statut: "non_ecrit" });
+    // ⚠️ ELLE ATTENDAIT `{ statut: "non_ecrit" }` AU MOT PRÈS, avec pour justification « v1 : aucun
+    // créneau n'est écrit ». C'était l'état du corpus, pas une règle — et le 2026-08-24 les neuf
+    // textes ont été écrits, ce qui l'a fait tomber sans qu'une seule ligne de code ait bougé.
+    //
+    // Et le corpus plein permet enfin de garder ce qui compte VRAIMENT ici, et qui était
+    // INDÉMONTRABLE tant qu'il était vide : que la jointure serve le texte DU TYPE RELU EN BASE, et
+    // pas celui d'un autre. Neuf créneaux vides sont neuf objets égaux — le mutant « rends toujours
+    // le premier » y passait sans broncher, et c'est écrit noir sur blanc dans l'en-tête de
+    // `corpus-enneagramme.test.ts`. Ici, la base dit 4 : le texte servi doit être celui du 4.
+    expect(type.texte).toEqual(texteDuTypeRetenu(4));
+    if (type.texte.statut === "ecrit" && texteDuTypeRetenu(5).statut === "ecrit") {
+      expect(
+        type.texte,
+        "le texte du 4 est celui du 5 : la jointure ne distingue plus les types",
+      ).not.toEqual(texteDuTypeRetenu(5));
+    }
 
     // Les dix-huit auto-évaluations ne survivent PAS au type qu'on en tire (décision Julian).
     expect(await lireTentativeEnneagramme(u.client, u.id)).toEqual({
