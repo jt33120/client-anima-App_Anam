@@ -61,15 +61,22 @@ describe("[6.9/T13] Anam prépare : un signe EN BAS DU FIL", () => {
     expect(iSigne).toBeGreaterThan(iDernierTour);
   });
 
-  it("[LE CŒUR] AUCUNE animation cyclique — la décision de la 2.2 n'est pas rouverte", () => {
-    // « Jamais trois points qui rebondissent ». Un `@keyframes` dans la feuille de la conversation
-    // à l'endroit exact où une réponse intime va paraître dirait « la machine calcule ».
-    const css = readFileSync(
-      resolve(__dirname, "../../render/conversation/conversation.module.css"),
-      "utf-8",
+  it("[LE CŒUR] RIEN NE PULSE dans la feuille du fil — la décision de la 2.2 n'est pas rouverte", () => {
+    // ⚠️ CETTE GARDE PASSAIT À VIDE DEPUIS LE 2026-08-24. Elle découpait 600 caractères à partir de
+    // `.attente` ; le jour où cette classe a déménagé dans `LotusAttente.module.css`, `indexOf` a
+    // renvoyé -1, `slice(-1, 600)` a renvoyé UN caractère, et plus rien n'était mesuré. Elle est
+    // restée verte en ne gardant rien — le pire état possible pour une garde.
+    //
+    // Ce qui est vrai et MENACÉ, maintenant que le lotus vit dans son propre module : que RIEN
+    // D'AUTRE dans la conversation ne pulse. Un halo qui respire sur une bulle, un filet qui
+    // clignote, une carte qui bat — chacun rouvrirait « la machine calcule » à l'endroit exact où
+    // une réponse intime paraît. Le signe d'attente, lui, est mesuré ailleurs (lotus-et-arbre-vide),
+    // où l'on vérifie qu'il reste LENT et qu'aucune forme ne s'y déplace.
+    const css = sansCommentaires(
+      readFileSync(resolve(__dirname, "../../render/conversation/conversation.module.css"), "utf-8"),
     );
-    const bloc = css.slice(css.indexOf(".attente"), css.indexOf(".attente") + 600);
-    expect(bloc).not.toMatch(/animation|@keyframes/);
+    expect(css.length, "la feuille de la conversation a disparu").toBeGreaterThan(500);
+    expect(css, "quelque chose pulse dans le fil").not.toMatch(/@keyframes|animation\s*:/);
   });
 
   it("[LE CŒUR] l'attente EST annoncée — par la région qui existe déjà", () => {
