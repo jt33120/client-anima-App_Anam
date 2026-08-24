@@ -89,9 +89,10 @@ export const SECTIONS: readonly Section[] = Object.freeze([
     paragraphes: [
       "Anam est une intelligence artificielle. Ce qu’elle te répond est produit par un modèle, et " +
         "c’est écrit partout où elle parle.",
-      "Les textes des cartes, eux, sont écrits à la main par Anima. Aucun n’est produit par un " +
-        "modèle, et c’est pour ça que certaines cartes disent honnêtement qu’elles attendent encore " +
-        "le leur, au lieu d’afficher quelque chose qui aurait l’air d’un texte.",
+      "Les textes des cartes, eux, ne sortent pas du modèle. Ce sont pour l’instant des premières " +
+        "versions, en attendant qu’Anima les reprenne à la main — et quelques cartes disent " +
+        "honnêtement qu’elles attendent encore la leur, au lieu d’afficher quelque chose qui aurait " +
+        "l’air d’un texte.",
     ],
   },
   {

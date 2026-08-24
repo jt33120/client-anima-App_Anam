@@ -1,4 +1,11 @@
-import { corpus, lireTexte, NON_ECRIT, type Corpus, type TexteCorpus } from "./port";
+import {
+  corpus,
+  lireTexte,
+  type Corpus,
+  type TexteCorpus,
+  creneau,
+  NON_ECRIT,
+} from "./port";
 import { normaliserTexte } from "../domain/normalisation-texte";
 import { CLES_JEU, type CleCarteJeu } from "../tirage/jeu";
 
@@ -37,12 +44,18 @@ import { CLES_JEU, type CleCarteJeu } from "../tirage/jeu";
  */
 
 /** Clé de créneau : `"description:<clé de carte>"`. */
-export const cleDescription = (carte: CleCarteJeu): string => `description:${carte}`;
+export const cleDescription = (carte: CleCarteJeu): string =>
+  `description:${carte}`;
 
 /** Les 21 créneaux, DÉRIVÉS du jeu — jamais recopiés (une liste recopiée diverge à la première carte ajoutée). */
 export const CORPUS_DESCRIPTION_CARTES: Corpus = corpus(
   "description-cartes",
-  Object.fromEntries(CLES_JEU.map((carte) => [cleDescription(carte), NON_ECRIT])),
+  Object.fromEntries(
+    CLES_JEU.map((carte) => [
+      cleDescription(carte),
+      creneau(cleDescription(carte)),
+    ]),
+  ),
 );
 
 /** La description littérale d'une carte — le texte alternatif de son visuel. */
@@ -69,7 +82,10 @@ export function lireDescriptionCarte(carte: CleCarteJeu): TexteCorpus {
  * un visuel d'emprunt (FR-022) ni nommer la carte (FR-018).
  */
 export function lireDescriptionCarteArchivee(carte: string): TexteCorpus {
-  return Object.hasOwn(CORPUS_DESCRIPTION_CARTES.textes, cleDescription(carte as CleCarteJeu))
+  return Object.hasOwn(
+    CORPUS_DESCRIPTION_CARTES.textes,
+    cleDescription(carte as CleCarteJeu),
+  )
     ? lireDescriptionCarte(carte as CleCarteJeu)
     : NON_ECRIT;
 }

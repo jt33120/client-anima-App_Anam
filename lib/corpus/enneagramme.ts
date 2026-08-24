@@ -1,5 +1,15 @@
-import { corpus, lireTexte, NON_ECRIT, type Corpus, type TexteCorpus } from "./port";
-import { TYPES, type ResultatTest, type TypeEnneagramme } from "../domain/enneagramme";
+import {
+  corpus,
+  lireTexte,
+  type Corpus,
+  type TexteCorpus,
+  creneau,
+} from "./port";
+import {
+  TYPES,
+  type ResultatTest,
+  type TypeEnneagramme,
+} from "../domain/enneagramme";
 
 /**
  * enneagramme.ts — LES NEUF INTERPRÉTATIONS DE TYPE (Story 5.5, AC1 — FR-054).
@@ -36,13 +46,17 @@ export const CARDINAL_ENNEAGRAMME = 9;
  */
 export function cleEnneagramme(type: number): string {
   if (!Number.isInteger(type) || type < 1 || type > CARDINAL_ENNEAGRAMME) {
-    throw new Error(`corpus ennéagramme : type hors domaine (${type}) — attendu 1..${CARDINAL_ENNEAGRAMME}`);
+    throw new Error(
+      `corpus ennéagramme : type hors domaine (${type}) — attendu 1..${CARDINAL_ENNEAGRAMME}`,
+    );
   }
   return `enneagramme:${type}`;
 }
 
 /** Les neuf clés, dans l'ordre des types. Exportée pour rendre la complétude mesurable. */
-export const CLES_ENNEAGRAMME: readonly string[] = Object.freeze(TYPES.map((t) => `enneagramme:${t}`));
+export const CLES_ENNEAGRAMME: readonly string[] = Object.freeze(
+  TYPES.map((t) => `enneagramme:${t}`),
+);
 
 /**
  * ⚠️ TOUS LES CRÉNEAUX SONT `NON_ECRIT`. La table se construit depuis `CLES_ENNEAGRAMME` plutôt
@@ -54,7 +68,7 @@ export const CLES_ENNEAGRAMME: readonly string[] = Object.freeze(TYPES.map((t) =
  */
 export const CORPUS_ENNEAGRAMME: Corpus = corpus(
   "enneagramme",
-  Object.fromEntries(CLES_ENNEAGRAMME.map((cle) => [cle, NON_ECRIT])),
+  Object.fromEntries(CLES_ENNEAGRAMME.map((cle) => [cle, creneau(cle)])),
 );
 
 /**

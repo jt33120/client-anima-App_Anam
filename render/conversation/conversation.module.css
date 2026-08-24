@@ -242,8 +242,12 @@
   position: relative;
   display: inline-block;
 }
+/* ⚠️ ELLE ÉTAIT TROP PETITE (retour du 2026-08-23 : « l'image devrait prendre plus de place »).
+   96 à 140 px sur un écran de 390 : un portrait de la taille d'une vignette de contact, au-dessus
+   d'un fil vide. C'est la SEULE présence d'Anam à l'écran, et l'écran de conversation est le sien.
+   On la porte à 40 % de la largeur, bornée à 240 px pour qu'elle ne mange pas le fil sur tablette. */
 .imageAnam.presence {
-  width: clamp(96px, 30vw, 140px);
+  width: clamp(150px, 40vw, 240px);
   aspect-ratio: 4 / 5;
 }
 .imageAnam.seuil {

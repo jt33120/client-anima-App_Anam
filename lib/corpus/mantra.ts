@@ -1,5 +1,11 @@
 import { indiceDuJour, type JourCivil } from "@/lib/astro/quotidien";
-import { corpus, lireTexte, type Corpus, type TexteCorpus, NON_ECRIT } from "./port";
+import {
+  corpus,
+  lireTexte,
+  type Corpus,
+  type TexteCorpus,
+  creneau,
+} from "./port";
 
 /**
  * mantra.ts — LES 60 MANTRAS DU JOUR (Story 5.4, FR-054 / FR-080 / FR-086).
@@ -64,7 +70,9 @@ export const CARDINAL_MANTRA = 60;
 /** La clé d'un créneau : `"mantra:7"`. Même format qu'en 5.2 — `"<domaine>:<valeur>"`. */
 export function cleMantra(rang: number): string {
   if (!Number.isInteger(rang) || rang < 1 || rang > CARDINAL_MANTRA) {
-    throw new Error(`corpus mantra : rang hors domaine (${rang}) — attendu 1..${CARDINAL_MANTRA}`);
+    throw new Error(
+      `corpus mantra : rang hors domaine (${rang}) — attendu 1..${CARDINAL_MANTRA}`,
+    );
   }
   return `mantra:${rang}`;
 }
@@ -85,7 +93,7 @@ export const CLES_MANTRA: readonly string[] = Object.freeze(
  */
 export const CORPUS_MANTRA: Corpus = corpus(
   "mantra",
-  Object.fromEntries(CLES_MANTRA.map((cle) => [cle, NON_ECRIT])),
+  Object.fromEntries(CLES_MANTRA.map((cle) => [cle, creneau(cle)])),
 );
 
 /**

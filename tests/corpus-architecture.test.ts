@@ -48,6 +48,8 @@ import { NOMBRES } from "@/lib/astro/numerologie";
  * pour de bon, sans qu'une ligne change ici.
  */
 
+import { texteDeBase } from "@/lib/corpus/textes-de-base";
+
 const RACINE = process.cwd();
 
 function sansCommentaires(source: string): string {
@@ -73,8 +75,11 @@ describe("[AD-1/DUR] lib/corpus est une couche PURE", () => {
     // ⚠️ UN COMPTE EXACT, JAMAIS `toBeGreaterThan`. Relâcher cette assertion pour faire passer une
     // story est précisément la façon dont les gardes meurent : un corpus ajouté sans être inscrit
     // ici échapperait à TOUTES les gardes de ce fichier sans que rien ne rougisse.
-    expect(FICHIERS_CORPUS.length, "aucun fichier trouvé dans lib/corpus — garde vide").toBe(7);
+    expect(FICHIERS_CORPUS.length, "aucun fichier trouvé dans lib/corpus — garde vide").toBe(8);
     expect(FICHIERS_CORPUS).toContain("lib/corpus/port.ts");
+    // 2026-08-23 — les textes de DÉPART, écrits sur décision de Julian en attendant Anima. Ils
+    // vivent ici, donc sous les mêmes gardes que le reste : voix, prédiction, pureté.
+    expect(FICHIERS_CORPUS).toContain("lib/corpus/textes-de-base.ts");
     expect(FICHIERS_CORPUS).toContain("lib/corpus/numerologie.ts");
     // Story 5.4 — les deux corpus du socle quotidien vivent sous EXACTEMENT les mêmes gardes.
     expect(FICHIERS_CORPUS).toContain("lib/corpus/mantra.ts");
@@ -424,16 +429,24 @@ describe("[FR-053/FR-054] le corpus réel passe le balayage", () => {
   });
 
   it("[porte pré-lancement] l'inventaire dit exactement où on en est", () => {
+    // ⚠️ CE TEST ATTENDAIT ZÉRO, ET C'ÉTAIT LA BONNE GARDE JUSQU'AU 2026-08-23. Il protégeait
+    // FR-054/FR-086 : aucun texte ne devait apparaître sous le nom d'Anima sans venir d'elle.
+    // Julian a tranché — « tu dois faire les cartes de base, et Anima corrigera » — et les 69
+    // créneaux portent désormais un texte de DÉPART (`lib/corpus/textes-de-base.ts`).
+    //
+    // La garde ne disparaît pas, elle change d'objet : ce qui est interdit n'est plus qu'un texte
+    // existe, c'est qu'il existe SANS PASSER PAR LA TABLE DE BASE. Un texte écrit en dur dans un
+    // fichier de famille échapperait à la relecture d'Anima — elle vide une table, pas six
+    // fichiers — et c'est exactement ce que le compte gardait.
     const ecrites = clesEcrites(CORPUS_NUMEROLOGIE);
     const restantes = clesNonEcrites(CORPUS_NUMEROLOGIE);
     expect(ecrites.length + restantes.length).toBe(69);
-    // ⚠️ Ce chiffre est VOULU. Il monte quand Anima écrit — jamais quand un modèle « aide ».
-    expect(
-      ecrites.length,
-      "des textes sont apparus dans le corpus : vérifier qu'ils viennent bien d'Anima (FR-054/FR-086), " +
-        "puis mettre à jour ce compte et le tableau de lib/corpus/README.md",
-    ).toBe(0);
-    expect(restantes.length).toBe(69);
+    for (const cle of ecrites) {
+      expect(
+        texteDeBase(cle),
+        `${cle} porte un texte qui ne vient PAS de la table de base : Anima ne pourra pas le retirer`,
+      ).toBeDefined();
+    }
   });
 });
 
@@ -455,7 +468,11 @@ describe("[AC2] un créneau non écrit ne se déguise jamais en texte", () => {
     // elle resterait vide pour toujours et l'inventaire ne la compterait jamais.
     expect(() => lireTexte(CORPUS_NUMEROLOGIE, "chemin_de_vie:44")).toThrow(/non déclaré/);
     expect(() => lireTexte(CORPUS_NUMEROLOGIE, "nimporte:1")).toThrow();
-    expect(lireTexte(CORPUS_NUMEROLOGIE, "chemin_de_vie:7")).toEqual(NON_ECRIT);
+    // ⚠️ ON NE SE SERT PLUS DU VIDE COMME TÉMOIN. Cette ligne lisait un créneau réel en attendant
+    // `NON_ECRIT` — vrai tant que le corpus était vide, et devenu faux le jour où il s'est rempli.
+    // Ce qui compte n'a jamais été la valeur : c'est que la clé DÉCLARÉE ne jette pas.
+    expect(() => lireTexte(CORPUS_NUMEROLOGIE, "chemin_de_vie:7")).not.toThrow();
+    expect(lireTexte(CORPUS_NUMEROLOGIE, "chemin_de_vie:7").statut).toMatch(/^(ecrit|non_ecrit)$/);
   });
 
   it("le corpus est GELÉ — personne n'y écrit à l'exécution", () => {
@@ -496,8 +513,11 @@ describe("[T1] les 69 créneaux sont dérivés, jamais recopiés", () => {
 
 describe("[T5] la jonction nombre → texte ne fabrique rien", () => {
   it("un nombre calculé mène à son créneau", () => {
+    // Le créneau EXISTE et se lit : c'est la jonction qu'on teste, pas son contenu (qui a cessé
+    // d'être vide le 2026-08-23).
     const t = texteDe("chemin_de_vie", { statut: "calcule", valeur: 7, maitre: false });
-    expect(t).toEqual(NON_ECRIT);
+    expect(t).not.toBeNull();
+    expect(t!.statut).toMatch(/^(ecrit|non_ecrit)$/);
   });
 
   it("un nombre NON calculé n'a pas de créneau — on ne cherche pas le sens de ce qu'on n'a pas", () => {
@@ -508,12 +528,19 @@ describe("[T5] la jonction nombre → texte ne fabrique rien", () => {
   });
 
   it("ne rend JAMAIS une chaîne vide en guise de texte manquant", () => {
+    // ⚠️ LA PROPRIÉTÉ EST L'ABSENCE DE FAUX-SEMBLANT, pas l'absence de texte. Un créneau non écrit
+    // ne porte AUCUN champ `texte` (sinon `?? ""` quelque part le ferait passer pour vide) ; un
+    // créneau écrit en porte un, non vide. Les deux cas sont vérifiés, et aucun ne suppose que le
+    // corpus soit vide — ce qu'il n'est plus.
     for (const n of NOMBRES) {
       for (const v of valeursPossibles(n)) {
         const t = texteDe(n, { statut: "calcule", valeur: v, maitre: false });
         expect(t, `${n}:${v}`).not.toBeNull();
-        expect(t!.statut, `${n}:${v}`).toBe("non_ecrit");
-        expect("texte" in t!, `${n}:${v} porte un champ texte`).toBe(false);
+        if (t!.statut === "non_ecrit") {
+          expect("texte" in t!, `${n}:${v} non écrit porte quand même un champ texte`).toBe(false);
+        } else {
+          expect(t!.texte.trim().length, `${n}:${v} écrit mais vide`).toBeGreaterThan(0);
+        }
       }
     }
   });

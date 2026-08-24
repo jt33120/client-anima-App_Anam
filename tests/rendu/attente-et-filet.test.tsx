@@ -160,7 +160,19 @@ describe("[6.9/T26] Le bloc de ressources est AMENÉ dans le champ", () => {
     const css = readFileSync(resolve(__dirname, "../../render/monde.module.css"), "utf-8");
     const bloc = css.slice(css.indexOf(".regionConversation"), css.indexOf(".titreConversation"));
     expect(bloc).toMatch(/overflow:\s*hidden/);
-    expect(bloc).toMatch(/padding-top:\s*var\(--cible-tactile\)/);
+    // ⚠️ LE HAUT A CHANGÉ LE 2026-08-23, ET C'EST ENCORE UNE CORRECTION DE CETTE GARDE. Elle
+    // exigeait `--cible-tactile` NU en haut — 44 px. L'intention restait juste : cette région ne
+    // défile pas, elle n'a pas à payer l'air anti-débordement. Mais la valeur était fausse, comme
+    // elle l'avait déjà été en bas : la surimpression fait `--cible-tactile + --esp-6`, soit 76 px.
+    // Le titre « Anam » démarrait donc 32 px À L'INTÉRIEUR de la bande où flottent « Anam est une
+    // IA », « Profil » et la porte de secours — visible sur la capture du 2026-08-23, où les deux
+    // se chevauchent.
+    //
+    // Ce qui est gardé reste le même : la RÉSERVE de la surimpression, jamais l'air en plus. Ce
+    // qu'on refuse est ce que `.region` ajoute pour le débordement, et cette région ne déborde pas.
+    expect(bloc, "la réserve du haut doit valoir la hauteur RÉELLE de la surimpression").toMatch(
+      /padding-top:\s*calc\(var\(--cible-tactile\)\s*\+\s*var\(--esp-6\)\)/,
+    );
     // ⚠️ LE BAS A CHANGÉ LE 2026-08-18, ET C'EST UNE CORRECTION DE CETTE GARDE, PAS SON ABANDON.
     // Elle exigeait `--cible-tactile` (44 px) en bas. L'intention était juste — ne pas payer les
     // 32 px d'air anti-débordement dont cette région n'a pas besoin — mais la valeur était fausse :

@@ -141,7 +141,17 @@ describe("Surimpression — le RENDU obéit au MODÈLE (art. 50 / AD-7, revue 1.
   });
 
   it("la porte de secours est bien rendue (son inconditionnalité est garantie par le type porteSecours: true + le test modèle)", () => {
-    expect(composant).toMatch(/className={s\.porteSecours}/);
+    // ⚠️ ON CHERCHE LA CLASSE, PAS LA FORME DE L'ATTRIBUT. La garde exigeait le littéral
+    // `className={s.porteSecours}` ; le 2026-08-23, « Aide » est devenu un point d'interrogation
+    // et la classe s'est composée avec `s.porteSecoursGlyphe`. La porte était intacte, la garde a
+    // rougi sur sa propre orthographe.
+    expect(composant).toMatch(/className=\{`?\$?\{?s\.porteSecours\b/);
+    // ⚠️ ET SON NOM ACCESSIBLE RESTE « AIDE ». Un pictogramme qui remplace un mot sans le rendre à
+    // l'`aria-label` est la façon la plus courante de casser une porte de secours sans s'en
+    // apercevoir : le lecteur d'écran et la recherche vocale ne la trouvent plus (FR-077).
+    expect(composant, "la porte de secours a perdu son nom accessible").toMatch(
+      /porteSecours[\s\S]{0,160}aria-label="Aide"/,
+    );
     // Garde-fou de proximité : aucune condition de modèle dans les ~80 caractères qui précèdent
     // directement le <Link porteSecours> (le `&&` de la mention est bien plus haut).
     const i = composant.indexOf("s.porteSecours");

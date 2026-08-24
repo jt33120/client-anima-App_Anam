@@ -59,18 +59,26 @@ describe("[H4] quand le passage EST dû", () => {
 describe("[H4] la note qui se retire toute seule", () => {
   it("[LE CŒUR] elle paraît TANT QUE des cartes attendent", () => {
     monte({ du: true, desCartesAttendent: true });
-    expect(screen.getByText(/attendent encore les leurs/)).toBeTruthy();
+    expect(screen.getByText(/attendent? encore la leur|attendent encore les leurs/)).toBeTruthy();
   });
 
   it("[LE CŒUR] et disparaît sans que personne n'ait à l'effacer", () => {
     monte({ du: true, desCartesAttendent: false });
-    expect(screen.queryByText(/attendent encore les leurs/)).toBeNull();
+    expect(screen.queryByText(/attendent? encore la leur|attendent encore les leurs/)).toBeNull();
   });
 
   it("elle dit que ces textes ne sortent PAS du modèle (FR-054/FR-086)", () => {
     // C'est la chose la plus importante à savoir sur ce lieu, et la seule occasion de la dire.
+    //
+    // ⚠️ LA GARDE CHERCHAIT « jamais par Anam », ET LA PHRASE A DÛ CHANGER LE 2026-08-23. Elle
+    // disait aussi « écrits à la main », au présent — ce qui laissait entendre qu'Anima les avait
+    // écrits, alors que les créneaux portent désormais des textes de DÉPART en attendant qu'elle
+    // les reprenne. L'inexactitude portait sur le seul point où le produit engage le nom d'une
+    // personne réelle. Ce qui est gardé reste la PROPRIÉTÉ, pas la formule : la note doit dire que
+    // ces textes ne viennent pas d'Anam, et nommer Anima comme celle qui les reprendra.
     monte({ du: true, desCartesAttendent: true });
-    expect(screen.getByText(/jamais par Anam/)).toBeTruthy();
+    expect(screen.getByText(/ne sont pas écrits par Anam/)).toBeTruthy();
+    expect(screen.getByText(/Anima/)).toBeTruthy();
   });
 });
 

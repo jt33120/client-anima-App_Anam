@@ -6,6 +6,9 @@ import {
   LIBELLE_FAMILLE,
   verifieLeLibelle,
 } from "@/lib/safety/ressources-aide";
+import * as reperes from "@/lib/domain/copie-reperes";
+import { RELANCER } from "@/lib/domain/copie-guide";
+import Link from "next/link";
 
 /**
  * ⚠️ RENDUE À LA DEMANDE, ET C'EST LA SORTIE DE SECOURS QUI EN DÉPEND (revue adversariale, R5).
@@ -88,6 +91,49 @@ export default function PageAide() {
               </section>
             );
           })}
+        </section>
+
+        {/* ══ COMMENT ÇA MARCHE — DEMANDÉ LE 2026-08-23, ET PLACÉ ICI À DESSEIN ═══════════════
+            « "Repères" devrait être dans la page "Aide". »
+
+            ⚠️ J'AVAIS ARGUMENTÉ CONTRE, ET LA DÉCISION EST PRISE. La réserve tenait à ceci :
+            `/aide` est la porte de secours (FR-077, AD-9, AD-15) — publique, sans session,
+            atteinte en détresse — et quelqu'un qui va mal ne doit pas tomber sur un mode
+            d'emploi. Cette réserve est honorée par la PLACE, pas par l'absence : la sortie
+            rapide reste en tête, les lignes tenues par des personnes viennent AVANT, et le mode
+            d'emploi vient après. Qui arrive ici en urgence trouve d'abord ce qu'il cherche.
+
+            `/reperes` continue d'exister et de porter la même copie : une seule source
+            (`lib/domain/copie-reperes.ts`), deux surfaces. */}
+        <section className={s.section} id="reperes" aria-label="Comment ça marche">
+          <h2 className="t-titre-sm">{reperes.TITRE_HALTE}</h2>
+          <p className="t-corps">{reperes.OUVERTURE}</p>
+
+          <Link className={s.tour} href="/?tour=1">
+            <span className="t-bouton">{RELANCER}</span>
+          </Link>
+
+          <dl className={s.places}>
+            {reperes.PLACES.map((place) => (
+              <div key={place.nom}>
+                <dt className="t-corps">{place.nom}</dt>
+                <dd className="t-corps">{place.quoi}</dd>
+              </div>
+            ))}
+          </dl>
+
+          {reperes.SECTIONS.map((section) => (
+            <div className={s.sousSection} key={section.titre}>
+              <h3 className="t-corps-fort">{section.titre}</h3>
+              {section.paragraphes.map((texte) => (
+                <p className="t-corps" key={texte}>
+                  {texte}
+                </p>
+              ))}
+            </div>
+          ))}
+
+          <p className="t-corps">{reperes.PAR_OU_COMMENCER}</p>
         </section>
 
         <section className={s.section} id="transparence" aria-label="Transparence">

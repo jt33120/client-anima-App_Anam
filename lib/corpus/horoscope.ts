@@ -6,7 +6,13 @@ import {
   type Configuration,
   type LuneRelative,
 } from "@/lib/astro/quotidien";
-import { corpus, lireTexte, type Corpus, type TexteCorpus, NON_ECRIT } from "./port";
+import {
+  corpus,
+  lireTexte,
+  type Corpus,
+  type TexteCorpus,
+  creneau,
+} from "./port";
 
 /**
  * horoscope.ts — LES 27 CRÉNEAUX D'INTERPRÉTATION DU JOUR (Story 5.4, FR-054 / FR-053 / FR-086).
@@ -59,7 +65,9 @@ export const DISTANCES_LUNE: readonly number[] = Object.freeze([
  */
 export function cleLuneRelative(distance: number): string {
   if (!DISTANCES_LUNE.includes(distance)) {
-    throw new Error(`corpus horoscope : distance de Lune hors domaine (${distance}) — attendu 0..11`);
+    throw new Error(
+      `corpus horoscope : distance de Lune hors domaine (${distance}) — attendu 0..11`,
+    );
   }
   return `lune_relative:${distance}`;
 }
@@ -81,7 +89,9 @@ export function cleAspect(aspect: Aspect, cible: CibleNatale): string {
     throw new Error(`corpus horoscope : aspect inconnu (${aspect})`);
   }
   if (!CIBLES_NATALES.includes(cible)) {
-    throw new Error(`corpus horoscope : cible hors domaine (${cible}) — voir CIBLES_NATALES`);
+    throw new Error(
+      `corpus horoscope : cible hors domaine (${cible}) — voir CIBLES_NATALES`,
+    );
   }
   return `aspect:${aspect}:${cible}`;
 }
@@ -103,7 +113,7 @@ export const CLES_HOROSCOPE: readonly string[] = Object.freeze([
  */
 export const CORPUS_HOROSCOPE: Corpus = corpus(
   "horoscope",
-  Object.fromEntries(CLES_HOROSCOPE.map((cle) => [cle, NON_ECRIT])),
+  Object.fromEntries(CLES_HOROSCOPE.map((cle) => [cle, creneau(cle)])),
 );
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
@@ -121,7 +131,12 @@ export function texteLuneRelative(lune: LuneRelative): TexteCorpus | null {
 }
 
 /** Le texte de la configuration dominante. `null` quand il n'y en a pas — un jour calme est un vrai jour. */
-export function texteConfiguration(configuration: Configuration | undefined): TexteCorpus | null {
+export function texteConfiguration(
+  configuration: Configuration | undefined,
+): TexteCorpus | null {
   if (!configuration) return null;
-  return lireTexte(CORPUS_HOROSCOPE, cleAspect(configuration.aspect, configuration.cible));
+  return lireTexte(
+    CORPUS_HOROSCOPE,
+    cleAspect(configuration.aspect, configuration.cible),
+  );
 }

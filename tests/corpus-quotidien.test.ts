@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { clesEcrites, clesNonEcrites, corpus, ecrit, textesEcrits, type Corpus } from "@/lib/corpus/port";
+import { clesEcrites, corpus, ecrit, textesEcrits, type Corpus } from "@/lib/corpus/port";
 import {
   CARDINAL_MANTRA,
   CLES_MANTRA,
@@ -43,6 +43,9 @@ import { chercherInterdits } from "@/lib/domain/lexique-interdit";
 // (b) PRÉSENCE AVANT ABSENCE — les créneaux existent, et en nombre connu
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
+import { texteDeBase } from "@/lib/corpus/textes-de-base";
+import { lireTexte } from "@/lib/corpus/port";
+
 describe("[T5/T6 / (b)] les créneaux sont DÉCLARÉS — la complétude est mesurable", () => {
   it("60 mantras, 27 créneaux d'horoscope, aucun doublon", () => {
     expect(CLES_MANTRA.length).toBe(60);
@@ -58,17 +61,39 @@ describe("[T5/T6 / (b)] les créneaux sont DÉCLARÉS — la complétude est mes
   it("toutes les clés déclarées sont bien dans la table du corpus", () => {
     // Une clé déclarée dans `CLES_*` mais absente de la table ferait jeter `lireTexte` à
     // l'exécution — un plantage en production pour un jour précis du cycle.
-    expect(clesNonEcrites(CORPUS_MANTRA).length).toBe(60);
-    expect(clesNonEcrites(CORPUS_HOROSCOPE).length).toBe(27);
+    //
+    // ⚠️ ON COMPTE LES CRÉNEAUX DÉCLARÉS, PLUS LES CRÉNEAUX VIDES. La version d'origine comptait
+    // les non-écrits (60 et 27) : c'était le même nombre tant que rien n'était écrit, et ça a
+    // cessé de l'être le 2026-08-23. Ce qui devait être vérifié n'a jamais été la vacuité — c'est
+    // que chaque clé déclarée EXISTE dans la table.
+    for (const cle of CLES_MANTRA) expect(() => lireTexte(CORPUS_MANTRA, cle), cle).not.toThrow();
+    for (const cle of CLES_HOROSCOPE) expect(() => lireTexte(CORPUS_HOROSCOPE, cle), cle).not.toThrow();
+    expect(Object.keys(CORPUS_MANTRA.textes).length).toBe(60);
+    expect(Object.keys(CORPUS_HOROSCOPE.textes).length).toBe(27);
   });
 
-  it("[PORTE PRÉ-LANCEMENT] aucun créneau n'est écrit — et c'est la seule forme conforme", () => {
-    // FR-054 + FR-086 : seule Anima peut écrire ces textes. Le jour où elle en dépose un, ce test
-    // change de valeur et les balayages ci-dessous se mettent à mordre pour de bon.
-    expect(clesEcrites(CORPUS_MANTRA)).toEqual([]);
-    expect(clesEcrites(CORPUS_HOROSCOPE)).toEqual([]);
-    expect(textesEcrits(CORPUS_MANTRA)).toEqual([]);
-    expect(textesEcrits(CORPUS_HOROSCOPE)).toEqual([]);
+  it("[PORTE PRÉ-LANCEMENT] tout texte écrit vient de la TABLE DE BASE, jamais du fichier", () => {
+    // ⚠️ CE TEST EXIGEAIT LE VIDE, ET C'ÉTAIT JUSTE JUSQU'AU 2026-08-23. Il portait FR-054 +
+    // FR-086 : seule Anima peut écrire ces textes, parce qu'ils paraissent sous le nom d'une
+    // personne réelle. Julian a tranché — « tu dois faire les cartes de base, et Anima corrigera ».
+    //
+    // Ce qui est gardé change donc d'objet, et rétrécit à ce qui reste vrai : un texte qui existe
+    // doit venir de `lib/corpus/textes-de-base.ts`, la table unique qu'Anima peut vider ou
+    // remplacer sans toucher au code. Un texte écrit EN DUR dans un fichier de famille lui
+    // échapperait — elle ne relit pas six fichiers — et c'est précisément ce que ce test empêche
+    // maintenant.
+    for (const c of [CORPUS_MANTRA, CORPUS_HOROSCOPE]) {
+      for (const cle of clesEcrites(c)) {
+        expect(
+          texteDeBase(cle),
+          `${cle} porte un texte hors de la table de base : Anima ne pourra pas le retirer`,
+        ).toBeDefined();
+      }
+    }
+    // Et aucun texte écrit n'est vide — `ecrit()` le refuse déjà à la construction, on le constate.
+    for (const t of [...textesEcrits(CORPUS_MANTRA), ...textesEcrits(CORPUS_HOROSCOPE)]) {
+      expect(t.trim().length).toBeGreaterThan(0);
+    }
   });
 });
 
@@ -122,8 +147,11 @@ describe("[T5 / D8 / P8] le mantra du jour ne dépend QUE du jour", () => {
       d.setUTCDate(d.getUTCDate() + k);
       return mantraDuJour(jour(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()));
     });
-    // Tous non écrits aujourd'hui, donc indiscernables par leur contenu : on compare les INDICES.
-    expect(servis.every((t) => t.statut === "non_ecrit")).toBe(true);
+    // ⚠️ ON COMPARE LES INDICES, PAS LES CONTENUS — et c'est vrai dans les deux régimes. Tant que
+    // le corpus était vide, deux mantras étaient littéralement indiscernables ; maintenant qu'il
+    // porte des textes de base, deux créneaux POURRAIENT se ressembler. L'indice, lui, ne ment
+    // dans aucun des deux cas.
+    expect(servis.every((t) => t.statut === "ecrit" || t.statut === "non_ecrit")).toBe(true);
 
     const indices = Array.from({ length: 60 }, (_, k) => {
       const d = new Date(Date.UTC(2026, 7, 11));
@@ -185,8 +213,11 @@ describe("[T6] les jonctions distinguent « pas calculé » de « pas écrit »"
   });
 
   it("une Lune relative calculée rend un créneau DÉCLARÉ (non écrit aujourd'hui)", () => {
+    // La jonction rend un créneau DÉCLARÉ ; qu'il soit écrit ou non ne la regarde pas.
     for (const distance of DISTANCES_LUNE) {
-      expect(texteLuneRelative({ statut: "calcule", distance })).toEqual({ statut: "non_ecrit" });
+      const t = texteLuneRelative({ statut: "calcule", distance });
+      expect(t, `${distance}`).not.toBeNull();
+      expect(t!.statut, `${distance}`).toMatch(/^(ecrit|non_ecrit)$/);
     }
   });
 
@@ -197,10 +228,9 @@ describe("[T6] les jonctions distinguent « pas calculé » de « pas écrit »"
   it("les 15 couples aspect × cible ont tous leur créneau", () => {
     for (const a of ASPECTS) {
       for (const cible of CIBLES_NATALES) {
-        expect(
-          texteConfiguration({ corpsTransitant: "lune", aspect: a.nom, cible, orbe: 1 }),
-          `${a.nom}/${cible}`,
-        ).toEqual({ statut: "non_ecrit" });
+        const t = texteConfiguration({ corpsTransitant: "lune", aspect: a.nom, cible, orbe: 1 });
+        expect(t, `${a.nom}/${cible}`).not.toBeNull();
+        expect(t!.statut, `${a.nom}/${cible}`).toMatch(/^(ecrit|non_ecrit)$/);
       }
     }
   });

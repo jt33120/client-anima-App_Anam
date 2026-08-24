@@ -46,6 +46,17 @@ export const URL_ABONNEMENT = "/abonnement";
  */
 export const URL_REPERES = "/reperes";
 
+/**
+ * Story « Profil » (2026-08-23) — « il manque un bouton Profil avec les paramètres, où on peut
+ * réinitialiser ses infos, changer son nom, gérer son abonnement ».
+ *
+ * ⚠️ IL REMPLACE « L'ABONNEMENT » DANS LA SURIMPRESSION, IL NE S'Y AJOUTE PAS. Trois liens
+ * flottants tenaient déjà juste sur 390 px (mesuré : « Anam est une IA » finit à 152, « Repères »
+ * 206–272, « Aide » 326–370) ; un quatrième les ferait se toucher. L'abonnement n'est pas perdu —
+ * il devient une entrée du profil, qui est l'endroit où on va le chercher.
+ */
+export const URL_PROFIL = "/profil";
+
 export interface Surimpression {
   /**
    * Toujours vraie, partout, indépendante de toute détection (FR-077, AD-9/AD-15).
@@ -82,7 +93,16 @@ export interface Surimpression {
    * l'endroit où chercher. Une entrée conditionnelle serait absente précisément là où elle sert.
    * Le rendre facultatif ne compile pas.
    */
-  readonly cheminReperes: true;
+  /**
+   * ⚠️ CE DRAPEAU EST DEVENU CELUI DU PROFIL (2026-08-23), et le nom du champ a suivi. « Repères »
+   * a rejoint la page d'aide sur décision produit ; la place qu'il occupait dans la surimpression
+   * revient au profil, qui est ce qui manquait — on n'y trouvait ni son nom, ni ses réglages, ni
+   * son abonnement.
+   *
+   * Type littéral `true`, comme la porte de secours : ses réglages doivent être atteignables d'où
+   * qu'elle soit, y compris au seuil. Le rendre facultatif ne compile pas.
+   */
+  readonly cheminProfil: true;
 }
 
 /**
@@ -98,6 +118,6 @@ export function surimpressionPour(region: IdRegion, abonnee = false): Surimpress
     signeAnam: enConversation,
     mentionIA: enConversation,
     cheminAbonnement: abonnee,
-    cheminReperes: true,
+    cheminProfil: true,
   };
 }

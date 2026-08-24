@@ -1,5 +1,15 @@
-import { NOMBRES, type LectureNombre, type NomNombre } from "@/lib/astro/numerologie";
-import { corpus, lireTexte, type Corpus, type TexteCorpus, NON_ECRIT } from "./port";
+import {
+  NOMBRES,
+  type LectureNombre,
+  type NomNombre,
+} from "@/lib/astro/numerologie";
+import {
+  corpus,
+  lireTexte,
+  type Corpus,
+  type TexteCorpus,
+  creneau,
+} from "./port";
 
 /**
  * numerologie.ts — LES 69 CRÉNEAUX D'INTERPRÉTATION NUMÉROLOGIQUE (Story 5.2, FR-054 / FR-086).
@@ -61,7 +71,9 @@ export function valeursPossibles(nombre: NomNombre): readonly number[] {
  */
 export function cleNumerologie(nombre: NomNombre, valeur: number): string {
   if (!valeursPossibles(nombre).includes(valeur)) {
-    throw new Error(`corpus numerologie : ${nombre} ne prend pas la valeur ${valeur}`);
+    throw new Error(
+      `corpus numerologie : ${nombre} ne prend pas la valeur ${valeur}`,
+    );
   }
   return `${nombre}:${valeur}`;
 }
@@ -86,7 +98,7 @@ export const CLES_NUMEROLOGIE: readonly string[] = Object.freeze(
  */
 export const CORPUS_NUMEROLOGIE: Corpus = corpus(
   "numerologie",
-  Object.fromEntries(CLES_NUMEROLOGIE.map((cle) => [cle, NON_ECRIT])),
+  Object.fromEntries(CLES_NUMEROLOGIE.map((cle) => [cle, creneau(cle)])),
 );
 
 /**
@@ -96,7 +108,10 @@ export const CORPUS_NUMEROLOGIE: Corpus = corpus(
  * Les deux absences restent distinctes de bout en bout, et la 5.6 les affichera différemment —
  * « je ne sais pas le calculer » (il manque ton nom) n'est pas « je ne l'ai pas encore écrit ».
  */
-export function texteDe(nombre: NomNombre, lecture: LectureNombre): TexteCorpus | null {
+export function texteDe(
+  nombre: NomNombre,
+  lecture: LectureNombre,
+): TexteCorpus | null {
   if (lecture.statut !== "calcule") return null;
   return lireTexte(CORPUS_NUMEROLOGIE, cleNumerologie(nombre, lecture.valeur));
 }

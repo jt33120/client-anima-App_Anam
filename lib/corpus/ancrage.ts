@@ -1,4 +1,4 @@
-import { corpus, NON_ECRIT, type Corpus } from "./port";
+import { corpus, type Corpus, creneau, type TexteCorpus } from "./port";
 
 /**
  * ancrage.ts — LES CRÉNEAUX DES ANCRAGES (Story 5.9, T2 · FR-054 / FR-081 / FR-086).
@@ -65,14 +65,14 @@ export function cleEtape(cle: string, etape: string): string {
 // et que chaque temps du domaine a bien son créneau pour chaque ancrage.
 const TEMPS = ["arrivee", "souffle", "corps", "nommer", "retour"] as const;
 
-function declarer(): Record<string, typeof NON_ECRIT> {
-  const table: Record<string, typeof NON_ECRIT> = {};
+function declarer(): Record<string, TexteCorpus> {
+  const table: Record<string, TexteCorpus> = {};
   for (const cle of CLES_ANCRAGE) {
-    table[cleTitre(cle)] = NON_ECRIT;
-    for (const t of TEMPS) table[cleEtape(cle, t)] = NON_ECRIT;
+    table[cleTitre(cle)] = creneau(cleTitre(cle));
+    for (const t of TEMPS) table[cleEtape(cle, t)] = creneau(cleEtape(cle, t));
   }
   return table;
 }
 
-/** 4 ancrages × (1 titre + 5 temps) = 24 créneaux. Zéro écrit. */
+/** 4 ancrages × (1 titre + 5 temps) = 24 créneaux. */
 export const ANCRAGES: Corpus = corpus("ancrages", declarer());

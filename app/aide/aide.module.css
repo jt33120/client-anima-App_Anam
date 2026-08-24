@@ -95,3 +95,53 @@
 .desc {
   color: var(--texte-doux);
 }
+
+/* ── « Comment ça marche », rapatrié ici le 2026-08-23 ─────────────────────────────────────────
+   Après les ressources, jamais avant : qui arrive en urgence trouve d'abord ce qu'il cherche. */
+.tour {
+  align-self: flex-start;
+  min-height: var(--cible-tactile);
+  display: inline-flex;
+  align-items: center;
+  padding: var(--esp-3) var(--esp-5);
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon);
+  color: var(--texte);
+  text-decoration: none;
+}
+.tour:hover {
+  border-color: var(--accent);
+}
+.tour:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+.places {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  margin: 0;
+}
+.places div {
+  margin: 0;
+}
+.places dt {
+  margin: 0 0 var(--esp-1);
+  color: var(--texte);
+}
+.places dd {
+  margin: 0;
+  color: var(--texte-doux);
+}
+.sousSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+.sousSection h3 {
+  margin: 0;
+  color: var(--texte);
+}
+.sousSection p {
+  margin: 0;
+}

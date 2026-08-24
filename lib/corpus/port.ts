@@ -47,6 +47,8 @@
  * `lib/corpus/` ne doit JAMAIS être ajouté aux exclusions de ce test.
  */
 
+import { texteDeBase } from "./textes-de-base";
+
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 /**
@@ -60,7 +62,9 @@ export type TexteCorpus =
   | { readonly statut: "non_ecrit" };
 
 /** Le créneau non écrit — valeur unique et gelée : rien à allouer, rien à muter. */
-export const NON_ECRIT: TexteCorpus = Object.freeze({ statut: "non_ecrit" as const });
+export const NON_ECRIT: TexteCorpus = Object.freeze({
+  statut: "non_ecrit" as const,
+});
 
 /**
  * Un corpus est une table de créneaux DÉCLARÉS.
@@ -80,9 +84,25 @@ export interface Corpus {
  * plus une constante : un module quelconque pourrait y écrire, et le texte affiché à l'utilisatrice
  * n'aurait plus d'auteur traçable.
  */
-export function corpus(identifiant: string, textes: Record<string, TexteCorpus>): Corpus {
+export function corpus(
+  identifiant: string,
+  textes: Record<string, TexteCorpus>,
+): Corpus {
   for (const cle of Object.keys(textes)) Object.freeze(textes[cle]);
   return Object.freeze({ identifiant, textes: Object.freeze({ ...textes }) });
+}
+
+/**
+ * Un créneau : son texte de base s'il en a un, `non_ecrit` sinon.
+ *
+ * ⚠️ CE CONSTRUCTEUR EST LA SEULE PORTE DES TEXTES DE BASE, et il est ici plutôt que dans chaque
+ * fichier de famille pour la raison qui vaut pour tout ce module : une règle recopiée six fois
+ * diverge à la première correction. Voir `textes-de-base.ts` pour ce que ces textes sont, d'où ils
+ * viennent, et pourquoi ils existent malgré ce que dit l'en-tête de ce fichier-ci.
+ */
+export function creneau(cle: string): TexteCorpus {
+  const base = texteDeBase(cle);
+  return base === undefined ? NON_ECRIT : ecrit(base);
 }
 
 /** Un texte écrit par Anima. Le seul constructeur du statut `ecrit`. */
@@ -91,7 +111,9 @@ export function ecrit(texte: string): TexteCorpus {
   if (propre.length === 0) {
     // Une chaîne vide déclarée « écrite » serait le pire des deux mondes : elle passerait le compte
     // de complétude (« 69/69 ») et n'afficherait rien. On refuse à la construction.
-    throw new Error("corpus : un texte « écrit » ne peut pas être vide — utiliser NON_ECRIT");
+    throw new Error(
+      "corpus : un texte « écrit » ne peut pas être vide — utiliser NON_ECRIT",
+    );
   }
   return Object.freeze({ statut: "ecrit" as const, texte: propre });
 }
@@ -140,6 +162,8 @@ export function clesNonEcrites(c: Corpus): readonly string[] {
 /** Tous les textes réellement écrits — la matière que les gardes de voix doivent balayer. */
 export function textesEcrits(c: Corpus): readonly string[] {
   return Object.values(c.textes)
-    .filter((t): t is { statut: "ecrit"; texte: string } => t.statut === "ecrit")
+    .filter(
+      (t): t is { statut: "ecrit"; texte: string } => t.statut === "ecrit",
+    )
     .map((t) => t.texte);
 }

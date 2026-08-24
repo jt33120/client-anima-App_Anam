@@ -10,6 +10,8 @@ import * as copie from "@/lib/domain/copie-ancrage";
  * ancrage-corpus.test.ts — LES CRÉNEAUX, ET LE VOCABULAIRE (Story 5.9, AC5/AC6/AC7).
  */
 
+import { texteDeBase } from "@/lib/corpus/textes-de-base";
+
 describe("[AC6] les 24 créneaux sont déclarés, et aucun n'est écrit", () => {
   it("4 ancrages × (1 titre + 5 temps) = 24 créneaux", () => {
     expect(CLES_ANCRAGE.length).toBe(4);
@@ -28,9 +30,14 @@ describe("[AC6] les 24 créneaux sont déclarés, et aucun n'est écrit", () => 
     }
   });
 
-  it("aucun créneau n'est écrit — Anima seule peut les écrire (FR-054 + FR-086)", () => {
-    expect(clesEcrites(ANCRAGES)).toEqual([]);
-    expect(clesNonEcrites(ANCRAGES).length).toBe(24);
+  it("tout créneau écrit vient de la TABLE DE BASE, jamais du fichier", () => {
+    // ⚠️ CE TEST EXIGEAIT LE VIDE (FR-054 + FR-086 : Anima seule écrit). Julian a tranché le
+    // 2026-08-23 : les textes de base existent, elle corrigera. Ce qui reste gardé, et qui compte
+    // autant, c'est qu'aucun texte n'entre AILLEURS que par la table qu'elle peut vider.
+    expect(clesEcrites(ANCRAGES).length + clesNonEcrites(ANCRAGES).length).toBe(24);
+    for (const cle of clesEcrites(ANCRAGES)) {
+      expect(texteDeBase(cle), `${cle} hors de la table de base`).toBeDefined();
+    }
   });
 
   it("la table est GELÉE — aucun module ne peut y déposer un texte sans auteur", () => {
@@ -66,16 +73,20 @@ describe("[AC5] le vocabulaire ne se confond jamais (FR-080)", () => {
   });
 
   it("les créneaux du corpus, le jour où Anima les écrira, passeront la même garde", () => {
-    // Aujourd'hui `textesEcrits` est vide : le test serait donc vacuement vrai. On prouve le
-    // balayage sur un faux corpus qui, lui, contient un texte fautif.
+    // ⚠️ CE COMMENTAIRE DISAIT « aujourd'hui `textesEcrits` est vide, le test serait vacuement
+    // vrai ». Ce n'est plus le cas depuis le 2026-08-23 : les 24 créneaux portent un texte, et le
+    // balayage du vrai corpus mord pour de bon. On garde quand même la preuve sur un faux corpus —
+    // elle prouve que le balayage TROUVE, là où le vrai prouve qu'il n'y a rien à trouver.
     const faux = corpus("faux-ancrages", {
       "a:titre": ecrit("Le mantra du matin"),
       "a:arrivee": NON_ECRIT,
     });
     const fautifs = textesEcrits(faux).flatMap((t) => chercherConfusionVocabulaire(t, "ancrage"));
     expect(fautifs).toContain("mantra");
-    // Et le vrai corpus, lui, n'a rien à redire (il est vide — l'assertion est explicite là-dessus).
-    expect(textesEcrits(ANCRAGES)).toEqual([]);
+    // Et le vrai corpus, lui, n'a rien à redire — vérifié texte par texte, désormais.
+    for (const t of textesEcrits(ANCRAGES)) {
+      expect(chercherConfusionVocabulaire(t, "ancrage"), t).toEqual([]);
+    }
   });
 });
 

@@ -55,6 +55,12 @@ const EXCLUS = new Set([
   "lib/domain/consigne-bilan.ts", // consigne de génération du bilan (2.9) — lexique en instructions inverses
   "lib/domain/consigne-synthese.ts", // consigne de génération de la synthèse (4.9) — même nature
   "lib/domain/consigne-lecture.ts", // consigne de génération de la lecture (5.8) — même nature
+  // Consigne de génération du geste du jour (2026-08-23) — MÊME NATURE que les quatre ci-dessus :
+  // elle nomme les interdits pour les refuser (« rien de médical, de thérapeutique ni de
+  // diagnostique », « ni ça va passer »). C'est la première consigne dont le produit affiche la
+  // sortie HORS conversation : ses interdits y sont d'autant plus nécessaires, et le contrôle de
+  // sortie s'applique quand même au TEXTE PRODUIT, qui, lui, n'est pas exclu.
+  "lib/domain/geste-du-jour.ts",
   "lib/domain/lexique-interdit.ts", // la source des interdits — s'auto-matcherait
 ]);
 

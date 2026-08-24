@@ -118,11 +118,19 @@ export default function PremierPassage({
         « écrits à la main, jamais par Anam » n'est pas une formule : c'est FR-054/FR-086. Ces
         textes-là ne sont PAS produits par le modèle, et c'est probablement la chose la plus
         importante à savoir sur ce lieu.
+
+        ⚠️ LA PHRASE A ÉTÉ RÉÉCRITE LE 2026-08-23, PARCE QU'ELLE ÉTAIT DEVENUE À MOITIÉ FAUSSE.
+        Elle disait « écrits à la main » au présent, ce qui laissait entendre qu'Anima les avait
+        écrits. Depuis que les créneaux portent des textes de DÉPART (voir
+        `lib/corpus/textes-de-base.ts`, écrits sur décision de Julian en attendant qu'elle les
+        reprenne), c'est inexact — et l'inexactitude porte sur le seul point où le produit engage
+        le nom d'une personne réelle. Ce qui reste vrai, et qui est dit : ces textes ne sortent
+        pas du modèle, et ils attendent la main d'Anima.
       */}
       {modele.desCartesAttendent && (
         <p className={`t-meta ${classeNote}`}>
-          Les textes d&rsquo;ici sont écrits à la main, jamais par Anam. Certaines cartes
-          attendent encore les leurs.
+          Les textes d&rsquo;ici ne sont pas écrits par Anam. Ce sont des premières versions,
+          en attendant qu&rsquo;Anima les reprenne — et certaines cartes attendent encore la leur.
         </p>
       )}
     </section>

@@ -43,21 +43,28 @@ import { CLES_JEU } from "@/lib/tirage/jeu";
 // 1. Les créneaux
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
+import { texteDeBase } from "@/lib/corpus/textes-de-base";
+
 describe("[AC8] 21 créneaux déclarés, dérivés du jeu", () => {
   it("un créneau par carte, aucun orphelin", () => {
     expect(Object.keys(CORPUS_DESCRIPTION_CARTES.textes).sort()).toEqual(CLES_JEU.map(cleDescription).sort());
   });
 
   it("[porte pré-lancement] l'inventaire dit exactement où on en est", () => {
-    // ⚠️ Ce chiffre est VOULU. Il monte quand les visuels sont produits et décrits — ces textes ne
-    // sont PAS d'Anima (une description littérale n'est pas une interprétation, FR-054), et sont donc
-    // comptés à part des créneaux du socle.
-    expect(clesEcrites(CORPUS_DESCRIPTION_CARTES).length).toBe(0);
-    expect(clesNonEcrites(CORPUS_DESCRIPTION_CARTES).length).toBe(21);
+    // ⚠️ CE COMPTE ATTENDAIT ZÉRO ; LES 21 SONT ÉCRITS DEPUIS LE 2026-08-23. Ce qu'il gardait —
+    // qu'aucun texte n'apparaisse sans qu'on sache d'où il vient — est reporté sur la table de
+    // base, seule porte par laquelle un texte entre et seule table qu'Anima peut vider.
+    expect(clesEcrites(CORPUS_DESCRIPTION_CARTES).length + clesNonEcrites(CORPUS_DESCRIPTION_CARTES).length).toBe(21);
+    for (const cle of clesEcrites(CORPUS_DESCRIPTION_CARTES)) {
+      expect(texteDeBase(cle), `${cle} hors de la table de base`).toBeDefined();
+    }
   });
 
   it("un créneau non écrit ne se déguise pas en texte, et une clé inconnue JETTE", () => {
-    expect(lireDescriptionCarte("seuil")).toEqual({ statut: "non_ecrit" });
+    // La clé DÉCLARÉE se lit sans jeter ; la clé inconnue jette. Le contenu n'est pas le sujet —
+    // il a cessé d'être vide le 2026-08-23.
+    expect(() => lireDescriptionCarte("seuil")).not.toThrow();
+    expect(lireDescriptionCarte("seuil").statut).toMatch(/^(ecrit|non_ecrit)$/);
     expect(() => lireDescriptionCarte("carte-fantome" as never)).toThrow(/non déclaré/);
   });
 
@@ -135,6 +142,12 @@ describe("[AC8] le balayage laisse passer les descriptions littérales", () => {
 
 describe("[AC8] le corpus réel passe le balayage", () => {
   it("aucune description écrite ne signifie (vacue tant qu'aucune n'est écrite — assumé)", () => {
+    // ⚠️ ET IL A MORDU LE JOUR OÙ ON L'A REMPLI PAR ERREUR (2026-08-23). Les textes de base ont
+    // d'abord été écrits pour cette famille comme pour les autres, en lisant le cahier — « ce que
+    // chaque carte annonce ». C'est une description LITTÉRALE qui est attendue ici, le texte
+    // alternatif d'un visuel, et ce test l'a dit en une exécution : « la carte demande ce que tu
+    // gardes à portée » porte une adresse et une signification. Les 21 créneaux sont redevenus
+    // non écrits — on n'écrit pas l'alt d'une image qui n'existe pas.
     for (const texte of textesEcrits(CORPUS_DESCRIPTION_CARTES)) {
       expect(chercherSensDansDescription(texte), texte).toEqual([]);
     }

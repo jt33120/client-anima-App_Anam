@@ -338,8 +338,17 @@
      supplémentaires ne protègent rien — ils rétrécissent le fil, mesuré par la QA à 307 px dans une
      fenêtre de 742, au moment précis où le bloc de ressources de détresse doit y tenir.
 
-     On garde la hauteur de la surimpression et celle de la nav ; on rend l'air. */
-  padding-top: var(--cible-tactile);
+     On garde la hauteur de la surimpression et celle de la nav ; on rend l'air.
+
+     ⚠️ ET « LA HAUTEUR DE LA SURIMPRESSION » N'ÉTAIT PAS 44 px (retour du 2026-08-23 : « Anam se
+     superpose »). `--cible-tactile` vaut 44 ; la surimpression, elle, occupe `--cible-tactile +
+     --esp-6`, soit 76 — c'est la réserve que `.region` pose partout ailleurs, et pour cette raison
+     exacte. Le titre de la conversation démarrait donc 32 px À L'INTÉRIEUR de la bande où flottent
+     « Anam est une IA », « Repères » et la porte de secours. Le raisonnement de la QA T26 tenait sur
+     le DÉBORDEMENT (cette région ne défile pas, son entête ne peut pas glisser sous quoi que ce
+     soit) et il est juste — mais il ne dit rien du chevauchement AU REPOS, qui est un problème
+     différent et qui, lui, se voyait. On rend l'air en trop, pas la réserve. */
+  padding-top: calc(var(--cible-tactile) + var(--esp-6));
   /* ⚠️ LA RÉSERVE DU BAS EST CELLE DE LA BARRE, PAS CELLE D'UNE CIBLE TACTILE (QA tour 2).
      `--cible-tactile` valait 44 px pour une barre qui en fait 68 : le composeur finissait 12 px
      DESSOUS, et la barre avalait le tap sur « Envoyer ». */
@@ -365,11 +374,24 @@
   text-align: center;
   color: var(--texte-doux);
 }
-.titreConversation:focus-visible {
-  outline: 2px solid var(--bordure-forte);
-  outline-offset: 4px;
-  border-radius: var(--rayon-sm);
-  color: var(--texte);
+/* ⚠️ L'ANNEAU NE PARAÎT QU'AU CLAVIER, ET UNE MESURE A MONTRÉ QU'IL PARAISSAIT QUAND MÊME.
+   Ce titre reçoit le focus PAR PROGRAMME à chaque changement de région (`tabIndex={-1}`), pour que
+   le lecteur d'écran annonce où l'on arrive. Sur un écran tactile, WebKit fait matcher
+   `:focus-visible` après un tap : le mot « Anam » se retrouvait dans une boîte arrondie, au milieu
+   de l'écran, ressemblant à un bouton qui ne fait rien — c'est le retour produit déjà reçu une
+   fois, et c'est la capture du 2026-08-23 qui l'a remontré.
+
+   `:focus-visible:not(:focus)` est impossible ; on gate donc sur le POINTEUR : là où il n'y a pas
+   de pointeur fin (téléphone, tablette), l'anneau ne se peint pas. Rien n'est perdu — l'annonce
+   du lecteur d'écran ne dépend pas de l'anneau, et au clavier (donc avec un pointeur fin, ou sans
+   pointeur du tout) il reste entier. */
+@media (any-pointer: fine), (any-pointer: none) {
+  .titreConversation:focus-visible {
+    outline: 2px solid var(--bordure-forte);
+    outline-offset: 4px;
+    border-radius: var(--rayon-sm);
+    color: var(--texte);
+  }
 }
 
 /* ── Région arbre (Story 4.6) : l'arbre RÉEL occupe la hauteur disponible ; fond opaque (le canevas et la
@@ -874,7 +896,7 @@
    chemin de service, pas une invitation. Aucun fond, aucun bord, aucune pastille, aucune icône.
    `margin-left: auto` comme les deux autres : l'espace libre se répartit, et « Aide » reste à
    droite, dernier. */
-.cheminReperes {
+.cheminProfil {
   margin-left: auto;
   flex: none;
   pointer-events: auto;
@@ -890,16 +912,29 @@
   text-decoration: none;
   transition: color var(--duree-standard) var(--courbe);
 }
-.cheminReperes:hover {
+.cheminProfil:hover {
   color: var(--texte);
 }
-.cheminReperes .t-meta {
+.cheminProfil .t-meta {
   color: inherit;
 }
-.cheminReperes:focus-visible {
+.cheminProfil:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
   border-radius: var(--rayon-sm);
+}
+
+/* ⚠️ LE GLYPHE « ? » A BESOIN D'UN CONTOUR, ET C'EST UNE QUESTION DE LISIBILITÉ, PAS DE DÉCOR.
+   Un point d'interrogation nu de la taille d'un `t-meta`, seul dans un coin, ne se lit pas comme un
+   bouton — il se lit comme une coquille. Un cercle d'un pixel dans la teinte des bordures suffit à
+   dire « ceci se touche », sans rien de ce que AD-9 refuse : ni fond plein, ni couleur d'alerte, ni
+   pastille. La cible tactile, elle, ne change pas : elle valait déjà 44 px. */
+.porteSecoursGlyphe {
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-full);
+}
+.porteSecoursGlyphe:hover {
+  border-color: var(--bordure-forte);
 }
 
 /* Porte de secours — un mot « Aide », discret, TOUJOURS au même endroit (à droite). Jamais
