@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
 import { chargerOuverture } from "@/lib/safety/ouverture-branche";
+import type { Ouverture } from "@/lib/domain/arbitrage-ouverture";
 import { chargerProjectionArbre } from "@/lib/safety/projection-arbre";
 import { lireBibliotheque } from "@/lib/data/lire-bibliotheque";
 import { lireFilRecent } from "@/lib/data/depot-fil";
@@ -130,7 +131,10 @@ export default async function Page() {
    * plus. `nom` est absent d'une branche dont le nom n'a pas encore été donné — elle n'entre alors
    * pas dans l'ouverture, faute de mot à rendre.
    */
-  const ouvertureFinale =
+  // ⚠️ ANNOTÉ, ET C'EST LE CORRECTIF. Sans `: Ouverture | null`, l'objet ci-dessous se typait tout
+  // seul et pouvait porter n'importe quoi — un champ que le miroir de rendu ne connaît pas, ou une
+  // variante que le contrat n'a jamais déclarée. C'est exactement ce qui est arrivé.
+  const ouvertureFinale: Ouverture | null =
     ouverture ??
     (historique.length === 0
       ? {

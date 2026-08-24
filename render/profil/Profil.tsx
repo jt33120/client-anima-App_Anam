@@ -62,13 +62,13 @@ export default function Profil(p: ProprietesProfil) {
           <p className="t-corps">{p.nomDescription}</p>
 
           <form action={action} className={s.section}>
-            <label className={s.champ}>
+            <label className={s.ligne}>
               <span className="t-meta">{p.labelPrenom}</span>
-              <input name="prenom" defaultValue={p.prenom} maxLength={100} required />
+              <input className={s.champ} name="prenom" defaultValue={p.prenom} maxLength={100} required />
             </label>
-            <label className={s.champ}>
+            <label className={s.ligne}>
               <span className="t-meta">{p.labelNomComplet}</span>
-              <input name="nom_complet" defaultValue={p.nomComplet} maxLength={200} />
+              <input className={s.champ} name="nom_complet" defaultValue={p.nomComplet} maxLength={200} />
               <span className={`t-meta ${s.entreeQuoi}`}>{p.aideNomComplet}</span>
             </label>
             {/* ⚠️ L'AVERTISSEMENT EST AVANT LE BOUTON, PAS APRÈS. Changer le nom complet recalcule

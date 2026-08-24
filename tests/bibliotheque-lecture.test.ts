@@ -81,8 +81,24 @@ describe("[5.6/AC7] l’échec d’une lecture n’emporte jamais les autres", (
       "nombres",
       "theme",
     ]);
-    // Aucune n'a rien à montrer aujourd'hui : il n'y a donc pas de carte du jour, et rien ne casse.
-    expect(b.enAvant).toBeNull();
+    // ⚠️ ELLE ATTENDAIT `enAvant === null`, ce qui n'était vrai QUE parce que le corpus était vide.
+    // Le mantra du jour ne demande rien à personne (T7/AC6) : depuis que les soixante textes sont
+    // écrits, il est présentable même quand tout le reste est en panne — c'est même exactement le
+    // service qu'on attend de lui. Ce qui doit tenir n'a pas bougé : la mise en avant tombe sur une
+    // carte PRÉSENTABLE, ou sur rien. Jamais sur une carte qui n'a rien à montrer.
+    //
+    // ⚠️ ET LA PRÉSENTABILITÉ EST RECALCULÉE ICI, PAS DEMANDÉE À LA PRODUCTION. Une première version
+    // appelait `estPresentable` pour décider ce qui est correct — donc elle prenait pour arbitre la
+    // fonction même qu'elle surveille. La campagne de mutation l'a dit tout de suite : `estPresentable`
+    // remplacée par `return true` SURVIVAIT, puisque le test la croyait sur parole.
+    const aDeQuoiMontrer = (c: (typeof b.cartes)[number]) =>
+      c.faits.length > 0 || c.texte.statut === "ecrit";
+    const presentables = b.cartes.filter(aDeQuoiMontrer).map((c) => c.cle);
+    if (b.enAvant === null) {
+      expect(presentables, "rien en avant alors qu'une carte avait de quoi").toEqual([]);
+    } else {
+      expect(presentables, "la carte du jour n'a rien à montrer").toContain(b.enAvant);
+    }
   });
 
   it("[LE TEST QUI COMPTE] une numérologie qui LÈVE ne fait pas disparaître l’ennéagramme", async () => {
@@ -99,8 +115,13 @@ describe("[5.6/AC7] l’échec d’une lecture n’emporte jamais les autres", (
     expect(e9?.faits, "l’ennéagramme est tombé avec la numérologie").toEqual([
       { intitule: "Type", valeur: "4" },
     ]);
-    // Et c'est la seule carte présentable, donc c'est elle qui est mise en avant.
-    expect(b.enAvant).toBe("enneagramme");
+    // ⚠️ ELLE DISAIT « c'est la SEULE carte présentable, donc c'est elle qui est mise en avant ».
+    // Le mantra en est une seconde depuis que le corpus est écrit, et la mise en avant tourne sur le
+    // jour civil (FR-033) : élire nommément l'ennéagramme mesurait le corpus, pas la robustesse.
+    // Ce que la story garde, c'est que la carte survivante SURVIT — donc qu'elle est présentable.
+    // La survivante doit avoir de quoi se montrer — prédicat recalculé ici, jamais emprunté au code
+    // sous test (voir le mutant survivant plus haut).
+    expect(e9!.faits.length > 0 || e9!.texte.statut === "ecrit", "l'ennéagramme a survécu mais n'a rien à montrer").toBe(true);
   });
 
   it("un ennéagramme qui LÈVE ne fait pas disparaître les nombres", async () => {
@@ -124,8 +145,10 @@ describe("[5.6/AC7] l’échec d’une lecture n’emporte jamais les autres", (
       },
     });
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
-    expect(b.cartes.find((c) => c.cle === "nombres")?.faits).toHaveLength(3);
-    expect(b.enAvant).toBe("nombres");
+    const nombres = b.cartes.find((c) => c.cle === "nombres");
+    expect(nombres?.faits).toHaveLength(3);
+    // Même correctif qu'au-dessus : de quoi se montrer, pas forcément élue (la rotation prend le jour).
+    expect(nombres!.faits.length > 0 || nombres!.texte.statut === "ecrit", "les nombres ont survécu mais n'ont rien à montrer").toBe(true);
   });
 
   it("[NFR-022] aucune donnée personnelle ne sort dans un log d’erreur", async () => {

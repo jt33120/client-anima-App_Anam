@@ -232,7 +232,17 @@ describe("[T7 / AC6] le mantra sort TOUJOURS — il ne demande rien à personne"
         new Date("2026-08-11T10:00:00Z"),
         ephemeride,
       );
-      expect(socle.mantra).toEqual({ statut: "non_ecrit" });
+      // ⚠️ ELLE ATTENDAIT `{ statut: "non_ecrit" }` À LA LETTRE — c'est-à-dire l'état du CORPUS,
+      // alors que le titre du test énonce une tout autre règle : « le mantra sort TOUJOURS ». Depuis
+      // que les soixante mantras sont écrits (2026-08-24), la lettre est fausse et la règle est
+      // intacte. On mesure donc la règle.
+      //
+      // Le mensonge qu'elle empêche est précis : que la panne du thème natal DÉTEIGNE sur le mantra.
+      // Le mantra ne dépend d'aucune donnée de naissance ; il ne peut donc jamais hériter d'un
+      // « indisponible ». C'est tout le sens de « il ne demande rien à personne ».
+      expect(["ecrit", "non_ecrit"], "le mantra a pris la panne du thème").toContain(
+        socle.mantra.statut,
+      );
       expect(socle.horoscope).toEqual({ statut: "indisponible", raison });
       expect(socle.jour).toEqual({ a: 2026, m: 8, j: 11 });
     },

@@ -90,6 +90,9 @@ const VARIANTES = [
   '"invitation"',
   '"socle-complete"',
   '"hypothese-enneagramme"',
+  // `premiere-parole` (Story 6.9) est la cinquième déclarée ici et la SIXIÈME de l'union : elle est
+  // née dans le miroir de rendu seul, et c'est la garde des champs — pas le compilateur — qui l'a vu.
+  '"premiere-parole"',
 ] as const;
 
 const DOMAINE = "lib/domain/arbitrage-ouverture.ts";

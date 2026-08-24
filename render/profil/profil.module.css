@@ -51,13 +51,19 @@
   margin: 0;
 }
 
-/* Le formulaire du nom. Deux champs, un bouton — pas une fiche d'identité. */
-.champ {
+/* Le formulaire du nom. Deux champs, un bouton — pas une fiche d'identité.
+
+   ⚠️ `.champ` DÉSIGNE LA ZONE DE SAISIE, jamais son enveloppe — c'est la convention des cinq autres
+   modules du dépôt (entrer, naissance, heure-naissance, mémoire, conversation). L'enveloppe s'appelle
+   `.ligne`. Ce n'est pas une question de goût : la garde des cibles tactiles reconnaît une commande à
+   son NOM, et un `.champ` qui n'est pas la cible la fait crier — à raison, puisqu'elle ne peut alors
+   plus distinguer « l'enveloppe n'a pas besoin de 44 px » de « le champ les a perdus ». */
+.ligne {
   display: flex;
   flex-direction: column;
   gap: var(--esp-2);
 }
-.champ input {
+.champ {
   min-height: var(--cible-tactile);
   padding: var(--esp-2) var(--esp-3);
   background: var(--surface);
@@ -66,7 +72,7 @@
   color: var(--texte);
   font: inherit;
 }
-.champ input:focus-visible {
+.champ:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
 }

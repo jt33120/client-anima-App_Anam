@@ -34,9 +34,20 @@ describe("[5.5/AC1] la forme du corpus", () => {
     expect([...CLES_ENNEAGRAMME]).toEqual(TYPES.map((t) => `enneagramme:${t}`));
   });
 
-  it("ZÉRO écrit — Anima seule a le droit d'écrire ici", () => {
-    expect(clesEcrites(CORPUS_ENNEAGRAMME)).toEqual([]);
-    expect(clesNonEcrites(CORPUS_ENNEAGRAMME)).toHaveLength(9);
+  it("[LE CŒUR] neuf créneaux, chacun dans UN des deux états — jamais un trou", () => {
+    // ⚠️ CETTE GARDE DISAIT « ZÉRO écrit ». C'était une PHOTO du corpus vide, pas une règle, et elle
+    // est tombée le 2026-08-24 quand les neuf textes de base ont été écrits — sur demande explicite
+    // (« tu dois faire les cartes de base, et Anima corrigera »). La règle de fond, elle, n'a pas
+    // bougé d'un pouce : Anima reste la seule à pouvoir REMPLACER un texte, et le corpus reste une
+    // table qu'elle édite sans qu'on touche au code.
+    //
+    // Ce qui doit tenir, et qui tient que la table soit pleine, vide, ou à moitié réécrite : neuf
+    // créneaux, un par type, chacun dans l'un des DEUX états légitimes. Un dixième créneau, un
+    // créneau manquant, ou un état inventé sont les trois façons dont ce corpus peut mentir.
+    const ecrites = clesEcrites(CORPUS_ENNEAGRAMME);
+    const nonEcrites = clesNonEcrites(CORPUS_ENNEAGRAMME);
+    expect(ecrites.length + nonEcrites.length, "un créneau n'est ni écrit ni non écrit").toBe(9);
+    expect([...ecrites, ...nonEcrites].sort()).toEqual([...CLES_ENNEAGRAMME].sort());
   });
 
   it("le corpus et ses créneaux sont GELÉS", () => {
@@ -62,9 +73,15 @@ describe("[5.5/AC1] la clé JETTE hors domaine — une clé fabriquée n'est pas
 });
 
 describe("[5.5/AC1] la jonction distingue TROIS états, jamais deux", () => {
-  it("[LE CŒUR] un type retenu rend un créneau non écrit — pas `null`", () => {
+  it("[LE CŒUR] un type retenu rend TOUJOURS un créneau — jamais `null`", () => {
+    // ⚠️ ELLE ATTENDAIT `{ statut: "non_ecrit" }` À LA LETTRE, donc elle mesurait l'état du corpus
+    // au lieu de la règle. La règle est la DISTINCTION : un type retenu ouvre un créneau — écrit ou
+    // pas —, tandis qu'un ex æquo n'ouvre rien. Confondre les deux ferait promettre « ce texte
+    // n'est pas encore écrit » à quelqu'un dont le test n'a désigné personne.
     const retenu: ResultatTest = { statut: "retenu", type: 4 };
-    expect(texteDuType(retenu)).toEqual({ statut: "non_ecrit" });
+    const creneau = texteDuType(retenu);
+    expect(creneau, "un type retenu qui n'ouvre rien").not.toBeNull();
+    expect(["ecrit", "non_ecrit"]).toContain(creneau!.statut);
   });
 
   it("[LE CŒUR] un ex æquo rend `null` — il n'y a rien à écrire, pas un texte en attente", () => {
@@ -102,10 +119,20 @@ describe("[5.5/AC1] LA GARDE QUI SURVIT AU CORPUS VIDE : on assère la CLÉ, pas
     expect(cleEnneagramme(4)).not.toBe(cleEnneagramme(7));
   });
 
-  it("[CONTRÔLE NÉGATIF] la comparaison de TEXTES, elle, ne prouve rien — et on le montre", () => {
-    // Ce test existe pour documenter le piège plutôt que pour garder quoi que ce soit : il PASSE
-    // aujourd'hui, et il passerait tout autant si le corpus rendait toujours le même créneau.
-    expect(texteDuTypeRetenu(4)).toEqual(texteDuTypeRetenu(7));
+  it("[LE PIÈGE S'EST REFERMÉ] les textes DISCRIMINENT maintenant — mais l'espion reste le juge", () => {
+    // ⚠️ CE TEST ÉTAIT UN CONTRÔLE NÉGATIF : il montrait qu'une comparaison de textes ne prouvait
+    // RIEN, parce que neuf créneaux vides sont neuf objets égaux. Un mutant « rends toujours le
+    // créneau du type 1 » y passait sans broncher. C'est pour ça que le test qui compte, juste
+    // au-dessus, espionne la CLÉ demandée au port et pas le texte rendu.
+    //
+    // Depuis que les neuf textes existent (2026-08-24), la comparaison discrimine. On l'assère donc
+    // — deux types, deux textes — mais ON NE DÉPLACE PAS LE JUGE : le jour où Anima vide un créneau
+    // pour le réécrire, cette ligne redeviendrait vacue, tandis que l'espion, lui, ne bouge pas.
+    const quatre = texteDuTypeRetenu(4);
+    const sept = texteDuTypeRetenu(7);
+    if (quatre?.statut === "ecrit" && sept?.statut === "ecrit") {
+      expect(quatre, "deux types, un seul texte : le corpus ne distingue plus personne").not.toEqual(sept);
+    }
   });
 });
 

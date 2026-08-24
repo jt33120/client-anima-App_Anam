@@ -127,7 +127,35 @@ describe("[AC6] un exercice à trous n'est pas traversable", () => {
     expect(estTraversable({ ...complet, titre: NON_ECRIT })).toBe(false);
   });
 
-  it("en v1, AUCUN des quatre ancrages n'est traversable (les 24 créneaux attendent Anima)", () => {
-    expect(CLES_ANCRAGE.map(assemblerAncrage).filter(estTraversable)).toEqual([]);
+  it("[LE CŒUR] un ancrage RÉEL est traversable si et seulement si TOUS ses créneaux sont écrits", () => {
+    // ⚠️ CETTE GARDE DISAIT « aucun n'est traversable en v1 ». C'était vrai le jour où elle a été
+    // écrite, et ce n'était pas une propriété : c'était une PHOTO du corpus vide. Le 2026-08-24 les
+    // 24 créneaux ont été écrits, et la garde est devenue fausse — sans qu'aucune règle n'ait bougé.
+    //
+    // La règle, elle, n'a jamais changé : un exercice se traverse quand rien n'y manque. On la
+    // mesure donc contre les VRAIS ancrages, ce qui tient que le corpus soit vide, plein, ou
+    // à moitié réécrit par Anima. Le mensonge qu'elle empêche est le seul qui compte ici : proposer
+    // un exercice de respiration guidée à quelqu'un, et le laisser en plan au troisième temps.
+    for (const cle of CLES_ANCRAGE) {
+      const a = assemblerAncrage(cle);
+      const rienNeManque =
+        a.titre.statut === "ecrit" && a.temps.every((t) => t.texte.statut === "ecrit");
+      expect(
+        estTraversable(a),
+        rienNeManque
+          ? `${cle} : tout est écrit, et pourtant il se refuse`
+          : `${cle} : il se propose alors qu'il lui manque un texte`,
+      ).toBe(rienNeManque);
+    }
+  });
+
+  it("[ANTI-VACUITÉ] le corpus réel n'est pas vide — sinon le test ci-dessus ne prouve rien", () => {
+    // Sans cette ligne, un corpus entièrement vidé rendrait `rienNeManque` faux partout et la garde
+    // passerait en vérifiant seulement que rien ne se propose. C'est le piège exact qu'elle vient de
+    // quitter, à l'envers.
+    const ecrits = CLES_ANCRAGE.map(assemblerAncrage).filter(
+      (a) => a.titre.statut === "ecrit" && a.temps.every((t) => t.texte.statut === "ecrit"),
+    );
+    expect(ecrits.length, "plus un seul ancrage complet : la garde ci-dessus tourne à vide").toBeGreaterThan(0);
   });
 });
