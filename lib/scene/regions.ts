@@ -13,7 +13,7 @@ export interface Region {
   readonly id: IdRegion;
   /** Libellé du lien nommé (doublage non-spatial de rang égal, UX-DR-37). */
   readonly nom: string;
-  /** Apparaît dans la barre basse / le rail latéral (Accueil, Anam, L’arbre). */
+  /** Apparaît dans la barre basse / le rail latéral (Moi, Anam, Mon arbre). */
   readonly destinationDirecte: boolean;
 }
 
@@ -22,11 +22,28 @@ export interface Region {
  * de la disposition spatiale. Le seuil ouvre le monde mais n’est pas une destination
  * de la barre : on n’y « retourne » pas, il se lève une fois.
  */
+/**
+ * ⚠️ « Accueil » EST DEVENU « Moi », ET « L’arbre » « Mon arbre » LE 2026-08-25 (Story 7.9).
+ *
+ * Retour de Julian : « L'arbre devient "Mon arbre" / Accueil devient "Moi" ». Ce ne sont pas des
+ * synonymes plus jolis : « Accueil » est un mot de SITE — la page d'entrée d'un lieu public —,
+ * « Moi » est un mot de personne. Le produit n'est pas un site qu'on visite.
+ *
+ * ⚠️ ET LA RÉGION RESTE UN LIEU, PAS UN HUB DE COMPTE (amendement d'`EXPERIENCE.md` §5, clause
+ * écrite AVANT ce renommage précisément pour qu'il ne dérive pas). Un lieu qui s'appelle « Moi »
+ * et affiche un taux de complétude n'est plus un lieu : c'est un tableau de bord, et le produit
+ * n'en a pas. Aucune entrée de compte n'y déménage, aucune rubrique nominative au-dessus du pli
+ * (`EXPERIENCE.md` ligne 452), aucune pastille (FR-031, DUR).
+ *
+ * ⚠️ ET C'EST LA SEULE SOURCE DE CES NOMS. `tests/scene-modele.test.ts` échoue si un fichier hors
+ * de celui-ci écrit un nom de région en littéral : sans quoi le renommage suivant en oublierait un,
+ * et deux surfaces du même produit appelleraient le même lieu autrement.
+ */
 export const CATALOGUE_REGIONS: readonly Region[] = [
   { id: "seuil", nom: "Seuil", destinationDirecte: false },
-  { id: "accueil", nom: "Accueil", destinationDirecte: true },
+  { id: "accueil", nom: "Moi", destinationDirecte: true },
   { id: "anam", nom: "Anam", destinationDirecte: true },
-  { id: "arbre", nom: "L’arbre", destinationDirecte: true },
+  { id: "arbre", nom: "Mon arbre", destinationDirecte: true },
 ] as const;
 
 /** Les destinations nommées, dans l’ordre — source de la barre basse et du rail. */

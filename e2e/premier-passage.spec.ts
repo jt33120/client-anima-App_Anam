@@ -36,23 +36,23 @@ test("[H4] le lieu se présente une fois, puis plus jamais", async ({ page }) =>
   //  2. la bibliothèque a ses propres `<dt>` (« Chemin de vie », « Soleil »…) — un `getByRole` non
   //     borné en ramassait dix. On borne au repère nommé de la présentation.
   const presentation = page.getByRole("region", { name: "Trois places" });
-  await expect(presentation.getByRole("term")).toHaveText(["Anam", "L’arbre", "L’accueil"]);
+  await expect(presentation.getByRole("term")).toHaveText(["Anam", "Mon arbre", "Moi"]);
   await expect(presentation.getByText(/Le plus simple/), "rien ne dit par quoi commencer").toBeVisible();
 
   // ── 2. La présentation est LUE avant les cartes, et sans avoir à chercher.
   await expect(titre).toBeInViewport();
-  await expect(page.getByRole("heading", { name: "Accueil", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Moi", level: 1 })).toBeVisible();
 
   // ── 3. Les trois noms de la présentation sont ceux de la barre : ce qu'on vient de lire est
   //       atteignable tout de suite, et c'est la moitié de « je sais quoi faire ».
   const barre = page.getByRole("navigation", { name: "Régions" });
-  await expect(barre.getByRole("button")).toHaveText(["Accueil", "Anam", "L’arbre"]);
+  await expect(barre.getByRole("button")).toHaveText(["Moi", "Anam", "Mon arbre"]);
 
   // ── 4. On revient. Le monde s'ouvre DIRECTEMENT sur l'accueil — le seuil ne se redresse plus
   //       (QA manuelle du 2026-08-19 : il était rendu à chaque chargement) — et l'accueil s'est tu.
   await page.waitForTimeout(1500); // la Server Action pose la date avant qu'on recharge
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Accueil", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Moi", level: 1 })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Trois places", level: 2, exact: true }),
     "la présentation revient à chaque chargement : la date n'a pas été posée, ou pas relue",

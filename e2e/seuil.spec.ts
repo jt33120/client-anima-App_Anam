@@ -188,7 +188,7 @@ test.describe("Le seuil", () => {
     await expect(
       page.getByRole("navigation", { name: "Régions" }).getByRole("button"),
       "le doublage non-spatial doit reprendre dès qu'il y a quelque chose à doubler (UX-DR-37)",
-    ).toHaveText(["Accueil", "Anam", "L’arbre"]);
+    ).toHaveText(["Moi", "Anam", "Mon arbre"]);
   });
 
   test("[UNE FOIS] franchi, le seuil ne se redresse plus devant personne", async ({ page }) => {
@@ -226,7 +226,7 @@ test.describe("Le seuil", () => {
       const w = window as unknown as { __ech: number[][] };
       w.__ech = [];
       const a = document.querySelector('section[aria-label="Seuil"]')!;
-      const b = document.querySelector('section[aria-label="Accueil"]')!;
+      const b = document.querySelector('section[aria-label="Moi"]')!;
       const tic = () => {
         w.__ech.push([Number(getComputedStyle(a).opacity), Number(getComputedStyle(b).opacity)]);
         if (w.__ech.length < 120) requestAnimationFrame(tic);

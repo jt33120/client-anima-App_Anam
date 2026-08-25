@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   REGIONS,
+  CATALOGUE_REGIONS,
   REGION_ENTREE,
   estRegion,
   etatInitial,
@@ -88,5 +89,80 @@ describe("projectionInitiale — projection serveur en lecture seule, STUB (AC2)
     for (const mot of ["eveil", "progression", "niveau", "score", "pourcentage", "total"]) {
       expect(bloc.toLowerCase(), `« ${mot} » dans ProjectionScene`).not.toContain(mot);
     }
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// [7.9] UNE SEULE SOURCE POUR LE NOM D'UN LIEU
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[7.9] aucun fichier hors du catalogue n'écrit un nom de région en littéral", () => {
+  /**
+   * ⚠️ CETTE GARDE EXISTE PARCE QUE LE RENOMMAGE A LAISSÉ UN FICHIER EN ARRIÈRE (2026-08-25).
+   *
+   * « Accueil » est devenu « Moi » et « L'arbre » « Mon arbre » dans `lib/scene/regions.ts`, seule
+   * source déclarée. Mais `render/premier-passage.tsx` — LE PREMIER ÉCRAN DU PRODUIT — écrivait ces
+   * noms en dur dans son JSX. Il aurait nommé les trois places autrement que la barre juste en
+   * dessous, pour toujours, et aucun test ne l'aurait dit : les deux fichiers compilent.
+   *
+   * Le renommage suivant en oublierait un autre. On ne compte donc pas sur la vigilance : on refuse
+   * le littéral.
+   */
+  const RACINE = process.cwd();
+  const lire = (f: string) => readFileSync(resolve(RACINE, f), "utf-8");
+
+  function fichiersSource(dossier: string): string[] {
+    return (readdirSync(resolve(RACINE, dossier), { recursive: true, encoding: "utf-8" }) as string[])
+      .filter((f) => f.endsWith(".ts") || f.endsWith(".tsx"))
+      .map((f) => `${dossier}/${f}`);
+  }
+
+  /** Le JSX écrit « L&rsquo;arbre » ; on normalise les deux formes avant de chercher. */
+  const normaliser = (src: string) =>
+    src.replace(/&rsquo;|&apos;|&#39;/g, "’").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+
+  /**
+   * ⚠️ « Anam » EST EXCLU, ET CE N'EST PAS UN TROU — c'est la seule lecture correcte.
+   *
+   * C'est à la fois le nom d'une région ET le nom du PRODUIT : il apparaît dans le `<title>` de
+   * chaque page, dans l'expéditeur des courriels, dans la marque de la surimpression. Le refuser
+   * ferait rougir quarante fichiers pour rien, et la pression serait alors d'exempter fichier par
+   * fichier jusqu'à ce que la garde ne garde plus rien.
+   *
+   * Le risque résiduel est nul dans les faits : la région de conversation ne sera jamais renommée
+   * autrement que le produit. Les deux noms qui BOUGENT — et qui viennent de bouger — sont couverts.
+   */
+  const NOM_DU_PRODUIT = "Anam";
+  const NOMS = CATALOGUE_REGIONS.filter((r) => r.destinationDirecte)
+    .map((r) => r.nom)
+    .filter((n) => n !== NOM_DU_PRODUIT);
+
+  it("[CONTRÔLE DU CONTRÔLE] le balayage voit un corpus réel, et les noms ne sont pas vides", () => {
+    const corpus = [...fichiersSource("app"), ...fichiersSource("render"), ...fichiersSource("lib")];
+    expect(corpus.length, "le balayage ne regarde rien").toBeGreaterThan(150);
+    expect(NOMS.length, "les noms de régions renommables").toBe(2);
+    for (const n of NOMS) expect(n.length).toBeGreaterThan(2);
+  });
+
+  it("[LE CŒUR] aucun littéral de nom de région hors `lib/scene/regions.ts`", () => {
+    // Les fichiers qui ont le DROIT de porter ces mots, avec leur raison :
+    //  • `regions.ts` : la source elle-même ;
+    //  • `copie-reperes.ts` : le mode d'emploi NOMME les lieux — c'est son objet, et il est relu
+    //    à la main. Il est exempté ici et gardé par son propre test de cohérence.
+    const EXEMPTS = new Set(["lib/scene/regions.ts", "lib/domain/copie-reperes.ts"]);
+    const fautifs: string[] = [];
+    for (const f of [...fichiersSource("app"), ...fichiersSource("render"), ...fichiersSource("lib")]) {
+      if (EXEMPTS.has(f)) continue;
+      const src = normaliser(lire(f));
+      for (const nom of NOMS) {
+        // On cherche le nom ENTRE GUILLEMETS ou entre balises — pas le mot au fil d'une phrase :
+        // « Anam » est le nom du produit, il apparaît partout et légitimement.
+        if (new RegExp(`["'>]\\s*${nom}\\s*["'<]`).test(src)) fautifs.push(`${f} → « ${nom} »`);
+      }
+    }
+    expect(
+      fautifs,
+      `un nom de région est réécrit hors du catalogue — le prochain renommage l'oubliera :\n${fautifs.join("\n")}`,
+    ).toEqual([]);
   });
 });

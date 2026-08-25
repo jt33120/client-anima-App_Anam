@@ -32,7 +32,7 @@ describe("[H4] quand le passage EST dû", () => {
   it("[LE CŒUR] les trois places sont nommées, et il n'y en a pas une quatrième", () => {
     monte({ du: true, desCartesAttendent: false });
     const noms = screen.getAllByRole("term").map((e) => e.textContent);
-    expect(noms).toEqual(["Anam", "L’arbre", "L’accueil"]);
+    expect(noms).toEqual(["Anam", "Mon arbre", "Moi"]);
   });
 
   it("chaque place a sa définition — un nom sans phrase n'explique rien", () => {

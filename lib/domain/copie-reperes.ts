@@ -52,14 +52,14 @@ export const PLACES: readonly Place[] = Object.freeze([
       "qu’elle comprend, et elle le garde d’une fois sur l’autre.",
   },
   {
-    nom: "L’arbre",
+    nom: "Mon arbre",
     quoi:
       "Ce qui pousse à mesure. Le tronc, c’est ce qui était déjà là à la naissance. Les branches " +
       "naissent de ce qui revient dans les échanges — jamais sur l’instant, et jamais sans que tu " +
       "l’aies vu venir. Une branche peut être nommée, corrigée, ou déclarée en pleine lumière.",
   },
   {
-    nom: "L’accueil",
+    nom: "Moi",
     quoi:
       "Ce que le jour propose : quelques cartes, la même chose pour tout le monde ce jour-là. " +
       "Rien n’y est calculé pour te retenir, et il n’y a rien à y rattraper si tu passes un jour.",

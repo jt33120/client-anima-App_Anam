@@ -150,7 +150,7 @@ describe("[QA 19/08] le produit n'écrit qu'une sorte d'apostrophe", () => {
     // ⚠️ `lib/domain` SEUL NE SUFFISAIT PAS, ET C'EST UN NAVIGATEUR QUI L'A DIT. La barre de
     // régions écrit son libellé depuis `lib/scene/regions.ts` — jamais balayé — et disait
     // « L'arbre » à l'apostrophe droite, à quelques pixels d'une présentation qui écrivait
-    // « L’arbre ». Aucune lecture de source ne pouvait voir la différence : les deux fichiers
+    // « Mon arbre ». Aucune lecture de source ne pouvait voir la différence : les deux fichiers
     // sont justes séparément. On balaie donc TOUT `lib/`, qui est l'autre endroit où des mots
     // affichés sont écrits.
     const sources = fichiers(".tsx")

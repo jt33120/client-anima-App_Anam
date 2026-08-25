@@ -61,11 +61,25 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
   await page.getByRole("button", { name: /entrer dans le monde/i }).click();
   await passerLeTour(page);
   const barre = page.getByRole("navigation", { name: "Régions" });
-  for (const region of ["Accueil", "Anam", "L’arbre"]) {
+  // ⚠️ LA LISTE EST EN DUR ICI, ET C'EST UN PIÈGE CONNU (Story 7.9, AC4). Le 2026-08-25, les
+  // régions ont été renommées : si un nom de cette liste cesse d'exister, `getByRole` ne trouve
+  // rien, la boucle ne mesure RIEN — et une boucle qui ne mesure rien passe au VERT. Le test se
+  // serait vidé sans une ligne rouge. On compte donc ce qui a réellement été mesuré, à la fin.
+  const mesurees: string[] = [];
+  for (const region of ["Moi", "Anam", "Mon arbre"]) {
     await barre.getByRole("button", { name: region, exact: true }).click();
     await page.waitForTimeout(1200);
     releves[region] = await imagesParSeconde(page);
+    mesurees.push(region);
   }
+
+  // ⚠️ LE TÉMOIN AVANT LE VERDICT. Sans lui, une boucle qui n'a rien parcouru rend un `releves`
+  // vide, `trop` vaut `[]`, et le test passe en n'ayant mesuré aucune région.
+  expect(
+    mesurees,
+    "la boucle n'a pas parcouru les trois régions : le test se serait vidé au lieu d'échouer",
+  ).toEqual(["Moi", "Anam", "Mon arbre"]);
+  expect(Object.keys(releves), "un relevé manque").toHaveLength(3);
 
   const trop = Object.entries(releves).filter(([, v]) => v < reference * PART_MINIMALE);
   expect(

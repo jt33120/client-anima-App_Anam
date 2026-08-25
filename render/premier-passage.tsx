@@ -28,6 +28,7 @@
 
 /** Le modèle de vue du premier passage. Miroir de `lib/domain/premier-passage.ts`. */
 import { URL_REPERES } from "@/lib/scene";
+import { CATALOGUE_REGIONS, type IdRegion } from "@/lib/scene";
 
 export interface PremierPassageVue {
   readonly du: boolean;
@@ -41,6 +42,11 @@ export interface ProprietesPremierPassage {
   readonly classeListe: string;
   readonly classeNote: string;
   readonly classeLien: string;
+}
+
+/** Le nom d'une région, pris au catalogue — jamais réécrit ici (Story 7.9). */
+function nomDe(id: IdRegion): string {
+  return CATALOGUE_REGIONS.find((r) => r.id === id)?.nom ?? "";
 }
 
 export default function PremierPassage({
@@ -73,18 +79,26 @@ export default function PremierPassage({
         Ce qu'on présente en franchissant une porte tient en trois lignes. Ce qui ne tient pas ici
         se découvre en le vivant — c'est le propos du lieu.
       */}
+      {/* ⚠️ LES NOMS VIENNENT DU CATALOGUE, PLUS DE CE FICHIER (2026-08-25, Story 7.9).
+          Ils y étaient écrits en littéral — « L'arbre », « L'accueil » — et le renommage en
+          « Mon arbre » et « Moi » les a laissés en arrière : le premier écran du produit aurait
+          nommé les trois places autrement que la barre juste en dessous, pour toujours. Un seul
+          endroit décide, et `tests/scene-modele.test.ts` refuse qu'un second réapparaisse. */}
       <dl className={classeListe}>
         <div>
-          <dt className="t-corps">Anam</dt>
+          <dt className="t-corps">{nomDe("anam")}</dt>
           <dd className="t-corps">on parle. C&rsquo;est une IA, et elle le dit elle-même.</dd>
         </div>
         <div>
-          <dt className="t-corps">L&rsquo;arbre</dt>
+          <dt className="t-corps">{nomDe("arbre")}</dt>
           <dd className="t-corps">ce qui compte pour toi y prend une branche.</dd>
         </div>
         <div>
-          <dt className="t-corps">L&rsquo;accueil</dt>
-          <dd className="t-corps">le ciel et les nombres de ta journée.</dd>
+          <dt className="t-corps">{nomDe("accueil")}</dt>
+          {/* « et les nombres » est parti le 2026-08-25 : les nombres ont quitté l'accueil pour la
+              halte « Ton socle » (Story 7.7). Une promesse d'accueil qui ne s'y trouve plus est
+              exactement ce qui fait douter quelqu'un de lui-même avant de douter du produit. */}
+          <dd className="t-corps">le ciel et le mantra de ta journée.</dd>
         </div>
       </dl>
 
