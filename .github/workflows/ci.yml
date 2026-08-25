@@ -117,8 +117,13 @@ jobs:
         run: node scripts/e2e-ligne-de-base.mjs rapport-playwright.json
 
       # Une capture et une trace par échec — sans elles, un échec de pixel en CI est indéchiffrable.
-      - name: Conserver les traces d'échec
-        if: failure()
+      # ⚠️ `always()` ET NON `failure()` (corrigé le 2026-08-26). L'étape du parcours porte
+      # `continue-on-error: true` : elle « réussit » toujours du point de vue du travail, et
+      # `failure()` pouvait donc ne pas se déclencher au moment où l'on avait le plus besoin des
+      # traces. On les conserve dans tous les cas — un rapport de 100 tests pèse quelques kilo-octets,
+      # et ne pas l'avoir coûte une relance complète de la suite.
+      - name: Conserver les traces et le rapport
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: traces-playwright

@@ -68,10 +68,20 @@ const normaliser = (f) => String(f).replace(/^\.?\//, "").replace(/^e2e\//, "");
 /** Parcourt l'arbre de suites de Playwright et rend un compte d'échecs par `projet › fichier`. */
 function compterEchecs(json) {
   const compte = new Map();
+  // ⚠️ ON RETIENT AUSSI LES TITRES, ET C'EST UN CORRECTIF DE MÉCANISME (2026-08-26). La première
+  // version ne rendait que des COMPTES par fichier. Quand la CI a rougi pour de bon, le journal
+  // disait « fluidite.spec.ts : 3 échecs, 2 tolérés » — et rien de plus. Impossible de savoir
+  // LEQUEL des trois était le nouveau, donc impossible de diagnostiquer sans relancer.
+  //
+  // Le rapport JSON contenait l'information depuis le début ; c'est le comparateur qui la jetait.
+  // Une garde qui dit qu'il y a un problème sans dire lequel oblige à refaire le travail qu'elle
+  // vient de faire.
+  const titres = new Map();
   let total = 0;
   let vus = 0;
-  const visiter = (suite, fichier) => {
+  const visiter = (suite, fichier, chemin) => {
     const f = suite.file ?? fichier;
+    const nom = [chemin, suite.title].filter(Boolean).join(" › ");
     for (const spec of suite.specs ?? []) {
       for (const t of spec.tests ?? []) {
         vus += 1;
@@ -79,16 +89,18 @@ function compterEchecs(json) {
         if (!echoue) continue;
         const cle = `${t.projectName} › ${normaliser(f)}`;
         compte.set(cle, (compte.get(cle) ?? 0) + 1);
+        if (!titres.has(cle)) titres.set(cle, []);
+        titres.get(cle).push([nom, spec.title].filter(Boolean).join(" › "));
         total += 1;
       }
     }
-    for (const s of suite.suites ?? []) visiter(s, f);
+    for (const s of suite.suites ?? []) visiter(s, f, nom);
   };
-  for (const s of json.suites ?? []) visiter(s, s.file);
-  return { compte, total, vus };
+  for (const s of json.suites ?? []) visiter(s, s.file, "");
+  return { compte, titres, total, vus };
 }
 
-const { compte, total, vus } = compterEchecs(rapport);
+const { compte, titres, total, vus } = compterEchecs(rapport);
 
 // ⚠️ TÉMOIN D'ANTI-VACUITÉ. Un rapport vide — suite qui n'a pas démarré, format changé, mauvais
 // chemin — donnerait ZÉRO échec et ce script dirait « tout va bien ». C'est exactement le mode de
@@ -123,6 +135,14 @@ for (const a of ameliorations) console.log(`✓ ${a}`);
 if (nouveaux.length > 0) {
   console.error("\n✘ ÉCHEC(S) AU-DELÀ DE LA LIGNE DE BASE :");
   for (const n of nouveaux) console.error(`   ${n}`);
+
+  // Le détail, dans le journal, tout de suite : sans lui il faut relancer la suite pour savoir quoi
+  // regarder — c'est-à-dire refaire le travail que la CI vient de faire.
+  console.error("\n   Tests en échec dans ces fichiers :");
+  for (const n of nouveaux) {
+    const cle = n.split(" : ")[0];
+    for (const titre of titres.get(cle) ?? []) console.error(`     · ${cle} — ${titre}`);
+  }
   console.error("\nRéparer, ou écrire dans `e2e/ligne-de-base.json` pourquoi on ne répare pas et");
   console.error("quelle story le fait. On n'ajoute jamais une ligne pour faire passer un commit.");
   process.exit(1);
