@@ -90,7 +90,15 @@ function compterEchecs(json) {
         const cle = `${t.projectName} › ${normaliser(f)}`;
         compte.set(cle, (compte.get(cle) ?? 0) + 1);
         if (!titres.has(cle)) titres.set(cle, []);
-        titres.get(cle).push([nom, spec.title].filter(Boolean).join(" › "));
+        // ⚠️ ON RETIENT AUSSI LE MESSAGE, ET C'EST LE DERNIER MAILLON (2026-08-26). Avec les seuls
+        // TITRES, le journal disait quel test tombait — et il fallait encore relancer la suite, ou
+        // télécharger 168 Mo de traces, pour savoir POURQUOI. Le rapport porte le message depuis le
+        // début ; c'est ce comparateur qui le jetait, pour la seconde fois.
+        const echec = (t.results ?? []).find((r) => r.error?.message);
+        const brut = echec?.error?.message ?? "";
+        // Les séquences de couleur du terminal rendent le journal de CI illisible : on les retire.
+        const message = brut.replace(/\u001b\[[0-9;]*m/g, "").split("\n")[0].slice(0, 160);
+        titres.get(cle).push({ titre: [nom, spec.title].filter(Boolean).join(" › "), message });
         total += 1;
       }
     }
@@ -141,7 +149,10 @@ if (nouveaux.length > 0) {
   console.error("\n   Tests en échec dans ces fichiers :");
   for (const n of nouveaux) {
     const cle = n.split(" : ")[0];
-    for (const titre of titres.get(cle) ?? []) console.error(`     · ${cle} — ${titre}`);
+    for (const { titre, message } of titres.get(cle) ?? []) {
+      console.error(`     · ${cle} — ${titre}`);
+      if (message) console.error(`       ↳ ${message}`);
+    }
   }
   console.error("\nRéparer, ou écrire dans `e2e/ligne-de-base.json` pourquoi on ne répare pas et");
   console.error("quelle story le fait. On n'ajoute jamais une ligne pour faire passer un commit.");

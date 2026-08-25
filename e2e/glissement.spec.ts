@@ -124,10 +124,16 @@ test.describe("Le glissement entre régions", () => {
     await doigt(page, { x: largeur * 0.75, y: 400 }, [{ x: -120, y: 0 }], { lacher: false });
     const pendant = await panneauxVisibles(page);
 
+    // ⚠️ LES DEUX CÔTÉS SONT TRIÉS, ET CE TEST L'A APPRIS À SES DÉPENS (2026-08-26). L'attendu était
+    // écrit `["Accueil", "Anam"]` — déjà dans l'ordre alphabétique, donc identique au trié, par
+    // COÏNCIDENCE. Le renommage en « Moi » (Story 7.9) a défait la coïncidence, et le test a rougi
+    // sur un produit parfaitement correct : « Moi » vient après « Anam ».
+    //
+    // Un `.sort()` d'un seul côté est une comparaison qui marche tant que l'alphabet coopère.
     expect(
       pendant.map((p) => p.nom).sort(),
       `régions peintes à mi-course : ${JSON.stringify(pendant)}`,
-    ).toEqual(["Moi", "Anam"]);
+    ).toEqual(["Moi", "Anam"].sort());
     const accueil = pendant.find((p) => p.nom === "Moi")!;
     const anam = pendant.find((p) => p.nom === "Anam")!;
     expect(accueil.x, "la région courante ne suit pas le doigt").toBe(-120);

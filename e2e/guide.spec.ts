@@ -136,10 +136,14 @@ test.describe("Le tour guidé", () => {
       await suivant.click();
       await page.waitForTimeout(1100);
     }
+    // ⚠️ LES DEUX CÔTÉS SONT TRIÉS (2026-08-26). L'attendu était `["Accueil", "Anam", "L'arbre"]` —
+    // déjà dans l'ordre alphabétique, donc identique au trié PAR COÏNCIDENCE. Le renommage en
+    // « Moi » a défait la coïncidence, et ce test a rougi sur un tour parfaitement correct.
+    // Un `.sort()` d'un seul côté est une comparaison qui marche tant que l'alphabet coopère.
     expect(
       [...regions].sort(),
       "le tour reste sur un seul écran : il explique au lieu de guider",
-    ).toEqual(["Moi", "Anam", "Mon arbre"]);
+    ).toEqual(["Moi", "Anam", "Mon arbre"].sort());
     await expect(dialogue(page), "le tour ne se termine jamais").toHaveCount(0);
   });
 

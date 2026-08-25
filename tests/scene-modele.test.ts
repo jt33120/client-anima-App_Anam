@@ -217,3 +217,45 @@ describe("[7.9] les spécifications au navigateur ne cherchent pas un nom de ré
     expect(tout, "les specs ne nomment plus « Mon arbre »").toContain("Mon arbre");
   });
 });
+
+describe("[7.9] aucune comparaison de noms de régions ne dépend de l'alphabet", () => {
+  /**
+   * ⚠️ DEUX SPÉCIFICATIONS ONT ROUGI SUR UN PRODUIT CORRECT (2026-08-26).
+   *
+   * Elles écrivaient `expect(noms.sort()).toEqual(["Accueil", "Anam", "L'arbre"])` — un `.sort()`
+   * d'un seul côté, comparé à une liste qui se trouvait DÉJÀ être dans l'ordre alphabétique. La
+   * comparaison marchait par coïncidence.
+   *
+   * Le renommage en « Moi » a défait la coïncidence — « Moi » vient après « Anam » — et deux tests
+   * ont accusé le produit d'un défaut qui n'existait pas. Un `.sort()` d'un seul côté est une
+   * comparaison qui tient tant que l'alphabet coopère.
+   */
+  it("[LE CŒUR] tout `.sort()` comparé à une liste littérale trie AUSSI l'attendu", () => {
+    const specs = readdirSync(resolve(process.cwd(), "e2e"), { encoding: "utf-8" }).filter((f) =>
+      f.endsWith(".ts"),
+    );
+    const fautifs: string[] = [];
+    for (const f of specs) {
+      const src = readFileSync(resolve(process.cwd(), "e2e", f), "utf-8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/(^|[^:])\/\/.*$/gm, "$1");
+      // Un `.sort()` dans un `expect(...)`, suivi d'un `.toEqual([...])` dont le tableau n'est pas
+      // lui-même trié : c'est exactement la forme qui a mordu.
+      for (const m of src.matchAll(/\.sort\(\)[\s\S]{0,200}?\.toEqual\(\s*(\[[^\]]*\])\s*\)/g)) {
+        if (!/\]\s*\.sort\(\)/.test(m[0])) fautifs.push(`e2e/${f} → ${m[1].replace(/\s+/g, " ")}`);
+      }
+    }
+    expect(
+      fautifs,
+      `comparaison triée d'un seul côté — elle rougira au prochain renommage :\n${fautifs.join("\n")}`,
+    ).toEqual([]);
+  });
+
+  it("[ANTI-VACUITÉ] le détecteur reconnaît bien la forme qu'il cherche", () => {
+    // Sans ce témoin, un motif cassé rendrait la garde verte pour toujours, sur n'importe quel code.
+    const fabrique = 'expect(noms.sort(), "msg").toEqual(["b", "a"]);';
+    const trouve = [...fabrique.matchAll(/\.sort\(\)[\s\S]{0,200}?\.toEqual\(\s*(\[[^\]]*\])\s*\)/g)];
+    expect(trouve.length, "le motif ne reconnaît même pas la forme fautive").toBe(1);
+    expect(/\]\s*\.sort\(\)/.test(trouve[0][0]), "le témoin de trié des deux côtés est cassé").toBe(false);
+  });
+});
