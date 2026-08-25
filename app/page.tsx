@@ -15,7 +15,7 @@ import { marquerHypotheseDite } from "@/app/_enneagramme/marquer-hypothese";
 import { marquerSeuilFranchi } from "@/app/_seuil/marquer-franchissement";
 import { creerDepotSeuil } from "@/lib/data/depot-seuil";
 import { premierPassage } from "@/lib/domain/premier-passage";
-import { phraseDOuverture } from "@/lib/domain/ouverture-seance";
+import { phraseDOuverture, estUneArrivee } from "@/lib/domain/ouverture-seance";
 import { lirePrenom } from "@/lib/data/lire-prenom";
 import { lireFaitsRetenus } from "@/lib/data/lire-memoire";
 import { ETAPES, SUIVANT, TERMINER, QUITTER } from "@/lib/domain/copie-guide";
@@ -134,9 +134,14 @@ export default async function Page() {
   // ⚠️ ANNOTÉ, ET C'EST LE CORRECTIF. Sans `: Ouverture | null`, l'objet ci-dessous se typait tout
   // seul et pouvait porter n'importe quoi — un champ que le miroir de rendu ne connaît pas, ou une
   // variante que le contrat n'a jamais déclarée. C'est exactement ce qui est arrivé.
+  // ⚠️ « LE FIL EST VIDE » ÉTAIT LA MAUVAISE QUESTION (retour du 2026-08-25). Le fil couvre 24 h
+  // glissantes : quelqu'un qui a parlé hier soir revenait sur un fil NON vide, donc sans un mot
+  // d'Anam. Elle n'ouvrait que pour une absente de plus d'un jour — jamais pour celle qui revient.
+  // On mesure maintenant l'ÉCART depuis le dernier tour (`estUneArrivee`, domaine pur).
+  const derniereParole = historique.length > 0 ? historique[historique.length - 1].creeLe : null;
   const ouvertureFinale: Ouverture | null =
     ouverture ??
-    (historique.length === 0
+    (estUneArrivee(derniereParole, maintenant)
       ? {
           type: "premiere-parole" as const,
           phrase: phraseDOuverture({

@@ -45,6 +45,13 @@ export interface TourFil {
   readonly id: string;
   readonly role: "utilisatrice" | "anam";
   readonly texte: string;
+  /**
+   * L'instant du tour, en ISO. ⚠️ IL ÉTAIT DÉJÀ LU PAR LA REQUÊTE ET JETÉ À LA CONSTRUCTION — et
+   * son absence a coûté cher : sans lui, la seule question qu'on pouvait poser au fil était « es-tu
+   * vide ? ». C'est ce qui rendait l'ouverture d'Anam muette pour toute personne revenue dans les
+   * vingt-quatre heures, c'est-à-dire pour quiconque revient.
+   */
+  readonly creeLe: string;
 }
 
 /** Vingt échanges. Voir l'en-tête pour le choix du nombre. */
@@ -61,6 +68,26 @@ export const FIL_FENETRE_HEURES = 24;
  * vingt-trois heures, et pas celle qu'elle vient d'écrire. L'ordre de la requête et l'ordre de
  * lecture ne sont pas le même ordre.
  */
+/**
+ * Une ligne de base → un tour, ou `null` si elle est inexploitable. PURE, et exportée EXPRÈS.
+ *
+ * ⚠️ ELLE VIVAIT EN LIGNE DANS `lireFilRecent`, donc derrière une base — donc intestable sans elle,
+ * donc non gardée. La campagne de mutation l'a dit : retirer le contrôle de `cree_le` ne faisait
+ * rougir personne. Ce n'est pas anodin depuis le 2026-08-25 : sans horodatage, `estUneArrivee`
+ * retombe sur son repli et Anam SALUE À CHAQUE RECHARGEMENT, y compris au milieu d'un échange —
+ * exactement le bug que la règle d'arrivée existe pour éviter.
+ *
+ * ⚠️ ON FILTRE SANS JAMAIS INVENTER. Une ligne mutilée est ÉCARTÉE plutôt que rendue avec un champ
+ * vide : une bulle vide dans le fil se lit comme un message effacé, et c'est précisément l'angoisse
+ * qu'on répare ici.
+ */
+export function tourDepuisLigne(l: Record<string, unknown> | null | undefined): TourFil | null {
+  if (typeof l?.id !== "string" || typeof l?.contenu !== "string") return null;
+  if (l.role !== "utilisatrice" && l.role !== "anam") return null;
+  if (typeof l.cree_le !== "string" || l.cree_le.length === 0) return null;
+  return { id: l.id, role: l.role, texte: l.contenu, creeLe: l.cree_le };
+}
+
 export async function lireFilRecent(
   supabase: SupabaseClient,
   maintenant: Date = new Date(),
@@ -81,9 +108,8 @@ export async function lireFilRecent(
   // lit comme un message effacé, et c'est précisément l'angoisse qu'on répare ici.
   const tours: TourFil[] = [];
   for (const l of data as Array<Record<string, unknown>>) {
-    if (typeof l?.id !== "string" || typeof l?.contenu !== "string") continue;
-    if (l.role !== "utilisatrice" && l.role !== "anam") continue;
-    tours.push({ id: l.id, role: l.role, texte: l.contenu });
+    const t = tourDepuisLigne(l);
+    if (t) tours.push(t);
   }
   return tours.reverse();
 }

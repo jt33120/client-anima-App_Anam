@@ -31,15 +31,43 @@ describe("consigneReponse — decision → consigne système (pur)", () => {
     }
   });
 
-  it("INTERDITS DURS présents dans toute consigne ≥ 1 (FR-039/041/075/076)", () => {
+  it("INTERDITS DURS présents dans toute consigne ≥ 1 (FR-039/041/075)", () => {
     for (const d of ["adoucir", "intervenir", "urgence", "repli_sur"] as const) {
       const t = consigneReponse(v(d))!.content;
       expect(t, `${d} · FR-039 ne quitte jamais`).toMatch(/ne quitte jamais|tu restes|reste avec elle|tu ne t['’]en vas pas/i);
       expect(t, `${d} · FR-041 jamais soignante`).toMatch(/pas une professionnelle de santé|tu n['’]es (pas|ni) (un|une)\s+(professionnel|soignant)/i);
       expect(t, `${d} · FR-075 jamais les moyens`).toMatch(/ni comment,? ni avec quoi,? ni quand|n['’]explore jamais.*(plan|moyens)/i);
-      expect(t, `${d} · FR-076 humain proche`).toMatch(/appeler ou (la )?rejoindre|quelqu['’]un.*(appeler|rejoindre)/i);
       expect(t, `${d} · aucune promesse creuse`).not.toMatch(/ça va aller/i);
       expect(t, `${d} · aucun lexique médical`).not.toMatch(/diagnostic|thérap|médical|patient|soigner/i);
+    }
+  });
+
+  it("[FR-076] la recherche d'un humain proche vit AUX NIVEAUX 2-3, et NULLE PART AILLEURS", () => {
+    // ⚠️ CETTE GARDE EXIGEAIT FR-076 À TOUS LES NIVEAUX, ET C'EST CE QUI A CIMENTÉ LE DÉFAUT.
+    //
+    // Le PRD dit deux choses que le code contredisait : sa table des niveaux décrit le niveau 1
+    // comme « elle reste, elle écoute, ELLE NE POUSSE PLUS », et sa formulation de référence place
+    // « est-ce qu'il y a quelqu'un que tu peux appeler ou rejoindre ? » au NIVEAU 2. Le préambule
+    // l'appliquait dès le niveau 1, en même temps que l'addendum disait l'inverse — et le modèle
+    // suivait la plus directive des deux.
+    //
+    // Retour d'usage du 2026-08-25 : quelqu'un qui dit une chose lourde SANS idéation s'entendait
+    // renvoyer vers un proche. Si cette personne est là, c'est qu'elle veut parler ICI ; le renvoi
+    // anticipé se lit comme un refus d'écouter.
+    //
+    // La garde mesure donc les DEUX SENS. Exiger sans interdire est ce qui a permis la dérive.
+    const cherche = /appeler ou (la )?rejoindre|quelqu['’]un.*(appeler|rejoindre)/i;
+    for (const d of ["intervenir", "urgence"] as const) {
+      expect(consigneReponse(v(d))!.content, `${d} · FR-076 doit être là`).toMatch(cherche);
+    }
+    for (const d of ["adoucir", "repli_sur"] as const) {
+      const t = consigneReponse(v(d))!.content;
+      expect(t, `${d} · FR-076 ne doit PAS être là (le PRD la réserve au niveau 2)`).not.toMatch(cherche);
+      // …et l'interdit est ÉCRIT, pas seulement omis : un modèle prudent propose « parles-en à
+      // quelqu'un » de lui-même. Ne pas le demander ne suffit pas à l'en empêcher.
+      expect(t, `${d} · le refus d'orienter doit être explicite`).toMatch(
+        /ne la renvoies vers personne|tu ne la renvoies/i,
+      );
     }
   });
 

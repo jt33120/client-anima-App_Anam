@@ -26,6 +26,39 @@
  * Module PUR (AD-1) : aucune I/O, aucune horloge. La matière lui arrive déjà lue.
  */
 
+/**
+ * L'ÉCART QUI FAIT UNE ARRIVÉE — et c'est le correctif du 2026-08-25.
+ *
+ * ⚠️ LA CONDITION ÉTAIT « LE FIL EST VIDE », ET ELLE NE POUVAIT PRESQUE JAMAIS ÊTRE VRAIE. Le fil
+ * lu couvre vingt-quatre heures glissantes : quelqu'un qui a parlé hier soir et qui revient ce
+ * matin trouvait un fil NON vide, donc pas d'ouverture, donc un composeur qui attend. Autrement
+ * dit, Anam n'ouvrait que pour une personne absente depuis plus d'un jour — et jamais pour celle
+ * qui revient, qui est le cas le plus fréquent. Le retour du 2026-08-25 le dit sans détour :
+ * « dès que je viens sur Anam, je veux qu'elle me dise bonjour ; là ça fait juste parler à ChatGPT ».
+ *
+ * Ce qu'on mesure maintenant est l'ÉCART depuis le dernier tour. Une pause de vingt minutes au
+ * milieu d'un échange n'est pas une arrivée — la resaluer serait absurde, et se lirait comme un
+ * bug. Une reprise après quelques heures en est une.
+ *
+ * Trois heures : au-delà d'une pause plausible dans une même séance, en deçà d'une demi-journée.
+ * La valeur est un choix de produit, pas une mesure — elle est ici pour se relire et se changer.
+ */
+export const REPRISE_HEURES = 3;
+
+/**
+ * Est-ce une ARRIVÉE ? Aucun tour, ou un dernier tour plus vieux que l'écart.
+ *
+ * ⚠️ UN HORODATAGE ILLISIBLE COMPTE COMME UNE ARRIVÉE, et c'est le repli le moins coûteux : le
+ * pire cas est une salutation en trop, contre un silence sur l'écran dont tout le propos est
+ * d'ouvrir la parole. L'inverse — se taire dans le doute — est précisément le défaut qu'on répare.
+ */
+export function estUneArrivee(derniereParoleIso: string | null, maintenant: Date): boolean {
+  if (!derniereParoleIso) return true;
+  const t = Date.parse(derniereParoleIso);
+  if (!Number.isFinite(t)) return true;
+  return maintenant.getTime() - t >= REPRISE_HEURES * 3_600_000;
+}
+
 export interface MatiereOuverture {
   /** Son prénom, s'il est connu. Jamais inventé. */
   readonly prenom: string | null;
