@@ -11,7 +11,7 @@ export default tseslint.config(
   // `verif-*.mjs` et `_*.mjs` : des sondes jetables, déjà exclues du dépôt (.gitignore:23). Sans
   // cette ligne, `npm run lint` sort rouge sur ~50 erreurs qui ne concernent aucun code livré —
   // et un linter qu'on a pris l'habitude de voir rouge ne garde plus rien.
-  { ignores: [".next/**", "node_modules/**", "coverage/**", "next-env.d.ts", "images/**", "verif-*.mjs", "_*.mjs"] },
+  { ignores: [".next/**", "node_modules/**", "coverage/**", "next-env.d.ts", "images/**", "verif-*.mjs", "_*.mjs", ".claude/**"] },
 
   ...tseslint.configs.recommended,
 
