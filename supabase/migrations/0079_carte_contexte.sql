@@ -27,8 +27,11 @@
 --
 -- `authenticated` détient les sept privilèges DML sur toutes les tables de ce schéma : une garde
 -- écrite dans une route ou dans le corps d'une RPC ne garderait rien. La table est donc en RLS
--- FORCÉE **sans aucune policy** — ce qui, en Postgres, vaut deny-all pour tout le monde sauf le
--- propriétaire de la table. Le patron est celui d'`abonnement` depuis la 0013.
+-- FORCÉE **sans aucune policy** — ce qui, en Postgres, vaut deny-all pour TOUT LE MONDE, le
+-- propriétaire de la table compris : c'est précisément ce que `force` ajoute à `enable`. Seuls les
+-- rôles `bypassrls` la traversent, et `service_role` en est un. Le patron est celui de
+-- `pause_rythme` et d'`invitation_integration` — zéro policy, écriture sous `service_role` seul.
+-- (Et non celui d'`abonnement`, qui porte une policy de LECTURE propriétaire : elle, on la voit.)
 --
 -- ⚠️ ELLE RESTE DANS L'EXPORT DE DONNÉES, ET CE N'EST PAS UNE CONTRADICTION. Le droit d'accès
 -- (RGPD art. 15) porte sur TOUTE donnée personnelle, et une carte tenue sur quelqu'un en est une.
@@ -44,7 +47,15 @@
 -- c'est celui-ci qui décide, parce que c'est le seul que personne ne peut contourner.
 
 create table public.carte_contexte (
-  utilisatrice_id uuid primary key references auth.users(id) on delete cascade,
+  -- ⚠️ ELLE PEND À `public.utilisatrice`, PAS À `auth.users`, ET LA CI A DÛ ME L'APPRENDRE. Dans sa
+  -- première version, cette table était la SEULE des trente et une à s'accrocher directement à
+  -- l'identité d'auth ; les trente autres pendent à `public.utilisatrice`. Les deux moteurs
+  -- d'effacement (0058, 0061) retirent `branche`, puis `utilisatrice`, puis `auth.users`, et le
+  -- commentaire de 0058 dit ce qu'ils tiennent pour vrai : « `utilisatrice` emporte les autres
+  -- tables ». Une table accrochée ailleurs ne part plus par CETTE cascade mais par la dernière ligne
+  -- du moteur : elle survivrait à tout effacement qui ne toucherait pas l'auth, et rien ne le dirait.
+  -- Une garde de corpus compte désormais les ancrages (`tests/effacement-schema.test.ts`).
+  utilisatrice_id uuid primary key references public.utilisatrice(id) on delete cascade,
 
   -- Les cinq champs. Tous nullables : une carte vide est l'état normal d'un premier passage, et
   -- `null` s'y lit « on ne sait pas » — jamais « il n'y a rien ».

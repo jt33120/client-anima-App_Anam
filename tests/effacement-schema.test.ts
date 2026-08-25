@@ -204,6 +204,32 @@ describe("[6.7/AC1] L'ordre du moteur, et pourquoi il n'est pas laissé au hasar
     )]).toHaveLength(0);
   });
 
+  it("[LE CŒUR] UNE SEULE table s’accroche à `auth.users` — la cascade n’a qu’une racine", () => {
+    // ⚠️ CETTE GARDE EST NÉE D'UN DÉFAUT À MOI, TROUVÉ PAR LA CI LE 2026-08-25. `carte_contexte`
+    // (0079) est arrivée accrochée à `auth.users(id)` au lieu de `public.utilisatrice(id)` — seule des
+    // trente et une, et pour aucune raison.
+    //
+    // Les deux moteurs (0058, 0061) retirent `branche`, puis `utilisatrice`, puis `auth.users`, et
+    // 0058 écrit noir sur blanc ce qu'il tient pour vrai : « `utilisatrice` emporte les autres
+    // tables ». Une table accrochée ailleurs ne part plus par CETTE cascade : elle dépend de la
+    // DERNIÈRE ligne du moteur. Elle survivrait donc à tout effacement qui ne toucherait pas l'auth
+    // — et ni l'inventaire, ni le test comportemental ne l'auraient dit, puisque les deux moteurs
+    // d'aujourd'hui effacent aussi l'auth. C'est la dette qui n'apparaît qu'au jour du troisième
+    // chemin d'effacement, c'est-à-dire trop tard.
+    const ANCRAGE_AUTH = /references\s+auth\.users\s*\(/gi;
+    const ancrages = [...TOUT.matchAll(ANCRAGE_AUTH)];
+    expect(
+      ancrages.length,
+      "une table s’accroche à `auth.users` au lieu de `public.utilisatrice` : la cascade a deux racines",
+    ).toBe(1);
+    // …et cet ancrage-là est `utilisatrice` elle-même, le 1:1 posé en 0002.
+    expect(TOUT).toMatch(/create\s+table\s+public\.utilisatrice[\s\S]{0,200}references\s+auth\.users/i);
+
+    // ANTI-VACUITÉ : le motif doit MORDRE sur un second ancrage, sinon il ne compte rien.
+    const seconde = "utilisatrice_id uuid primary key references auth.users(id) on delete cascade";
+    expect([...seconde.matchAll(ANCRAGE_AUTH)]).toHaveLength(1);
+  });
+
   it("l'identité d'auth part aussi — une ligne ne portant qu'une adresse en est une donnée", () => {
     expect(MOTEUR).toMatch(/delete\s+from\s+auth\.users\s+where\s+id\s*=\s*[a-z_]+/i);
   });

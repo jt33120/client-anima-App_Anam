@@ -24,7 +24,7 @@ export async function poser(
 }
 
 /**
- * Sème une ligne dans chacune des 31 tables qui portent une colonne la nommant. L'ordre suit les
+ * Sème une ligne dans chacune des 32 tables qui portent une colonne la nommant. L'ordre suit les
  * clés étrangères ; le consentement passe en premier parce que le write-gate art. 9 borne la suite.
  */
 export async function semerTout(admin: SupabaseClient, id: string, marqueur: string): Promise<void> {
@@ -92,6 +92,21 @@ export async function semerTout(admin: SupabaseClient, id: string, marqueur: str
   await poser(admin, "enneagramme", { utilisatrice_id: id, type: 5, origine: "test" });
   await poser(admin, "enneagramme_hypothese", { utilisatrice_id: id, type: 4 });
   await poser(admin, "enneagramme_tentative", { utilisatrice_id: id, reponses: { e1a: 2, e1b: 1 } });
+
+  // ── LA CARTE DE CONTEXTE (0079) — et le seul semis qui ne peut pas porter le marqueur ─────────
+  //
+  // ⚠️ LE MARQUEUR CONTIENT UN HORODATAGE, DONC DES CHIFFRES, et `carte_contexte` les REFUSE au
+  // niveau de la table (`carte_contexte_sans_chiffre`, FR-031 marqué DUR : le produit ne compte
+  // jamais ce qu'une personne a ou n'a pas). Le semis translittère donc les chiffres en lettres
+  // plutôt que d'assouplir la contrainte : la ligne reste unique par utilisatrice — c'est tout ce
+  // dont l'isolation a besoin — et la contrainte éprouvée reste celle du produit, pas celle du test.
+  const sansChiffre = marqueur.replace(/[0-9]/g, (d) => "abcdefghij"[Number(d)]);
+  await poser(admin, "carte_contexte", {
+    utilisatrice_id: id,
+    presentant: `ce que ${sansChiffre} amene`,
+    precipitant: `le soir ou ${sansChiffre} est rentree`,
+    protecteur: `ce qui tient deja pour ${sansChiffre}`,
+  });
   await poser(admin, "lecture", {
     utilisatrice_id: id,
     tirage_id: tirage.id,
