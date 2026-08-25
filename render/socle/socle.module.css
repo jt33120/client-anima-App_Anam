@@ -79,6 +79,17 @@
   border-bottom: 1px solid color-mix(in srgb, var(--texte-doux) 25%, transparent);
 }
 
+/* Une porte du socle. Classe DISTINCTE de `.entree`, et ce n'est pas cosmétique : une garde compte
+   les entrées de nombre (« six sur six », FR-055) et une classe partagée lui ferait compter deux
+   choses différentes sous le même nom — elle mesurerait la mise en page, pas la promesse. */
+.porte {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--texte-doux) 25%, transparent);
+}
+
 /* Une position : tout sur une ligne, parce qu'il y en a douze et qu'on les compare du regard.
    `flex-wrap` : sur 390 px, « Nœud lunaire moyen » + « Sagittaire, 12° » + « neuvième maison »
    ne tiennent pas — et une valeur tronquée serait un fait faux. */

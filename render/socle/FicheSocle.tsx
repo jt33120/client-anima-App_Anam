@@ -39,13 +39,14 @@ export interface ProprietesFicheSocle {
     readonly titreMaisons: string;
     readonly titreType: string;
     readonly titreManques: string;
+    readonly titrePortes: string;
     readonly sensDuCielNonEcrit: string;
     readonly typeSansTexte: string;
   };
 }
 
 export default function FicheSocle({ fiche, copie }: ProprietesFicheSocle) {
-  const { nombres, ciel, type } = fiche;
+  const { nombres, ciel, type, portes } = fiche;
   return (
     <>
       <p className={`t-corps ${s.introduction}`}>{copie.introduction}</p>
@@ -165,6 +166,25 @@ export default function FicheSocle({ fiche, copie }: ProprietesFicheSocle) {
             <Lien reparation={type.absence.reparation} />
           </div>
         )}
+      </section>
+
+      {/* ── Les deux portes du socle. TOUJOURS là, même quand rien ne manque : une porte qui
+             n'apparaît qu'en cas de problème est une porte qu'on ne trouve pas quand on la
+             cherche. Elles quittent `/profil` en Story 7.2 — c'est ici qu'on les atteint. ──── */}
+      <section className={s.section} aria-labelledby="socle-portes">
+        <h2 id="socle-portes" className={`t-titre-sm ${s.titreSection}`}>
+          {copie.titrePortes}
+        </h2>
+        <ul className={s.liste}>
+          {portes.map((porte) => (
+            <li key={porte.url} className={s.porte}>
+              <Link className={s.reparation} href={porte.url}>
+                <span className="t-corps">{porte.titre}</span>
+              </Link>
+              <p className={`t-meta ${s.etiquette}`}>{porte.quoi}</p>
+            </li>
+          ))}
+        </ul>
       </section>
     </>
   );

@@ -16,6 +16,7 @@ import {
   RAISON_CORPS,
   URL_CORRIGER_LE_NOM,
   URL_AJOUTER_SON_HEURE,
+  PORTES_DU_SOCLE,
 } from "./copie-socle";
 
 /**
@@ -141,10 +142,23 @@ export interface SectionType {
   readonly absence: { readonly phrase: string; readonly reparation: Reparation } | null;
 }
 
+/** Une porte du socle : ce qu'on peut changer, et où. Même forme qu'une entrée de menu. */
+export interface PorteFiche {
+  readonly titre: string;
+  readonly quoi: string;
+  readonly url: string;
+}
+
 export interface FicheSocle {
   readonly nombres: SectionNombres;
   readonly ciel: SectionCiel;
   readonly type: SectionType;
+  /**
+   * ⚠️ TOUJOURS PRÉSENTES, MÊME QUAND RIEN NE MANQUE. Une porte qui n'apparaît qu'en cas de
+   * problème est une porte qu'on ne trouve pas quand on la cherche — et elles quittent `/profil`
+   * en Story 7.2, donc ce serait le seul endroit où les atteindre.
+   */
+  readonly portes: readonly PorteFiche[];
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
@@ -339,6 +353,7 @@ export function ficheSocle(
     nombres: sectionNombres(numerologie, indisponibles.nombres),
     ciel: sectionCiel(theme, indisponibles.ciel),
     type: sectionType(type),
+    portes: PORTES_DU_SOCLE,
   });
 }
 

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
 import * as copie from "@/lib/domain/copie-profil";
+import { ENTREES_MENU } from "@/lib/domain/menu-compte";
 import Profil from "@/render/profil/Profil";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
@@ -64,7 +65,7 @@ export default async function PageProfil() {
         actionEnregistrer={copie.ACTION_ENREGISTRER}
         prenom={data?.prenom ?? ""}
         nomComplet={data?.nom_complet ?? ""}
-        entrees={copie.ENTREES}
+        entrees={ENTREES_MENU}
         urlRetour="/"
         enregistrer={enregistrerNom}
       />

@@ -65,6 +65,31 @@ export const TITRE_ANGLES = "Tes angles";
 export const TITRE_MAISONS = "Tes maisons";
 export const TITRE_TYPE = "Ton type";
 export const TITRE_MANQUES = "Ce qui manque, et pourquoi";
+export const TITRE_PORTES = "Ce que tu peux changer";
+
+/**
+ * ⚠️ CES DEUX PORTES VIVENT ICI PLUTÔT QUE DANS LE MENU DE COMPTE, ET C'EST UNE DÉCISION ÉCRITE
+ * (amendement d'`EXPERIENCE.md` du 2026-08-25, §1).
+ *
+ * Ce sont les deux seules choses qui CORRIGENT le socle. Les ranger dans le menu de compte, à côté
+ * de « Mes données » et « L'abonnement », les couperait de ce qu'elles réparent : on découvre qu'il
+ * manque son heure EN REGARDANT SON CIEL, pas en ouvrant une liste de réglages. Elles sont donc au
+ * contact du manque — et elles restent là même quand rien ne manque, parce qu'une porte qui
+ * n'apparaît qu'en cas de problème est une porte qu'on ne trouve pas quand on la cherche.
+ */
+export const PORTES_DU_SOCLE: readonly { readonly titre: string; readonly quoi: string; readonly url: string }[] =
+  Object.freeze([
+    {
+      titre: "Ton heure de naissance",
+      quoi: "Elle complète le ciel — l’ascendant, le milieu du ciel et les maisons en dépendent.",
+      url: "/heure-naissance",
+    },
+    {
+      titre: "Ton type",
+      quoi: "Le test d’ennéagramme : court, interruptible, et repris là où tu l’as laissé.",
+      url: "/enneagramme",
+    },
+  ]);
 
 /**
  * ⚠️ L'AVEU QUE LA STORY 7.5 EXIGE PAR ÉCRIT : LES FAITS SONT LÀ, LE SENS NE L'EST PAS.

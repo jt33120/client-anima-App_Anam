@@ -11,6 +11,7 @@ import {
   TITRE_MAISONS,
   TITRE_TYPE,
   TITRE_MANQUES,
+  TITRE_PORTES,
   SENS_DU_CIEL_NON_ECRIT,
 } from "@/lib/domain/copie-socle";
 import { MESSAGE_TYPE_SANS_TEXTE, MESSAGE_TYPE_ABSENT } from "@/lib/domain/enneagramme-items";
@@ -46,6 +47,7 @@ const COPIE = {
   titreMaisons: TITRE_MAISONS,
   titreType: TITRE_TYPE,
   titreManques: TITRE_MANQUES,
+  titrePortes: TITRE_PORTES,
   sensDuCielNonEcrit: SENS_DU_CIEL_NON_ECRIT,
   typeSansTexte: MESSAGE_TYPE_SANS_TEXTE,
 };
@@ -176,7 +178,14 @@ describe("[7.5 · 7.8] le type — Anima cesse d'être accusée d'un vide qui n'
     expect(texte, "l'ancien message accusait Anima d'un texte qu'elle a pourtant écrit").not.toContain(
       "Anima n’a pas encore écrit cette carte",
     );
-    expect(container.querySelectorAll("a[href='/enneagramme']").length).toBe(1);
+    // ⚠️ ON VISE LE LIEN DE L'ABSENCE, PAS TOUS LES LIENS DE LA PAGE. La section « Ce que tu peux
+    // changer » porte elle aussi une porte vers `/enneagramme` : compter la page entière ferait
+    // passer ce test au vert le jour où l'invitation disparaîtrait, la porte suffisant au compte.
+    const bloc = [...container.querySelectorAll("div[class*='manque']")].find((d) =>
+      (d.textContent ?? "").includes(MESSAGE_TYPE_ABSENT),
+    );
+    expect(bloc, "l'invitation au test n'est pas dans un bloc d'absence").toBeDefined();
+    expect(bloc!.querySelectorAll("a[href='/enneagramme']").length).toBe(1);
   });
 
   it("avec un type, son texte de corpus paraît et l'invitation disparaît", () => {
@@ -204,11 +213,31 @@ describe("[7.5/AC8 · FR-031] rien à l'écran ne compte quoi que ce soit", () =
   });
 });
 
+describe("[7.5 · 7.2] les deux portes du socle", () => {
+  it("[LE CŒUR] elles sont là MÊME quand rien ne manque", () => {
+    // ⚠️ C'EST LE CŒUR PARCE QUE C'EST LE CAS QU'ON OUBLIE. Une porte qui n'apparaît qu'en cas de
+    // problème est une porte qu'on ne trouve pas quand on la cherche — et depuis la Story 7.2, ces
+    // deux-là ne vivent plus dans `/profil` : c'est ici, ou nulle part.
+    const { container } = dessiner(complete);
+    const portes = container.querySelectorAll("li[class*='porte']");
+    expect(portes.length).toBe(2);
+    const cibles = [...portes].flatMap((p) => [...p.querySelectorAll("a")].map((a) => a.getAttribute("href")));
+    expect(cibles.sort()).toEqual(["/enneagramme", "/heure-naissance"]);
+  });
+
+  it("chaque porte dit ce qu'il y a derrière", () => {
+    const { container } = dessiner(complete);
+    for (const porte of container.querySelectorAll("li[class*='porte']")) {
+      expect((porte.textContent ?? "").length, "une porte sans phrase est une ligne de menu").toBeGreaterThan(50);
+    }
+  });
+});
+
 describe("[7.5] la structure du document", () => {
-  it("trois sections, chacune avec un titre accessible", () => {
+  it("quatre sections, chacune avec un titre accessible", () => {
     const { container } = dessiner(complete);
     const sections = container.querySelectorAll("section[aria-labelledby]");
-    expect(sections.length).toBe(3);
+    expect(sections.length, "nombres, ciel, type, portes").toBe(4);
     for (const sec of sections) {
       const id = sec.getAttribute("aria-labelledby")!;
       const titre = container.querySelector(`#${id}`);

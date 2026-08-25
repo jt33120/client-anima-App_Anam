@@ -43,63 +43,24 @@ export const NOM_ECHEC = "Je n’ai pas réussi à enregistrer. Réessaie dans u
 export const NOM_PREVIENT_LES_NOMBRES =
   "Changer le nom complet recalcule les nombres qui en viennent. Ta date de naissance, elle, ne bouge pas.";
 
-export interface EntreeProfil {
-  readonly titre: string;
-  readonly quoi: string;
-  readonly url: string;
-}
-
 /**
- * ⚠️ L'ORDRE VA DU PLUS COURANT AU PLUS DÉFINITIF, et il finit par l'effacement. Ce n'est pas de la
- * mise en page : une liste de réglages qui met « supprimer mon compte » en troisième position le
- * fait toucher par accident.
+ * ⚠️ LA LISTE D'ENTRÉES A ÉTÉ RETIRÉE D'ICI LE 2026-08-25 (Story 7.2), ET C'EST UNE SUPPRESSION,
+ * PAS UN DÉPLACEMENT DE CONFORT.
+ *
+ * `/profil` a été livré le 2026-08-23 comme réponse d'urgence à « il manque un bouton Profil » :
+ * une page pleine listant six liens, faute de menu de compte. Le menu de compte EST cette réponse
+ * (`lib/domain/menu-compte.ts`), et maintenir les deux listes garantissait qu'elles divergeraient
+ * au premier ajout — une entrée nouvelle dans l'une, absente de l'autre, sans que rien ne rougisse.
+ *
+ * `tests/menu-compte-frontiere.test.ts` refuse désormais qu'une SECONDE constante d'entrées de
+ * compte existe dans le dépôt.
+ *
+ * Ce qui reste ici est la seule chose que `/profil` porte et qui n'existe nulle part ailleurs : le
+ * FORMULAIRE DE NOM. L'amendement d'`EXPERIENCE.md` du 2026-08-25 (§6) le déménage vers `/reglages`
+ * et fait disparaître `/profil` ; c'est la Story 7.3 qui pose ce geste, quand la feuille de menu
+ * existera. Le supprimer avant elle retirerait le seul moyen de corriger son prénom.
+ *
+ * ⚠️ ET LES DEUX ENTRÉES QUI ONT QUITTÉ CETTE LISTE SANS ENTRER DANS LE MENU — « Ton heure de
+ * naissance » et « Ton type » — ne sont PAS perdues : elles vivent sous la halte « Ton socle »
+ * (`PORTES_DU_SOCLE`, amendement §1), au contact du manque qu'elles réparent.
  */
-export const ENTREES: readonly EntreeProfil[] = Object.freeze([
-  {
-    /**
-     * ⚠️ EN TÊTE, ET C'EST UNE DÉCISION ÉCRITE (amendement d'`EXPERIENCE.md` du 2026-08-25, §1).
-     *
-     * « Ton socle » est la DEUXIÈME entrée du menu de compte, juste après « Aide et ressources » —
-     * qui, elle, ne vit pas encore ici. C'est donc la première de cette liste-ci. Elle y est mise
-     * dès maintenant plutôt qu'à la Story 7.3 pour une raison simple : la halte existe (7.5), et
-     * une halte qu'on ne peut atteindre qu'en tapant son URL est une halte qui n'existe pas pour
-     * celle qui l'utilise.
-     *
-     * Cette liste entière est reprise par `lib/domain/menu-compte.ts` en Story 7.2 — il n'existera
-     * alors plus qu'UNE seule liste d'entrées de compte dans le dépôt.
-     */
-    titre: "Ton socle",
-    quoi: "Tes six nombres et leur sens, ton ciel de naissance, ton type — tout ce qui a été calculé, et ce qui manque.",
-    url: "/socle",
-  },
-  {
-    titre: "Le rythme quotidien",
-    quoi: "À quelle heure ton téléphone peut afficher quelques mots, et s’il le fait.",
-    url: "/reglages",
-  },
-  {
-    titre: "Ce qu’Anam retient",
-    quoi: "Les phrases qu’elle a gardées de ce que tu lui as dit. Tu peux les corriger ou les effacer une par une.",
-    url: "/memoire",
-  },
-  {
-    titre: "Ton heure de naissance",
-    quoi: "Elle complète le socle. Sans elle, une partie du ciel reste incalculable.",
-    url: "/heure-naissance",
-  },
-  {
-    titre: "Ton type",
-    quoi: "L’ennéagramme, si le test a été passé ou si une hypothèse a été posée.",
-    url: "/enneagramme",
-  },
-  {
-    titre: "Ton abonnement",
-    quoi: "Ce qui est en cours, et comment l’arrêter. Arrêter prend autant de clics que commencer.",
-    url: "/abonnement",
-  },
-  {
-    titre: "Tes données",
-    quoi: "Tout télécharger, ou tout effacer — définitivement, compte compris.",
-    url: "/mes-donnees",
-  },
-]);

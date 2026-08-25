@@ -91,8 +91,15 @@ export interface SectionTypeVue {
   readonly absence: { readonly phrase: string; readonly reparation: ReparationVue } | null;
 }
 
+export interface PorteVue {
+  readonly titre: string;
+  readonly quoi: string;
+  readonly url: string;
+}
+
 export interface FicheSocleVue {
   readonly nombres: SectionNombresVue;
   readonly ciel: SectionCielVue;
   readonly type: SectionTypeVue;
+  readonly portes: readonly PorteVue[];
 }

@@ -14,6 +14,7 @@ import {
   TITRE_MAISONS,
   TITRE_TYPE,
   TITRE_MANQUES,
+  TITRE_PORTES,
   SENS_DU_CIEL_NON_ECRIT,
   NOMBRES_INDISPONIBLES,
   CIEL_INDISPONIBLE,
@@ -126,6 +127,7 @@ export default async function Page() {
           titreMaisons: TITRE_MAISONS,
           titreType: TITRE_TYPE,
           titreManques: TITRE_MANQUES,
+          titrePortes: TITRE_PORTES,
           sensDuCielNonEcrit: SENS_DU_CIEL_NON_ECRIT,
           typeSansTexte: MESSAGE_TYPE_SANS_TEXTE,
         }}
