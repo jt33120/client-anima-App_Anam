@@ -1,0 +1,21 @@
+{
+  "_pourquoi": "La suite qui voit des pixels a rendu son premier verdict le 2026-08-25 : 73 passés, 17 échoués. Ces 17 ne sont PAS causés par le commit qui a ajouté le travail `navigateur` — il ne touchait qu'un fichier de CI. Ce sont des défauts qui vivaient déjà, invisibles depuis que le stack Supabase local a disparu des machines (décision du 2026-08-24).",
+  "_comment_lire": "Chaque clé est `projet › fichier`, chaque valeur le NOMBRE d'échecs tolérés dans ce fichier. La CI échoue si un fichier dépasse son compte, ou si un fichier absent d'ici échoue. Elle SIGNALE quand un compte peut baisser — et ce fichier ne doit que décroître.",
+  "_regle": "On n'AJOUTE jamais une entrée ici pour faire passer un commit. Une nouvelle ligne est l'aveu qu'on a cassé un pixel ; le geste attendu est de réparer, ou d'écrire pourquoi on ne répare pas et quelle story le fait.",
+  "_verdict_du_2026-08-25": {
+    "perimes": "e2e/reperes.spec.ts et e2e/guide.spec.ts (8 échecs) : `/reperes` a été replié dans `/aide` le 2026-08-23 et ces specs cherchent encore la page. L'une d'elles porte pourtant une vraie question — « la porte de secours n'est pas un mode d'emploi » — qui appartient à la Story 7.12.",
+    "reels": "fluidite (4) : la scène mesurée à 4 im/s pendant le tour guidé, et 32 im/s contre 61 au repos → Story 11.1. conversation-attente (1) : le signe d'Anam à 1087 ms → Epic 8. barre-basse (2), glissement (1), seuil (1) : des gestes qui ne rendent pas ce qu'ils promettent."
+  },
+  "echecs_tolerés": {
+    "mobile › e2e/barre-basse.spec.ts": 2,
+    "mobile › e2e/conversation-attente.spec.ts": 1,
+    "mobile › e2e/fluidite.spec.ts": 2,
+    "mobile › e2e/glissement.spec.ts": 1,
+    "mobile › e2e/guide.spec.ts": 1,
+    "mobile › e2e/reperes.spec.ts": 3,
+    "mobile › e2e/seuil.spec.ts": 1,
+    "bureau › e2e/fluidite.spec.ts": 2,
+    "bureau › e2e/guide.spec.ts": 1,
+    "bureau › e2e/reperes.spec.ts": 3
+  }
+}

@@ -99,8 +99,22 @@ jobs:
       # `npm run e2e` démarre son propre `next dev` avec les clés du stack local, écrites en dur
       # dans `playwright.config.ts`. Rien à exporter ici : c'est justement ce qui empêche
       # `.env.local` de gagner.
+      #
+      # ⚠️ `continue-on-error` ICI N'EST PAS UNE TOLÉRANCE À L'ÉCHEC : c'est ce qui laisse le
+      # comparateur de l'étape suivante rendre le verdict. Playwright sort en erreur dès le premier
+      # test rouge, et la suite en compte 17 attendus depuis le 2026-08-25 (voir
+      # `e2e/ligne-de-base.json`). Sans ce drapeau, le travail s'arrêterait avant d'avoir comparé
+      # quoi que ce soit — et on ne saurait jamais si le 18ᵉ est arrivé.
       - name: Parcours au navigateur (WebKit + Chromium)
-        run: npm run e2e
+        id: parcours
+        continue-on-error: true
+        run: npx playwright test --reporter=json > rapport-playwright.json
+
+      # LE VERDICT. Il échoue sur un échec NOUVEAU, jamais sur la ligne de base — et il signale
+      # quand un compte peut baisser. Un « main » rouge en permanence détruirait le signal ; un
+      # travail non bloquant ne serait lu par personne. Voir l'en-tête du script.
+      - name: Comparer à la ligne de base
+        run: node scripts/e2e-ligne-de-base.mjs rapport-playwright.json
 
       # Une capture et une trace par échec — sans elles, un échec de pixel en CI est indéchiffrable.
       - name: Conserver les traces d'échec
@@ -111,4 +125,5 @@ jobs:
           path: |
             test-results/
             playwright-report/
+            rapport-playwright.json
           retention-days: 7
