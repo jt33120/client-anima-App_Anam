@@ -55,14 +55,33 @@ Gardé par `tests/corpus-architecture.test.ts`.
 
 ## L'état des corpus
 
+⚠️ **CE TABLEAU EST VÉRIFIÉ PAR LA CI**, ligne à ligne, contre ce que les modules contiennent
+réellement (`tests/corpus-etat.test.ts`). Ne le modifiez pas à la main en espérant qu'il ait raison :
+si vous le changez sans changer le code, le build casse — et c'est le but.
+
+Il a menti pendant des semaines. Il annonçait **cinq** corpus, 186 créneaux et **zéro texte écrit**,
+alors que cinq corpus sur sept étaient COMPLETS. Le 2026-08-25, une investigation de code l'a lu, en
+a conclu que la numérologie était vide, et a déclaré bloqué un chantier parfaitement faisable. Un
+document faux avait arrêté un travail. C'est pour ça que ce tableau est désormais calculé.
+
 | Corpus | Créneaux | Écrits | Story |
 |---|---|---|---|
-| **Numérologie** (`numerologie.ts`) | 69 | **0** | 5.2 |
-| **Mantras du jour** (`mantra.ts`) | 60 | **0** | 5.4 |
-| **Horoscope du jour** (`horoscope.ts`) | 27 | **0** | 5.4 |
-| **Ennéagramme** (`enneagramme.ts`) | 9 | **0** | 5.5 |
-| **Sens des cartes** (`../lecture/sens-cartes.ts`) | 21 | **0** | 5.7, ramené de 24 à 21 en 5.10 |
-| **Total déclaré** | **186** | **0** | |
+| Numérologie · `numerologie` | 69 | **69** | 5.2 |
+| Mantras du jour · `mantra` | 60 | **60** | 5.4 |
+| Horoscope du jour · `horoscope` | 27 | **27** | 5.4 |
+| Ennéagramme · `enneagramme` | 9 | **9** | 5.5 |
+| Ancrages · `ancrages` | 24 | **24** | — |
+| Description des cartes · `description-cartes` | 21 | **0** | 5.7 |
+| Sens des cartes · `sens-cartes` | 21 | **0** | 5.7, ramené de 24 à 21 en 5.10 |
+| **Total** | **231** | **189** | |
+
+**Ce qui reste à écrire, et par qui.** Les 42 créneaux non écrits sont les deux corpus du jeu de
+cartes, et ils relèvent d'Anima seule (FR-054, FR-086) : c'est un travail d'ÉCRITURE, pas de code.
+
+**Ce qui n'a même pas de créneau.** Le thème natal n'apparaît nulle part dans ce tableau, et ce n'est
+pas un oubli : **il n'a aucun corpus déclaré**. `lib/domain/cartes-socle.ts` code son texte en
+`NON_ECRIT` en dur. Toute surface qui prétendrait « expliquer ton thème » afficherait donc un tableau
+d'éphémérides sans une ligne de sens. Le corpus d'astrologie natale est à créer entièrement.
 
 Le **sens des cartes** est le seul corpus qui ne vit pas dans ce dossier, et c'est délibéré : il
 porte `import "server-only"`, que `tests/corpus-architecture.test.ts` interdit ici. Toute sa valeur
