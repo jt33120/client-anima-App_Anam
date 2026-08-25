@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { dateNaissanceParis } from "./_dates-paris";
 
 /**
  * REVUE DE CODE du 2026-08-12, Lot 3 — LES HORODATAGES AUTORITAIRES (0046), LA PROVENANCE D'UN FAIT
@@ -228,11 +229,13 @@ describe("[0048/DUR] les 18 ans ne se contournent pas par un PATCH direct", () =
   }, 60_000);
 
   /** `n` années en arrière, plus `decalageJours` — arithmétique de calendrier, comme Postgres. */
-  const ilYA = (annees: number, decalageJours = 0): string => {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - annees);
-    return new Date(d.getTime() + decalageJours * 86_400_000).toISOString().slice(0, 10);
-  };
+  /**
+   * ⚠️ CE CALCUL SE FAISAIT EN UTC, ET LA BASE COMPTE EN EUROPE/PARIS (corrigé le 2026-08-26).
+   * Deux heures par nuit, la CI rougissait sans qu'une ligne du produit ait changé. Le calcul vit
+   * désormais dans `tests/_dates-paris.ts`, éprouvé à TOUTES LES HEURES du jour par
+   * `tests/dates-paris.test.ts` — sans base, donc sans dépendre de ce fichier-ci.
+   */
+  const ilYA = (annees: number, decalageJours = 0): string => dateNaissanceParis(annees, decalageJours);
 
   it("[L'EXPLOIT] une date de naissance de MINEURE est refusée par la base", async () => {
     const { error } = await vierge.client
