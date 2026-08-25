@@ -97,8 +97,11 @@ function Carte({ carte, enAvant }: { carte: CarteVue; enAvant: boolean }) {
       {/*
         L'ABSENCE, DITE HONNÊTEMENT (AC5).
 
-        165 créneaux de corpus sont déclarés et aucun n'est écrit : c'est l'état RÉEL du produit, pas
-        un cas dégradé rare. Trois refus tiennent cette phrase :
+        ⚠️ CE COMMENTAIRE ANNONÇAIT « 165 CRÉNEAUX ET AUCUN ÉCRIT ». C'était faux, et la même phrase
+        a coûté une demi-journée le 2026-08-25 dans `lib/corpus/README.md` : une enquête l'a lue et a
+        déclaré bloqué un chantier faisable. L'état réel est CALCULÉ par `tests/corpus-etat.test.ts`
+        et vit là, nulle part ailleurs. Ce qui reste vrai ici, c'est qu'un créneau vide est un état
+        NORMAL du produit, pas un cas dégradé rare. Trois refus tiennent cette phrase :
           — pas de « bientôt » ni de compte à rebours (FR-057 : on ne teaser pas ce qu'on n'a pas) ;
           — pas d'excuse, et surtout pas de repli fabriqué : seule Anima peut écrire ces textes
             (FR-054 + FR-086), et une phrase de remplacement serait une citation inventée attribuée

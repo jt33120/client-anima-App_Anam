@@ -56,6 +56,23 @@ export interface EntreeProfil {
  */
 export const ENTREES: readonly EntreeProfil[] = Object.freeze([
   {
+    /**
+     * ⚠️ EN TÊTE, ET C'EST UNE DÉCISION ÉCRITE (amendement d'`EXPERIENCE.md` du 2026-08-25, §1).
+     *
+     * « Ton socle » est la DEUXIÈME entrée du menu de compte, juste après « Aide et ressources » —
+     * qui, elle, ne vit pas encore ici. C'est donc la première de cette liste-ci. Elle y est mise
+     * dès maintenant plutôt qu'à la Story 7.3 pour une raison simple : la halte existe (7.5), et
+     * une halte qu'on ne peut atteindre qu'en tapant son URL est une halte qui n'existe pas pour
+     * celle qui l'utilise.
+     *
+     * Cette liste entière est reprise par `lib/domain/menu-compte.ts` en Story 7.2 — il n'existera
+     * alors plus qu'UNE seule liste d'entrées de compte dans le dépôt.
+     */
+    titre: "Ton socle",
+    quoi: "Tes six nombres et leur sens, ton ciel de naissance, ton type — tout ce qui a été calculé, et ce qui manque.",
+    url: "/socle",
+  },
+  {
     titre: "Le rythme quotidien",
     quoi: "À quelle heure ton téléphone peut afficher quelques mots, et s’il le fait.",
     url: "/reglages",

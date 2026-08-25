@@ -19,8 +19,15 @@ import type { CarteBibliotheque, LigneFait } from "./bibliotheque";
  *
  * ── LE VIDE EST LE CAS NORMAL, PAS LE CAS DÉGRADÉ ──────────────────────────────────────────────
  *
- * Le corpus d'Anima compte 165 créneaux déclarés et **0 écrit** (FR-054 + FR-086 : elle seule peut
- * les écrire). Les cinq cartes ne sont donc pas égales devant ce vide :
+ * ⚠️ CE PARAGRAPHE ANNONÇAIT « 165 CRÉNEAUX ET 0 ÉCRIT », ET C'ÉTAIT FAUX (corrigé le 2026-08-25).
+ * La même phrase vivait dans `lib/corpus/README.md` et y a coûté une demi-journée : une enquête l'a
+ * lue, en a conclu que la numérologie était vide, et a déclaré bloqué un chantier faisable. Le
+ * tableau du README est désormais CALCULÉ (`tests/corpus-etat.test.ts`) ; ce commentaire-ci, lui,
+ * ne peut pas l'être — alors il ne porte plus de chiffre. L'état réel se lit d'une commande, et
+ * seulement là.
+ *
+ * Ce qui reste vrai, et qui est le vrai sujet de ce paragraphe : les cinq cartes ne sont PAS égales
+ * devant un créneau vide.
  *
  *     mantra       →  la carte EST le texte. Sans texte, elle n'a rien. Aucun fait à montrer.
  *     horoscope    →  des énumérations (`lune:…`, `configuration:…`), pas de la prose. Rien non plus.
@@ -64,12 +71,26 @@ export const SIGNE_LIBELLE: Readonly<Record<Signe, string>> = Object.freeze({
   poissons: "Poissons",
 });
 
-const CORPS_LIBELLE: Readonly<Partial<Record<Corps, string>>> = Object.freeze({
+/**
+ * ⚠️ EXPORTÉ POUR LA HALTE DU SOCLE (7.5), et complété avec les dix classiques et les deux nœuds.
+ * La CARTE n'en montre toujours que cinq (`CORPS_DE_CARTE`) : c'est une contrainte de vignette, pas
+ * une limite du produit. La halte, elle, montre tout ce que le thème contient. Deux tables auraient
+ * divergé au premier renommage — il n'y en a qu'une, et c'est celle-ci.
+ */
+export const CORPS_LIBELLE: Readonly<Partial<Record<Corps, string>>> = Object.freeze({
   soleil: "Soleil",
   lune: "Lune",
   mercure: "Mercure",
   venus: "Vénus",
   mars: "Mars",
+  jupiter: "Jupiter",
+  saturne: "Saturne",
+  uranus: "Uranus",
+  neptune: "Neptune",
+  pluton: "Pluton",
+  noeud_moyen: "Nœud lunaire moyen",
+  noeud_vrai: "Nœud lunaire vrai",
+  chiron: "Chiron",
 });
 
 /**
@@ -79,7 +100,8 @@ const CORPS_LIBELLE: Readonly<Partial<Record<Corps, string>>> = Object.freeze({
  */
 const CORPS_DE_CARTE: readonly Corps[] = Object.freeze(["soleil", "lune", "mercure", "venus", "mars"]);
 
-const NOMBRE_LIBELLE: Readonly<Record<NomNombre, string>> = Object.freeze({
+/** ⚠️ EXPORTÉ POUR LA HALTE DU SOCLE (7.5) — même raison que `CORPS_LIBELLE` : une seule table. */
+export const NOMBRE_LIBELLE: Readonly<Record<NomNombre, string>> = Object.freeze({
   chemin_de_vie: "Chemin de vie",
   expression: "Expression",
   intime: "Intime",
@@ -194,8 +216,13 @@ function faitsDuTheme(theme: ThemeNatal): readonly LigneFait[] {
   return Object.freeze(lignes);
 }
 
-/** « Balance » sans l'heure, « Balance, 12° » avec. Jamais de minutes d'arc : on n'en a pas besoin. */
-function enSigne(signe: Signe, degre: number, avecDegre: boolean): string {
+/**
+ * « Balance » sans l'heure, « Balance, 12° » avec. Jamais de minutes d'arc : on n'en a pas besoin.
+ *
+ * ⚠️ EXPORTÉ POUR LA HALTE DU SOCLE (7.5). C'est la SEULE mise en mots d'une position dans le
+ * produit, et la règle du degré — rendu seulement sous `heure_connue` — vit ici, une fois.
+ */
+export function enSigne(signe: Signe, degre: number, avecDegre: boolean): string {
   const nom = SIGNE_LIBELLE[signe];
   return avecDegre ? `${nom}, ${Math.floor(degre)}°` : nom;
 }

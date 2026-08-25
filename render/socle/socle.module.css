@@ -1,0 +1,155 @@
+/* La halte « Ton socle » (Story 7.5).
+
+   Même sobriété que `/memoire` et `/reglages`, et pour une raison précise : c'est un écran de
+   CONSULTATION, pas une région du monde. On y montre à quelqu'un ce qui a été calculé sur lui —
+   l'habiller de l'imagerie de séance ferait passer un registre d'intimité sur une page dont l'objet
+   est la transparence.
+
+   ⚠️ AUCUN `font-size` ICI. L'échelle vit dans `app/styles/globals.css` et s'applique par les
+   classes globales (`t-titre-sm`, `t-corps`, `t-meta`, `t-anam`). Trois haltes ont déjà titré à
+   1,75 rem quand tout le reste titrait à 1,5 (QA du 2026-08-19, M5) : ce fichier ne peut pas
+   refaire cette faute, il n'a pas d'endroit où l'écrire. */
+
+.halte {
+  max-width: 38rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.titreHalte {
+  font-family: var(--pile-anam);
+  font-weight: 400;
+  color: var(--texte);
+  margin: 0;
+}
+
+.introduction {
+  margin: 0;
+  color: var(--texte-doux);
+  line-height: 1.6;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.titreSection {
+  font-family: var(--pile-anam);
+  font-weight: 400;
+  color: var(--texte);
+  margin: 0;
+}
+
+.sousSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.titreSousSection {
+  margin: 0;
+  color: var(--texte-doux);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  font-weight: 400;
+}
+
+.liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Un nombre : son étiquette, sa valeur, son texte. Trois étages, jamais une ligne de tableau —
+   c'est ce qui distingue une fiche qu'on lit d'un relevé qu'on parcourt. */
+.entree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--texte-doux) 25%, transparent);
+}
+
+/* Une position : tout sur une ligne, parce qu'il y en a douze et qu'on les compare du regard.
+   `flex-wrap` : sur 390 px, « Nœud lunaire moyen » + « Sagittaire, 12° » + « neuvième maison »
+   ne tiennent pas — et une valeur tronquée serait un fait faux. */
+.position {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+}
+
+.etiquette {
+  color: var(--texte-doux);
+  margin: 0;
+}
+
+.valeur {
+  color: var(--texte);
+  margin: 0;
+}
+
+.maison {
+  color: var(--texte-doux);
+  margin: 0;
+}
+
+.texte {
+  margin: 0;
+  color: var(--texte);
+  line-height: 1.7;
+}
+
+/* Le silence du corpus. Il se lit comme une note, jamais comme une erreur : ce n'est pas une panne,
+   c'est un texte qu'une personne n'a pas encore écrit. */
+.nonEcrit {
+  margin: 0;
+  color: var(--texte-doux);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* Un manque : dit, encadré doucement, et suivi de ce qui le répare quand quelque chose le répare. */
+.manque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+
+.raison {
+  margin: 0;
+  color: var(--texte);
+  line-height: 1.6;
+}
+
+/* La cible tactile fait 44 px de haut comme partout ailleurs (UX-DR-42) : un lien de réparation
+   qu'on rate au doigt est un lien qui n'existe pas. */
+.reparation {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  align-self: flex-start;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+/* Une panne se dit comme une panne — jamais comme un vide (leçon 4.6 puis 4.9). */
+.panne {
+  margin: 0;
+  color: var(--texte-doux);
+  line-height: 1.6;
+}

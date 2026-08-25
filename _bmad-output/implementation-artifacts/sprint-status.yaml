@@ -295,7 +295,7 @@ development_status:
   7-2-catalogue-menu-compte-modele-garde-frontiere: backlog
   7-3-glyphe-feuille-bouge-pixel: backlog
   7-4-resilier-trois-clics-compte-clic-lu: backlog
-  7-5-halte-ton-socle-premiere-fois-fr: backlog
+  7-5-halte-ton-socle-premiere-fois-fr: done  # prise AVANT 7.2/7.3 : sinon lien mort puis compte sans surface
   7-6-univers-creer-matiere: backlog
   7-7-accueil-redevient-quotidien-plancher-deplace-decision: backlog
   7-8-enneagramme-cesse-accuser-anima-vide-n: backlog

@@ -44,6 +44,7 @@ export type IdHalte =
   | "reglages"
   | "profil"
   | "reperes"
+  | "socle"
   | "synthese";
 
 export interface PiedHalte {
@@ -70,6 +71,14 @@ const MENTION_DUE: Readonly<Record<IdHalte, { readonly mention: boolean; readonl
     memoire: {
       mention: true,
       motif: "les phrases affichées sont extraites des échanges PAR UN MODÈLE (4.2) — elles se lisent comme des faits sur soi",
+    },
+    socle: {
+      mention: true,
+      motif:
+        "le TYPE retenu qui y paraît peut venir d’une hypothèse formulée par Anam (5.5) — la " +
+        "valeur, pas le texte. Tout le reste de la page est calculé (nombres, positions, angles) et " +
+        "les textes viennent du corpus d’Anima. On ne trie pas l’affichage pour s’épargner la mention : " +
+        "n’afficher que les types issus du test dirait « le test t’attend » à quelqu’une qui a déjà un type",
     },
     synthese: {
       mention: true,

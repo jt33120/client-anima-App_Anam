@@ -125,3 +125,32 @@ export function itemsPourAffichage(): readonly ItemAffiche[] {
  */
 export const MESSAGE_TYPE_SANS_TEXTE =
   "Anima n’a pas encore écrit ce qu’elle voit dans ce type. Son texte se posera ici.";
+
+/**
+ * ⚠️ CE MESSAGE EXISTE PARCE QUE LE PRODUIT ACCUSAIT ANIMA D'UN VIDE QUI N'ÉTAIT PAS LE SIEN
+ * (retour de Julian, 2026-08-25 — Stories 7.5 et 7.8).
+ *
+ * Un compte qui n'a pas passé le test lisait « Anima n'a pas encore écrit cette carte ». Or les
+ * NEUF textes de type SONT écrits (`lib/corpus/textes-de-base.ts`) : ce qui manque n'est pas le
+ * texte, c'est le test. Le produit désignait donc un blocage chez quelqu'un d'autre là où il y
+ * avait un geste à un clic — et personne ne pouvait le deviner.
+ *
+ * Julian l'a dit exactement : « c'est à toi de dire : vous n'avez pas encore fait votre
+ * ennéagramme, faites-le maintenant. »
+ *
+ * ⚠️ UN SEUL ENDROIT POUR CETTE PHRASE. La halte du socle (7.5) et la carte de l'accueil (7.8) la
+ * lisent toutes les deux ici. Deux formulations pour un même état, à deux fichiers d'écart, est
+ * exactement le défaut que la 6.5b a payé sur les libellés de signes.
+ *
+ * Sans impératif — « fais le test » ferait de l'état une relance (`arbitrage-ouverture.ts`) — et
+ * sans futur adressé : c'est le lien à côté qui dit où aller, pas la phrase.
+ */
+export const MESSAGE_TYPE_ABSENT =
+  "Le test n’a pas encore été passé — c’est lui qui manque, pas le texte : les neuf types sont " +
+  "écrits et t’attendent. Il est court, et tu peux t’arrêter en route.";
+
+/** Où le passer. Constante unique — un test vérifie que la page existe. */
+export const URL_PASSER_LE_TEST: { readonly libelle: string; readonly url: string } = Object.freeze({
+  libelle: "Le test d’ennéagramme",
+  url: "/enneagramme",
+});
