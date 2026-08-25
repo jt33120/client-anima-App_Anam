@@ -47,3 +47,68 @@ jobs:
       # Bloque le build si un test échoue — dont la preuve RLS (AD-12) et le smoke test.
       - name: Tests (bloquants)
         run: npm test
+  # ══════════════════════════════════════════════════════════════════════════════════════════════
+  # LA SUITE QUI VOIT DES PIXELS
+  # ══════════════════════════════════════════════════════════════════════════════════════════════
+  #
+  # ⚠️ CE TRAVAIL N'EXISTAIT PAS, ET C'EST POURQUOI RIEN NE VOYAIT UN PIXEL (ajouté le 2026-08-25).
+  #
+  # Le travail `quality` ci-dessus monte un Supabase local et lance 5 300 tests Vitest. AUCUN ne voit
+  # un pixel : ils montent des composants en mémoire. Ils savent qu'un bouton existe, jamais qu'il
+  # fait 27 px de haut, ni qu'un mot flottant atterrit au centre horizontal de l'écran — le défaut
+  # de « Profil » mesuré le 2026-08-25, que 5 300 tests verts n'ont pas vu.
+  #
+  # `e2e/` existe depuis le 2026-08-19 et se lançait à la main sur un stack Supabase LOCAL. La
+  # décision du 2026-08-24 — 100 % cloud, zéro Docker — a fait disparaître ce stack des machines de
+  # développement, et avec lui la seule chose qui regardait l'écran. La suite n'a plus tourné.
+  #
+  # Elle tourne ici. C'est la continuation exacte de la décision du 24 : si c'est la CI qui tient la
+  # base, c'est la CI qui tient le navigateur.
+  #
+  # ⚠️ TRAVAIL SÉPARÉ, PAS UNE ÉTAPE DE PLUS DANS `quality`. Deux raisons. Il installe deux
+  # navigateurs et démarre un serveur Next : le mettre en série ferait attendre la preuve de RLS
+  # derrière un `playwright install`. Et surtout, quand il rougit on veut savoir TOUT DE SUITE si
+  # c'est le pixel ou la base — deux travaux, deux verdicts, aucune confusion.
+  #
+  # ⚠️ IL NE VISE JAMAIS LA PRODUCTION. `playwright.config.ts` impose la cible dans `webServer.env`
+  # et la vérifie dans `globalSetup` AVANT le premier test, avant tout envoi de courriel, avant toute
+  # écriture. C'est la garde posée après l'incident du 2026-08-19 (six comptes créés en production).
+  navigateur:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # Même version ÉPINGLÉE que `quality` : la 2.110+ casse les grants service_role (voir plus haut).
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.67.1
+      - run: supabase start
+
+      # WebKit pour le projet « mobile » (iPhone 14) et Chromium pour « bureau ». Le téléphone
+      # D'ABORD : c'est là que vivait le défaut du 2026-08-19, et c'est la cible réelle du produit.
+      - name: Installer les navigateurs
+        run: npx playwright install --with-deps webkit chromium
+
+      # `npm run e2e` démarre son propre `next dev` avec les clés du stack local, écrites en dur
+      # dans `playwright.config.ts`. Rien à exporter ici : c'est justement ce qui empêche
+      # `.env.local` de gagner.
+      - name: Parcours au navigateur (WebKit + Chromium)
+        run: npm run e2e
+
+      # Une capture et une trace par échec — sans elles, un échec de pixel en CI est indéchiffrable.
+      - name: Conserver les traces d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: traces-playwright
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
