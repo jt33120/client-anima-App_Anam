@@ -45,6 +45,21 @@ import s from "./halte-en-attente.module.css";
  *
  * `aria-hidden` : ce n'est pas du contenu, c'est un état transitoire. Un lecteur d'écran annonce
  * déjà la navigation ; lui faire lire trois blocs vides ajouterait du bruit, pas de l'information.
+  *
+ * ══ ET `/aide` — LE TROISIÈME CAS, TRANCHÉ LE 2026-08-25 (Story 8.2) ═══════════════════════════
+ *
+ * `app/aide/` n'avait NI frontière de chargement NI raison écrite de ne pas en avoir. Ce blanc-là
+ * ne pouvait pas rester : `/aide` est la page qui doit marcher quand tout le reste est cassé
+ * (AD-9, FR-077), et son cas s'arbitre.
+ *
+ * ⚠️ ELLE N'EN REÇOIT PAS, ET C'EST UNE DÉCISION. Un `loading.tsx` remplace le contenu par un
+ * squelette le temps que le serveur réponde. Sur toutes les autres haltes c'est un progrès. Ici,
+ * c'est le contraire de ce qu'on veut : les numéros joignables sont du contenu STATIQUE, rendus
+ * sans aucune lecture de base — la page est déjà quasi instantanée, et un squelette n'ajouterait
+ * qu'un clignotement entre le clic et des numéros qui étaient prêts.
+ *
+ * Et surtout : quelqu'un qui ouvre cette page peut être en train d'en avoir besoin tout de suite.
+ * Un écran d'attente, si court soit-il, est un écran où il n'y a personne à appeler.
  */
 export default function HalteEnAttente() {
   return (

@@ -23,7 +23,7 @@
  * dernier arrêt. C'est ce qu'`e2e/clavier.spec.ts` vérifie, et c'est ce qui compte.
  */
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import {
   URL_AIDE,
   URL_ABONNEMENT,
@@ -40,6 +40,22 @@ import s from "./monde.module.css";
  * par le glyphe. « Anam prépare » (Story 2.2, AC2) : le trait S'ÉPAISSIT (attribut statique piloté
  * par `prepare`), SANS animation cyclique — jamais trois points qui rebondissent.
  */
+/**
+ * L'INDICE D'ATTENTE (Story 8.2 · retour du 2026-08-25 : « rien ne se passe et d'un coup, quelques
+ * secondes après, la page s'ouvre »).
+ *
+ * ⚠️ IL SE LIT DEPUIS UN ENFANT DE `<Link>`, ET NULLE PART AILLEURS. `useLinkStatus` est un hook de
+ * contexte : posé sur un bouton ou en dehors, il rend `pending: false` pour toujours et l'indice ne
+ * paraît jamais — un défaut parfaitement silencieux (`next/dist/docs/…/use-link-status.md`).
+ *
+ * Jamais un tourniquet, jamais trois points qui rebondissent (`EXPERIENCE.md` ligne 200) : un filet
+ * qui s'allume, grammaire de `.signeAnamPrepare`.
+ */
+function IndiceAttente() {
+  const { pending } = useLinkStatus();
+  return <span aria-hidden className={`${s.indiceAttente} ${pending ? s.indiceAttenteActif : ""}`} />;
+}
+
 function SigneAnam({ prepare }: { prepare: boolean }) {
   return (
     <svg
@@ -102,6 +118,7 @@ export default function Surimpression({
         {modele.cheminAbonnement && (
           <Link className={s.cheminAbonnement} href={URL_ABONNEMENT}>
             <span className="t-meta">L&rsquo;abonnement</span>
+            <IndiceAttente />
           </Link>
         )}
 
@@ -140,6 +157,7 @@ export default function Surimpression({
           <span className="t-meta" aria-hidden>
             ?
           </span>
+          <IndiceAttente />
         </Link>
       </div>
     </div>

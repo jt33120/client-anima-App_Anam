@@ -312,7 +312,7 @@ development_status:
   epic-8: backlog
   8-1-ligne-base-ou-geste-ete-fait: backlog
   8-2-retour-clic-pose-deux-gestes-manquent: backlog
-  8-3-lectures-serie-chaque-halte-paie: backlog
+  8-3-lectures-serie-chaque-halte-paie: done  # les deux lectures d'onboarding partent ensemble, sur TOUTES les pages protégées
   8-4-seul-getuser-requete-arbitrage-fraicheur-revue: backlog
   8-5-ou-passent-7-371-ms-repartition: backlog
   8-6-deux-leviers-premier-caractere-gain-borne: backlog

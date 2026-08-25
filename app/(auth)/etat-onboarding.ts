@@ -18,23 +18,47 @@ export async function etapeOnboardingPour(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<EtapeOnboarding> {
-  const { data: ligne, error: erreurLigne } = await supabase
-    .from("utilisatrice")
-    .select("date_naissance, mineur_detecte, barriere_minorite_le")
-    .eq("id", userId)
-    .maybeSingle();
-  // Fail LOUD sur une vraie erreur de lecture : ne jamais confondre « lecture impossible »
-  // (transitoire) avec « pas de ligne ». Sinon on renverrait une adulte déjà consentante vers
-  // /naissance, ensuite bloquée par l'immutabilité de la date (revue 1.5).
+  // ══ LES DEUX LECTURES PARTENT ENSEMBLE (Story 8.3, 2026-08-25) ══════════════════════════════
+  //
+  // ⚠️ ELLES ÉTAIENT AWAITÉES L'UNE APRÈS L'AUTRE, ET ELLES SONT INDÉPENDANTES. Cette fonction est
+  // la garde partagée par TOUTES les pages protégées — la scène, les réglages, la mémoire, les
+  // lectures, la synthèse, les ancrages, la halte du socle. Un aller-retour de base en file
+  // indienne s'y payait donc à CHAQUE navigation, sur chaque écran, par tout le monde.
+  //
+  // Retour de Julian, 2026-08-25 : « quand je clique sur profil, rien ne se passe et d'un coup,
+  // quelques secondes après, la page s'ouvre ». C'est ici qu'une part de cette attente vivait.
+  //
+  // ⚠️ ET LE PARALLÉLISME CHANGE LA PROPAGATION DES ERREURS, CE QUI EST LE VRAI RISQUE DU GESTE.
+  // En série, une panne sur `utilisatrice` levait AVANT que `consentement` soit lu. En parallèle,
+  // les deux promesses existent : si l'une rejette et qu'on ne l'attend pas, Node lève un rejet
+  // NON CAPTÉ, qui tue le processus au lieu de rendre une erreur propre. `Promise.all` attend
+  // bien les deux, et `maybeSingle()` ne REJETTE pas sur une erreur SQL — il rend `{ error }`.
+  // Les deux `throw` ci-dessous restent donc les seuls chemins d'échec, et ils sont éprouvés
+  // chacun séparément par `tests/etat-onboarding.test.ts`.
+  //
+  // La règle qu'ils tiennent n'a pas bougé d'un pouce : FAIL LOUD sur une vraie erreur de lecture,
+  // et ne JAMAIS confondre « lecture impossible » (transitoire) avec « pas de ligne ». Sinon on
+  // renvoie une adulte déjà consentante vers /naissance, où l'immutabilité de la date la bloque
+  // (le défaut est arrivé, revue 1.5).
+  const [
+    { data: ligne, error: erreurLigne },
+    { data: consentement, error: erreurConsentement },
+  ] = await Promise.all([
+    supabase
+      .from("utilisatrice")
+      .select("date_naissance, mineur_detecte, barriere_minorite_le")
+      .eq("id", userId)
+      .maybeSingle(),
+    supabase
+      .from("consentement")
+      .select("art9_accorde, ia_reconnue, cgu_acceptees, revoked_at")
+      .eq("utilisatrice_id", userId)
+      .maybeSingle(),
+  ]);
+
   if (erreurLigne) {
     throw new Error(`Lecture de l’état d’onboarding impossible : ${erreurLigne.message}`);
   }
-
-  const { data: consentement, error: erreurConsentement } = await supabase
-    .from("consentement")
-    .select("art9_accorde, ia_reconnue, cgu_acceptees, revoked_at")
-    .eq("utilisatrice_id", userId)
-    .maybeSingle();
   if (erreurConsentement) {
     throw new Error(`Lecture du consentement impossible : ${erreurConsentement.message}`);
   }

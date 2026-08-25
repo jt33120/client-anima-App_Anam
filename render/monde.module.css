@@ -871,6 +871,7 @@
    jour-là — ce qui règle aussi l'ancien « compromis » de ce commentaire : la position d'« Aide » ne
    bouge plus quand ce lien apparaît. */
 .cheminAbonnement {
+  position: relative;
   flex: none;
   pointer-events: auto;
   min-height: var(--cible-tactile);
@@ -935,6 +936,7 @@
 /* Porte de secours — un mot « Aide », discret, TOUJOURS au même endroit (à droite). Jamais
    rouge / --alerte / pastille / icône / majuscule (FR-077, AD-9). Même grammaire que .navLien. */
 .porteSecours {
+  position: relative;
   /* ⚠️ PLUS DE `margin-left: auto` ICI (2026-08-25). C'est `.groupeDroite` qui aligne, une fois
      pour les trois. Le remettre ici recréerait exactement le défaut : deux marges automatiques se
      partagent l'espace, et l'élément d'avant part au milieu. */
@@ -994,5 +996,54 @@
   .etoile {
     animation: none;
     opacity: 0.55;
+  }
+}
+
+/* ══ L'APPUI PRODUIT UN PIXEL (Story 8.2, 2026-08-25) ══════════════════════════════════════════
+
+   ⚠️ AU 2026-08-25, `grep -n ":active" render/monde.module.css` RENVOYAIT ZÉRO. Sur un écran
+   tactile, `:hover` n'existe pas : un appui sur ces liens ne produisait strictement AUCUN pixel.
+   Entre le doigt et l'ouverture de la page, l'application avait l'air morte — et on réappuie, en
+   croyant avoir raté sa cible. C'est la moitié de « les boutons sont très lents, l'UI fait pas
+   très pro ».
+
+   Une propriété qui change suffit. Ce n'est pas un effet : c'est un accusé de réception. */
+.cheminAbonnement:active,
+.porteSecours:active {
+  color: var(--texte);
+  transform: scale(0.94);
+}
+
+/* ⚠️ L'INDICE D'ATTENTE, ET POURQUOI IL EST UN FILET ET PAS UN TOURNIQUET. `EXPERIENCE.md` ligne
+   200 bannit les spinners et les trois points qui rebondissent partout dans le produit. La
+   grammaire employée est celle de `.signeAnamPrepare` : une propriété, à sens unique.
+
+   Le délai de 100 ms vient de la documentation embarquée de Next
+   (`01-getting-started/04-linking-and-navigating.md`) : sous ce seuil la navigation est déjà finie,
+   et l'indice ne ferait que clignoter — ce qui se lit comme un défaut, pas comme une réponse. */
+.indiceAttente {
+  position: absolute;
+  left: var(--esp-1);
+  right: var(--esp-1);
+  bottom: 2px;
+  height: 1px;
+  background: var(--texte);
+  opacity: 0;
+  transition: opacity var(--duree-standard) var(--courbe) 100ms;
+  pointer-events: none;
+}
+.indiceAttenteActif {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Le CONTENU reste, seul le mouvement cède (UX-DR-38). L'indice est une information : il garde
+     son apparition, sans transition ni mise à l'échelle. */
+  .cheminAbonnement:active,
+  .porteSecours:active {
+    transform: none;
+  }
+  .indiceAttente {
+    transition: none;
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
@@ -108,5 +108,63 @@ describe("[7.3/AC2] l'appui produit un pixel — sur un écran tactile, `:hover`
     expect(indice, "sans délai, l'indice clignote sur une navigation instantanée").toMatch(/transition:[^;]*\d+ms/);
     expect(indice).toContain("opacity: 0");
     expect(MENU, "jamais une rotation infinie").not.toMatch(/animation:[^;]*infinite/);
+  });
+});
+
+describe("[8.2] l'appui et l'attente, sur les liens qui survivent à la 7.3", () => {
+  it("[LE CŒUR] `.cheminAbonnement` et `.porteSecours` répondent à l'appui", () => {
+    // ⚠️ AU 2026-08-25, `grep -n ":active" render/monde.module.css` RENVOYAIT ZÉRO. Sur un écran
+    // tactile `:hover` n'existe pas : un appui ne produisait aucun pixel, et on réappuie en croyant
+    // avoir raté sa cible. C'est la moitié de « les boutons sont très lents ».
+    const actifs = [...MONDE.matchAll(/([.\w-]+):active[^{]*\{([^}]*)\}/g)];
+    expect(actifs.length, "aucun état d'appui dans la surimpression").toBeGreaterThan(0);
+    expect(MONDE).toMatch(/\.cheminAbonnement:active/);
+    expect(MONDE).toMatch(/\.porteSecours:active/);
+    for (const [, sel, corps] of actifs) {
+      expect(corps, `${sel}:active ne déclare aucune propriété`).toMatch(/[a-z-]+\s*:/);
+    }
+  });
+
+  it("[LE CŒUR] l'indice d'attente est branché sur `useLinkStatus`, dans un ENFANT de `<Link>`", () => {
+    // ⚠️ `useLinkStatus` EST UN HOOK DE CONTEXTE. Posé sur un bouton ou hors d'un `<Link>`, il rend
+    // `pending: false` pour toujours et l'indice ne paraît JAMAIS — un défaut parfaitement
+    // silencieux. On vérifie donc qu'il est appelé, ET que le composant qui l'appelle est monté
+    // à l'intérieur des deux liens.
+    const src = lire("render/surimpression.tsx").replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(src, "`useLinkStatus` n'est pas employé").toContain("useLinkStatus()");
+    for (const lien of ["cheminAbonnement", "porteSecours"]) {
+      const i = src.indexOf(`s.${lien}`);
+      expect(i, `${lien} a disparu de la surimpression`).toBeGreaterThan(-1);
+      const bloc = src.slice(i, src.indexOf("</Link>", i));
+      expect(bloc, `${lien} : l'indice d'attente n'est pas dans le lien`).toContain("<IndiceAttente />");
+    }
+  });
+
+  it("l'indice apparaît APRÈS un délai, et n'est ni un tourniquet ni des points", () => {
+    // ⚠️ ON REGARDE LE BLOC DE L'INDICE, PAS TOUTE LA FEUILLE — un mutant l'a exigé. La première
+    // version refusait `animation: … infinite` PARTOUT dans `monde.module.css` et rougissait sur
+    // le SCINTILLEMENT DES ÉTOILES (ligne 144), qui est le décor de la scène et n'a rien d'un
+    // indicateur d'attente. Une garde impossible à satisfaire finit assouplie jusqu'à ne plus rien
+    // garder ; celle-ci vise ce qu'`EXPERIENCE.md` ligne 200 bannit vraiment — un tourniquet À LA
+    // PLACE d'une réponse.
+    const debut = MONDE.indexOf(".indiceAttente {");
+    expect(debut, "l'indice d'attente a disparu de la feuille").toBeGreaterThan(-1);
+    const bloc = MONDE.slice(debut, MONDE.indexOf("}", MONDE.indexOf(".indiceAttenteActif")));
+    expect(bloc, "sans délai, l'indice clignote sur une navigation instantanée").toMatch(
+      /transition:[^;]*\d+ms/,
+    );
+    expect(bloc, "l'indice d'attente est devenu un tourniquet").not.toMatch(/animation:/);
+    expect(bloc, "l'indice doit partir invisible").toContain("opacity: 0");
+  });
+
+  it("[8.2/AC2] le cas de `/aide` est TRANCHÉ par écrit, pas laissé en blanc", () => {
+    // Une page sans frontière de chargement ET sans raison écrite est un blanc : personne ne peut
+    // dire si c'est une décision ou un oubli. `/aide` est la page qui doit marcher quand tout le
+    // reste est cassé — son cas s'arbitre.
+    const entete = lire("render/HalteEnAttente.tsx");
+    expect(entete, "le cas de /aide n'est pas arbitré").toMatch(/`\/aide`/);
+    expect(existsSync(resolve(RACINE, "app/aide/loading.tsx")), "la décision écrite dit le contraire du dépôt").toBe(
+      false,
+    );
   });
 });
