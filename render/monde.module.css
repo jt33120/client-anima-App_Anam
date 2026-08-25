@@ -70,8 +70,9 @@
  * bouge devant lui, et coûte tout dès que la page défile.
  *
  * ⚠️ INVENTAIRE DES PROPRIÉTÉS NON COMPOSITÉES DÉJÀ PRÉSENTES, avec leur verdict :
- *   • `.arbreMonde { filter: drop-shadow(...) }` — STATIQUE, jamais animée, sur la plus GRANDE
- *     couche de la scène.
+ *   • `.arbreMonde { filter: drop-shadow(...) }` — RETIRÉ le 2026-08-26, comme expérience mesurée
+ *     (voir la règle elle-même). Et il n'était pas « statique » comme je l'avais écrit : `top` et
+ *     `opacity` se transitionnent sur cette même couche.
  *
  *     ⚠️ J'AI ÉCRIT ICI « laissée, et mesurée par le cas au repos qui est vert ». C'ÉTAIT FAUX
  *     (corrigé le 2026-08-26) : le cas au repos est dans la ligne de base des échecs, il n'a jamais
@@ -204,7 +205,26 @@
      ferait SAUTER l'arbre au changement de région, pendant qu'il est encore visible. */
   transform: translate(-50%, -50%);
   pointer-events: none;
-  filter: drop-shadow(0 8px 40px rgba(143, 193, 239, 0.12));
+  /* ⚠️ `filter: drop-shadow(0 8px 40px …)` A ÉTÉ RETIRÉ ICI LE 2026-08-26, COMME EXPÉRIENCE MESURÉE.
+   *
+   * Ce que la CI dit, chiffres en main (WebKit, iPhone 14) : la scène tourne à 5 IMAGES PAR SECONDE
+   * au seuil et 9 sur « Moi », contre 62 pour un document du même produit. Ce n'est ni le tour
+   * guidé ni le défilement — c'est la scène AU REPOS, dès le rideau d'entrée. Sur bureau, 32
+   * contre 61.
+   *
+   * Ce filtre est le suspect le plus lourd de cette couche, et pour deux raisons cumulées :
+   *   • il porte un flou de 40 px sur le plus grand élément de la scène — même famille que le
+   *     `blur(44px)` de la voie lactée, qui avait fait tomber l'application à 4 im/s le 2026-08-20 ;
+   *   • et cette couche N'EST PAS statique : `top` et `opacity` se transitionnent juste en dessous.
+   *     Un filtre sur une couche animée se re-rasterise à chaque trame.
+   *
+   * ⚠️ C'EST UNE EXPÉRIENCE, PAS UNE CERTITUDE. Le halo qu'il peignait est très discret
+   * (alpha 0,12) ; s'il manque à l'œil ET que la mesure ne bouge pas, il revient — mais sous une
+   * forme compositée (un `radial-gradient` derrière le canevas), jamais sous un filtre. Si la
+   * mesure bouge, on saura enfin où partait le budget de trame.
+   *
+   * La réponse est dans `e2e/fluidite.spec.ts` au prochain passage de CI. C'est elle qui décide.
+   */
   /* Le retrait derrière l'accueil se FOND, il ne coupe pas — même durée que le fondu de région,
      pour que le passage accueil ↔ arbre reste UN mouvement et non deux. Voir .arbreEnRetrait.
      `top` suit la même durée et la même courbe : l'arbre REDESCEND en s'effaçant, en un seul

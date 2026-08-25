@@ -40,13 +40,14 @@ async function traverser(page: Page, plafond = 40): Promise<Arret[]> {
 
   for (let i = 0; i < plafond; i++) {
     await page.keyboard.press("Tab");
-    const a = await page.evaluate(() => {
+    const a: Arret | "portail" | null = await page.evaluate(() => {
       const el = document.activeElement;
       if (!el || el === document.body) return null;
       // ⚠️ `nextjs-portal` EST LA SURCOUCHE DE DÉVELOPPEMENT DE NEXT, PAS LE PRODUIT. Elle prend le
-      // focus en fin de traversée et peint son propre contour ; la compter ferait rougir la garde
-      // sur quelque chose que personne ne voit en production. On l'ignore, nommément.
-      if (el.tagName.toLowerCase() === "nextjs-portal") return null;
+      // focus et peint son propre contour ; la compter ferait rougir la garde sur quelque chose que
+      // personne ne voit en production. On la SAUTE — voir la boucle plus bas, qui a longtemps cru
+      // s'arrêter dessus alors qu'elle prétendait l'ignorer.
+      if (el.tagName.toLowerCase() === "nextjs-portal") return "portail" as const;
       const s = getComputedStyle(el);
       return {
         balise: el.tagName.toLowerCase(),
@@ -60,7 +61,18 @@ async function traverser(page: Page, plafond = 40): Promise<Arret[]> {
         decalage: s.outlineOffset,
       };
     });
-    if (!a) break;
+    // ⚠️ « ON L'IGNORE » ET « ON S'ARRÊTE DESSUS » NE SONT PAS LA MÊME CHOSE, et le code faisait le
+    // second en disant le premier (corrigé le 2026-08-26). La surcouche de développement de Next
+    // rendait `null`, et `if (!a) break` confondait « ce n'est pas le produit » avec « il n'y a plus
+    // rien à visiter ». Quand le portail prenait le focus EN PREMIER — ce qui arrive dès que Next
+    // affiche son indicateur — la traversée rendait ZÉRO arrêt, et deux tests concluaient que
+    // `/reglages` était « inatteignable au clavier ». La page allait parfaitement bien.
+    //
+    // Mesuré en CI le 2026-08-25 : `/reglages → aucun arrêt`, sur une page qui rend une quinzaine
+    // d'éléments focusables. Une garde qui accuse le produit d'un défaut du harnais fait perdre le
+    // temps qu'elle prétend faire gagner.
+    if (a === "portail") continue; // ce n'est pas le produit : on saute, on ne s'arrête pas
+    if (!a) break; // le focus est sorti du document : la traversée a bouclé
     const cle = `${a.balise}|${a.nom}`;
     if (vus.has(cle)) break; // on a bouclé
     vus.add(cle);
