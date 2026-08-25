@@ -1,7 +1,7 @@
 ---
 status: final
 created: 2026-07-21
-updated: 2026-07-22
+updated: 2026-08-25
 design_spine: ./DESIGN.md
 sources:
   - _bmad-output/planning-artifacts/prds/prd-Anima-2026-07-21/prd.md
@@ -83,7 +83,7 @@ La scène est **une**. On n'y navigue pas entre des pages : on s'y **déplace en
 - `≥ lg` : rail latéral gauche, mêmes entrées.
 - **La marque « Anam », en surimpression légère, sur toutes les régions** : « Anam » en {typography.surtitre} à gauche, un unique glyphe de menu à droite. Ce n'est **pas une barre bordée** posée en haut d'une page, mais une **surimpression discrète** sur la scène continue. **Rien d'autre**, littéralement : aucun titre bavard, aucune barre de statistiques, aucun compteur, **et aucun élément de séance** — ceux-ci vivent dans la **surimpression persistante** (ci-dessous).
 - **La surimpression persistante**, sur toutes les régions, remplace l'ancienne « bande de contexte » bordée. Ce n'est **plus une bande** posée entre deux filets : c'est une **présence flottante, sans bord, sans fond barré, sans filet**, en surimpression constante sur la scène. Sa lisibilité sur l'imagerie est tenue par le **voile** ({components.voile}), jamais par une barre. Elle porte — et elle **seule** — le **signe d'Anam**, la **mention IA persistante** et la **porte de secours** vers les ressources. Elle est **toujours présente et lisible**, jamais masquée, jamais repliée. Voir *Component Patterns*.
-- Le **menu de compte** est une feuille (sheet) qui s'ouvre par-dessus. Elle liste, dans cet ordre invariable : **Aide et ressources**, Ce qu'Anam retient, La synthèse, Mes lectures, L'abonnement, Mes données, Ce que j'ai accepté, Réglages.
+- Le **menu de compte** est une feuille (sheet) qui s'ouvre par-dessus. Elle liste, dans cet ordre invariable : **Aide et ressources**, **Ton socle**, Ce qu'Anam retient, La synthèse, Mes lectures, L'abonnement, Mes données, Ce que j'ai accepté, Réglages. *(« Ton socle » ajouté par l'amendement du 2026-08-25, en fin de document.)*
 - **Profondeur modale : un niveau, jamais deux.** Aucune feuille ne s'ouvre depuis une feuille.
 - **Aucun badge, aucune pastille de non-lu, aucun compteur** sur aucune entrée de navigation (FR-031).
 
@@ -141,7 +141,7 @@ Comportemental. Les spécifications visuelles vivent dans `DESIGN.md.Components`
 
 | Composant | Où | Règles de comportement |
 |---|---|---|
-| **Carte de bibliothèque** | Accueil | Objet, pas ligne de menu. 4 à 6 maximum. Ordre **fixe, jamais algorithmique**. Une seule carte est mise en avant par jour, en tête. Aucun badge, aucun compteur, aucun cadenas. |
+| **Carte de bibliothèque** | Accueil | Objet, pas ligne de menu. **3 à 6 maximum** *(plancher abaissé de 4 à 3 par l'amendement du 2026-08-25, en fin de document ; le compte porte sur les clés du catalogue, la carte « Anam » en est exclue)*. Ordre **fixe, jamais algorithmique**. Une seule carte est mise en avant par jour, en tête. Aucun badge, aucun compteur, aucun cadenas. |
 | **Carte « Anam »** | Accueil | Si Anam a un motif spécifique en attente (FR-034), la carte porte **une** ligne secondaire spécifique. Sinon : libellé neutre, rien d'autre. Jamais de nombre de messages. |
 | **Fil de conversation** | Anam | Flux vertical, pas de bulles opposées. Anam en {typography.anam} sur {colors.texte} ; l'utilisatrice en {typography.corps} sur {colors.texte} **à pleine valeur**, filet vertical à gauche en {colors.bordure-forte}. **Jamais {colors.texte-doux} pour ses mots à elle** : on ne met jamais ses mots en sourdine (`DESIGN.md`, `tour-utilisatrice`). La distinction des deux voix se fait par la famille typographique et par le filet, pas par l'extinction. Aucun horodatage permanent, aucune coche de lecture, aucun indicateur « en ligne ». Maximum 3 à 4 échanges lisibles à l'écran. Aux moments-clés, le personnage paraît — voir *Apparition d'Anam*. |
 | **Apparition d'Anam** | Conversation, aux moments-clés | Le personnage en format **Présence** (`DESIGN.md.personnage.presence`) paraît à **trois beats seulement** : à l'**ouverture** d'une séance, à l'instant où Anam **nomme** l'observation (FR-005), et à la **clôture** (FR-008), où elle passe en format **Veille**. **Jamais à côté d'un tour ordinaire.** Elle émerge du {colors.fond} sans cadre ni cercle, en {components.fondu}. Entre ces beats, seul le **signe** porte sa présence — *présence n'est pas répétition*. `prefers-reduced-motion` : elle paraît sans fondu, jamais supprimée. |
@@ -606,3 +606,166 @@ Points où les sources ne tranchent pas. Rien n'a été inventé silencieusement
 7. **Notification d'inactivité à 24 mois** (NFR-021) : son canal et sa formulation ne sont spécifiés nulle part, et elle entre en tension avec FR-034. Décision prise ici : elle est **émise par le produit, jamais signée d'Anam**. À confirmer.
 8. **Archive du mantra du jour** : non spécifiée. Aucune archive en v1 dans ce contrat.
 9. **Composition spatiale de la scène unique** : ce contrat fixe le *modèle* — monde continu sans bord, régions reliées en fondu (`{components.fondu.region}`), ancrage arbre-centre / Anam-gauche, doublage non-spatial obligatoire — mais **pas la chorégraphie détaillée** : disposition exacte des régions dans le plan, ampleur du déplacement de cadrage, profondeur de parallaxe. À spécifier en phase de composition, sous la double contrainte du plancher d'accessibilité (navigation non-spatiale équivalente) et de `prefers-reduced-motion` (transitions de région instantanées). La vraie 3D (l'étoile du nord) reste un cap v2 ; la v1 est 2D et doit l'accueillir sans réécriture.
+
+---
+
+## Amendement du 2026-08-25 — la coquille d'application, la halte « Ton socle », et le plancher de l'accueil
+
+> **Statut : contractuel.** Cette section a la même autorité que le reste du document et gagne sur
+> lui en cas d'écart, puisqu'elle est postérieure et datée. Elle est portée par l'**Epic 7** et par
+> la **décision de Julian du 2026-08-25** (« une halte “Ton socle” », option B) : les cartes du socle
+> ne restent pas à l'accueil faute de mieux, un écran est créé pour elles.
+>
+> **⚠️ POURQUOI CETTE SECTION EST EN FIN DE FICHIER ET NON INSÉRÉE À SA PLACE.** Le dépôt cite ce
+> document **par numéro de ligne**, une centaine de fois, depuis les commentaires de code, les tests
+> et `epics.md` (`EXPERIENCE.md:144` neuf fois, `:62` six fois, `:452`, `:505`, `:511`…). Insérer une
+> ligne dans le tableau d'architecture de l'information décalerait **toutes** les citations situées
+> plus bas et les rendrait fausses **en silence** — aucune garde ne le verrait. Les seules retouches
+> faites **en place** par cet amendement sont donc celles qui **conservent le nombre de lignes**
+> (la ligne 86 et la ligne 144). Tout le reste s'ajoute ici, à la fin.
+
+### 1. « Ton socle » — la douzième halte
+
+Le tableau d'*Information Architecture* (lignes 64-77) ne portait **aucune surface de consultation du
+socle**. C'est la cause directe d'une promesse non tenue : **FR-055** garantit la numérologie complète
+et gratuite à vie, et le produit n'affiche **qu'un texte sur six** (`lib/domain/cartes-socle.ts:219-222`),
+parce que la seule surface qui rend les nombres est une vignette d'accueil dimensionnée pour une
+vignette. Cette ligne s'ajoute au tableau, **au même format que les onze autres** :
+
+| Région / halte | Atteinte depuis | Rôle |
+|---|---|---|
+| **Ton socle** | Menu de compte, **deuxième entrée** · depuis la halte, les liens qui le corrigent | Ce que le produit a calculé : les six nombres et leurs six sens, les dix corps, l'ascendant, le milieu du ciel, le type — et, franchement, ce qui manque et pourquoi |
+
+**Tranché — c'est une entrée de premier rang du menu de compte, pas une sous-entrée de Réglages.**
+Deux raisons, et elles ne sont pas de goût. (1) Réglages est l'endroit où l'on **change** quelque
+chose — la ligne 77 le dit : prénom, heure de naissance, thème, notifications. « Ton socle » est un
+endroit où l'on **regarde** ; ranger une surface de consultation dans une page de réglages, c'est la
+rendre introuvable pour qui ne cherche pas à modifier. (2) C'est l'écran qui rend **FR-055** vrai. La
+promesse « gratuit à vie » ne peut pas vivre à deux niveaux de profondeur.
+
+**Sa position : deuxième, juste après « Aide et ressources ».** Le socle est ce que le produit savait
+**avant le premier mot échangé** ; « Ce qu'Anam retient » est ce qu'il a appris **après**. L'ordre du
+menu suit cette chronologie. « Aide et ressources » reste **première, toujours** (FR-077) — cette
+règle-là n'est pas négociable et aucune entrée ne passe devant elle.
+
+**Deux entrées de `/profil` déménagent sous cette halte plutôt que dans le menu de premier rang :**
+« Ton heure de naissance » (`/heure-naissance`) et « Ton type » (`/enneagramme`). Ce sont les deux
+liens qui **corrigent le socle** ; ils vivent là où l'on constate ce qui manque, au contact du manque.
+La ligne 77 les mentionne aussi sous Réglages : les deux chemins mènent au même écran, ce n'est pas
+une duplication de surface mais un second accès — la figure exacte de la porte de secours.
+
+### 2. Le menu de compte passe de huit à neuf entrées
+
+La ligne 86 est amendée **en place** (elle conserve son numéro). L'ordre invariable devient :
+
+**Aide et ressources**, **Ton socle**, Ce qu'Anam retient, La synthèse, Mes lectures, L'abonnement,
+Mes données, Ce que j'ai accepté, Réglages.
+
+`/ancrages` **n'y entre pas** tant qu'aucun ancrage n'est écrit : une entrée qui mène toujours à
+« Anima n'a pas encore écrit d'ancrage » se lit comme une panne, alors que la même phrase atteinte par
+URL se lit comme un état.
+
+### 3. Le plancher des cartes de bibliothèque passe de 4 à **3**
+
+**Ce que le plancher garde.** Il n'est pas une préférence de mise en page : il est l'alarme qui se
+déclenche quand l'accueil cesse d'être une bibliothèque pour devenir une liste. En dessous d'un
+certain nombre d'objets, « objet reçu » (ligne 144) redevient « ligne de menu » — ce que ce document
+refuse deux fois. Le plancher existe pour que cette bascule soit **décidée**, jamais subie.
+
+**Pourquoi il bouge.** Retour de Julian du 2026-08-25 : « Ton thème : ça sert à rien de le voir tous
+les jours » et « Pareil pour tes nombres, ce n'est pas quelque chose qui change tous les jours ». Il a
+raison, et le dépôt le prouve deux fois : « Ton thème » affiche `texte: NON_ECRIT` **codé en dur**
+(`lib/domain/cartes-socle.ts:171`), donc une panne permanente environ un jour sur cinq en position
+mise en avant ; et la carte des nombres force une lecture de base (`lib/data/lire-bibliotheque.ts`)
+sur le chemin critique de l'écran le plus lourd, pour un contenu qui ne changera plus jamais.
+
+**Le catalogue retenu compte trois clés : `mantra`, `horoscope`, `enneagramme`.**
+
+`mantra` et `horoscope` changent chaque jour — ils sont l'accueil. **`enneagramme` reste**, et c'est un
+écart assumé avec la première rédaction de la Story 7.7, qui le rangeait parmi « les trois cartes qui
+ne changent jamais ». Elle allait au-delà de ce que Julian a demandé : sa remarque sur l'ennéagramme
+était l'**inverse** d'un retrait — « c'est à toi de dire : vous n'avez pas encore fait votre
+ennéagramme, faites-le maintenant ». Retirer la carte, c'est retirer le seul endroit où cette phrase
+peut être lue par quelqu'un qui n'est pas parti la chercher. La carte reste donc, et la **Story 7.8**
+réécrit son texte pour qu'elle cesse d'accuser Anima d'un vide qui est celui du test.
+
+**Ce que le plancher compte — et ce qu'il ne compte pas.** Il compte les **clés du catalogue**
+(`CATALOGUE_CARTES`), c'est-à-dire les cartes de bibliothèque au sens de la ligne 144. La **carte
+« Anam »** (ligne 145) est un composant distinct, rendu **hors de la grille**, et elle n'entre pas
+dans le compte. Cette précision n'est pas une subtilité : au 2026-08-25, deux gardes mesuraient deux
+nombres différents en se réclamant toutes deux d'UX-DR-30 — l'assertion du module comptait le
+catalogue (5), un test de rendu comptait les objets à l'écran (6). Le plancher gouverne le
+**catalogue** ; ce qui borne l'écran, c'est que l'accueil ne rend **jamais plus que le catalogue plus
+la carte d'Anam**. La Story 7.7 repose les gardes de rendu sur ce compte-là.
+
+**Bornes retenues : 3 minimum, 6 maximum.** Le plafond ne bouge pas. Cette valeur est reportée **à
+l'identique** ligne 144 de ce document, dans `epics.md` (UX-DR-30), dans le commentaire de
+`lib/domain/bibliotheque.ts` et dans l'assertion elle-même — et la CI échoue si l'une des quatre
+diverge (§7).
+
+### 4. [REFUS TENU] Pas de grille d'icônes-rubriques — et le prix exact de l'issue inverse
+
+Julian a demandé, le 2026-08-25 : « une page d'icônes scintillants, représentant les différentes
+rubriques ». Ce document refuse cette forme **deux fois** — ligne 144 (« Objet, pas ligne de menu ») et
+ligne 505 (« la carte comme objet reçu, pas comme ligne de menu »). Le refus est **tenu** : les portes
+vers les univers vivent dans le **menu de compte** et dans la **halte du socle**, jamais dans une
+grille d'icônes posée à côté des cartes. `tests/bibliotheque-frontiere.test.ts` n'est ni amendé ni
+contourné par aucune story de l'Epic 7, et ni `CarteBibliotheque` ni `CarteVue` ne gagnent de champ
+`{ url, libelle }`.
+
+**Mais ce refus est un arbitrage, pas une évidence, et il a une seconde issue.** Elle est écrite ici
+**d'avance et chiffrée**, pour qu'elle ne se rejoue pas à chaud le jour où Julian insistera :
+
+> **Issue B — la grille d'icônes-rubriques REMPLACE la bibliothèque de cartes.** Elle ne s'y ajoute
+> **jamais** : empiler les deux donnerait un accueil à deux grammaires concurrentes, et c'est le seul
+> résultat que ni ce document ni la demande de Julian ne veulent. Choisir l'issue B, c'est **changer
+> de grammaire d'accueil**, et cela coûte, noir sur blanc :
+> - les lignes 144 et 505 sont **amendées et datées** — jamais contournées ;
+> - `lib/domain/bibliotheque.ts` perd son objet, et son plancher avec ;
+> - `tests/bibliotheque-frontiere.test.ts` **change de sujet** au lieu d'être assoupli — la garde
+>   FR-031 doit alors être reportée sur le type de la grille, sans quoi le compte fuit par elle ;
+> - les Stories **7.7** et **7.10** sont réécrites, et la 7.10 (« le bandeau du jour ») perd ce qu'elle
+>   découvre en défilant ;
+> - la carte « Anam » (ligne 145, FR-034) doit trouver une place hors grille, ou disparaître.
+>
+> Ce prix est le contenu de la décision. Il ne rend pas l'issue B mauvaise ; il la rend **choisie**.
+
+### 5. « Moi » et « Mon arbre » — la région reste un **lieu**, pas un hub de compte
+
+Le renommage demandé le 2026-08-25 est acté : « Accueil » devient **« Moi »**, « L'arbre » devient
+**« Mon arbre »** (Story 7.9). La ligne 62 sépare explicitement les **lieux du monde** des **haltes de
+compte**, et ce renommage ne déplace pas cette frontière d'un millimètre :
+
+- **aucune entrée de compte ne déménage dans la région** — le menu reste la feuille, la région reste
+  la scène ;
+- **aucune rubrique nominative au-dessus du pli** (ligne 452 : au-dessus de la ligne de flottaison,
+  uniquement du contenu impersonnel) ;
+- **aucune icône d'état, aucun taux de complétude, aucune pastille, aucun compteur** (FR-031, **DUR**).
+
+Un lieu qui s'appelle « Moi » et qui affiche un état de complétude n'est plus un lieu : c'est un
+tableau de bord, et le produit n'en a pas.
+
+### 6. `/profil` disparaît — il n'existe qu'**une** surface de compte
+
+`/profil` (`lib/domain/copie-profil.ts`) a été livré le 2026-08-23 comme réponse d'urgence à « il
+manque un bouton Profil » : une page pleine listant six liens, faute de menu. Le menu de compte est
+cette réponse ; maintenir les deux, c'est garantir que les deux listes divergeront au premier ajout.
+
+- Ses **six liens** sont repris par `lib/domain/menu-compte.ts` (Story 7.2) : il n'existe plus qu'une
+  seule constante d'entrées de compte dans le dépôt, et un test échoue s'il en existe deux.
+- Son **formulaire de nom** (prénom, nom complet, et l'avertissement « changer le nom complet
+  recalcule les nombres ») **n'est pas perdu** : il déménage vers `/reglages`, que la ligne 77 désigne
+  déjà comme le lieu du prénom. C'est la seule partie de `/profil` qui n'existe nulle part ailleurs —
+  la supprimer sans la déplacer retirerait à l'utilisatrice le seul moyen de corriger son prénom.
+
+### 7. Ce que la CI garde de cette section
+
+Une décision écrite dans un document que personne ne relit se périme. `tests/architecture-information.test.ts`
+lit ce fichier, `epics.md` et `lib/domain/bibliotheque.ts`, et **échoue** si :
+
+- le tableau d'architecture de l'information ne porte plus de ligne « Ton socle » ;
+- le menu de compte de la ligne 86 ne porte plus « Ton socle », ou ne le place plus en deuxième
+  position, ou fait passer une entrée devant « Aide et ressources » ;
+- les **quatre** valeurs de plancher divergent : celle de la ligne 144, celle de cette section, celle
+  d'UX-DR-30 dans `epics.md`, celle de l'assertion de `lib/domain/bibliotheque.ts` ;
+- le refus de la grille d'icônes-rubriques (§4) disparaît sans que l'issue B soit écrite à sa place.

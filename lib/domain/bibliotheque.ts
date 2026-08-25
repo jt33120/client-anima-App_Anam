@@ -60,9 +60,27 @@ export interface CarteBibliotheque {
  * L'ORDRE FIXE (AC1). Une constante, dans l'ordre d'`EXPERIENCE.md` §66 — aucun tri ne s'applique
  * entre ici et le rendu, hors la mise en tête de la carte du jour.
  *
- * ⚠️ UX-DR-30 pose un plancher de 4 et un plafond de 6. `assertCatalogueBorne` le vérifie au
- * chargement du module plutôt qu'en test : une sixième carte ajoutée par la 5.8 ou la 5.9 ne peut
- * pas franchir le plafond en silence.
+ * ⚠️ UX-DR-30 pose un plancher de 3 et un plafond de 6. La borne est vérifiée au chargement du
+ * module plutôt qu'en test : une septième carte ajoutée par une story future ne peut pas franchir
+ * le plafond en silence.
+ *
+ * ⚠️ LE PLANCHER ÉTAIT DE 4, ET IL A ÉTÉ ABAISSÉ À 3 PAR DÉCISION ÉCRITE (2026-08-25), pas par
+ * commodité. Retour de Julian : « Ton thème : ça sert à rien de le voir tous les jours » et
+ * « Pareil pour tes nombres ». Les deux cartes quittent l'accueil pour la halte « Ton socle »
+ * (Story 7.5), et le catalogue tombe à trois clés. La décision, son motif et son prix sont écrits
+ * dans l'amendement du 2026-08-25 en fin d'`EXPERIENCE.md`, §3.
+ *
+ * ⚠️ CE QUE CETTE BORNE COMPTE : LES CLÉS DU CATALOGUE, PAS LES OBJETS À L'ÉCRAN. La carte « Anam »
+ * (`lib/domain/carte-anam.ts`, `EXPERIENCE.md` ligne 145) est un composant distinct, rendu HORS de
+ * la grille, et elle n'entre pas dans ce compte. La distinction n'est pas cosmétique : au
+ * 2026-08-25, cette assertion comptait 5 pendant que `tests/rendu/carte-anam.test.tsx` en comptait
+ * 6, les deux se réclamant d'UX-DR-30. Ce qui borne l'écran, c'est que l'accueil ne rend jamais
+ * plus que le catalogue plus la carte d'Anam.
+ *
+ * ⚠️ LES QUATRE VALEURS SONT SOLIDAIRES, ET LA CI LE VÉRIFIE. Le plancher est écrit ici (commentaire
+ * ET assertion), ligne 144 d'`EXPERIENCE.md`, dans son amendement, et dans UX-DR-30
+ * (`epics.md:220`). `tests/architecture-information.test.ts` échoue si l'une diverge : changer ce
+ * nombre tout seul ne compile pas la décision, il la casse.
  */
 export const CATALOGUE_CARTES: readonly CleCarte[] = Object.freeze([
   "mantra",
@@ -72,9 +90,9 @@ export const CATALOGUE_CARTES: readonly CleCarte[] = Object.freeze([
   "enneagramme",
 ]);
 
-if (CATALOGUE_CARTES.length < 4 || CATALOGUE_CARTES.length > 6) {
+if (CATALOGUE_CARTES.length < 3 || CATALOGUE_CARTES.length > 6) {
   throw new Error(
-    `bibliotheque : ${CATALOGUE_CARTES.length} cartes au catalogue — UX-DR-30 en exige 4 à 6`,
+    `bibliotheque : ${CATALOGUE_CARTES.length} cartes au catalogue — UX-DR-30 en exige 3 à 6`,
   );
 }
 

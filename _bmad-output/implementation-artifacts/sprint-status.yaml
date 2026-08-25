@@ -19,7 +19,7 @@
 # prod. Ce qui manque, c'est leur revue. C'est une dette réelle, pas un artefact de comptabilité.
 
 generated: 2026-08-07
-last_updated: 2026-08-18
+last_updated: 2026-08-25
 project: Anam
 project_key: ANAM
 tracking_system: file-system
@@ -283,6 +283,83 @@ development_status:
   # qui bloque une ré-extraction, pas la ligne. Fermés par une contrainte de table et par le GRANT.
   # TROIS TESTS GRAVAIENT LE DÉFAUT EN VERT, dont celui de la synthèse, sous le titre « AD-18 ».
   epic-6-retrospective: done
+
+  # ══════════════════════════════════════════════════════════════════════════════════════════
+  # EPICS 7 À 12 — ajoutés le 2026-08-25 (commit `9fb1958`), 50 stories issues des huit remarques
+  # de Julian du 2026-08-25. Ils NE sont PAS une suite naturelle des six premiers : ce sont des
+  # défauts constatés à l'usage et des chantiers qu'aucun epic n'avait ouverts.
+  # ══════════════════════════════════════════════════════════════════════════════════════════
+  # ── Epic 7 : La coquille d’application — le menu de compte et la halte du socle ──
+  epic-7: in-progress
+  7-1-ecrire-halte-ton-socle-architecture-information: done  # amendement d'EXPERIENCE.md + garde de CI (tests/architecture-information.test.ts)
+  7-2-catalogue-menu-compte-modele-garde-frontiere: backlog
+  7-3-glyphe-feuille-bouge-pixel: backlog
+  7-4-resilier-trois-clics-compte-clic-lu: backlog
+  7-5-halte-ton-socle-premiere-fois-fr: backlog
+  7-6-univers-creer-matiere: backlog
+  7-7-accueil-redevient-quotidien-plancher-deplace-decision: backlog
+  7-8-enneagramme-cesse-accuser-anima-vide-n: backlog
+  7-9-moi-mon-arbre-renommage-gardes-doivent: backlog
+  7-10-bandeau-jour-dessus-pli: backlog
+  7-11-module-mort-tableau-corpus-deja-remis: backlog
+  7-12-filet-aide-correctif-25-aout-laisse: backlog
+  7-13-revenir-ou-vient-halte-rend-region: backlog
+  7-14-chantier-ecriture-chiffre-confie-rien-annonce: backlog
+  epic-7-retrospective: optional
+
+  # ── Epic 8 : Le temps de réponse — celui qu'on ressent, et celui qu'on mesure ──
+  epic-8: backlog
+  8-1-ligne-base-ou-geste-ete-fait: backlog
+  8-2-retour-clic-pose-deux-gestes-manquent: backlog
+  8-3-lectures-serie-chaque-halte-paie: backlog
+  8-4-seul-getuser-requete-arbitrage-fraicheur-revue: backlog
+  8-5-ou-passent-7-371-ms-repartition: backlog
+  8-6-deux-leviers-premier-caractere-gain-borne: backlog
+  8-7-seuil-rougit-garde-n-jamais-existe: backlog
+  epic-8-retrospective: optional
+
+  # ── Epic 9 : Ce qu'Anam sait — la couverture, sans agent à outils ──
+  epic-9: backlog
+  9-1-numerologie-entre-qu-anam-sait-mise: backlog
+  9-2-refus-boucle-outils-ecrit-ci: backlog
+  9-3-format-sortie-port-intention-tirage-cesse: backlog
+  9-4-trois-autres-analyseurs-texte-libre: backlog
+  9-5-detecteur-detresse-seul-dernier-ou-tout: backlog
+  9-6-quatre-extractions-post-reponse-consolidees: backlog
+  9-7-borne-historique-seul-proprietaire-detection-droit: backlog
+  9-8-ciel-fait-aujourd-hui-texte-jamais: backlog
+  epic-9-retrospective: optional
+
+  # ── Epic 10 : Le coût, rendu lisible — sans une clé par personne ──
+  epic-10: backlog
+  10-1-refus-ecrit-garde-pourquoi-jamais-cle: backlog
+  10-2-porte-lancement-aujourd-hui-conversation-gratuite: backlog
+  10-3-donner-prix-tokens-module-domaine-pur: backlog
+  10-4-trancher-usage-ia-droit-savoir-avant: backlog
+  10-5-boucher-deux-trous-metrage-jamais-toucher: backlog
+  10-6-lecture-script-ops-page: backlog
+  10-7-seuil-alerte-lieu-couper: backlog
+  10-8-six-portes-pre-lancement-chiffrees-datees: backlog
+  epic-10-retrospective: optional
+
+  # ── Epic 11 : L'arbre — un seul arbre, un seul style, sur le ciel ──
+  epic-11: backlog
+  11-1-garde-fluidite-voit-defilement-avant-moindre: backlog
+  11-2-ciel-etoile-revient-sous-arbre-seul: backlog
+  11-3-plus-pomme-nulle-part-seul-handoff: backlog
+  11-4-graine-ou-tronc-deux-cote-cote: backlog
+  11-5-trancher-plafond-13-branches-question-claude: backlog
+  11-6-porter-moteur-lunaire-meme-dessin-meme: backlog
+  epic-11-retrospective: optional
+
+  # ── Epic 12 : Elle l'écoute — la saisie vocale, et le refus de la voix de synthèse ──
+  epic-12: backlog
+  12-1-porte-conformite-sous-traitant-art-9: backlog
+  12-2-porte-latence-rien-cet-epic-avant: backlog
+  12-3-sttport-transcription-passe-frontiere-egress-comme: backlog
+  12-4-micro-composeur-transcription-reste-modifiable: backlog
+  12-5-refus-voix-synthese-ecrit-date-motive: backlog
+  epic-12-retrospective: optional
 
 # Portes PRÉ-LANCEMENT — humaines, hors code, aucune story ne les débloque toute seule.
 # Elles ne bloquent pas le développement ; elles bloquent la MISE EN LIGNE.
