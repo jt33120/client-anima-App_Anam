@@ -15,7 +15,14 @@ import { ENTREES_MENU, LIBELLE_GLYPHE, TITRE_FEUILLE, LIBELLE_FERMER } from "@/l
  * hors du menu.
  */
 
+/**
+ * ⚠️ `lienVers` EST L'IDENTITÉ ICI, ET C'EST DÉLIBÉRÉ. Ce fichier éprouve la FEUILLE : ses entrées,
+ * son ordre, son focus, ses refus. Emporter la région d'où l'on vient (Story 7.13) est le sujet de
+ * `tests/retour-scene.test.ts`, qui l'éprouve sur la fonction elle-même. Mélanger les deux ferait
+ * de chaque `href` attendu ici une chaîne à recalculer, pour ne rien prouver de plus.
+ */
 const COPIE = {
+  lienVers: (url: string) => url,
   entrees: ENTREES_MENU,
   libelleGlyphe: LIBELLE_GLYPHE,
   titreFeuille: TITRE_FEUILLE,
@@ -204,7 +211,9 @@ describe("[7.3] le glissement entre régions s'arrête à la feuille", () => {
 
 describe("[7.3] ce qui ne bouge pas — le refus tenu", () => {
   const scene = (abonnee: boolean) =>
-    render(<Surimpression modele={surimpressionPour("accueil", abonnee)} menu={COPIE} />);
+    render(
+      <Surimpression modele={surimpressionPour("accueil", abonnee)} menu={COPIE} lienVers={(u) => u} />,
+    );
 
   it("[LE CŒUR · FR-077] le « ? » est rendu HORS du composant de menu", () => {
     // Mutation-cible : le déplacer dans la feuille « puisque le menu porte déjà l'aide ». FR-077

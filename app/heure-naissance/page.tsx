@@ -6,6 +6,8 @@ import FormulaireHeure from "./formulaire-heure";
 import s from "./heure-naissance.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 
 /**
  * ⚠️ RENDUE À LA DEMANDE, ET C'EST UNE GARDE (revue adversariale, R5).
@@ -48,7 +50,15 @@ export const metadata = { title: "Anam" };
  * FR-048 rend d'ailleurs ces champs facultatifs. On les demande le jour où elle le décide, depuis
  * son tronc.
  */
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  /**
+   * Les paramètres d'URL — Story 7.13. Ils portent la région d'où l'on vient, pour que fermer
+   * cette halte repose au bon endroit du monde. `Promise` : c'est la forme de Next 16.
+   */
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -77,6 +87,7 @@ export default async function Page() {
 
   return (
     <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className="t-titre">Ton heure de naissance</h1>
       {/* La même phrase que la fiche du tronc, depuis la même source : un second texte divergerait. */}
       <p className="t-corps">{OU_TROUVER_SON_HEURE}</p>

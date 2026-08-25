@@ -304,7 +304,7 @@ development_status:
   7-10-bandeau-jour-dessus-pli: backlog
   7-11-module-mort-tableau-corpus-deja-remis: backlog
   7-12-filet-aide-correctif-25-aout-laisse: backlog
-  7-13-revenir-ou-vient-halte-rend-region: backlog
+  7-13-revenir-ou-vient-halte-rend-region: done  # la région voyage dans l'URL ; retour en TÊTE de halte, pas dans le pied
   7-14-chantier-ecriture-chiffre-confie-rien-annonce: backlog
   epic-7-retrospective: optional
 

@@ -6,6 +6,8 @@ import FicheSynthese from "@/render/synthese/FicheSynthese";
 import s from "@/render/synthese/synthese.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 
 /** Combien de synthèses passées la halte transporte. Voir la note sur `<details>` plus bas. */
 const PRECEDENTES_MAX = 12;
@@ -29,7 +31,15 @@ export const metadata = { title: "Anam" };
  * FR-031 : aucun compte, aucun chiffre, aucune progression. On montre la dernière synthèse et on donne
  * accès aux précédentes par leur période — jamais « ta 7ᵉ synthèse » ni « 3 synthèses en attente ».
  */
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  /**
+   * Les paramètres d'URL — Story 7.13. Ils portent la région d'où l'on vient, pour que fermer
+   * cette halte repose au bon endroit du monde. `Promise` : c'est la forme de Next 16.
+   */
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createSupabaseServerClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) redirect("/entrer");
@@ -72,6 +82,7 @@ export default async function Page() {
 
   return (
     <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className="t-titre">La synthèse</h1>
 
       {indisponible && (

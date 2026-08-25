@@ -16,6 +16,8 @@ import {
 } from "./actions";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 import { enregistrerNom } from "./actions";
 
 // NFR-015 / identité de route — « Anam » partout, jamais un titre qui dit l'intimité de la page.
@@ -53,7 +55,15 @@ export const revalidate = 0;
  * en silence un réglage qui ne produira rien — lui promettre une notification qui n'arrivera pas
  * serait une panne invisible pour elle comme pour nous.
  */
-export default async function PageReglages() {
+export default async function PageReglages({
+  searchParams,
+}: {
+  /**
+   * Les paramètres d'URL — Story 7.13. Ils portent la région d'où l'on vient, pour que fermer
+   * cette halte repose au bon endroit du monde. `Promise` : c'est la forme de Next 16.
+   */
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -105,6 +115,7 @@ export default async function PageReglages() {
 
   return (
     <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className={s.titreHalte}>{copie.TITRE_HALTE}</h1>
 
       {/* ⚠️ EN TÊTE, ET CE N'EST PAS DE LA MISE EN PAGE. `EXPERIENCE.md` ligne 77 range le prénom

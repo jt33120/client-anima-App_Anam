@@ -63,7 +63,9 @@ vi.mock("@/lib/data/supabase/server", () => ({
 const { default: Page } = await import("@/app/synthese/page");
 
 async function monter() {
-  render(await Page());
+  // Story 7.13 : la page lit ses paramètres d'URL pour savoir OÙ revenir. Un objet vide fait le
+  // repli nominal — retour au foyer — qui est exactement ce que ce fichier éprouve.
+  render(await Page({ searchParams: Promise.resolve({}) }));
 }
 
 /** Rend la page en absorbant la redirection simulée, et rend la cible atteinte. */

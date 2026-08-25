@@ -7,6 +7,8 @@ import { MontagePaywall } from "@/app/_commerce/MontagePaywall";
 import s from "./abonnement.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 import { situationAbonnement } from "@/lib/domain/abonnement";
 
 // NFR-015 — « Anam » partout, y compris ici : le titre paraît dans un onglet, potentiellement partagé.
@@ -40,7 +42,7 @@ export const dynamic = "force-dynamic";
 export default async function PageAbonnement({
   searchParams,
 }: {
-  searchParams: Promise<{ etat?: string; confirmer?: string }>;
+  searchParams: Promise<{ etat?: string; confirmer?: string; de?: string }>;
 }) {
   const { etat: retour, confirmer } = await searchParams;
 
@@ -80,6 +82,7 @@ export default async function PageAbonnement({
     // la revue 4.6 a payé sur l'arbre. On le dit, et on ne propose aucun geste qu'on ne saurait tenir.
     return (
       <main className={s.page}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
         <h1 className="t-titre">{c.TITRE}</h1>
         <p className="t-corps">{c.ETAT_INDISPONIBLE}</p>
         <p className="t-meta">{c.ETAT_INDISPONIBLE_CORPS}</p>

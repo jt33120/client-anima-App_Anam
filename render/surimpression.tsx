@@ -81,9 +81,18 @@ export interface CopieMenu {
 export default function Surimpression({
   modele,
   menu,
+  lienVers,
   prepare = false,
 }: {
   modele: Surimpression;
+  /**
+   * Fabrique l'URL d'une entrée de menu en EMPORTANT la région courante (Story 7.13).
+   *
+   * ⚠️ ELLE VIENT DE LA SCÈNE, PAS D'ICI ET PAS DE LA PAGE. La page ne connaît pas la région
+   * affichée — c'est un état de scène, qui change au doigt sans navigation. Ce composant ne la
+   * connaît pas davantage. Seule `scene-dom` la tient.
+   */
+  lienVers: (url: string) => string;
   /** La copie du menu de compte — elle DESCEND du domaine, le rendu n'y touche pas (AD-7/AD-10). */
   menu: CopieMenu;
   prepare?: boolean;
@@ -127,6 +136,7 @@ export default function Surimpression({
         {modele.menuCompte && (
           <MenuCompte
             entrees={menu.entrees}
+            lienVers={lienVers}
             libelleGlyphe={menu.libelleGlyphe}
             titreFeuille={menu.titreFeuille}
             libelleFermer={menu.libelleFermer}

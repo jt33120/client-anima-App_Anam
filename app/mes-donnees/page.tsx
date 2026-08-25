@@ -7,6 +7,8 @@ import s from "@/render/mes-donnees/mes-donnees.module.css";
 import { effacerTout } from "./actions";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 
 // NFR-015 / identité de route — « Anam » partout, jamais un titre qui dit l'intimité de la page.
 export const metadata = { title: "Anam" };
@@ -40,7 +42,7 @@ export const revalidate = 0;
 export default async function PageMesDonnees({
   searchParams,
 }: {
-  searchParams: Promise<{ echec?: string }>;
+  searchParams: Promise<{ echec?: string; de?: string }>;
 }) {
   const { echec } = await searchParams;
   // AD-14 : l'échéance est lue à l'exécution, jamais codée en dur — et ce qu'on lui annonce est
@@ -64,6 +66,7 @@ export default async function PageMesDonnees({
 
   return (
     <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className={s.titreHalte}>{copie.TITRE_HALTE}</h1>
       <p className={s.introduction}>{copie.INTRODUCTION}</p>
 

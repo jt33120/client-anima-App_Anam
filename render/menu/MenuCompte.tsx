@@ -72,6 +72,17 @@ function GlypheCompte() {
 
 export interface ProprietesMenuCompte {
   readonly entrees: readonly EntreeMenuVue[];
+  /**
+   * Fabrique l'URL d'une entrée EN EMPORTANT la région d'où l'on part (Story 7.13).
+   *
+   * ⚠️ ELLE ARRIVE PAR PROPRIÉTÉ, ELLE N'EST PAS CALCULÉE ICI. `render/` n'a pas le droit
+   * d'importer `lib/scene` pour décider (AD-7/AD-10) — et surtout, ce composant ne sait pas sur
+   * quelle région il est monté : c'est la scène qui le sait.
+   *
+   * Sans elle, fermer une halte ouverte depuis l'arbre reposerait à l'accueil : la parenthèse
+   * coûterait sa place à celle qui l'ouvre, neuf fois au lieu d'une.
+   */
+  readonly lienVers: (url: string) => string;
   /** Le nom accessible du glyphe. Le glyphe lui-même est décoratif. */
   readonly libelleGlyphe: string;
   readonly titreFeuille: string;
@@ -80,6 +91,7 @@ export interface ProprietesMenuCompte {
 
 export default function MenuCompte({
   entrees,
+  lienVers,
   libelleGlyphe,
   titreFeuille,
   libelleFermer,
@@ -191,7 +203,7 @@ export default function MenuCompte({
             <ul className={s.liste}>
               {entrees.map((e) => (
                 <li key={e.url}>
-                  <Link className={s.entree} href={e.url}>
+                  <Link className={s.entree} href={lienVers(e.url)}>
                     <span className={`t-corps ${s.entreeTitre}`}>{e.titre}</span>
                     <span className={`t-meta ${s.entreeQuoi}`}>{e.quoi}</span>
                     <IndiceAttente />

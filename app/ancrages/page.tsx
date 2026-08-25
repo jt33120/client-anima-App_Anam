@@ -19,6 +19,8 @@ import Ancrage from "@/render/ancrage/Ancrage";
 import s from "@/render/ancrage/ancrage.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 
 // NFR-015 / identité de route — « Anam » partout, jamais un titre qui dit l'intimité de la page.
 export const metadata = { title: "Anam" };
@@ -53,7 +55,15 @@ export const revalidate = 0;
  * Un compte barré, mineur, ou dont le consentement est révoqué n'a rien à faire ici — même si son
  * abonnement est actif. L'ordre est le même partout : l'état d'abord, l'offre ensuite.
  */
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  /**
+   * Les paramètres d'URL — Story 7.13. Ils portent la région d'où l'on vient, pour que fermer
+   * cette halte repose au bon endroit du monde. `Promise` : c'est la forme de Next 16.
+   */
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createSupabaseServerClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) redirect("/entrer");
@@ -83,6 +93,7 @@ export default async function Page() {
   if (acces === null) {
     return (
       <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
         <h1 className="t-titre">{TITRE_HALTE}</h1>
         <p className="t-corps">{INDISPONIBLE}</p>
       {/* ⚠️ LA PORTE DE SECOURS MANQUAIT SUR CE CHEMIN DE RETOUR (revue Epic 5, R2b · FR-077).

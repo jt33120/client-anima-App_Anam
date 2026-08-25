@@ -84,6 +84,17 @@ describe("[6.7/AC3] UNE confirmation, sur le même écran, et pas une de plus", 
     // ajouté demain change ce type, la garde rougit, et quelqu'un doit relire l'AC3 — plutôt que de
     // laisser un « es-tu sûre ? » à étages entrer par la seule porte que les deux autres gardes
     // laissaient ouverte.
+    //
+    // ⚠️ UN SECOND PARAMÈTRE EST ENTRÉ LE 2026-08-26, ET IL EST NOMMÉ ICI PLUTÔT QUE TOLÉRÉ EN
+    // BLOC. `de` porte la région d'où l'on vient (Story 7.13), pour que fermer cette halte repose
+    // à l'endroit du monde qu'on quittait. Il est admis pour trois raisons vérifiables :
+    //   • il ne porte AUCUN état de l'effacement — sa valeur est une région, validée contre le
+    //     catalogue de `lib/scene`, et toute autre valeur retombe sur le foyer ;
+    //   • il n'est LU QUE pour fabriquer une URL de retour, jamais pour décider ce qui s'affiche ;
+    //   • il ne peut donc pas cacher d'étape : un « es-tu sûre ? » a besoin de gouverner le rendu.
+    //
+    // L'inventaire reste EXHAUSTIF — c'est lui la garde. Un troisième paramètre fait rougir, et
+    // quelqu'un doit relire l'AC3 avant de l'ajouter.
     const parametres = /searchParams:\s*Promise<\{([^}]*)\}>/.exec(PAGE)?.[1] ?? "";
     expect(parametres, "le type des paramètres d'URL n'a pas été trouvé").not.toBe("");
     expect(
@@ -91,7 +102,30 @@ describe("[6.7/AC3] UNE confirmation, sur le même écran, et pas une de plus", 
       "un paramètre d'URL a été ajouté : un second geste peut s'y cacher",
       // Le `;` final est optionnel en TypeScript : on le retire des deux côtés plutôt que de parier
       // sur le style de qui écrira la prochaine ligne.
-    ).toBe("echec?:string");
+    ).toBe("echec?:string;de?:string");
+
+    // ⚠️ ET LA MOITIÉ QUI COMPTE : `de` ne gouverne RIEN de ce qui s'affiche.
+    //
+    // La première version de cette sous-garde cherchait `de` dans des conditions — `de ===`,
+    // `de &&`, `de ?`. C'était intenable : « de » est le mot le plus courant du français, et la
+    // page est pleine de prose destinée à l'utilisatrice. Elle rougissait sur du texte.
+    //
+    // Ce qu'on vérifie vraiment est plus simple ET plus fort : la page ne DÉSTRUCTURE jamais `de`.
+    // Elle passe `await searchParams` en entier à `urlRetourScene`, qui seul le lit. Sans variable
+    // locale, aucune condition de rendu ne peut s'en servir — la porte est fermée par construction,
+    // pas par vigilance.
+    const sansCommentairesPage = PAGE.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const destructurations = [...sansCommentairesPage.matchAll(/const\s*\{([^}]*)\}\s*=\s*await\s+searchParams/g)];
+    expect(
+      destructurations.length,
+      "témoin : la page ne déstructure plus rien de `searchParams` — la garde ne mesure rien",
+    ).toBeGreaterThan(0);
+    for (const [, champs] of destructurations) {
+      expect(
+        champs.split(",").map((c) => c.trim().split(":")[0].trim()),
+        "`de` est extrait dans une variable : il peut alors gouverner le rendu, donc cacher une étape",
+      ).not.toContain("de");
+    }
     // Même inventaire côté action : elle revient bien sur la halte avec un paramètre, mais UNIQUEMENT
     // pour porter un échec. Un `?confirmer=2` ici serait la deuxième étape par la porte de derrière.
     const retours = [...ACTION.matchAll(/redirect\("\/mes-donnees\?([a-z_]+)=/g)].map((m) => m[1]);

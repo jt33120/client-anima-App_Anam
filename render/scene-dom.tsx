@@ -32,6 +32,7 @@ import {
 import ArbreVivant from "./arbre-vivant";
 import ArbreInteractif from "./arbre/ArbreInteractif";
 import Surimpression, { type CopieMenu } from "./surimpression";
+import { versHalte } from "@/lib/scene/retour-scene";
 import Conversation from "./conversation/Conversation";
 import EchangeSource from "./conversation/EchangeSource";
 import Bibliotheque from "./accueil/Bibliotheque";
@@ -559,6 +560,10 @@ export default function SceneDom({
           projection.abonnementGerable === true,
         )}
         menu={menu}
+        // Story 7.13 — la région courante voyage vers la halte, pour que la refermer repose au
+        // bon endroit du monde. `versHalte` vit dans `lib/scene`, que le rendu a le droit de
+        // connaître (AD-7/AD-10 n'interdisent que `lib/domain` et `lib/data`).
+        lienVers={(url) => versHalte(url, region)}
         prepare={anamPrepare}
       />
 

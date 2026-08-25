@@ -1,0 +1,34 @@
+/* Le chemin de retour en tête d'une halte (Story 7.13).
+
+   Grammaire de `.retour` de `/aide` : un lien nu, aucun fond, aucun bord, aucune couleur d'accent.
+   C'est un chemin de service, pas une action. */
+.retour {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--cible-tactile);
+  color: var(--texte-doux);
+  text-decoration: none;
+  transition: color var(--duree-standard) var(--courbe);
+}
+.retour:hover {
+  color: var(--texte);
+}
+
+/* ⚠️ L'APPUI PRODUIT UN PIXEL. Sur un écran tactile `:hover` n'existe pas — c'est la leçon de la
+   Story 8.2, où un appui sur la surimpression ne changeait strictement rien. */
+.retour:active {
+  color: var(--texte);
+  opacity: 0.7;
+}
+.retour:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+  border-radius: var(--rayon-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retour {
+    transition: none;
+  }
+}

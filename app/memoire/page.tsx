@@ -10,6 +10,8 @@ import CorrectionNaissance from "@/render/memoire/CorrectionNaissance";
 import s from "@/render/memoire/memoire.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 import {
   annulerSuppression,
   apercevoirCorrection,
@@ -53,7 +55,15 @@ export const revalidate = 0;
  * Les trois autres gardes, elles, s'appliquent pleinement : une mineure barrée ne voit rien, et
  * quelqu'un qui n'a pas encore consenti n'a de toute façon aucun fait à voir.
  */
-export default async function PageMemoire() {
+export default async function PageMemoire({
+  searchParams,
+}: {
+  /**
+   * Les paramètres d'URL — Story 7.13. Ils portent la région d'où l'on vient, pour que fermer
+   * cette halte repose au bon endroit du monde. `Promise` : c'est la forme de Next 16.
+   */
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -77,6 +87,7 @@ export default async function PageMemoire() {
 
   return (
     <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className={s.titreHalte}>{copie.TITRE_HALTE}</h1>
       <p className={s.introduction}>{copie.INTRODUCTION}</p>
       <Memoire

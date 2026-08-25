@@ -9,6 +9,8 @@ import LienEchangeSource from "@/render/lecture/LienEchangeSource";
 import s from "@/render/lecture/lecture.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 
 /** Combien de lectures la halte transporte. Même raison qu'en 4.9 : un document art. 9 pèse. */
 const LECTURES_MAX = 30;
@@ -43,7 +45,15 @@ export const revalidate = 0;
  * FR-067 en dépend. Mais SERVIR de l'art. 9 dans l'app à quelqu'un qui a révoqué son consentement,
  * ou dont le compte est barré, n'est pas de l'export : c'est de l'usage produit.
  */
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  /**
+   * Les paramètres d'URL — Story 7.13. Ils portent la région d'où l'on vient, pour que fermer
+   * cette halte repose au bon endroit du monde. `Promise` : c'est la forme de Next 16.
+   */
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createSupabaseServerClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) redirect("/entrer");
@@ -90,6 +100,7 @@ export default async function Page() {
 
   return (
     <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className="t-titre">Mes lectures</h1>
 
       {indisponible && (

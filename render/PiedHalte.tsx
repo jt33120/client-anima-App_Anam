@@ -36,6 +36,15 @@ export default function PiedHalte({
 }) {
   return (
     <footer className={s.pied}>
+      {/* ⚠️ LE RETOUR N'EST PAS ICI, ET C'EST UNE DÉCISION (Story 7.13, 2026-08-26). Il y a été
+          posé, et `tests/pied-halte.test.ts` l'a refusé — avec sa raison écrite : « le jour où
+          quelqu'un y ajoutera un plan du site, des réseaux sociaux ou un logo, la porte de secours
+          cessera d'être ce qu'on trouve des yeux quand on ne va pas bien ». Un lien de retour est
+          exactement une chose de plus à regarder à côté d'elle.
+
+          Il vit donc EN HAUT de chaque halte (`render/RetourScene.tsx`), là où `/aide` avait déjà
+          mis le sien le 2026-08-25. Le pied garde ses deux liens, et la garde n'a pas bougé d'un
+          pouce. */}
       {mentionIA && (
         <Link className={s.lien} href={urlTransparence}>
           <span className="t-meta">{texteMention}</span>

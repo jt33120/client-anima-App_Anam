@@ -21,6 +21,8 @@ import Resultat from "./resultat";
 import s from "./enneagramme.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { urlRetourScene } from "@/lib/scene/retour-scene";
+import RetourScene from "@/render/RetourScene";
 
 /**
  * ⚠️ RENDUE À LA DEMANDE, ET C'EST UNE GARDE (revue adversariale, R5).
@@ -83,7 +85,7 @@ export const metadata = { title: "Anam" };
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ refaire?: string }>;
+  searchParams: Promise<{ refaire?: string; de?: string }>;
 }) {
   const supabase = await createSupabaseServerClient();
   const {
@@ -123,6 +125,7 @@ export default async function Page({
 
   return (
     <main className={s.halte}>
+      <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className="t-titre">Ton type</h1>
 
       {refaire === undefined && hypothese.statut === "calcule" ? (
