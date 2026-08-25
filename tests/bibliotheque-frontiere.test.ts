@@ -21,6 +21,9 @@ import { resolve } from "node:path";
  * S'il n'existe aucun champ où écrire un compte, il n'y a rien à masquer au rendu.
  */
 
+import { carteEnneagramme, carteMantra, carteHoroscope } from "@/lib/domain/cartes-socle";
+import { NON_ECRIT } from "@/lib/corpus/port";
+
 const RACINE = process.cwd();
 const lire = (f: string) => readFileSync(resolve(RACINE, f), "utf-8");
 
@@ -87,17 +90,45 @@ describe("[5.6/AD-10] le rendu ne connaît pas le domaine, et c'est ce qui impos
     // réciproquement. On vérifie donc que les deux formes coïncident champ pour champ.
     const champs = (corps: string) =>
       [...corps.matchAll(/readonly\s+(\w+)\s*[?:]/g)].map((m) => m[1]).sort();
-    expect(champs(corpsInterface(RENDU, "CarteVue"))).toEqual(["cle", "faits", "texte", "titre"]);
+    // ⚠️ `etat` A ÉTÉ AJOUTÉ LE 2026-08-25 (Story 7.8) : un TROISIÈME registre, distinct des faits
+    // calculés et du texte d'Anima — ce que le PRODUIT dit de son propre état. Sans lui, la carte
+    // de l'ennéagramme affichait « Anima n'a pas encore écrit cette carte » à tous les comptes
+    // neufs, alors que les neuf textes de type sont écrits : elle accusait quelqu'un d'un vide qui
+    // n'était pas le sien. Le glisser dans `texte` l'aurait fait paraître sous la plume d'Anima.
+    //
+    // La liste reste EXHAUSTIVE des deux côtés : c'est ce qui fait la garde. Un champ de plus ne
+    // passe pas sans qu'on relise cette décision.
+    expect(champs(corpsInterface(RENDU, "CarteVue"))).toEqual(["cle", "etat", "faits", "texte", "titre"]);
     // Le domaine porte `terme` en plus : il décide de la disponibilité (FR-080/FR-055). Ce champ
     // ne DOIT PAS traverser — le rendu n'a pas à savoir si une carte est premium, puisqu'une carte
     // indisponible n'est jamais construite (AC2).
     expect(champs(corpsInterface(DOMAINE, "CarteBibliotheque"))).toEqual([
       "cle",
+      "etat",
       "faits",
       "terme",
       "texte",
       "titre",
     ]);
+  });
+
+  it("[7.8 · FR-031 DUR] aucune VALEUR d'`etat` ne porte de mesure", () => {
+    // ⚠️ `etat` EST LE CHAMP LE PLUS TENTANT DU TYPE. Il accepte de la prose libre, et « 3 cartes
+    // sur 5 », « profil complété à 40 % », « il te reste deux étapes » y entreraient sans qu'aucun
+    // nom de champ ne rougisse. La garde de NOM ne suffit donc pas ici : on éprouve les valeurs
+    // réelles que le domaine produit.
+    const valeurs = [
+      carteEnneagramme(null, NON_ECRIT).etat,
+      carteEnneagramme(4, NON_ECRIT).etat,
+      carteMantra(NON_ECRIT).etat,
+      carteHoroscope(null).etat,
+    ].filter((v): v is string => v !== null);
+    expect(valeurs.length, "témoin : aucun état produit — le test ne mesurerait rien").toBeGreaterThan(0);
+    for (const v of valeurs) {
+      for (const tournure of [/\d+\s*(?:sur|\/)\s*\d+/, /%/, /\bétapes?\b/, /complét/i, /progress/i]) {
+        expect(v, `mesure dans un état de carte : « ${v} »`).not.toMatch(tournure);
+      }
+    }
   });
 
   it("[6.3] `CarteAnam` et `CarteAnamVue` portent les MÊMES champs — trois chaînes, rien d'autre", () => {

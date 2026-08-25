@@ -9,6 +9,7 @@ import {
 import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
 import {
   LIBELLES_NIVEAU,
+  ANNONCE_DU_TEST,
   MESSAGE_TYPE_SANS_TEXTE,
   itemsPourAffichage,
 } from "@/lib/domain/enneagramme-items";
@@ -137,14 +138,20 @@ export default async function Page({
           messageSansTexte={MESSAGE_TYPE_SANS_TEXTE}
         />
       ) : (
-        <TestCourt
-          key={cleTentative}
-          items={itemsPourAffichage()}
-          // Les libellés descendent du SERVEUR (jamais recopiés dans un module de rendu) : `render/`
-          // ne peut pas importer `lib/domain`, et une copie serait une divergence en attente.
-          libelles={NIVEAUX.map((n) => LIBELLES_NIVEAU[n])}
-          reponsesInitiales={reponsesInitiales}
-        />
+        <>
+          {/* ⚠️ L'ÉCRAN S'ANNONCE AVANT DE DÉMARRER, et seulement au PREMIER passage (Story 7.8).
+              Quelqu'un qui reprend une passe en cours n'a pas besoin qu'on lui réexplique ce
+              qu'elle fait : la relance serait alors du bavardage à chaque retour. */}
+          {cleTentative === "nouvelle" && <p className="t-corps">{ANNONCE_DU_TEST}</p>}
+          <TestCourt
+            key={cleTentative}
+            items={itemsPourAffichage()}
+            // Les libellés descendent du SERVEUR (jamais recopiés dans un module de rendu) :
+            // `render/` ne peut pas importer `lib/domain`, et une copie serait une divergence.
+            libelles={NIVEAUX.map((n) => LIBELLES_NIVEAU[n])}
+            reponsesInitiales={reponsesInitiales}
+          />
+        </>
       )}
 
       {/* Un chemin de retour, jamais un cul-de-sac. */}

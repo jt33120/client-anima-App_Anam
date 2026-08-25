@@ -108,7 +108,15 @@ function Carte({ carte, enAvant }: { carte: CarteVue; enAvant: boolean }) {
             à une personne réelle ;
           — pas de silence : une carte vide sans explication se lit comme une panne.
       */}
-      {carte.texte.statut === "ecrit" ? (
+      {/* ⚠️ L'ÉTAT DU PRODUIT PASSE AVANT, ET IL REMPLACE LE SILENCE D'ANIMA (Story 7.8).
+          Quand le produit a quelque chose à dire sur son propre état — « le test n'a pas encore
+          été passé » — c'est CELA qu'il faut lire, pas « Anima n'a rien écrit », qui était faux et
+          accusait quelqu'un d'un vide qui n'était pas le sien.
+
+          Rendu en `t-corps`, JAMAIS en `t-anam` : ce ne sont pas ses mots (FR-054/FR-086). */}
+      {carte.etat !== null ? (
+        <p className={`t-corps ${s.etatProduit}`}>{carte.etat}</p>
+      ) : carte.texte.statut === "ecrit" ? (
         <p className="t-anam">{carte.texte.texte}</p>
       ) : (
         <p className={`t-meta ${s.nonEcrit}`}>

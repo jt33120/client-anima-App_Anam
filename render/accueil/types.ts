@@ -35,6 +35,17 @@ export interface CarteVue {
   readonly titre: string;
   readonly faits: readonly LigneFaitVue[];
   readonly texte: TexteVue;
+  /**
+   * Ce que le PRODUIT dit de son propre état — jamais ce qu'Anima a écrit (Story 7.8).
+   *
+   * ⚠️ IL EST RENDU DANS UN AUTRE STYLE QUE `texte`, ET C'EST LA MOITIÉ DE SON EXISTENCE. Le texte
+   * d'Anima paraît en `t-anam` ; cette phrase-ci ne le peut pas, sinon on attribuerait à une
+   * personne réelle des mots qui ne sont pas d'elle (FR-054/FR-086). Deux registres, deux styles.
+   *
+   * ⚠️ ET CE N'EST PAS UNE PLACE POUR UNE MESURE. C'est le champ le plus tentant du type pour y
+   * écrire « 3 sur 5 » : `tests/bibliotheque-frontiere.test.ts` refuse qu'une valeur en porte une.
+   */
+  readonly etat: string | null;
 }
 
 /**

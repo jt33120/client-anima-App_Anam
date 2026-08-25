@@ -129,6 +129,7 @@ describe("[UX-DR-30] la borne compte les objets RENDUS, pas les entrées du cata
     titre: `Titre ${cle}`,
     faits: [],
     texte: { statut: "non_ecrit" },
+    etat: null,
   });
 
   const vue = (cles: readonly string[]): BibliothequeVue => ({

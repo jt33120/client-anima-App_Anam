@@ -68,6 +68,30 @@ export interface CarteBibliotheque {
   readonly faits: readonly LigneFait[];
   /** Ce qu'ANIMA a écrit — ou n'a pas encore écrit. L'union force à traiter le second cas (FR-054). */
   readonly texte: TexteCorpus;
+  /**
+   * CE QUE LE PRODUIT DIT DE SON PROPRE ÉTAT — troisième registre, ajouté le 2026-08-25 (Story 7.8).
+   *
+   * ══ POURQUOI IL FALLAIT UN TROISIÈME REGISTRE ══════════════════════════════════════════════
+   *
+   * Une carte portait deux choses : des FAITS calculés, et le TEXTE d'Anima. Un compte qui n'a pas
+   * passé le test d'ennéagramme n'a ni l'un ni l'autre — et l'écran affichait donc « Anima n'a pas
+   * encore écrit cette carte », à 100 % des comptes neufs. C'était FAUX : les neuf textes de type
+   * SONT écrits depuis la Story 5.5. Ce qui manque n'est pas le texte, c'est le test.
+   *
+   * Retour de Julian, 2026-08-25 : « c'est à toi de dire : vous n'avez pas encore fait votre
+   * ennéagramme, faites-le maintenant. » Le produit désignait un blocage chez quelqu'un d'autre là
+   * où il y avait un geste à un clic, et personne ne pouvait le deviner.
+   *
+   * ⚠️ CE N'EST PAS UN TROISIÈME ÉTAT DE `texte`, ET C'EST TOUT LE SUJET. `lib/corpus/port.ts`
+   * refuse d'exister un « texte par défaut » : glisser cette phrase dans `texte` la ferait paraître
+   * sous la plume d'Anima, en `t-anam`, alors qu'elle n'est pas d'elle. Deux registres, deux
+   * champs, deux styles de rendu — et FR-054/FR-086 tient sans dépendre de la discipline.
+   *
+   * ⚠️ ET CE N'EST PAS UNE PLACE POUR UNE MESURE (FR-031, DUR). `tests/bibliotheque-frontiere.test.ts`
+   * refuse qu'une valeur d'`etat` porte un compte, un pourcentage ou une progression : c'est le
+   * champ le plus tentant du type pour y écrire « 3 cartes sur 5 ».
+   */
+  readonly etat: string | null;
 }
 
 /**

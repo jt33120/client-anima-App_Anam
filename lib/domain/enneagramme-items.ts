@@ -150,6 +150,27 @@ export const MESSAGE_TYPE_ABSENT =
   "écrits et t’attendent. Il est court, et tu peux t’arrêter en route.";
 
 /** Où le passer. Constante unique — un test vérifie que la page existe. */
+/**
+ * ⚠️ L'ÉCRAN DÉMARRAIT SANS SE PRÉSENTER (Story 7.8, retour du 2026-08-25).
+ *
+ * `app/enneagramme/page.tsx` posait un `<h1>Ton type</h1>` puis affichait directement le premier
+ * énoncé. On tombait sur une affirmation à noter sans savoir combien il y en avait, ni si on
+ * pouvait s'arrêter, ni ce qu'on allait en obtenir.
+ *
+ * Or NFR-017 — « aucune session expirée n'interrompt, on reprend où l'on s'est arrêté » — est tenu
+ * par le code DEPUIS LA 5.5 : les réponses sont sauvegardées à mesure, et la `key` de tentative
+ * remonte l'arbre proprement. Ce n'a simplement jamais été DIT à l'écran. Une garantie qu'on ne
+ * connaît pas ne rassure personne : elle ne sert qu'à celui qui a lu le code.
+ *
+ * ⚠️ ET AUCUN INDICATEUR DE PROGRESSION. « Court » remplace la barre — c'est la décision de la 5.5
+ * (`ITEMS`), et elle tient : un compteur « 4 / 18 » transforme une lecture de soi en formulaire à
+ * finir, et FR-031 refuse les jauges partout ailleurs dans le produit.
+ */
+export const ANNONCE_DU_TEST =
+  "Quelques phrases, à situer entre « pas du tout moi » et « tout à fait moi ». C’est court. Tu " +
+  "peux t’arrêter en route et reprendre plus tard : ce que tu as posé reste là, et rien ne se " +
+  "perd si tu fermes l’application.";
+
 export const URL_PASSER_LE_TEST: { readonly libelle: string; readonly url: string } = Object.freeze({
   libelle: "Le test d’ennéagramme",
   url: "/enneagramme",

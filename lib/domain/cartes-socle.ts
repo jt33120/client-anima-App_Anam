@@ -5,6 +5,7 @@ import type { HoroscopeDuJour } from "@/lib/astro/quotidien";
 import { texteConfiguration, texteLuneRelative } from "@/lib/corpus/horoscope";
 import { NON_ECRIT, type TexteCorpus } from "@/lib/corpus/port";
 import type { TypeEnneagramme } from "./enneagramme";
+import { MESSAGE_TYPE_ABSENT } from "./enneagramme-items";
 import type { CarteBibliotheque } from "./bibliotheque";
 
 /**
@@ -125,6 +126,9 @@ export function carteMantra(texte: TexteCorpus): CarteBibliotheque {
     // rien — et c'est ce qui l'exclut de la mise en avant du jour (AC5).
     faits: [],
     texte,
+    // Rien à dire de l'état : quand le créneau est vide, la carte le dit déjà par `texte`, et
+    // c'est bien Anima qui n'a pas écrit — pas un geste qui attend quelqu'un.
+    etat: null,
   };
 }
 
@@ -146,6 +150,9 @@ export function carteHoroscope(horoscope: HoroscopeDuJour | null): CarteBiblioth
     titre: "Ton ciel du jour",
     terme: null,
     faits: [],
+    // Rien à dire de l'état : le ciel du jour est toujours calculable, et son silence éventuel est
+    // celui du corpus — donc celui d'Anima, que `texte` porte déjà.
+    etat: null,
     // Un horoscope indisponible (pas de date de naissance, ou panne) n'a pas de texte non plus : on
     // ne fabrique pas un repli, on transmet l'absence telle quelle.
     texte: horoscope === null ? NON_ECRIT : texteDuCiel(horoscope),
@@ -224,5 +231,17 @@ export function carteEnneagramme(type: TypeEnneagramme | null, texte: TexteCorpu
     // Le texte est attaché au résultat par la 5.5 elle-même — deux écrans le demanderaient sinon,
     // et l'un des deux finirait par écrire son propre repli.
     texte: type === null ? NON_ECRIT : texte,
+    /**
+     * ⚠️ SANS TYPE, C'EST LE PRODUIT QUI PARLE, PAS ANIMA (Story 7.8).
+     *
+     * L'écran affichait « Anima n'a pas encore écrit cette carte » à 100 % des comptes neufs, alors
+     * que les NEUF textes de type sont écrits depuis la 5.5. Il accusait quelqu'un d'un vide qui
+     * n'était pas le sien, et personne ne pouvait deviner qu'il suffisait de passer un test.
+     *
+     * La phrase vit dans `enneagramme-items.ts`, à UN seul endroit, et la halte « Ton socle » la
+     * lit aussi (Story 7.5). Deux formulations pour un même état, à deux fichiers d'écart, est le
+     * défaut que la 6.5b a déjà payé sur les libellés de signes.
+     */
+    etat: type === null ? MESSAGE_TYPE_ABSENT : null,
   };
 }

@@ -20,6 +20,7 @@ const carte = (cle: string, o: Partial<CarteVue> = {}): CarteVue => ({
   titre: `Titre ${cle}`,
   faits: [],
   texte: { statut: "non_ecrit" },
+  etat: null,
   ...o,
 });
 
@@ -30,7 +31,23 @@ const ANAM_NEUTRE = {
   ligne: null,
 } as const;
 
-/** L'état RÉEL du produit aujourd'hui : 165 créneaux déclarés, 0 écrit. */
+/** Une petite bibliothèque, pour éprouver un rendu de carte isolé. */
+const biblio = (cartes: readonly CarteVue[]): BibliothequeVue => ({
+  jour: { a: 2026, m: 8, j: 14 },
+  enAvant: null,
+  anam: ANAM_NEUTRE,
+  cartes,
+});
+
+/**
+ * ⚠️ LE CHIFFRE « 165 créneaux, 0 écrit » A ÉTÉ RETIRÉ DE CE COMMENTAIRE le 2026-08-25 : il était
+ * faux, et la même phrase a coûté une demi-journée dans `lib/corpus/README.md`. L'état réel est
+ * calculé par `tests/corpus-etat.test.ts`, et nulle part ailleurs.
+ *
+ * Ce jeu d'essai porte encore « theme » et « nombres », partis du catalogue avec la Story 7.7 : ce
+ * n'est pas un oubli. Ce fichier éprouve le RENDU d'une carte, qui doit continuer de savoir
+ * dessiner n'importe quelle carte qu'on lui donne — y compris celles d'un autre écran.
+ */
 const REELLE: BibliothequeVue = {
   jour: { a: 2026, m: 8, j: 14 },
   enAvant: "theme",
@@ -182,5 +199,53 @@ describe("[5.6/D4] la date est portée — sans elle, deux jours identiques se l
     // `lune_relative` ne change que tous les ~2,5 jours : le même texte d'horoscope sort deux à
     // trois jours de suite. C'est le ciel, pas un blocage — la date le dit.
     expect(screen.getByText("14 août")).toBeTruthy();
+  });
+});
+
+describe("[7.8 · FR-054/FR-086] la voix du PRODUIT n'emprunte jamais celle d'Anima", () => {
+  /**
+   * ⚠️ CETTE GARDE EXISTE PARCE QU'UN MUTANT A SURVÉCU (2026-08-25). Peindre `carte.etat` en
+   * `t-anam` passait TOUS les tests : le champ existait bien, séparé du corpus, avec sa phrase
+   * juste — et l'écran attribuait quand même à une personne réelle des mots qui ne sont pas d'elle.
+   *
+   * La séparation des deux registres ne vaut que si elle se VOIT. Un champ distinct rendu dans le
+   * même style est une distinction qui n'existe que dans le code.
+   */
+  it("[LE CŒUR] l'état du produit n'est JAMAIS peint en `t-anam`", () => {
+    const { container } = render(
+      <Bibliotheque bibliotheque={biblio([carte("enneagramme", { etat: "Le test n’a pas encore été passé." })])} />,
+    );
+    const porteur = [...container.querySelectorAll("p")].find((p) =>
+      (p.textContent ?? "").includes("Le test n’a pas encore été passé."),
+    );
+    expect(porteur, "l'état du produit n'atteint pas l'écran").toBeDefined();
+    expect(
+      porteur!.className,
+      "l'état du produit est peint dans la voix d'Anima — il lui attribue des mots qui ne sont pas d'elle",
+    ).not.toContain("t-anam");
+  });
+
+  it("[LE TÉMOIN] le texte d'Anima, LUI, est bien peint en `t-anam`", () => {
+    // Sans ce témoin, le refus ci-dessus serait vrai sur un rendu qui n'emploie plus `t-anam` du
+    // tout — et la garde passerait au vert en ayant fait disparaître la voix d'Anima de l'écran.
+    const { container } = render(
+      <Bibliotheque
+        bibliotheque={biblio([carte("mantra", { texte: { statut: "ecrit", texte: "Les mots d’Anima." } })])}
+      />,
+    );
+    const porteur = [...container.querySelectorAll("p")].find((p) =>
+      (p.textContent ?? "").includes("Les mots d’Anima."),
+    );
+    expect(porteur, "le texte d'Anima n'atteint pas l'écran").toBeDefined();
+    expect(porteur!.className, "la voix d'Anima a disparu du rendu").toContain("t-anam");
+  });
+
+  it("l'état PRÉCÈDE le silence du corpus — c'est lui qui doit se lire", () => {
+    const { container } = render(
+      <Bibliotheque bibliotheque={biblio([carte("enneagramme", { etat: "Le test attend." })])} />,
+    );
+    const texte = container.textContent ?? "";
+    expect(texte).toContain("Le test attend.");
+    expect(texte, "l'ancienne phrase, fausse, est revenue").not.toContain("Anima n’a pas encore écrit cette carte");
   });
 });

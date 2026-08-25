@@ -122,3 +122,15 @@
 .presenceAnam {
   color: var(--texte-doux);
 }
+
+/* La voix du PRODUIT sur une carte (Story 7.8) — « le test n'a pas encore été passé ».
+
+   ⚠️ DÉLIBÉRÉMENT DIFFÉRENTE DE `.nonEcrit` ET DE `t-anam`. Le silence d'Anima se lit comme une
+   note en retrait, en italique ; ses mots à elle se lisent en `t-anam`. Ceci n'est ni l'un ni
+   l'autre : c'est le produit qui parle de lui-même, et le confondre avec la plume d'Anima
+   attribuerait à une personne réelle des mots qui ne sont pas d'elle (FR-054/FR-086). */
+.etatProduit {
+  margin: 0;
+  color: var(--texte);
+  line-height: 1.6;
+}
