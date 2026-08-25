@@ -113,3 +113,46 @@ export async function lireFilRecent(
   }
   return tours.reverse();
 }
+
+/**
+ * Le plafond d'UNE lecture de rattrapage. Le compactage avance par tranches (`tranchePourCompactage`
+ * borne ensuite sur les caractères) ; ce plafond-ci borne la REQUÊTE, pour qu'un retard de plusieurs
+ * milliers de tours ne se lise pas d'un seul coup.
+ */
+export const FIL_COMPACTAGE_TOURS_MAX = 120;
+
+/**
+ * Les tours NON ENCORE COMPACTÉS de la propriétaire du JWT, du plus ancien au plus récent.
+ *
+ * ⚠️ ICI, ASCENDANT AVEC UNE LIMITE EST LE BON ORDRE — et c'est exactement l'inverse de
+ * `lireFilRecent`, dont l'encadré ci-dessus explique pourquoi elle demande les plus RÉCENTES. Les
+ * deux fonctions ne cherchent pas la même chose : le fil veut ce qu'elle vient d'écrire, le
+ * compactage veut le plus ancien retard, celui qui n'a jamais été résumé. Prendre les plus récentes
+ * ici sauterait une tranche du milieu, définitivement : la borne avancerait par-dessus du verbatim
+ * jamais lu, et personne ne s'en apercevrait — il ne manquerait « que » du contexte.
+ *
+ * `depuisIso` est la borne EXCLUSIVE (`gt`) : le dernier tour déjà compacté ne l'est pas deux fois.
+ */
+export async function lireFilDepuis(
+  supabase: SupabaseClient,
+  depuisIso: string | null,
+  plafond: number = FIL_COMPACTAGE_TOURS_MAX,
+): Promise<readonly TourFil[]> {
+  let requete = supabase
+    .from("entree_journal")
+    .select("id, role, contenu, cree_le")
+    .order("cree_le", { ascending: true })
+    .limit(plafond);
+  if (depuisIso) requete = requete.gt("cree_le", depuisIso);
+
+  const { data, error } = await requete;
+  if (error) throw new Error(`fil_depuis: ${error.code ?? "echec"}`);
+  if (!Array.isArray(data)) return [];
+
+  const tours: TourFil[] = [];
+  for (const l of data as Array<Record<string, unknown>>) {
+    const t = tourDepuisLigne(l);
+    if (t) tours.push(t);
+  }
+  return tours;
+}

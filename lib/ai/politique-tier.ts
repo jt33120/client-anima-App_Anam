@@ -42,6 +42,12 @@ export function tierPour(capacite: CapaciteIa, niveauSecurite: NiveauSecurite = 
   // le voir. Une lecture reprend SES mots dans un document qu'elle relira dans un an ; un modèle
   // léger qui la paraphrase de travers laisse une trace écrite, pas une phrase oubliée.
   if (capacite === "lecture") return "fort";
+  // LE COMPACTAGE (2026-08-25), tranché ici pour une raison PLUS FORTE encore que les deux
+  // ci-dessus. Sa sortie n'est pas lue une fois : elle est écrite dans `carte_contexte` et
+  // re-préfixée à CHAQUE tour suivant, jusqu'au prochain compactage. Un modèle léger qui glisse
+  // « elle a du mal à » là où elle a dit « je suis crevée » ne produit pas une phrase maladroite :
+  // il produit une hypothèse fausse que le modèle relira comme un acquis, tous les jours.
+  if (capacite === "compactage") return "fort";
   if (niveauSecurite >= 1) return "fort"; // AD-5 : détresse → le plus capable, jamais le léger
   // Tout le reste (reconceptualisation, synthèse, retour_theme) est du travail de schéma : FORT.
   return capacite === "echange" ? "leger" : "fort";

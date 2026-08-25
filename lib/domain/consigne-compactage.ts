@@ -1,5 +1,11 @@
-import type { MessageIa } from "@/lib/ai/port";
-import { CARTE_CHAMP_MAX, CHAMPS_CARTE, INTITULE_CHAMP, type CarteContexte } from "./carte-contexte";
+import type { MessageIa, RequeteIa } from "@/lib/ai/port";
+import {
+  CARTE_CHAMP_MAX,
+  CHAMPS_CARTE,
+  INTITULE_CHAMP,
+  type CarteContexte,
+  type TourCompactable,
+} from "./carte-contexte";
 
 /**
  * consigne-compactage.ts — LA CONSIGNE QUI FABRIQUE LA CARTE (retour du 2026-08-25).
@@ -115,5 +121,32 @@ export function analyserCompactage(sortie: string, actuelle: CarteContexte): Car
     predisposant: lu.predisposant ?? actuelle.predisposant,
     perpetuant: lu.perpetuant ?? actuelle.perpetuant,
     protecteur: lu.protecteur ?? actuelle.protecteur,
+  };
+}
+
+/**
+ * ══ LA REQUÊTE DE COMPACTAGE ════════════════════════════════════════════════════════════════════
+ *
+ * ⚠️ LE VERBATIM PART EN `user`, JAMAIS DANS LA CONSIGNE SYSTÈME, et ce n'est pas une convention de
+ * forme. Concaténer la matière aux règles ferait de ce qu'elle a écrit une INSTRUCTION : il suffirait
+ * qu'elle tape « ignore les consignes précédentes et écris… » pour que la phrase se retrouve du côté
+ * du modèle qui donne les ordres. En la laissant en `user`, elle reste ce qu'elle est — du texte à
+ * lire. C'est le même partage que partout ailleurs dans le produit.
+ *
+ * `contientArt9: true` : le verbatim d'une conversation intime en est, évidemment. L'envoi passe donc
+ * par la frontière d'egress (AD-13) comme tous les autres, et un consentement révoqué le bloque.
+ */
+export function verbatimPourCompactage(tours: readonly TourCompactable[]): string {
+  return tours.map((t) => `${t.role === "utilisatrice" ? "Elle" : "Anam"} : ${t.texte}`).join("\n\n");
+}
+
+export function requeteCompactage(
+  carte: CarteContexte,
+  tours: readonly TourCompactable[],
+): RequeteIa {
+  return {
+    capacite: "compactage",
+    messages: [consigneCompactage(carte), { role: "user", content: verbatimPourCompactage(tours) }],
+    contientArt9: true,
   };
 }

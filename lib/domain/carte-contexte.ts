@@ -141,6 +141,50 @@ export function doitCompacter(m: MatiereCompactage): boolean {
 }
 
 /**
+ * Un tour tel que le compactage a besoin de le voir. STRUCTUREL, et volontairement plus étroit que
+ * `TourFil` : le domaine ne connaît ni `id`, ni la forme d'une ligne de base (AD-1).
+ */
+export interface TourCompactable {
+  readonly role: "utilisatrice" | "anam";
+  readonly texte: string;
+  readonly creeLe: string;
+}
+
+export interface TrancheCompactage {
+  readonly tours: readonly TourCompactable[];
+  /** La borne à écrire : l'instant du DERNIER tour inclus. `null` quand il n'y a rien à compacter. */
+  readonly borne: string | null;
+}
+
+/**
+ * Découpe la tranche à compacter MAINTENANT, dans l'ordre du plus ancien au plus récent.
+ *
+ * ⚠️ ELLE INCLUT TOUJOURS AU MOINS UN TOUR, ET C'EST UNE GARDE CONTRE UN BLOCAGE PERMANENT. Un seul
+ * tour plus long que le budget — un long message écrit d'une traite, ce qui arrive précisément les
+ * soirs qui comptent — laisserait sinon la tranche VIDE : la borne n'avancerait jamais, le seuil
+ * resterait franchi, et le compactage se relancerait à chaque tour, éternellement, sur le même
+ * verbatim. Un coût qui se répète sans jamais rien produire, et rien pour le dire.
+ *
+ * Ce que le budget borne, c'est donc la taille d'UNE passe, pas la taille d'un tour. Le reste du
+ * retard sera repris à la passe suivante : le compactage avance par tranches, il ne rattrape pas
+ * tout d'un coup.
+ */
+export function tranchePourCompactage(
+  tours: readonly TourCompactable[],
+  budget: number = BUDGET_COMPACTAGE_CARACTERES,
+): TrancheCompactage {
+  if (tours.length === 0) return { tours: [], borne: null };
+  const retenus: TourCompactable[] = [];
+  let total = 0;
+  for (const t of tours) {
+    if (retenus.length > 0 && total + t.texte.length > budget) break;
+    retenus.push(t);
+    total += t.texte.length;
+  }
+  return { tours: retenus, borne: retenus[retenus.length - 1].creeLe };
+}
+
+/**
  * ══ LA CONSIGNE QUI PORTE LA CARTE DANS LA CONVERSATION ═════════════════════════════════════════
  *
  * `null` quand la carte est vide : une consigne qui dit « tu ne sais rien de ses mécanismes » est du

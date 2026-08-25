@@ -23,8 +23,13 @@ import "server-only";
 // tranché explicitement dans `politique-tier` : registre document, il reprend ses mots en clair et
 // n'a pas droit à la prédiction. C'est la capacité où vit toute la personnalisation du rituel —
 // jamais dans la sélection de la carte, qui elle ne sait rien de personne (AD-11, FR-019).
+// `compactage` (2026-08-25) = « à partir de cet échange, que retiens-tu du contexte de cette
+// personne ? ». FORT, et tranché EXPLICITEMENT dans `politique-tier` : sa sortie est PERSISTÉE et
+// re-préfixée à CHAQUE tour suivant. Une phrase de travers n'est pas oubliée au tour d'après, elle
+// devient un fait pour le modèle et se répète — c'est la capacité la plus durable du produit.
 export type CapaciteIa =
   | "echange"
+  | "compactage"
   | "reconceptualisation"
   | "synthese"
   | "detection"

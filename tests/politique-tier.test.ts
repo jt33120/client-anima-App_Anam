@@ -23,6 +23,10 @@ const TIER_ATTENDU: Record<CapaciteIa, TierIa> = {
   // Story 5.8 — la lecture reprend SES mots dans un document qu'elle relira dans un an. Un modèle
   // léger qui la paraphrase de travers laisse une trace écrite, pas une phrase oubliée.
   lecture: "fort",
+  // 2026-08-25 — le compactage écrit la carte de contexte, et cette carte est re-préfixée à CHAQUE
+  // tour suivant. C'est la sortie la plus DURABLE du produit : plus durable qu'une lecture, qu'on
+  // relit une fois. Un glissement de mot y devient un acquis que le modèle relit tous les jours.
+  compactage: "fort",
 };
 
 /**

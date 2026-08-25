@@ -42,6 +42,11 @@ import type { CleCarteJeu } from "@/lib/tirage/jeu";
 import { consignePhaseDuTour } from "@/lib/domain/consigne-phase";
 import { consigneVoixAnam } from "@/lib/domain/consigne-voix";
 import { consigneContexte } from "@/lib/domain/contexte-anam";
+import { consigneCarte } from "@/lib/domain/carte-contexte";
+import { CARTE_ABSENTE } from "@/lib/domain/depot-carte";
+import { creerDepotCarte } from "@/lib/data/depot-carte";
+import { lireFilDepuis } from "@/lib/data/depot-fil";
+import { compacterSiNecessaire } from "@/lib/safety/compactage-pipeline";
 import { lireContexteAnam } from "@/lib/data/lire-contexte-anam";
 import { consigneBilan } from "@/lib/domain/consigne-bilan";
 import { structurerBilan } from "@/lib/domain/bilan";
@@ -452,6 +457,48 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  // ── ÉTAGE COMPACTAGE DE LA CARTE (2026-08-25 — AD-1/AD-5/AD-13/AD-17) ─────────────────────────
+  //
+  // « Une architecture de mémoire et de compacting intelligente pour garder ce qui est important et
+  // enlever le bruit. » C'est cet étage-là, et il est le dernier maillon de la carte : la 0079 a posé
+  // la table, la 0080 les deux portes, `carte-contexte.ts` le seuil — ici, ça tourne.
+  //
+  // Même posture que les autres étages : `after()` (aucune latence, rien à l'écran ce tour), après la
+  // sécurité, après le gate d'allocation, sur le même client JWT, métré `:compactage`. Un échec
+  // journalise un incident sans art. 9 ; JAMAIS un 500.
+  //
+  // ⚠️ IL NE TOURNE PAS À CHAQUE TOUR, ET LE SEUIL EST LE SEUL JUGE. `compacterSiNecessaire` lit la
+  // borne déjà compactée, mesure ce qui reste, et rend la main sans rien dépenser tant que le budget
+  // n'est pas franchi. Le coût suit donc l'usage : qui parle beaucoup compacte souvent, qui écrit
+  // trois phrases par semaine ne compacte jamais. C'est le choix de Julian contre un job quotidien,
+  // qui aurait mis tout le monde au même rythme et payé pour des gens qui n'ont rien dit.
+  //
+  // ⚠️ ET IL EST SUPPRIMÉ EN DÉTRESSE (AD-17), comme les trois autres étages de schéma. Résumer « ce
+  // qui l'entretient » depuis un soir de crise écrirait une hypothèse au pire moment de sa vie — et
+  // la lui resservirait ensuite à chaque tour, puisque la carte est re-préfixée. La garde vit dans le
+  // pipeline, pas ici : une garde de sécurité ne dépend jamais d'une condition de produit.
+  if (dernierMessage?.role === "user") {
+    after(async () => {
+      try {
+        const compactage = await compacterSiNecessaire(
+          {
+            supabase,
+            adaptateur,
+            depot: creerDepotCarte(user.id),
+            lireTours: (depuis) => lireFilDepuis(supabase, depuis),
+            fenetreDetresseActive: () => fenetreDetresseActive(supabase, "compactage"),
+          },
+          { verdict: securite.verdict },
+        );
+        if (compactage.usage) {
+          await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence: `${cleIdempotence}:compactage`, ...compactage.usage });
+        }
+      } catch (e) {
+        console.error("anam/message : étage compactage en repli", { nom: e instanceof Error ? e.name : "inconnu" });
+      }
+    });
+  }
+
   // Story 3.2 — la carte d'abonnement se propose APRÈS le bilan (AC1), UNIQUEMENT si l'utilisatrice
   // n'est pas déjà premium. Entitlement lu SOUS JWT/RLS (source de vérité unique 3.1) et SEULEMENT
   // quand un bilan est attendu (aucun surcoût DB les autres tours). Repli en cas de DOUTE (lecture en
@@ -697,8 +744,28 @@ export async function POST(request: NextRequest) {
    *
    * Repli : jamais bloquant. Une lecture en panne rend une matière vide, et le module pur sait dire
    * l'ignorance — ce qui vaut mieux qu'un modèle qui comble. */
-  const matiereContexte = await lireContexteAnam(supabase, user.id).catch(() => null);
+  /* ── CE QU'ANAM A COMPRIS D'ELLE (carte de contexte, 0079/0080) ──────────────────────────────
+   *
+   * La couche du dessus : `contexte` porte ce qu'elle SAIT (prénom, socle, branches, faits retenus),
+   * la carte porte ce qu'elle a COMPRIS (ce qui l'amène, ce qui l'a déclenchée, ce qui l'entretient,
+   * ce qui tient déjà). L'une est une liste, l'autre est une formulation.
+   *
+   * ⚠️ LES DEUX LECTURES PARTENT ENSEMBLE. Elles sont indépendantes et quelqu'un attend une réponse :
+   * les enchaîner ajouterait un aller-retour à chaque message, pour rien.
+   *
+   * ⚠️ ET LE `catch` EST ICI, PAS DANS LE DÉPÔT. `charger` LÈVE par conception (voir `depot-carte`) —
+   * sur ce chemin-ci l'absence de carte n'est qu'un tour moins renseigné, donc on rattrape ; sur le
+   * chemin du COMPACTAGE, rattraper ferait écrire une carte reconstruite de rien par-dessus la vraie,
+   * donc on ne rattrape pas. La même panne, deux conduites, et c'est délibéré. */
+  const [matiereContexte, cartePersistee] = await Promise.all([
+    lireContexteAnam(supabase, user.id).catch(() => null),
+    creerDepotCarte(user.id)
+      .charger()
+      .catch(() => CARTE_ABSENTE),
+  ]);
   const contexte = matiereContexte ? consigneContexte(matiereContexte) : null;
+  // `null` quand la carte est vide — une consigne qui dit « tu ne sais rien » est du bruit.
+  const carte = consigneCarte(cartePersistee.carte);
   // En détresse au moment d'une clôture, on NE demande PAS au modèle de clore (la séance cesse d'être
   // une séance, AC5) : la consigne de phase `clore` (« c'est toi qui clos… ») est supprimée — seul
   // l'overlay détresse régit le tour. Les autres phases restent injectées (bénignes en détresse ;
@@ -708,7 +775,10 @@ export async function POST(request: NextRequest) {
   // toujours. La règle — et ce qu'elle coûtait — est écrite dans `consigne-phase.ts`.
   const consignePhase = consignePhaseDuTour(arc, clotureAutorisee);
   const consigneDetresse = consigneReponse(securite.verdict);
-  const prefixes = [consigneVoix, contexte, consignePhase, consigneDetresse].filter(
+  // ⚠️ LA CARTE SE PLACE APRÈS LE CONTEXTE ET AVANT LA PHASE, ET CETTE PLACE EST UNE GARDE — la même
+  // que celle du contexte, pour la même raison : ce qu'on lui APPREND ne peut jamais primer sur ce
+  // qu'on lui INTERDIT. La détresse reste au plus près des messages, la voix reste en tête.
+  const prefixes = [consigneVoix, contexte, carte, consignePhase, consigneDetresse].filter(
     (c): c is MessageIa => c !== null,
   );
   const messagesReponse = prefixes.length ? [...prefixes, ...messages] : messages;
