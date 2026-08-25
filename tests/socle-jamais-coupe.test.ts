@@ -6,13 +6,11 @@ import { doitCouperConversation } from "@/lib/domain/allocation-residuelle";
 import { limiteAllocationResiduelle } from "@/lib/ai/allocation-config";
 import { LIGNE_QUOTA_EPUISEE } from "@/render/conversation/ligne-quota";
 import { chargerProjectionArbre } from "@/lib/safety/projection-arbre";
-import { cartesDisponibles } from "@/lib/domain/bibliotheque";
+import { cartesDisponibles, CATALOGUE_CARTES } from "@/lib/domain/bibliotheque";
 import {
   carteEnneagramme,
   carteHoroscope,
   carteMantra,
-  carteNombres,
-  carteTheme,
 } from "@/lib/domain/cartes-socle";
 import { NON_ECRIT } from "@/lib/corpus/port";
 
@@ -351,29 +349,37 @@ describe("[T6-1 / AC4] les items FR-055 qui EXISTENT : aucun chemin premium ne l
     }
   });
 
-  it("[FR-055 / Story 5.6] les CINQ cartes du socle survivent à un compte gratuit", () => {
+  it("[FR-055 / Story 5.6] les cartes du socle survivent TOUTES à un compte gratuit", () => {
     // ⚠️ POURQUOI CETTE GARDE EST COMPORTEMENTALE ET NON LEXICALE. `lib/data/lire-bibliotheque.ts`
     // ne peut PAS entrer dans les listes « aucun mot premium » ci-dessus : il porte `aPremium`, et
     // légitimement — la bibliothèque est le contenant, et elle accueillera des cartes payantes en
     // 5.8 (la lecture) et 5.9 (l'ancrage).
     //
     // Refuser le mot serait donc impossible ; refuser le RÉSULTAT ne l'est pas. On construit les
-    // cinq VRAIES cartes du socle — pas des doublures — et on vérifie qu'un compte gratuit les
-    // garde toutes. C'est plus fort que le balayage : ça interdit la conséquence, pas le vocabulaire.
+    // VRAIES cartes du socle — pas des doublures — et on vérifie qu'un compte gratuit les garde
+    // toutes. C'est plus fort que le balayage : ça interdit la conséquence, pas le vocabulaire.
+    //
+    // ⚠️ ELLES SONT TROIS DEPUIS LE 2026-08-25 (Story 7.7), et le thème et les nombres n'ont PAS
+    // été perdus : ils ont quitté l'accueil pour la halte « Ton socle », qui les rend en ENTIER.
+    // Ce que FR-055 protège — « le socle n'est jamais coupé » — vaut donc désormais sur DEUX
+    // surfaces, et le test qui garde la seconde est `tests/fiche-socle.test.ts`. Le catalogue est
+    // lu depuis le module plutôt qu'écrit ici : une carte ajoutée demain entre dans cette garde
+    // sans que personne n'y pense.
     const socle = [
       carteMantra(NON_ECRIT),
       carteHoroscope(null),
-      carteTheme(null),
-      carteNombres(null),
       carteEnneagramme(null, NON_ECRIT),
     ];
-    expect(socle, "témoin : les cinq cartes du socle sont bien construites").toHaveLength(5);
+    expect(
+      socle.map((c) => c.cle).sort(),
+      "témoin : les cartes construites ici ne sont plus celles du catalogue",
+    ).toEqual([...CATALOGUE_CARTES].sort());
 
     const gratuite = cartesDisponibles(socle, false);
     expect(
       gratuite.map((c) => c.cle).sort(),
       "une carte du socle a disparu pour un compte gratuit — FR-055",
-    ).toEqual(["enneagramme", "horoscope", "mantra", "nombres", "theme"]);
+    ).toEqual([...CATALOGUE_CARTES].sort());
 
     // Et l'entitlement n'AJOUTE rien non plus : le socle est le même des deux côtés du paywall.
     expect(cartesDisponibles(socle, true).map((c) => c.cle).sort()).toEqual(

@@ -85,13 +85,19 @@ describe("[5.6/AC2 DUR] aucun champ ne peut porter une mesure — la garde est s
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 describe("[5.6/AC1] le catalogue est une constante, dans les bornes d'UX-DR-30", () => {
-  it("4 à 6 cartes, jamais plus", () => {
-    expect(CATALOGUE_CARTES.length).toBeGreaterThanOrEqual(4);
+  it("3 à 6 cartes, jamais moins, jamais plus", () => {
+    // ⚠️ LE PLANCHER EST PASSÉ DE 4 À 3 LE 2026-08-25, par DÉCISION ÉCRITE et non par commodité —
+    // amendement d'`EXPERIENCE.md` §3. La valeur vit à cinq endroits et
+    // `tests/architecture-information.test.ts` échoue si l'un d'eux diverge : ici on éprouve
+    // seulement que le catalogue RÉEL la respecte.
+    expect(CATALOGUE_CARTES.length).toBeGreaterThanOrEqual(3);
     expect(CATALOGUE_CARTES.length).toBeLessThanOrEqual(6);
   });
 
   it("l'ordre est celui d'EXPERIENCE.md, et il est gelé", () => {
-    expect([...CATALOGUE_CARTES]).toEqual(["mantra", "horoscope", "theme", "nombres", "enneagramme"]);
+    // « Ton thème » et « Tes nombres » sont partis le 2026-08-25 (Story 7.7) : ils ne changent
+    // jamais d'un jour à l'autre, et la halte « Ton socle » les rend en ENTIER.
+    expect([...CATALOGUE_CARTES]).toEqual(["mantra", "horoscope", "enneagramme"]);
     expect(Object.isFrozen(CATALOGUE_CARTES)).toBe(true);
   });
 
@@ -149,25 +155,27 @@ describe("[5.6/AC1] la mise en avant ne dépend QUE du jour civil", () => {
 
 describe("[5.6/AC5] une carte sans rien à montrer n'est jamais mise en avant", () => {
   it("un fait calculé suffit à être présentable ; un texte écrit aussi ; ni l'un ni l'autre, non", () => {
-    expect(estPresentable(avecFait("theme"))).toBe(true);
+    expect(estPresentable(avecFait("enneagramme"))).toBe(true);
     expect(estPresentable(carte("mantra", { texte: ecrit("Un texte d'Anima.") }))).toBe(true);
     expect(estPresentable(carte("mantra"))).toBe(false);
   });
 
   it("[LE TEST QUI COMPTE] avec un corpus vide, la rotation évite les deux cartes muettes", () => {
-    // C'est l'état RÉEL du produit aujourd'hui : 165 créneaux déclarés, 0 écrit. Le mantra et
-    // l'horoscope n'ont aucun fait calculé à montrer — seulement du texte, qui n'existe pas.
-    // Sans ce filtre, l'accueil s'ouvrirait DEUX JOURS SUR CINQ sur une carte vide en tête.
+    // ⚠️ LE CHIFFRE « 165 créneaux, 0 écrit » A ÉTÉ RETIRÉ D'ICI le 2026-08-25 : il était faux, et
+    // la même phrase a coûté une demi-journée dans `lib/corpus/README.md`. L'état réel est calculé
+    // par `tests/corpus-etat.test.ts`.
+    //
+    // Ce que ce test garde n'a pas changé : une carte sans fait ET sans texte ne peut pas être
+    // mise en avant. Le mantra EST son texte ; l'horoscope est fait d'énumérations. Sans ce
+    // filtre, l'accueil s'ouvrirait sur une carte vide en tête.
     const reelles = [
       carte("mantra"), // rien : le mantra EST son texte
       carte("horoscope"), // rien : des énumérations, pas de la prose
-      avecFait("theme"),
-      avecFait("nombres"),
       avecFait("enneagramme"),
     ];
     for (let d = 1; d <= 31; d++) {
       const cle = cleCarteDuJour(JOUR(2026, 8, d), reelles);
-      expect(["theme", "nombres", "enneagramme"], `le ${d}/08 met en avant « ${cle} »`).toContain(cle);
+      expect(["enneagramme"], `le ${d}/08 met en avant « ${cle} »`).toContain(cle);
     }
   });
 

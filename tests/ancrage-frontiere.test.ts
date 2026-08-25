@@ -157,9 +157,14 @@ describe("[AC3/AC6] la halte elle-même — ce qu'un rendu de Server Component n
 });
 
 describe("[AC4] le socle gratuit n'est pas dégradé, et rien ne se teaser", () => {
-  it("la bibliothèque reste à CINQ cartes — l'ancrage n'y entre pas (D1)", () => {
-    expect(CATALOGUE_CARTES.length).toBe(5);
+  it("l'ancrage n'entre pas dans la bibliothèque (D1)", () => {
+    // ⚠️ CE TEST EXIGEAIT `length === 5`, ET CE N'ÉTAIT PAS SON SUJET. Le 2026-08-25, le catalogue
+    // est passé à trois (Story 7.7) et ce test a rougi — alors que ce qu'il garde, « l'ancrage
+    // premium ne s'invite pas dans le socle gratuit », n'avait pas bougé d'un pouce. Un compte en
+    // dur transforme chaque décision voulue en échec de test, et pousse à « réparer » le chiffre
+    // sans lire la décision derrière.
     expect(CATALOGUE_CARTES).not.toContain("ancrage");
+    expect(CATALOGUE_CARTES.length, "témoin : le catalogue n'est pas vide").toBeGreaterThan(0);
   });
 
   it("le modèle de vue n'a AUCUN champ capable de porter un badge, un compte ou un cadenas", () => {

@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import CarteAnam from "@/render/accueil/CarteAnam";
 import Bibliotheque from "@/render/accueil/Bibliotheque";
 import type { BibliothequeVue, CarteAnamVue, CarteVue } from "@/render/accueil/types";
+import { CATALOGUE_CARTES } from "@/lib/domain/bibliotheque";
 
 /**
  * carte-anam.test.tsx — LA CARTE D'ANAM MONTÉE POUR DE VRAI (Story 6.3, T5 · AC6, AC7).
@@ -137,28 +138,33 @@ describe("[UX-DR-30] la borne compte les objets RENDUS, pas les entrées du cata
     anam: NEUTRE,
   });
 
-  it("[LE CŒUR] l'accueil réel rend SIX objets — le plafond, pile", () => {
+  it("[LE CŒUR] l'accueil RÉEL rend le catalogue, plus la carte d'Anam — pas un objet de plus", () => {
     // ⚠️ CE TEST EXISTE PARCE QUE LA BORNE ÉTAIT MESURÉE AU MAUVAIS ENDROIT (Story 6.3, D8).
+    // `assertCatalogueBorne` vérifie `CATALOGUE_CARTES.length` pendant que l'écran rend une carte
+    // de PLUS. Une carte de catalogue ajoutée passait donc sous le plafond du module et le
+    // franchissait à l'écran, avec un build vert.
     //
-    // `assertCatalogueBorne` (lib/domain/bibliotheque.ts) vérifie `CATALOGUE_CARTES.length` — donc 5,
-    // pendant que l'écran en rendait 6 depuis cette story. Une sixième carte de catalogue serait
-    // passée : catalogue à 6, plafond respecté, SEPT objets à l'écran, et un build vert.
-    //
-    // ⚠️ ET NOUS SOMMES AU PLAFOND. Toute carte de catalogue ajoutée après la 6.3 fera rougir ce
-    // test, et c'est voulu : il faudra alors retirer quelque chose, pas relever la borne.
-    const { container } = render(<Bibliotheque bibliotheque={vue(["theme", "mantra", "horoscope", "nombres", "enneagramme"])} />);
-    expect(container.querySelectorAll("article").length).toBe(6);
+    // ⚠️ ET IL FABRIQUAIT SON PROPRE ACCUEIL, CE QUI ÉTAIT LA MOITIÉ DU DÉFAUT (corrigé le
+    // 2026-08-25, Story 7.7). Il rendait `["theme","mantra","horoscope","nombres","enneagramme"]`
+    // — cinq clés écrites à la main — et attendait six objets. Le 2026-08-25, « theme » et
+    // « nombres » ont quitté le catalogue : le test est resté VERT en éprouvant un accueil qui
+    // n'existe plus. Il lit désormais le catalogue réel.
+    const { container } = render(<Bibliotheque bibliotheque={vue([...CATALOGUE_CARTES])} />);
+    expect(container.querySelectorAll("article").length).toBe(CATALOGUE_CARTES.length + 1);
   });
 
-  it("le plancher de quatre est tenu même avec un catalogue minimal", () => {
-    const { container } = render(<Bibliotheque bibliotheque={vue(["theme", "mantra", "horoscope"])} />);
-    expect(container.querySelectorAll("article").length).toBeGreaterThanOrEqual(4);
+  it("le plancher décidé est tenu — la grille plus la carte d'Anam", () => {
+    // Le plancher vaut sur le CATALOGUE (amendement d'`EXPERIENCE.md` §3) ; ce qui borne l'écran,
+    // c'est que l'accueil ne rende jamais plus que le catalogue plus la carte d'Anam.
+    const { container } = render(<Bibliotheque bibliotheque={vue([...CATALOGUE_CARTES])} />);
+    expect(CATALOGUE_CARTES.length, "le catalogue est passé sous son plancher").toBeGreaterThanOrEqual(3);
+    expect(container.querySelectorAll("article").length).toBe(CATALOGUE_CARTES.length + 1);
   });
 
   it("la carte d'Anam est rendue HORS de la grille — elle n'entre pas dans la rotation", () => {
     // Mutation-cible : la glisser dans la `<ul>`. Elle deviendrait alors une carte du catalogue pour
     // le CSS (`.item:first-child` prend toute la largeur) et pourrait se retrouver en tête.
-    const { container } = render(<Bibliotheque bibliotheque={vue(["theme", "mantra"])} />);
+    const { container } = render(<Bibliotheque bibliotheque={vue(["mantra", "horoscope"])} />);
     expect(container.querySelectorAll("ul article").length, "la grille ne contient que le catalogue").toBe(2);
     expect(container.querySelectorAll("article").length).toBe(3);
   });

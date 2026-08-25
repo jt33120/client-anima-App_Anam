@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { ETAPES } from "@/lib/domain/copie-guide";
+import { ENTREES_MENU } from "@/lib/domain/menu-compte";
 
 /**
  * guide-cibles.test.ts — LE TOUR GUIDÉ NE DÉSIGNE QUE CE QUE LA SCÈNE REND (2026-08-25).
@@ -179,7 +180,20 @@ describe("[2026-08-25] Chaque étape du tour désigne quelque chose que la SCÈN
     const cites = new Set<string>();
     for (const e of ETAPES)
       for (const m of e.texte.matchAll(/«\s*([A-ZÀ-Ý][^»]{1,20}?)\s*»/g)) cites.add(m[1]);
-    const introuvables = [...cites].filter((mot) => !SOURCE_SCENE.includes(mot));
+
+    // ⚠️ CE QUE « LA SCÈNE PORTE » A GRANDI LE 2026-08-25, ET LA GARDE DOIT SUIVRE — sans quoi elle
+    // interdirait de parler de ce qui est désormais atteignable.
+    //
+    // La scène rend une FEUILLE de menu (Story 7.3) dont les entrées descendent de
+    // `lib/domain/menu-compte.ts` par propriété : `render/` n'a pas le droit d'importer le domaine
+    // (AD-7/AD-10), donc leurs libellés n'apparaissent PAS dans la clôture d'imports de la scène.
+    // Chercher « Ton socle » dans le seul code de rendu revenait à ignorer neuf portes réelles.
+    //
+    // Ce n'est pas un assouplissement : le corpus de référence est toujours fermé et vérifié —
+    // il compte maintenant deux sources au lieu d'une, et chacune est ce que la scène rend
+    // vraiment. Un mot inventé reste introuvable dans les deux.
+    const portees = SOURCE_SCENE + "\n" + ENTREES_MENU.map((e) => `${e.titre} ${e.quoi}`).join("\n");
+    const introuvables = [...cites].filter((mot) => !portees.includes(mot));
     expect(
       introuvables,
       `le tour nomme des surfaces que la scène ne rend pas : ${introuvables.join(", ")}`,

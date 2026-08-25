@@ -3,17 +3,12 @@ import {
   carteEnneagramme,
   carteHoroscope,
   carteMantra,
-  carteNombres,
-  carteTheme,
 } from "@/lib/domain/cartes-socle";
-import { estPresentable } from "@/lib/domain/bibliotheque";
+import { estPresentable, CATALOGUE_CARTES } from "@/lib/domain/bibliotheque";
 import { chercherInterdits } from "@/lib/domain/lexique-interdit";
 import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
 import { chercherConfusionVocabulaire } from "@/lib/domain/vocabulaire";
 import { ecrit, NON_ECRIT } from "@/lib/corpus/port";
-import { placer, type ThemeNatal, type PositionCorps } from "@/lib/astro/theme-natal";
-import type { Corps } from "@/lib/astro/port";
-import type { Numerologie } from "@/lib/astro/numerologie";
 
 /**
  * cartes-socle.test.ts — LES CINQ CARTES DANS LEURS CAS RÉELS (Story 5.6, T5/T6).
@@ -27,100 +22,27 @@ import type { Numerologie } from "@/lib/astro/numerologie";
 // Harnais
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-function theme(o: {
-  corps?: Partial<Record<Corps, number>>;
-  ascendant?: number;
-  precision?: "heure_connue" | "midi_par_defaut";
-}): ThemeNatal {
-  const positions: PositionCorps[] = [];
-  for (const [corps, longitude] of Object.entries(o.corps ?? {})) {
-    const { signe, degre } = placer(longitude as number);
-    positions.push({ corps: corps as Corps, longitude: longitude as number, signe, degre });
-  }
-  return {
-    schema: 2,
-    adaptateur: "fictif",
-    positions: Object.freeze(positions),
-    absents: Object.freeze([]),
-    angles:
-      o.ascendant === undefined
-        ? { statut: "non_calcule", raison: "heure_absente" }
-        : {
-            statut: "calcule",
-            ascendant: o.ascendant,
-            milieuDuCiel: 0,
-            maisons: Object.freeze(Array.from({ length: 12 }, (_, i) => i * 30)),
-            systeme: "signes_entiers",
-          },
-    precision: o.precision ?? "heure_connue",
-  };
-}
 
-function numerologie(nombres: Partial<Record<string, number>>): Numerologie {
-  const table = Object.fromEntries(
-    ["chemin_de_vie", "expression", "intime", "personnalite", "jour_de_naissance", "annee_personnelle"].map(
-      (n) => [
-        n,
-        nombres[n] === undefined
-          ? { statut: "non_calcule" as const, raison: "nom_absent" as const }
-          : { statut: "calcule" as const, valeur: nombres[n] as number, maitre: false },
-      ],
-    ),
-  );
-  return {
-    schema: 1,
-    methodeCheminDeVie: "reduction_separee",
-    regleY: "voyelle",
-    basculeAnneePersonnelle: "premier_janvier",
-    anneeDeReference: 2026,
-    nombres: table as Numerologie["nombres"],
-  };
-}
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 // AC6 — aucun degré quand l'heure manque
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-describe("[5.6/AC6] sous `midi_par_defaut`, la carte du thème n'affiche AUCUN degré", () => {
-  // 186,5° = Balance à 6,5°. Le signe est sûr ; le degré ne l'est pas quand l'instant est midi.
-  const positions = { soleil: 186.5, lune: 100.2 };
-
-  it("[LE TEST QUI COMPTE] heure inconnue ⇒ le signe seul, jamais le degré", () => {
-    // Report explicite de la 5.3 : « afficher "Lune à 12°34' du Cancer" quand la vérité est
-    // 12° ± 7° serait fabriquer de la précision ». Aucune garde ne l'imposait avant celle-ci.
-    const c = carteTheme(theme({ corps: positions, precision: "midi_par_defaut" }));
-    for (const f of c.faits) {
-      expect(f.valeur, `« ${f.intitule} : ${f.valeur} » porte un degré sans heure`).not.toMatch(/°/);
-    }
-    expect(c.faits.map((f) => f.valeur)).toContain("Balance");
-  });
-
-  it("[CONTRÔLE] heure connue ⇒ le degré revient", () => {
-    // Sans ce contrôle, supprimer purement et simplement l'affichage du degré passerait le test
-    // ci-dessus — la garde ne prouverait plus rien.
-    const c = carteTheme(theme({ corps: positions, precision: "heure_connue" }));
-    expect(c.faits.map((f) => f.valeur).join(" ")).toMatch(/°/);
-    expect(c.faits.find((f) => f.intitule === "Soleil")?.valeur).toBe("Balance, 6°");
-  });
-
-  it("l'ascendant suit la même règle, et n'existe pas sans angles", () => {
-    const sans = carteTheme(theme({ corps: positions }));
-    expect(sans.faits.map((f) => f.intitule)).not.toContain("Ascendant");
-
-    const avec = carteTheme(theme({ corps: positions, ascendant: 45, precision: "heure_connue" }));
-    expect(avec.faits.find((f) => f.intitule === "Ascendant")?.valeur).toBe("Taureau, 15°");
-  });
-
-  it("un thème indisponible ne fabrique aucun fait", () => {
-    const c = carteTheme(null);
-    expect(c.faits).toEqual([]);
-    expect(estPresentable(c)).toBe(false);
-  });
-});
-
-// ══════════════════════════════════════════════════════════════════════════════════════════════
-// AC5 — l'absence honnête
-// ══════════════════════════════════════════════════════════════════════════════════════════════
+/**
+ * ⚠️ TROIS BLOCS ONT ÉTÉ RETIRÉS D'ICI LE 2026-08-25 (Story 7.7), ET LEURS INVARIANTS N'ONT PAS
+ * DISPARU AVEC EUX — ils ont déménagé, et c'est la seule raison acceptable de retirer un test.
+ *
+ *   • « sous `midi_par_defaut`, aucun degré » → `tests/fiche-socle.test.ts`, « le degré n'est rendu
+ *     QUE sous `heure_connue` ». Prouvé sur les DIX corps au lieu de cinq.
+ *   • « les nombres : ce qui manque est ABSENT » → `tests/fiche-socle.test.ts`, et la règle a
+ *     CHANGÉ en mieux : une absence n'est plus silencieuse, elle DIT sa raison et porte le lien
+ *     qui la répare (FR-050).
+ *   • la carte du thème et celle des nombres n'existent plus : elles ont quitté l'accueil pour la
+ *     halte « Ton socle », qui rend le socle en entier — six textes au lieu d'un.
+ *
+ * Retirer un test parce qu'il rougit est une faute ; le retirer parce que son sujet a bougé, en
+ * nommant où il est parti, est la seule façon de ne pas empiler des gardes sur du vide.
+ */
 
 describe("[5.6/AC5] les deux cartes structurellement vides le sont, et le disent", () => {
   it("le mantra n'a AUCUN fait — il est son texte, et son texte n'est pas écrit", () => {
@@ -157,31 +79,6 @@ describe("[5.6/AC5] les deux cartes structurellement vides le sont, et le disent
 // Les nombres et l'ennéagramme — des chiffres qui ne sont pas des mesures
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-describe("[5.6] les nombres : ce qui est calculé paraît, ce qui manque est ABSENT", () => {
-  it("les nombres calculés paraissent dans l'ordre du socle", () => {
-    const c = carteNombres(numerologie({ chemin_de_vie: 7, jour_de_naissance: 4, annee_personnelle: 9 }));
-    expect(c.faits.map((f) => f.intitule)).toEqual([
-      "Chemin de vie",
-      "Jour de naissance",
-      "Année personnelle",
-    ]);
-    expect(c.faits[0].valeur).toBe("7");
-  });
-
-  it("un nombre non calculé n'apparaît NI en creux NI comme « — »", () => {
-    // La 5.2 a tranché : l'absence se dit dans la fiche du socle, pas en trous dans une liste.
-    const c = carteNombres(numerologie({ chemin_de_vie: 7 }));
-    expect(c.faits).toHaveLength(1);
-    expect(JSON.stringify(c)).not.toMatch(/—|non disponible|indisponible/);
-  });
-
-  it("une numérologie indisponible donne une carte sans fait et sans texte", () => {
-    const c = carteNombres(null);
-    expect(c.faits).toEqual([]);
-    expect(estPresentable(c)).toBe(false);
-  });
-});
-
 describe("[5.6] l'ennéagramme : « sans type » n'est pas un incident", () => {
   it("un type retenu donne un fait, et le texte vient de la 5.5", () => {
     const c = carteEnneagramme(4, NON_ECRIT);
@@ -202,19 +99,13 @@ describe("[5.6] l'ennéagramme : « sans type » n'est pas un incident", () => {
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 describe("[5.6] tout ce que les cartes écrivent passe les contrôles bloquants", () => {
-  const toutes = [
-    carteMantra(NON_ECRIT),
-    carteHoroscope(null),
-    carteTheme(
-      theme({ corps: { soleil: 186.5, lune: 100.2, mercure: 200, venus: 10, mars: 300 }, ascendant: 45 }),
-    ),
-    carteNombres(numerologie({ chemin_de_vie: 7 })),
-    carteEnneagramme(4, NON_ECRIT),
-  ];
+  const toutes = [carteMantra(NON_ECRIT), carteHoroscope(null), carteEnneagramme(4, NON_ECRIT)];
 
-  it("[CONTRÔLE DU CONTRÔLE] les cinq cartes sont bien construites", () => {
-    expect(toutes).toHaveLength(5);
-    expect(new Set(toutes.map((c) => c.cle)).size).toBe(5);
+  it("[CONTRÔLE DU CONTRÔLE] toutes les cartes du catalogue sont construites ici", () => {
+    // ⚠️ ON COMPARE AU CATALOGUE, PAS À UN NOMBRE ÉCRIT À LA MAIN. Un compte en dur (« cinq »)
+    // devient faux le jour où une carte part — c'est exactement ce qui vient d'arriver — et il
+    // devient MUET le jour où une carte arrive sans passer par ce contrôle de voix.
+    expect(toutes.map((c) => c.cle).sort()).toEqual([...CATALOGUE_CARTES].sort());
   });
 
   it("[FR-023 / NFR-008] aucun titre, aucun intitulé ne porte un interdit", () => {

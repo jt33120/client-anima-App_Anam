@@ -1,13 +1,11 @@
 import type { Corps } from "@/lib/astro/port";
-import { NOMBRES, type NomNombre } from "@/lib/astro/numerologie";
-import { placer, type Signe, type ThemeNatal } from "@/lib/astro/theme-natal";
+import type { NomNombre } from "@/lib/astro/numerologie";
+import type { Signe } from "@/lib/astro/theme-natal";
 import type { HoroscopeDuJour } from "@/lib/astro/quotidien";
 import { texteConfiguration, texteLuneRelative } from "@/lib/corpus/horoscope";
-import { texteDe } from "@/lib/corpus/numerologie";
 import { NON_ECRIT, type TexteCorpus } from "@/lib/corpus/port";
-import type { Numerologie } from "@/lib/astro/numerologie";
 import type { TypeEnneagramme } from "./enneagramme";
-import type { CarteBibliotheque, LigneFait } from "./bibliotheque";
+import type { CarteBibliotheque } from "./bibliotheque";
 
 /**
  * cartes-socle.ts — LES CINQ CARTES, CONSTRUITES DEPUIS CE QUE LE SOCLE A CALCULÉ (Story 5.6, T5).
@@ -94,11 +92,12 @@ export const CORPS_LIBELLE: Readonly<Partial<Record<Corps, string>>> = Object.fr
 });
 
 /**
- * Les corps que la carte du thème montre, dans l'ordre traditionnel. **Cinq, pas dix** : une carte
- * est un objet qu'on saisit d'un regard, pas un tableau d'éphémérides (`EXPERIENCE.md` : « la carte
- * comme objet reçu, pas comme ligne de menu »). Le thème complet vit dans sa fiche, pas ici.
+ * ⚠️ `CORPS_DE_CARTE` A DISPARU LE 2026-08-25 (Story 7.7). Il limitait l'affichage à CINQ corps —
+ * une contrainte de VIGNETTE, assumée en commentaire : « une carte est un objet qu'on saisit d'un
+ * regard, pas un tableau d'éphémérides ». La carte du thème a quitté l'accueil, et la halte
+ * « Ton socle » montre les DIX corps, plus les deux nœuds, avec leur maison. La contrainte est
+ * partie avec l'objet qu'elle contraignait.
  */
-const CORPS_DE_CARTE: readonly Corps[] = Object.freeze(["soleil", "lune", "mercure", "venus", "mars"]);
 
 /** ⚠️ EXPORTÉ POUR LA HALTE DU SOCLE (7.5) — même raison que `CORPS_LIBELLE` : une seule table. */
 export const NOMBRE_LIBELLE: Readonly<Record<NomNombre, string>> = Object.freeze({
@@ -180,81 +179,29 @@ function texteDuCiel(horoscope: HoroscopeDuJour): TexteCorpus {
  * demande « son heure réparerait-elle quelque chose ? » (faux au pôle, où l'heure est connue et les
  * angles n'existent pas) ; ici on demande « l'instant retenu est-il le vrai ? ».
  */
-export function carteTheme(theme: ThemeNatal | null): CarteBibliotheque {
-  return {
-    cle: "theme",
-    titre: "Ton thème",
-    terme: null,
-    faits: theme === null ? [] : faitsDuTheme(theme),
-    // ⚠️ IL N'EXISTE AUCUN CORPUS DE THÈME, et ce n'est pas un oubli : les Stories 5.1 à 5.5 ont
-    // déclaré des créneaux pour la numérologie (69), l'horoscope (27), le mantra (60) et
-    // l'ennéagramme (9) — jamais pour le thème natal, dont l'interprétation n'a été cadrée par
-    // aucune story. La carte montre donc ses faits et rien d'autre, honnêtement.
-    texte: NON_ECRIT,
-  };
-}
-
-function faitsDuTheme(theme: ThemeNatal): readonly LigneFait[] {
-  const degreSur = theme.precision === "heure_connue";
-  const lignes: LigneFait[] = [];
-
-  for (const corps of CORPS_DE_CARTE) {
-    const position = theme.positions.find((p) => p.corps === corps);
-    // Absent = la 5.3 l'a retiré parce qu'il n'est pas déterminable. On ne le remplace par rien.
-    if (!position) continue;
-    const intitule = CORPS_LIBELLE[corps];
-    if (!intitule) continue;
-    lignes.push({ intitule, valeur: enSigne(position.signe, position.degre, degreSur) });
-  }
-
-  // L'ascendant n'est pas un corps : il vit dans les angles, et il n'existe que si l'heure existe.
-  if (theme.angles.statut === "calcule") {
-    const { signe, degre } = placer(theme.angles.ascendant);
-    lignes.push({ intitule: "Ascendant", valeur: enSigne(signe, degre, degreSur) });
-  }
-
-  return Object.freeze(lignes);
-}
+/**
+ * ⚠️ `carteTheme`, `carteNombres` ET `faitsDuTheme` ONT ÉTÉ SUPPRIMÉS LE 2026-08-25 (Story 7.7).
+ *
+ * Les deux cartes ont quitté l'accueil pour la halte « Ton socle », qui rend le même socle en
+ * ENTIER — six textes au lieu d'un, dix corps au lieu de cinq, l'ascendant ET le milieu du ciel.
+ * Les garder ici « au cas où » aurait laissé deux mises en mots du même socle dans le dépôt : la
+ * complète et la tronquée, dont l'une aurait dérivé sans que rien ne rougisse.
+ *
+ * CE QUI RESTE, ET QUI EST RÉUTILISÉ PAR LA HALTE : `SIGNE_LIBELLE`, `CORPS_LIBELLE`,
+ * `NOMBRE_LIBELLE` et `enSigne`. Ce ne sont pas des restes de cartes : c'est la SEULE mise en mots
+ * du socle du produit, et la règle du degré — rendu seulement sous `heure_connue` — vit dans
+ * `enSigne`, une fois.
+ */
 
 /**
  * « Balance » sans l'heure, « Balance, 12° » avec. Jamais de minutes d'arc : on n'en a pas besoin.
  *
- * ⚠️ EXPORTÉ POUR LA HALTE DU SOCLE (7.5). C'est la SEULE mise en mots d'une position dans le
- * produit, et la règle du degré — rendu seulement sous `heure_connue` — vit ici, une fois.
+ * ⚠️ SEULE MISE EN MOTS D'UNE POSITION DANS LE PRODUIT. La règle du degré vit ici : sans heure
+ * connue, un degré serait une précision inventée.
  */
 export function enSigne(signe: Signe, degre: number, avecDegre: boolean): string {
   const nom = SIGNE_LIBELLE[signe];
   return avecDegre ? `${nom}, ${Math.floor(degre)}°` : nom;
-}
-
-/**
- * Les nombres.
- *
- * Un nombre `non_calcule` (il manque le nom complet de naissance, par exemple) est simplement
- * ABSENT de la carte. Il n'y a pas de « — » ni de « non disponible » : la 5.2 a déjà tranché que
- * l'absence se dit dans la fiche du socle, pas en creux dans une liste.
- */
-export function carteNombres(numerologie: Numerologie | null): CarteBibliotheque {
-  const faits: LigneFait[] = [];
-  let texte: TexteCorpus = NON_ECRIT;
-  if (numerologie !== null) {
-    for (const nom of NOMBRES) {
-      const lecture = numerologie.nombres[nom];
-      if (lecture.statut !== "calcule") continue;
-      faits.push({ intitule: NOMBRE_LIBELLE[nom], valeur: String(lecture.valeur) });
-    }
-    // Le CHEMIN DE VIE porte le texte de la carte : c'est le nombre qu'on donne quand on n'en donne
-    // qu'un. Les cinq autres ont leur texte dans la fiche du socle (5.2), pas ici — une carte qui
-    // empilerait six interprétations ne serait plus un objet qu'on saisit d'un regard.
-    texte = texteDe("chemin_de_vie", numerologie.nombres.chemin_de_vie) ?? NON_ECRIT;
-  }
-  return {
-    cle: "nombres",
-    titre: "Tes nombres",
-    terme: null,
-    faits: Object.freeze(faits),
-    texte,
-  };
 }
 
 /**

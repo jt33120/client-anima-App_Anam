@@ -29,7 +29,21 @@ import { terme, type CleTerme } from "./vocabulaire";
  */
 
 /** Les cartes du socle. Une sixième se déclare ICI, jamais dans un composant. */
-export type CleCarte = "mantra" | "horoscope" | "theme" | "nombres" | "enneagramme";
+/**
+ * ⚠️ « theme » ET « nombres » ONT ÉTÉ RETIRÉS LE 2026-08-25 (Story 7.7), et c'est le TYPE qui le
+ * rend irréversible par distraction : les recréer ne compile pas tant qu'on ne les rajoute pas ici,
+ * ce qui oblige à relire la décision.
+ *
+ * Retour de Julian : « Ton thème : ça sert à rien de le voir tous les jours » et « Pareil pour tes
+ * nombres, ce n'est pas quelque chose qui change tous les jours ». Il avait raison, et le dépôt le
+ * prouvait deux fois : « Ton thème » portait `texte: NON_ECRIT` EN DUR — donc une panne permanente
+ * un jour sur cinq en position mise en avant — et la carte des nombres imposait une lecture de base
+ * sur le chemin critique de l'écran le plus lourd, pour un contenu qui ne changera plus jamais.
+ *
+ * Ils ne sont pas PERDUS : la halte « Ton socle » (Story 7.5) les rend en ENTIER — les six nombres
+ * avec leurs six textes au lieu d'un, et les dix corps au lieu de cinq.
+ */
+export type CleCarte = "mantra" | "horoscope" | "enneagramme";
 
 /**
  * Une ligne de fait CALCULÉ, déjà mise en mots par le domaine — le rendu ne formate rien (AD-7).
@@ -85,8 +99,6 @@ export interface CarteBibliotheque {
 export const CATALOGUE_CARTES: readonly CleCarte[] = Object.freeze([
   "mantra",
   "horoscope",
-  "theme",
-  "nombres",
   "enneagramme",
 ]);
 

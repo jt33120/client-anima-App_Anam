@@ -12,13 +12,10 @@ import {
   carteEnneagramme,
   carteHoroscope,
   carteMantra,
-  carteNombres,
-  carteTheme,
 } from "@/lib/domain/cartes-socle";
 import { carteAnam, type CarteAnam } from "@/lib/domain/carte-anam";
 import { creerDepotMotifsAnam } from "@/lib/data/depot-motifs-anam";
 import { lireEnneagramme } from "@/lib/data/lire-enneagramme";
-import { lireNumerologie } from "@/lib/data/lire-numerologie";
 import { lireSocleQuotidien, jourCivilParis } from "@/lib/data/lire-quotidien";
 import type { ResultatThemeNatal } from "@/lib/data/depot-theme-natal";
 import { NON_ECRIT } from "@/lib/corpus/port";
@@ -149,22 +146,25 @@ export async function lireBibliotheque(
     // Le domaine ne reçoit donc qu'une chose : le thème, ou rien.
     cartes.push(carteMantra(socle.mantra));
     cartes.push(carteHoroscope(socle.horoscope.statut === "calcule" ? socle.horoscope.horoscope : null));
-    cartes.push(carteTheme(socle.theme.statut === "calcule" ? socle.theme.theme : null));
+    // ⚠️ LE THÈME N'EST PLUS UNE CARTE (Story 7.7), MAIS IL EST TOUJOURS LU. `lireSocleQuotidien`
+    // le rend dans le même appel, et `troncIncomplet` (projection de l'arbre) s'en sert : le
+    // retirer de la lecture coûterait un aller-retour ailleurs. C'est la CARTE qui part, pas
+    // l'information — elle vit maintenant en entier dans la halte « Ton socle ».
   } catch (e) {
     journaliser("socle quotidien", e);
     cartes.push(carteMantra(NON_ECRIT));
     cartes.push(carteHoroscope(null));
-    cartes.push(carteTheme(null));
   }
 
-  // ── Les nombres ──────────────────────────────────────────────────────────────────────────────
-  try {
-    const n = await lireNumerologie(supabase, utilisatriceId, maintenant);
-    cartes.push(carteNombres(n.statut === "calcule" ? n.numerologie : null));
-  } catch (e) {
-    journaliser("numerologie", e);
-    cartes.push(carteNombres(null));
-  }
+  // ── LES NOMBRES SONT PARTIS, ET AVEC EUX UN ALLER-RETOUR DE BASE (Story 7.7) ─────────────────
+  //
+  // `lireNumerologie` était appelé ICI, sur le chemin critique de l'écran le plus lourd du produit,
+  // pour alimenter une carte qui ne change JAMAIS — les nombres se dérivent d'une date et d'un nom.
+  // La halte « Ton socle » les rend en entier, avec leurs six textes au lieu d'un seul.
+  //
+  // ⚠️ NE PAS LE REMETTRE « POUR PLUS TARD ». Si un jour l'accueil doit connaître un nombre, il
+  // faudra d'abord dire lequel et pourquoi : une lecture de base sur ce chemin se paie à chaque
+  // ouverture, par tout le monde, tous les jours.
 
   // ── L'ennéagramme ────────────────────────────────────────────────────────────────────────────
   try {

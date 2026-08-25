@@ -85,10 +85,18 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
   {
     region: "accueil",
     cible: "[class*='bibliotheque'] article",
+    /**
+     * ⚠️ RÉÉCRIT LE 2026-08-25 (Story 7.7), DANS LE MÊME COMMIT QUE L'ÉCRAN. « Ce que le jour
+     * propose » décrivait un accueil de cinq cartes dont TROIS ne changeaient jamais — le thème
+     * natal et les nombres sont figés à la naissance. Le tour promettait donc du quotidien devant
+     * un écran figé, et personne ne pouvait le voir : `Guide.tsx` franchit sans bruit une étape
+     * dont la cible manque, mais il ne sait pas dire qu'un TEXTE a cessé d'être vrai.
+     */
     titre: "L’accueil",
     texte:
-      "Ce que le jour propose : quelques cartes, les mêmes pour tout le monde ce jour-là. Rien à " +
-      "rattraper si tu passes un jour, rien qui compte tes visites.",
+      "Ce qui a changé depuis hier, et rien d’autre : le mantra du jour, le ciel du jour. Ton " +
+      "thème et tes nombres ne bougent pas d’un jour à l’autre — ils t’attendent dans « Ton " +
+      "socle », en entier. Rien à rattraper si tu passes un jour, rien qui compte tes visites.",
   },
   {
     region: "anam",

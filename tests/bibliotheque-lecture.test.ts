@@ -1,3 +1,4 @@
+import { CATALOGUE_CARTES } from "@/lib/domain/bibliotheque";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -72,15 +73,13 @@ describe("[5.6/T4] le thème natal est lu UNE SEULE FOIS", () => {
 });
 
 describe("[5.6/AC7] l’échec d’une lecture n’emporte jamais les autres", () => {
-  it("les cinq cartes sont là même quand TOUT est indisponible", async () => {
+  it("toutes les cartes du catalogue sont là même quand TOUT est indisponible", async () => {
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
-    expect(b.cartes.map((c) => c.cle).sort()).toEqual([
-      "enneagramme",
-      "horoscope",
-      "mantra",
-      "nombres",
-      "theme",
-    ]);
+    // ⚠️ ON LIT LE CATALOGUE, ON NE LE RECOPIE PLUS. Cette liste était écrite à la main et
+    // portait « theme » et « nombres », partis le 2026-08-25 (Story 7.7). Une liste recopiée
+    // devient fausse au premier changement — et, pire, elle transforme un déplacement voulu en
+    // échec de test qu'on est tenté de « réparer » sans lire la décision derrière.
+    expect(b.cartes.map((c) => c.cle).sort()).toEqual([...CATALOGUE_CARTES].sort());
     // ⚠️ ELLE ATTENDAIT `enAvant === null`, ce qui n'était vrai QUE parce que le corpus était vide.
     // Le mantra du jour ne demande rien à personne (T7/AC6) : depuis que les soixante textes sont
     // écrits, il est présentable même quand tout le reste est en panne — c'est même exactement le
@@ -101,7 +100,7 @@ describe("[5.6/AC7] l’échec d’une lecture n’emporte jamais les autres", (
     }
   });
 
-  it("[LE TEST QUI COMPTE] une numérologie qui LÈVE ne fait pas disparaître l’ennéagramme", async () => {
+  it("[LE TEST QUI COMPTE] une panne d’horoscope ne fait pas disparaître l’ennéagramme", async () => {
     lireNumerologie.mockRejectedValue(new Error("timeout"));
     lireEnneagramme.mockResolvedValue({
       statut: "calcule",
@@ -110,9 +109,9 @@ describe("[5.6/AC7] l’échec d’une lecture n’emporte jamais les autres", (
       texte: { statut: "non_ecrit" },
     });
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
-    expect(b.cartes).toHaveLength(5);
+    expect(b.cartes).toHaveLength(CATALOGUE_CARTES.length);
     const e9 = b.cartes.find((c) => c.cle === "enneagramme");
-    expect(e9?.faits, "l’ennéagramme est tombé avec la numérologie").toEqual([
+    expect(e9?.faits, "l’ennéagramme est tombé avec l’horoscope").toEqual([
       { intitule: "Type", valeur: "4" },
     ]);
     // ⚠️ ELLE DISAIT « c'est la SEULE carte présentable, donc c'est elle qui est mise en avant ».
@@ -124,36 +123,34 @@ describe("[5.6/AC7] l’échec d’une lecture n’emporte jamais les autres", (
     expect(e9!.faits.length > 0 || e9!.texte.statut === "ecrit", "l'ennéagramme a survécu mais n'a rien à montrer").toBe(true);
   });
 
-  it("un ennéagramme qui LÈVE ne fait pas disparaître les nombres", async () => {
+  it("un ennéagramme qui LÈVE ne fait pas disparaître le reste du socle", async () => {
+    // ⚠️ CE TEST S'APPELAIT « … ne fait pas disparaître LES NOMBRES », et son sujet a bougé le
+    // 2026-08-25 (Story 7.7) : la carte des nombres a quitté l'accueil, et avec elle l'appel à
+    // `lireNumerologie` sur le chemin critique. L'INVARIANT, lui, n'a pas bougé d'un pouce — une
+    // lecture qui lève n'emporte pas les autres cartes — et c'est lui qu'on garde ici.
     lireEnneagramme.mockRejectedValue(new Error("timeout"));
-    lireNumerologie.mockResolvedValue({
-      statut: "calcule",
-      numerologie: {
-        schema: 1,
-        methodeCheminDeVie: "reduction_separee",
-        regleY: "voyelle",
-        basculeAnneePersonnelle: "premier_janvier",
-        anneeDeReference: 2026,
-        nombres: {
-          chemin_de_vie: { statut: "calcule", valeur: 7, maitre: false },
-          expression: { statut: "non_calcule", raison: "nom_absent" },
-          intime: { statut: "non_calcule", raison: "nom_absent" },
-          personnalite: { statut: "non_calcule", raison: "nom_absent" },
-          jour_de_naissance: { statut: "calcule", valeur: 4, maitre: false },
-          annee_personnelle: { statut: "calcule", valeur: 9, maitre: false },
-        },
-      },
-    });
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
-    const nombres = b.cartes.find((c) => c.cle === "nombres");
-    expect(nombres?.faits).toHaveLength(3);
-    // Même correctif qu'au-dessus : de quoi se montrer, pas forcément élue (la rotation prend le jour).
-    expect(nombres!.faits.length > 0 || nombres!.texte.statut === "ecrit", "les nombres ont survécu mais n'ont rien à montrer").toBe(true);
+    const cles = b.cartes.map((c) => c.cle);
+    expect(cles, "le mantra est parti avec l'ennéagramme").toContain("mantra");
+    expect(cles, "l'horoscope est parti avec l'ennéagramme").toContain("horoscope");
+  });
+
+  it("[7.7] la numérologie n'est PLUS lue sur le chemin critique de l'accueil", async () => {
+    // ⚠️ C'EST LA MESURE, PAS L'INTENTION. `lireNumerologie` alimentait une carte qui ne change
+    // jamais, sur l'écran le plus lourd du produit — un aller-retour de base à chaque ouverture,
+    // pour tout le monde, tous les jours. Un commentaire qui dit « on l'a retiré » se périme ;
+    // un espion qui compte ses appels, non.
+    lireNumerologie.mockClear();
+    await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
+    expect(lireNumerologie, "la numérologie est revenue sur le chemin critique").not.toHaveBeenCalled();
   });
 
   it("[NFR-022] aucune donnée personnelle ne sort dans un log d’erreur", async () => {
     const espion = vi.spyOn(console, "error").mockImplementation(() => {});
-    lireNumerologie.mockRejectedValue(new Error(`échec pour ${UID}`));
+    // ⚠️ LA PANNE FABRIQUÉE A CHANGÉ DE SOURCE le 2026-08-25 : `lireNumerologie` n'est plus appelé
+    // sur ce chemin (Story 7.7), donc le faire lever ne journalisait plus RIEN — et le contrôle
+    // positif de ce test l'a dit tout de suite, ce qui est exactement son rôle.
+    lireEnneagramme.mockRejectedValue(new Error(`échec pour ${UID}`));
     await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     for (const appel of espion.mock.calls) {
       expect(JSON.stringify(appel), "un identifiant a fuité dans un log").not.toContain(UID);
@@ -264,13 +261,13 @@ describe("[6.3/AC6] la carte d’Anam est CÂBLÉE au dépôt, pas décorative",
     expect(b.anam.ligne).toBe("Pour aujourd’hui : si je bloque, alors j’écris.");
   });
 
-  it("[AD-15] une panne du dépôt rend la carte NEUTRE — et n’emporte pas les cinq autres", async () => {
+  it("[AD-15] une panne du dépôt rend la carte NEUTRE — et n’emporte pas les autres", async () => {
     // Le repli va vers MOINS d'effet : se taire à tort coûte un rappel différé ; parler à tort met
     // sur son accueil une phrase qui ne correspond à rien. Et le socle survit, comme les trois
     // autres lectures de ce module.
     motifsAnam.mockRejectedValue(new Error("PGRST000"));
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     expect(b.anam.ligne).toBeNull();
-    expect(b.cartes).toHaveLength(5);
+    expect(b.cartes).toHaveLength(CATALOGUE_CARTES.length);
   });
 });
