@@ -1470,3 +1470,42 @@ doivent être différées ». Voici où chacune atterrit, pour qu'aucune ne se p
 - **T11 lui-même** : ouvrir `/reglages` dans un vrai navigateur et cliquer pour de bon. Dix secondes.
   Tant que ce n'est pas fait, la PWA, le hors-ligne et l'installation restent **non statués** — et
   aucun test ne peut les statuer à sa place, puisque le navigateur exige une activation utilisateur.
+
+---
+
+## Le geste du jour — un module écrit, jamais câblé, et retiré le 2026-08-25 (Story 7.11)
+
+`lib/domain/geste-du-jour.ts` a été écrit le 2026-08-23 en réponse à une demande de Julian —
+**« Accueil : chose quotidienne avec tâche »** — puis n'a **jamais eu le moindre appelant**. Il a
+dormi deux mois sans que rien ne le dise. Il est supprimé, et le besoin est consigné ici pour que la
+suppression ne soit pas un oubli.
+
+**Le besoin, tel qu'il a été formulé.** L'accueil ne portait que des choses à LIRE — un mantra, un
+ciel, des nombres. Rien à FAIRE, donc rien qui distingue aujourd'hui d'hier.
+
+**Ce que le module avait déjà tranché, et qui reste juste** (à relire avant de le refaire) :
+
+- un geste n'est **ni une prescription, ni une prédiction, ni une série** — c'est le format qui
+  appelle le plus naturellement les trois (« fais ceci et tu iras mieux », « 3 jours d'affilée ») ;
+- son texte vient du **MODÈLE**, pas d'Anima. C'est la première fois qu'un texte de modèle
+  paraîtrait **hors de la conversation**, et cela emporte trois obligations : la mention de l'art. 50
+  devient **due sur l'accueil**, le contrôle de voix s'applique à sa sortie, et la carte doit
+  **disparaître pendant une fenêtre de détresse** (AD-17).
+
+**Pourquoi il est supprimé plutôt que câblé, le 2026-08-25.** Trois raisons, et aucune n'est « ça ne
+sert à rien » :
+
+1. **Son en-tête annonçait que le plafond d'UX-DR-30 « passe à sept ».** Cela n'a jamais été fait, et
+   la Story 7.1 a déplacé le **plancher**, pas le plafond — qui refuse toujours au-delà de six. Le
+   module s'appuyait sur une décision qui n'existe pas.
+2. **L'accueil vient d'être délibérément réduit** à ce qui change vraiment d'un jour à l'autre
+   (Story 7.7, retour de Julian : « ça sert à rien de le voir tous les jours »). Y ajouter le jour
+   même une quatrième carte, produite par un modèle, demanderait de rouvrir cette décision — pas de
+   la contourner en silence.
+3. **Aucune de ses trois obligations de sécurité n'est posée.** Le câbler sans elles mettrait du
+   texte de modèle sur le premier écran, sans mention art. 50 et **sans retrait en fenêtre de
+   détresse**. C'est exactement le genre de livraison qu'on refuse ici.
+
+**Ce qu'il faudra si le sujet revient :** une story qui commence par l'arbitrage du plafond, puis les
+trois obligations, puis le geste. Dans cet ordre. Le module supprimé est retrouvable dans l'historique
+git au commit qui porte cette note.

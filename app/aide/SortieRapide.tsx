@@ -3,9 +3,32 @@
 import s from "./aide.module.css";
 
 /**
- * SortieRapide — le contrôle « Quitter » en tête de /aide (Story 2.6, FR-074). Pratique STANDARD des
- * pages de ressources sur les violences : navigue vers un site NEUTRE et REMPLACE l'entrée d'historique
- * (le bouton « précédent » ne ramène pas ici). Discret, jamais alarmant.
+ * SortieRapide — le contrôle « Quitter le site » en tête de /aide. Pratique STANDARD des pages de
+ * ressources sur les violences : navigue vers un site NEUTRE et REMPLACE l'entrée d'historique (le
+ * bouton « précédent » ne ramène pas ici). Discret, jamais alarmant.
+ *
+ * ══ ⚠️ CE FICHIER CITAIT « FR-074 », ET C'ÉTAIT UN INVARIANT EMPRUNTÉ (corrigé le 2026-08-25) ═════
+ *
+ * FR-074 (`prd.md:139`) traite des **dangers non suicidaires** et ne dit rien d'une sortie rapide.
+ * Aucun FR du PRD ne porte ce contrôle. Le numéro donnait donc à ce bouton l'autorité d'une exigence
+ * produit qu'il n'a pas — et c'est plus dangereux qu'une absence d'invariant, parce que ça EMPÊCHE
+ * L'ARBITRAGE : personne ne discute une ligne marquée FR.
+ *
+ * Ce qui le fonde vraiment : `EXPERIENCE.md:434` le décrit, et `EXPERIENCE.md:605` le range parmi les
+ * **propositions d'interface NON VALIDÉES**. C'est le statut réel, et il est cité tel quel.
+ *
+ * ⚠️ PORTE PRÉ-LANCEMENT : professionnel qualifié + juriste. Toute modification de ce contrôle —
+ * l'URL neutre, le libellé, sa place — le re-soumet à cette porte. C'est un coût à noter, pas une
+ * raison de ne rien faire.
+ *
+ * ⚠️ ET IL RESTE SUR `/aide` — DÉCISION ÉCRITE DU 2026-08-25. L'autre issue était de le déplacer
+ * dans la surimpression, là où la conversation a lieu, donc là où le danger est réellement présent.
+ * Elle est refusée pour l'instant, et pour une raison précise : la surimpression est constante sur
+ * TOUTES les régions, et un contrôle qui quitte le site posé en permanence à côté du fil se
+ * déclencherait par erreur bien plus souvent qu'il ne servirait — c'est exactement le défaut qu'on
+ * vient de corriger sur cette page (« Quitter » pris pour « fermer »). Le jour où cette décision se
+ * rediscute, `tests/aide-route.test.ts` (qui verrouille `location.replace` et l'URL absolue) se
+ * DÉPLACE avec le contrôle ; il ne se supprime pas.
  *
  * Feuille `"use client"` : n'introduit AUCUNE session/IA/traceur — l'étanchéité de /aide (statique,
  * publique, sans dépendance IA — 2.5) est préservée : ce composant ne fait que naviguer.

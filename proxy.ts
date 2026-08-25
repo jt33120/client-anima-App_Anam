@@ -30,13 +30,36 @@ export async function proxy(request: NextRequest) {
  * sorties de modèle sur trois (R3). L'en-tête est donc posé PAR-DESSUS le routage, à l'unique
  * endroit où toutes les réponses se rejoignent : ajouter une branche demain ne peut pas l'oublier.
  */
+/**
+ * ⚠️ AUCUN `Referrer-Policy` N'EXISTAIT DANS TOUT LE PRODUIT (vérifié le 2026-08-25 : zéro
+ * occurrence dans `proxy.ts`, `app/`, `lib/`, `next.config.ts`). Story 7.12.
+ *
+ * ══ POURQUOI CE N'EST PAS UNE COQUETTERIE DE SÉCURITÉ ═══════════════════════════════════════════
+ *
+ * `/aide` porte une SORTIE RAPIDE : elle navigue vers un site anodin et écrase l'entrée
+ * d'historique, pour que quelqu'un qui lit ces ressources avec un tiers dangereux derrière l'épaule
+ * puisse disparaître d'un geste. Sans en-tête, le navigateur envoie l'origine d'Anima au site de
+ * destination dans `Referer` — et par défaut (`strict-origin-when-cross-origin`), c'est l'ORIGINE
+ * complète qui part.
+ *
+ * Un contrôle dont l'objet est de NE LAISSER AUCUNE TRACE ne peut pas annoncer d'où l'on vient.
+ *
+ * ⚠️ ET IL EST POSÉ SUR TOUTES LES RÉPONSES, PAS SUR `/aide` SEULEMENT. La classe de défauts la
+ * plus coûteuse de ce dépôt est la garde posée sur un chemin sur trois. Le produit entier parle
+ * d'art. 9 ; il n'existe aucune page dont on veuille annoncer l'origine à un tiers.
+ */
+function neLaisserAucuneTrace(reponse: NextResponse): NextResponse {
+  reponse.headers.set("Referrer-Policy", "no-referrer");
+  return reponse;
+}
+
 function marquerPourLesMoteurs(reponse: NextResponse): NextResponse {
   if (!siteIndexable(process.env)) {
     // `noindex` interdit de PARAÎTRE dans les résultats — ce que `robots.txt` ne sait pas faire.
     // `nofollow` évite que les liens de l'application servent à découvrir le reste du site.
     reponse.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
-  return reponse;
+  return neLaisserAucuneTrace(reponse);
 }
 
 async function router(request: NextRequest): Promise<NextResponse> {

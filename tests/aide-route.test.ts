@@ -172,3 +172,50 @@ describe("/aide — sortie rapide (FR-074, Story 2.6)", () => {
     expect(sortie).not.toMatch(/analytics|gtag|mixpanel|posthog|plausible/i);
   });
 });
+
+describe("[7.12] la sortie rapide ne laisse aucune trace, et n'emprunte aucun invariant", () => {
+  const RACINE_7_12 = process.cwd();
+  const lireFichier = (f: string) => readFileSync(resolve(RACINE_7_12, f), "utf-8");
+
+  it("[LE CŒUR] aucun numéro de FR n'est REVENDIQUÉ par la sortie rapide", () => {
+    // ⚠️ ELLE CITAIT « FR-074 », QUI TRAITE DES DANGERS NON SUICIDAIRES ET NE DIT RIEN D'UNE SORTIE
+    // RAPIDE. Aucun FR du PRD ne porte ce contrôle. Un invariant EMPRUNTÉ est plus dangereux qu'un
+    // invariant absent : il donne à une ligne l'autorité d'une exigence produit qu'elle n'a pas, et
+    // il EMPÊCHE L'ARBITRAGE — personne ne discute une ligne marquée FR.
+    //
+    // On distingue REVENDIQUER de CITER : le commentaire qui explique pourquoi FR-074 était faux
+    // doit pouvoir nommer FR-074. Ce qu'on refuse, c'est la forme « (Story X, FR-Y) » d'en-tête.
+    const src = lireFichier("app/aide/SortieRapide.tsx");
+    expect(src, "la sortie rapide se réclame à nouveau d'un FR").not.toMatch(
+      /SortieRapide[^\n]*\(Story [^)]*FR-\d+\)/,
+    );
+    expect(src, "son statut réel — proposition non validée — n'est plus cité").toMatch(/EXPERIENCE\.md:605/);
+    expect(src, "la porte pré-lancement n'est plus nommée").toMatch(/juriste/i);
+  });
+
+  it("[LE CŒUR] la décision de PLACEMENT est écrite et datée", () => {
+    // `EXPERIENCE.md:605` laissait la question ouverte : reste-t-elle sur /aide, ou migre-t-elle
+    // dans la surimpression ? Une question ouverte se retranche à chaud, dans un sens ou dans
+    // l'autre, par celui qui passe.
+    const src = lireFichier("app/aide/SortieRapide.tsx");
+    expect(src).toMatch(/DÉCISION ÉCRITE DU 20\d\d-\d\d-\d\d/);
+    expect(src, "l'issue refusée n'est pas nommée — une décision sans alternative n'en est pas une").toMatch(
+      /surimpression/,
+    );
+  });
+
+  it("[LE CŒUR] `Referrer-Policy: no-referrer` est posé, et sur TOUTES les réponses", () => {
+    // ⚠️ AUCUN `Referrer-Policy` N'EXISTAIT DANS TOUT LE PRODUIT au 2026-08-25. Sans lui, la sortie
+    // rapide annonce l'origine d'Anima au site de destination dans `Referer` — un contrôle dont
+    // l'objet est de NE LAISSER AUCUNE TRACE ne peut pas dire d'où l'on vient.
+    //
+    // Il est posé dans `proxy.ts`, à l'unique endroit où toutes les réponses se rejoignent : la
+    // classe de défauts la plus coûteuse de ce dépôt est la garde posée sur un chemin sur trois.
+    const proxy = lireFichier("proxy.ts").replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(proxy, "l'en-tête n'est pas posé").toMatch(/headers\.set\("Referrer-Policy",\s*"no-referrer"\)/);
+    expect(
+      proxy,
+      "l'en-tête est posé mais jamais appelé — il ne protège rien",
+    ).toMatch(/return neLaisserAucuneTrace\(/);
+  });
+});

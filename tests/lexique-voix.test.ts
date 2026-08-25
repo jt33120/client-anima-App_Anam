@@ -60,7 +60,6 @@ const EXCLUS = new Set([
   // diagnostique », « ni ça va passer »). C'est la première consigne dont le produit affiche la
   // sortie HORS conversation : ses interdits y sont d'autant plus nécessaires, et le contrôle de
   // sortie s'applique quand même au TEXTE PRODUIT, qui, lui, n'est pas exclu.
-  "lib/domain/geste-du-jour.ts",
   // Consigne de fabrication de la carte de contexte (2026-08-25) — MÊME NATURE : elle nomme les
   // interdits pour les refuser (« aucun diagnostic, aucun trouble, aucun terme de thérapie ni de
   // médecine »). Ces refus-là ne sont pas de principe : ce sont les sorties les PLUS PROBABLES d'un

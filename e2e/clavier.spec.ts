@@ -153,3 +153,49 @@ test.describe("La tabulation, avec de vraies frappes", () => {
     expect(fautifs, `« Aide » n'est plus le dernier arrêt :\n${fautifs.join("\n")}`).toEqual([]);
   });
 });
+
+test("[7.12] la sortie rapide de /aide quitte VRAIMENT le site, et n'y ramène pas", async ({ page, context }) => {
+  /**
+   * ⚠️ CE BOUTON A DÉJÀ ÉTÉ LIVRÉ AFFICHÉ ET INERTE. Le 2026-08-18, `/aide` était pré-rendue au
+   * build : 16 balises `<script>`, 0 noncées, 16 refusées par la CSP, React jamais hydraté. La
+   * sortie de secours — sur la page qu'on atteint en détresse — était là et ne faisait RIEN.
+   *
+   * Aucun test du dépôt ne le CLIQUAIT : les gardes lisaient la source, où tout était juste. Un
+   * contrôle de sécurité qu'on n'a jamais actionné n'est pas un contrôle de sécurité.
+   */
+  await page.goto("/aide");
+  await expect(page.getByRole("link", { name: /retour/i }), "témoin : la page n'est pas rendue").toBeVisible();
+
+  const bouton = page.getByRole("button", { name: /quitter ce site/i });
+  await expect(bouton, "la sortie rapide n'est pas là").toBeVisible();
+
+  // On reste sur l'onglet : `location.replace` navigue dans le MÊME contexte, et c'est tout
+  // l'intérêt — l'entrée d'historique de `/aide` doit être écrasée, pas empilée.
+  const avant = page.url();
+  await bouton.click();
+  await page.waitForURL((u) => new URL(u.toString()).origin !== new URL(avant).origin, { timeout: 20_000 });
+
+  const apres = new URL(page.url());
+  expect(apres.origin, "on n'a pas quitté l'origine d'Anima").not.toBe(new URL(avant).origin);
+
+  // ⚠️ LA MOITIÉ QUI COMPTE : le « précédent » ne ramène PAS sur /aide. C'est ce qui protège
+  // quelqu'un qui lit ces ressources avec un tiers dangereux derrière l'épaule.
+  await page.goBack();
+  await page.waitForTimeout(800);
+  expect(page.url(), "le retour arrière ramène sur /aide — l'historique n'a pas été écrasé").not.toContain("/aide");
+  void context;
+});
+
+test("[7.12] l'en-tête de /aide : « Retour » d'abord, la sortie du site ensuite", async ({ page }) => {
+  // Deux contrôles côte à côte disent tous les deux « partir », et sous stress la confusion se
+  // reforme. La séparation est de FORME autant que de mot — et l'ordre de tabulation en fait
+  // partie : on rencontre d'abord celui qui ramène dans Anima.
+  await page.goto("/aide");
+  const arrets = await traverser(page, 8);
+  const noms = arrets.map((a) => (a.nom ?? "").toLowerCase());
+  const iRetour = noms.findIndex((n) => n.includes("retour"));
+  const iQuitter = noms.findIndex((n) => n.includes("quitter"));
+  expect(iRetour, "« Retour » n'est atteignable au clavier").toBeGreaterThan(-1);
+  expect(iQuitter, "la sortie rapide n'est pas atteignable au clavier").toBeGreaterThan(-1);
+  expect(iRetour, "la sortie du site vient AVANT le retour").toBeLessThan(iQuitter);
+});
