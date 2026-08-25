@@ -40,6 +40,31 @@ const rapport = JSON.parse(readFileSync(chemin, "utf-8"));
 const base = JSON.parse(readFileSync("e2e/ligne-de-base.json", "utf-8"));
 const tolere = base["echecs_tolerés"] ?? {};
 
+/**
+ * ⚠️ LES DEUX CÔTÉS SONT NORMALISÉS, ET LA PREMIÈRE VERSION NE L'ÉTAIT PAS (corrigé le 2026-08-25).
+ *
+ * Playwright rapporte ses fichiers RELATIVEMENT à `testDir` — `fluidite.spec.ts` — pendant que la
+ * ligne de base, écrite à la main depuis un log, portait `e2e/fluidite.spec.ts`. Aucune clé ne
+ * correspondait : chaque entrée de la ligne de base paraissait « améliorée à 0 », chaque échec réel
+ * paraissait NOUVEAU, et la CI rougissait sur exactement les 17 échecs qu'elle était censée
+ * tolérer. Le mécanisme entier ne mesurait rien.
+ *
+ * C'est le mode d'échec d'une garde qui compare deux chaînes venues de deux mondes : elle ne dit
+ * jamais « je ne trouve pas la clé », elle dit « tout a changé ».
+ *
+ * ⚠️ ET CE SCRIPT AVAIT ÉTÉ « ÉPROUVÉ » AVANT D'ÊTRE LIVRÉ, SUR CINQ RAPPORTS FABRIQUÉS — identique,
+ * régression, aggravation, amélioration, vide — dont les codes de sortie avaient été vérifiés un par
+ * un. Il est passé les cinq fois, et il ne marchait pas.
+ *
+ * La raison est instructive : les rapports fabriqués avaient été écrits DANS MON FORMAT DE CLÉ, pas
+ * dans celui de Playwright. Une épreuve construite sur la même hypothèse que le code ne peut pas
+ * réfuter cette hypothèse — elle la confirme, avec l'apparence de la rigueur. Le seul témoin qui
+ * comptait était un VRAI rapport, et il n'est arrivé qu'en CI.
+ *
+ * Quand une épreuve et le code partagent leur auteur, ils partagent aussi leurs angles morts.
+ */
+const normaliser = (f) => String(f).replace(/^\.?\//, "").replace(/^e2e\//, "");
+
 /** Parcourt l'arbre de suites de Playwright et rend un compte d'échecs par `projet › fichier`. */
 function compterEchecs(json) {
   const compte = new Map();
@@ -52,7 +77,7 @@ function compterEchecs(json) {
         vus += 1;
         const echoue = (t.results ?? []).some((r) => r.status === "failed" || r.status === "timedOut");
         if (!echoue) continue;
-        const cle = `${t.projectName} › ${f}`;
+        const cle = `${t.projectName} › ${normaliser(f)}`;
         compte.set(cle, (compte.get(cle) ?? 0) + 1);
         total += 1;
       }
@@ -73,13 +98,21 @@ if (vus < 50) {
   process.exit(1);
 }
 
+// La ligne de base est normalisée de la MÊME façon : elle peut donc s'écrire avec ou sans `e2e/`.
+const tolerees = new Map(
+  Object.entries(tolere).map(([cle, n]) => {
+    const [projet, fichier] = cle.split("›").map((x) => x.trim());
+    return [`${projet} › ${normaliser(fichier)}`, n];
+  }),
+);
+
 const nouveaux = [];
 const ameliorations = [];
 for (const [cle, n] of compte) {
-  const attendu = tolere[cle] ?? 0;
+  const attendu = tolerees.get(cle) ?? 0;
   if (n > attendu) nouveaux.push(`${cle} : ${n} échecs, ${attendu} toléré(s)`);
 }
-for (const [cle, attendu] of Object.entries(tolere)) {
+for (const [cle, attendu] of tolerees) {
   const n = compte.get(cle) ?? 0;
   if (n < attendu) ameliorations.push(`${cle} : ${n} échecs au lieu de ${attendu} — abaisse la ligne de base`);
 }

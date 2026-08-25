@@ -55,7 +55,7 @@ test.describe("Le décor de l'arbre", () => {
     await laisserRetomber(page);
 
     // La région d'accueil est bien celle qui est active — sans quoi la mesure ne dirait rien.
-    await expect(page.getByRole("heading", { name: /^Accueil$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
 
     expect(
       await opaciteEffectiveArbre(page),

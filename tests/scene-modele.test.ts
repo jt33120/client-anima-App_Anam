@@ -166,3 +166,54 @@ describe("[7.9] aucun fichier hors du catalogue n'écrit un nom de région en li
     ).toEqual([]);
   });
 });
+
+describe("[7.9] les spécifications au navigateur ne cherchent pas un nom de région disparu", () => {
+  /**
+   * ⚠️ CETTE GARDE EXISTE PARCE QUE LE RENOMMAGE A CASSÉ HUIT TESTS SANS QUE JE LE VOIE (2026-08-25).
+   *
+   * La substitution ne visait que les libellés ENTRE GUILLEMETS. Trois specs cherchaient le titre
+   * par EXPRESSION RÉGULIÈRE — `/^Accueil$/` — et ont survécu intactes. `getByRole` ne trouvait
+   * plus rien, chaque test attendait 45 secondes puis échouait : `glissement.spec.ts` est passé de
+   * 1 échec à 8, sur les deux projets.
+   *
+   * Aucun `tsc`, aucun `eslint`, aucun test unitaire ne pouvait le dire : une chaîne dans une
+   * expression régulière est du texte valide. Seule la CI navigateur l'a vu — et c'est précisément
+   * pour ça qu'elle a été ajoutée le même jour.
+   */
+  const RACINE_E2E = process.cwd();
+
+  it("[LE CŒUR] aucun ancien nom de région ne survit dans `e2e/`, sous aucune forme", () => {
+    const specs = readdirSync(resolve(RACINE_E2E, "e2e"), { encoding: "utf-8" }).filter((f) =>
+      f.endsWith(".ts"),
+    );
+    expect(specs.length, "aucune spec trouvée : la garde ne mesure rien").toBeGreaterThan(8);
+
+    // Les noms d'AVANT le 2026-08-25. Ils ne doivent plus apparaître nulle part hors commentaire —
+    // ni entre guillemets, ni dans une expression régulière, ni dans un sélecteur.
+    const ANCIENS = ["Accueil", "L’arbre", "L'arbre", "L’accueil"];
+    const fautifs: string[] = [];
+    for (const f of specs) {
+      const src = readFileSync(resolve(RACINE_E2E, "e2e", f), "utf-8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/(^|[^:])\/\/.*$/gm, "$1");
+      for (const ancien of ANCIENS) {
+        if (src.includes(ancien)) fautifs.push(`e2e/${f} → « ${ancien} »`);
+      }
+    }
+    expect(
+      fautifs,
+      `une spec cherche un nom de région qui n'existe plus — elle attendra 45 s puis échouera :\n${fautifs.join("\n")}`,
+    ).toEqual([]);
+  });
+
+  it("[ANTI-VACUITÉ] les NOUVEAUX noms, eux, sont bien présents dans les specs", () => {
+    // Sans ce témoin, le refus ci-dessus serait vert sur un dossier `e2e/` qui ne nommerait plus
+    // aucune région du tout — c'est-à-dire sur une suite qui aurait cessé de les éprouver.
+    const tout = readdirSync(resolve(RACINE_E2E, "e2e"), { encoding: "utf-8" })
+      .filter((f) => f.endsWith(".ts"))
+      .map((f) => readFileSync(resolve(RACINE_E2E, "e2e", f), "utf-8"))
+      .join("\n");
+    expect(tout, "les specs ne nomment plus « Moi »").toContain("Moi");
+    expect(tout, "les specs ne nomment plus « Mon arbre »").toContain("Mon arbre");
+  });
+});

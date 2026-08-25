@@ -79,7 +79,7 @@ test.describe("Repères", () => {
 
     // On revient d'où l'on vient, sans passer par l'historique du navigateur.
     await page.getByRole("link", { name: /Revenir/ }).click();
-    await expect(page.getByRole("heading", { name: /^Accueil$|^Anam$|^Mon arbre$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Moi$|^Anam$|^Mon arbre$/, level: 1 })).toBeVisible();
   });
 
   test("[LA PORTE DE SECOURS N'EST PAS UN MODE D'EMPLOI] les deux pages ne se confondent pas", async ({

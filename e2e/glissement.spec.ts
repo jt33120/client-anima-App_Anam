@@ -105,7 +105,7 @@ async function dansLeMonde(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /entrer dans le monde/i }).click();
   await passerLeTour(page);
-  await expect(page.getByRole("heading", { name: /^Accueil$/, level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
   await page.waitForTimeout(1200);
 }
 

@@ -184,7 +184,7 @@ test.describe("Le seuil", () => {
 
     await page.getByRole("button", { name: /entrer dans le monde/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: /^Accueil$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Régions" }).getByRole("button"),
       "le doublage non-spatial doit reprendre dès qu'il y a quelque chose à doubler (UX-DR-37)",
@@ -196,13 +196,13 @@ test.describe("Le seuil", () => {
     await page.goto("/");
     await page.getByRole("button", { name: /entrer dans le monde/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: /^Accueil$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
     // La Server Action pose la date ; on lui laisse le temps de revenir avant de recharger.
     await page.waitForTimeout(1500);
 
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: /^Accueil$/, level: 1 }),
+      page.getByRole("heading", { name: /^Moi$/, level: 1 }),
       "le monde ne s'ouvre pas sur l'accueil : la date n'a pas été posée, ou pas relue",
     ).toBeVisible();
     await expect(
