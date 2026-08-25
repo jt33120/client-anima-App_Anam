@@ -129,7 +129,10 @@ describe("[6.2/T3] ce que l'adaptateur CONCLUT", () => {
     // le fan-out entier attendrait jusqu'à ce que la plateforme tue la lambda — rien de clos, aucun
     // incident levé (le défaut n°8 de la revue 4.8, encore lui).
     const cles = await clesDEssai(); // AVANT les faux minuteurs — voir la boucle ci-dessous.
-    vi.useFakeTimers();
+    // ⚠️ ON NE FAUSSE QUE `setTimeout`/`clearTimeout`, ET C'EST LA MOITIÉ DU CORRECTIF DU 2026-08-25.
+    // `avecDelai` (`lib/domain/delai.ts`) n'utilise QUE ces deux-là ; `setImmediate`, lui, doit rester
+    // RÉEL, sans quoi la boucle ci-dessous n'a aucun moyen de rendre la main à libuv.
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     vi.stubGlobal("fetch", () => new Promise(() => {}));
     const port = creerAdaptateurWebPush(cles);
 
@@ -140,9 +143,24 @@ describe("[6.2/T3] ce que l'adaptateur CONCLUT", () => {
     // ⚠️ On AVANCE EN BOUCLE, et ce n'est pas de la superstition. `reveiller` signe d'abord son jeton
     // VAPID, et `crypto.subtle.sign` se règle sur un tour de boucle d'événements RÉEL, pas sur une
     // microtâche : au premier `advanceTimersByTimeAsync`, le minuteur d'`avecDelai` n'est pas encore
-    // armé, et l'avance ne déclenche rien. Chaque tour rend la main à la boucle, ce qui laisse la
-    // signature se terminer, puis arme et déclenche le minuteur.
-    for (let i = 0; i < 20 && issue === undefined; i += 1) {
+    // armé, et l'avance ne déclenche rien.
+    //
+    // ⚠️ CE TEST A ÉCHOUÉ EN CI LE 2026-08-25, SUR UN COMMIT QUI NE TOUCHAIT QU'UN FICHIER MARKDOWN
+    // (`9fb1958`) — « expected undefined to be 'refuse' ». Il n'était pas capricieux : il était FAUX,
+    // et il l'était depuis toujours. La version précédente bouclait vingt fois sur
+    // `advanceTimersByTimeAsync` SANS jamais rendre la main à la boucle d'événements : ces vingt tours
+    // se consomment en microtâches, en quelques microsecondes. Tant que la signature ECDSA se termine
+    // vite — deux tours suffisent au repos, mesuré — le test passe. Mais `crypto.subtle` se règle sur
+    // le pool de threads de libuv (quatre par défaut, PARTAGÉ par tous les fichiers de test d'un même
+    // processus) : dans une suite complète en parallèle, la signature peut attendre son tour derrière
+    // d'autres. Les vingt itérations s'épuisent alors avant qu'elle démarre, `issue` reste `undefined`,
+    // et le test accuse l'adaptateur d'avoir pendu alors que c'est la boucle qui n'a rien attendu.
+    //
+    // Le `setImmediate` ci-dessous est un VRAI tour de boucle : il laisse libuv livrer la signature.
+    // Le mécanisme a été reproduit avant d'être corrigé — une opération qui ne se termine qu'après 40
+    // tours réels n'est JAMAIS atteinte par la boucle d'origine, et l'est par celle-ci.
+    for (let i = 0; i < 200 && issue === undefined; i += 1) {
+      await new Promise((tour) => setImmediate(tour));
       await vi.advanceTimersByTimeAsync(DELAI_POUSSEE_MS);
     }
     expect(issue, "l'adaptateur a pendu — la borne ne borne rien").toBe("refuse");
