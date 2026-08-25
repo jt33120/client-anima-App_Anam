@@ -115,7 +115,16 @@ describe("[QA 2026-08-19] la réserve du seuil se déduit de l'arbre, elle ne la
 
   it("`--arbre-l` est déclaré UNE fois et consommé par l'arbre ET par la réserve du seuil", () => {
     // Deux valeurs écrites séparément, c'est le titre dans le feuillage le jour où l'une bouge.
-    const css = readFileSync(resolve(racine, "render/monde.module.css"), "utf-8");
+    // ⚠️ COMMENTAIRES RETIRÉS AVANT TOUTE MESURE, ET ÇA VIENT DE MORDRE (2026-08-25). Un inventaire
+    // des propriétés non compositées a été écrit dans la feuille, et il CITE `.arbreMonde { filter:
+    // drop-shadow(...) }` en prose. `indexOf(".arbreMonde {")` est tombé sur le COMMENTAIRE, et la
+    // garde a mesuré de la documentation au lieu du code. C'est la troisième fois de la journée
+    // qu'une garde compte de la prose : le dépouillement n'est pas une précaution, c'est un
+    // préalable.
+    const css = readFileSync(resolve(racine, "render/monde.module.css"), "utf-8").replace(
+      /\/\*[\s\S]*?\*\//g,
+      "",
+    );
     expect((css.match(/--arbre-l:/g) ?? []).length, "un seul point de déclaration").toBe(1);
 
     const bloc = (sel: string) => {

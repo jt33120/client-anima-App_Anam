@@ -13,12 +13,28 @@
   min-height: 0;
 }
 
+/* ══ LA BARRE PORTE SON PROPRE VOILE (Story 11.2, UX-DR-39) ═══════════════════════════════════
+   Depuis le 2026-08-25, la région arbre a un fond TRANSPARENT : les étoiles, la lune et la voie
+   lactée sont visibles derrière l'arbre — c'était la demande. Tout ce qui porte du TEXTE dans cette
+   région doit donc porter son propre fond, sinon on lit du texte clair sur des étoiles.
+
+   ⚠️ UN APLAT, PAS UN FLOU. `backdrop-filter: blur()` est la réponse spontanée, et c'est celle qui
+   a fait tomber la scène à 4 images/seconde le 2026-08-20. Un aplat translucide est composité et
+   ne coûte rien par trame.
+
+   ⚠️ ET PAS DE `text-shadow`. Un contour porté par le texte donne un contraste qui dépend du pixel
+   derrière : sur une étoile claire il ne sauve rien, et NFR-016 exige 4,5:1 sur le PIRE pixel.
+
+   88 % : au-dessus du plancher de 85 % qu'UX-DR-39 pose sous du texte courant. */
 .barre {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--esp-3);
   flex: none;
+  background: color-mix(in srgb, var(--fond) 88%, transparent);
+  border-radius: var(--rayon-md);
+  padding: var(--esp-1) var(--esp-2);
 }
 
 .zoomBoutons {
@@ -310,9 +326,13 @@
 }
 
 /* ── L'arbre vide ── */
+/* L'état vide porte lui aussi son voile : c'est le seul texte de l'écran quand il n'y a pas encore
+   de branche, et c'est exactement l'écran d'un compte neuf — celui qu'on voit en premier. */
 .vide {
   flex: 1;
   display: flex;
+  background: color-mix(in srgb, var(--fond) 88%, transparent);
+  border-radius: var(--rayon-md);
   flex-direction: column;
   align-items: center;
   /* ⚠️ `safe`, ET C'EST LA MOITIÉ DE LA CORRECTION. Un `center` ordinaire qui déborde déborde DES
@@ -537,5 +557,18 @@
 
 .troncSeul {
     max-height: 110px;
+  }
+}
+
+/* En contraste renforcé, les étoiles sont déjà en `display: none` et la région retombe sur un fond
+   plein : les voiles deviennent opaques plutôt que de superposer deux transparences pour rien. */
+:global(:root[data-a11y="contraste"]) .barre,
+:global(:root[data-a11y="contraste"]) .vide {
+  background: var(--fond);
+}
+@media (prefers-contrast: more) {
+  :global(:root:not([data-a11y="nuit"])) .barre,
+  :global(:root:not([data-a11y="nuit"])) .vide {
+    background: var(--fond);
   }
 }

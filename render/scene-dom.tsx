@@ -587,7 +587,7 @@ export default function SceneDom({
         <div
           className={`${s.arbreMonde} ${region === "seuil" ? s.arbreAuSeuil : ""} ${
             region === "accueil" ? s.arbreEnRetrait : ""
-          } imagerie`}
+          } ${region === "arbre" ? s.arbreEnRetraitArbre : ""} imagerie`}
           aria-hidden
         >
           <div className="fondu-image">

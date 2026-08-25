@@ -1,3 +1,5 @@
+⚠️ **PÉRIMÉ — NE PAS PORTER CE MODE D'EMPLOI (2026-08-25).** Le `progress` de 0 à 100, le slider, le bouton play et les cinq pastilles de jalon décrits plus bas sont une **barre de progression notée**, que **FR-031 interdit** (DUR) : l'arbre d'Anima est un miroir descriptif, jamais une note — « un score qui baisse fait se sentir ratée ». Le `reference.png` de ce dossier porte en plus une **pomme**, alors que le produit a tranché « rayonnement, pas fruit » (FR-028). **L'asset qui fait foi est `design_handoff_arbre_lunaire/`.** Les illustrations d'ici restent une référence de STYLE, et rien d'autre.
+
 # Handoff : Arbre de Vie (asset génératif animé, croissance 0→100)
 
 > **Remplace l'ancien asset "Arbre Pomme Magique".** Si `MagicAppleTree` existe déjà dans l'app, ce composant le remplace (même API `progress`, plus de pomme).

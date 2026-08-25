@@ -2,6 +2,21 @@
  * copie-arbre.ts — Les libellés STATIQUES de l'arbre et le mapping d'AFFICHAGE de l'état. Le rendu ne peut
  * pas importer `lib/` (frontière AD-7) : la copie d'UI vit donc ici. Depuis 4.7, l'état s'appelle
  * « rayonnement » PARTOUT (base, modèle, écran) : plus aucune traduction, et jamais un objet-fruit.
+ *
+ * ══ LA DÉCISION, ÉCRITE ET DATÉE — FR-028 (Story 11.3, 2026-08-25) ═════════════════════════════
+ *
+ * Le troisième état d'une branche est le **RAYONNEMENT** : la branche ENTIÈRE entre en lumière,
+ * déclarée par elle. Ce n'est pas un fruit, ni une pomme, ni un objet suspendu — rien ne se
+ * « récolte » sur cet arbre, parce que rien ne se gagne. FR-028 le pose, `DESIGN.md` §arbre le
+ * répète : « la branche entière entre en lumière, aucun objet-fruit suspendu ».
+ *
+ * ⚠️ SI TU TROUVES `reference.png` DANS `images/assets/design_handoff_arbre_de_vie/`, NE LE
+ * REPRODUIS PAS. C'est un rendu peint qui porte une POMME BLEUE, et son README décrit une barre de
+ * progression de 0 à 100 avec cinq jalons — exactement ce que FR-031 interdit (l'arbre est un
+ * miroir descriptif, jamais une note). L'asset qui fait foi est `design_handoff_arbre_lunaire/`.
+ *
+ * Le code de rendu ne sait plus dessiner de fruit depuis le 2026-08-25, et
+ * `tests/arbre-sans-fruit.test.ts` refuse qu'il réapprenne.
  */
 
 import type { EtatBranche } from "@/lib/scene/projection";

@@ -112,3 +112,85 @@ test("[PENDANT LE TOUR AUSSI] l'écran qui apprend le produit ne doit pas saccad
     `le tour tourne à ${pendant} im/s contre ${reference} pour un document statique`,
   ).toBeGreaterThanOrEqual(reference * PART_MINIMALE);
 });
+
+/**
+ * ⚠️ LE TROISIÈME CAS — MESURÉ PENDANT UN DÉFILEMENT (Story 11.1, 2026-08-25).
+ *
+ * Les deux cas ci-dessus mesurent AU REPOS et pendant le tour guidé. Ni l'un ni l'autre ne verrait
+ * l'effet le plus coûteux qu'on s'apprête à livrer : un voile de fond sous un arbre (Story 11.2) et
+ * un bandeau qui se fond au défilement (Story 7.10). Un fond ne coûte presque rien tant que rien ne
+ * bouge devant lui ; il coûte tout quand la page défile, parce que le navigateur doit alors le
+ * recomposer à chaque trame.
+ *
+ * C'est le cas exact du flou de la voie lactée : au repos il tenait, et c'est en défilant que
+ * l'application tombait à 4 images/seconde.
+ *
+ * ⚠️ CETTE GARDE EST ÉCRITE AVANT LES DEUX EFFETS QU'ELLE DOIT SURVEILLER, ET CE N'EST PAS UN
+ * DÉTAIL D'ORDONNANCEMENT. Écrite après, elle graverait le coût livré comme normal.
+ */
+async function imagesParSecondePendantDefilement(page: Page): Promise<number> {
+  return page.evaluate(
+    () =>
+      new Promise<number>((res) => {
+        const region = document.querySelector('[class*="regionActive"]') as HTMLElement | null;
+        let n = 0;
+        let sens = 1;
+        const t0 = performance.now();
+        const tic = () => {
+          n++;
+          // Un défilement PROGRAMMÉ, qui va et vient : c'est ce qui force la recomposition du fond
+          // à chaque trame, exactement comme un doigt le ferait.
+          if (region) {
+            region.scrollTop += 24 * sens;
+            if (region.scrollTop <= 0 || region.scrollTop >= region.scrollHeight - region.clientHeight) sens = -sens;
+          } else {
+            window.scrollBy(0, 24 * sens);
+          }
+          if (performance.now() - t0 < 1600) requestAnimationFrame(tic);
+          else res(Math.round((n * 1000) / (performance.now() - t0)));
+        };
+        requestAnimationFrame(tic);
+      }),
+  );
+}
+
+test("[PENDANT UN DÉFILEMENT] un fond ne coûte rien au repos et tout quand la page bouge", async ({ page }) => {
+  await ouvrirUnCompteNeuf(page);
+
+  // La référence est prise DANS LES MÊMES CONDITIONS — en défilant elle aussi. Comparer un
+  // défilement à un repos mesurerait le défilement, pas la scène.
+  await page.goto("/aide");
+  await page.waitForTimeout(900);
+  const reference = await imagesParSecondePendantDefilement(page);
+  expect(reference, "témoin : la référence elle-même ne tient pas — machine trop chargée").toBeGreaterThan(8);
+
+  await page.goto("/");
+  await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+  await passerLeTour(page);
+  const barre = page.getByRole("navigation", { name: "Régions" });
+
+  const releves: Record<string, number> = {};
+  const mesurees: string[] = [];
+  // Les deux régions que les Stories 11.2 et 7.10 vont repeindre. « Anam » est hors du cas : son
+  // fil a son propre défilement, éprouvé par `conversation-attente.spec.ts`.
+  for (const region of ["Moi", "Mon arbre"]) {
+    await barre.getByRole("button", { name: region, exact: true }).click();
+    await page.waitForTimeout(1000);
+    releves[region] = await imagesParSecondePendantDefilement(page);
+    mesurees.push(region);
+  }
+
+  expect(
+    mesurees,
+    "la boucle n'a pas parcouru les deux régions : le test se serait vidé au lieu d'échouer",
+  ).toEqual(["Moi", "Mon arbre"]);
+
+  const trop = Object.entries(releves).filter(([, v]) => v < reference * PART_MINIMALE);
+  expect(
+    trop.map(([nom, v]) => `${nom} : ${v} im/s`),
+    `une région rame EN DÉFILANT par rapport à un document du même produit (${reference} im/s) :\n` +
+      Object.entries(releves)
+        .map(([n, v]) => `  ${n} → ${v} im/s`)
+        .join("\n"),
+  ).toEqual([]);
+});

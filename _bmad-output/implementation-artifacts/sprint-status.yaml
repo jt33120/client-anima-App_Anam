@@ -345,9 +345,9 @@ development_status:
 
   # ── Epic 11 : L'arbre — un seul arbre, un seul style, sur le ciel ──
   epic-11: backlog
-  11-1-garde-fluidite-voit-defilement-avant-moindre: backlog
-  11-2-ciel-etoile-revient-sous-arbre-seul: backlog
-  11-3-plus-pomme-nulle-part-seul-handoff: backlog
+  11-1-garde-fluidite-voit-defilement-avant-moindre: done  # 3e cas e2e : mesure PENDANT un défilement + inventaire des propriétés non compositées
+  11-2-ciel-etoile-revient-sous-arbre-seul: done  # aplat retiré, voiles locaux, décor éteint sur la région arbre
+  11-3-plus-pomme-nulle-part-seul-handoff: done  # cycle du fruit retiré appelant par appelant ; handoff périmé désamorcé
   11-4-graine-ou-tronc-deux-cote-cote: backlog
   11-5-trancher-plafond-13-branches-question-claude: backlog
   11-6-porter-moteur-lunaire-meme-dessin-meme: backlog

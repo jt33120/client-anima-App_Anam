@@ -51,6 +51,30 @@
   isolation: isolate;
 }
 
+/* ══ CE QU'ON N'ANIME JAMAIS DANS LA SCÈNE — LA LISTE, LÀ OÙ ON LA LIRA (Story 11.1) ═══════════
+ *
+ * Le 2026-08-20, une voie lactée en `filter: blur(44px)` a fait tomber l'application à 4 IMAGES
+ * PAR SECONDE au repos, contre 25. Sur une capture d'écran le résultat était exactement celui
+ * voulu ; c'est un coût PAR TRAME, et aucune garde de pixels ou de boîtes ne peut le voir.
+ *
+ * INTERDITES EN ANIMATION ET EN TRANSITION, sur toute couche de la scène :
+ *     filter · backdrop-filter · box-shadow · drop-shadow
+ * Chacune force le navigateur à REPEINDRE, et à repeindre tout ce qui est derrière.
+ *
+ * AUTORISÉES : `opacity` et `transform`, et elles seules — ce sont les deux que le compositeur sait
+ * traiter sans repasser par la peinture.
+ *
+ * ⚠️ DEUX STORIES VONT REPEINDRE CES COUCHES : la 11.2 (le ciel étoilé sous l'arbre) et la 7.10
+ * (le bandeau du jour au-dessus du pli). Elles ne fusionnent ni l'une ni l'autre avant que
+ * `e2e/fluidite.spec.ts` mesure un DÉFILEMENT — un fond ne coûte presque rien tant que rien ne
+ * bouge devant lui, et coûte tout dès que la page défile.
+ *
+ * ⚠️ INVENTAIRE DES PROPRIÉTÉS NON COMPOSITÉES DÉJÀ PRÉSENTES, avec leur verdict :
+ *   • `.arbreMonde { filter: drop-shadow(...) }` — STATIQUE, jamais animée, sur une couche de
+ *     décor qui ne bouge pas. Laissée, et mesurée par le cas au repos qui est vert.
+ *   • `.voie` ci-dessous — le flou a été RETIRÉ le 2026-08-20 ; ce qui reste est un dégradé.
+ * Aucune autre. Toute nouvelle entrée doit rejoindre cette liste avec son verdict.
+ */
 /* Mode accessibilité (-clair) : l'imagerie cède aux aplats — fond plat, ni halo violet
    codé en dur, ni lune, ni étoiles (cohérent avec --imagerie-opacite: 0). */
 :global(:root[data-a11y="contraste"]) .monde {
@@ -362,10 +386,22 @@
      `--fond` — même famille, aucune texture : la surface reste assez uniforme pour porter un fil de
      conversation, et cesse d'être une couleur morte sur toute la hauteur. Le contraste ne bouge
      pas : `tests/contraste.test.ts` compose sur `--fond`, qui reste la base et le repli. */
-  background:
-    radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--surface) 55%, var(--fond)) 0%, transparent 64%),
-    radial-gradient(100% 50% at 50% 100%, color-mix(in srgb, var(--lueur) 7%, var(--fond)) 0%, transparent 70%),
-    var(--fond);
+  /* ══ ET L'APLAT A DISPARU (Story 11.2, 2026-08-25) ═════════════════════════════════════════
+     Retour de Julian : « je ne dois pas avoir l'image de l'arbre, mais bien l'asset […] dans un
+     environnement d'étoiles ». La région posait un fond COUVRANT toute sa hauteur — d'abord uni,
+     puis en deux dégradés — et il cachait entièrement les étoiles, la lune et la voie lactée qui
+     vivent derrière la scène. L'arbre poussait sur un aplat.
+
+     ⚠️ LA RAISON DE L'APLAT RESTE ENTIÈRE : le texte ne doit jamais reposer sur l'imagerie
+     (UX-DR-39). Elle est re-satisfaite AUTREMENT et dans le même commit — par des voiles LOCAUX,
+     posés seulement sous ce qui porte du texte (la barre d'outils, la fiche de branche, l'état
+     vide). Un retrait livré sans ses voiles mettrait du texte blanc sur des étoiles.
+
+     ⚠️ ET AUCUN `backdrop-filter` POUR CES VOILES. C'est la propriété qu'on emploierait
+     spontanément pour « flouter derrière le texte » — et c'est exactement celle qui a fait tomber
+     la scène à 4 im/s (voir l'inventaire plus haut). Un aplat translucide suffit, et il est
+     composité. */
+  background: transparent;
 }
 /* h1 de la conversation : discret (cible du focus + hiérarchie), la conversation vient dessous. */
 .titreConversation {
@@ -408,10 +444,22 @@
      Deux dégradés très proches de `--fond` — quelques points d'écart, jamais une texture : la
      surface reste assez uniforme pour porter du texte, et cesse d'être morte. Rien ici ne
      transporte d'information ; en contraste renforcé, tout retombe sur l'aplat. */
-  background:
-    radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--surface) 55%, var(--fond)) 0%, transparent 64%),
-    radial-gradient(100% 50% at 50% 100%, color-mix(in srgb, var(--lueur) 7%, var(--fond)) 0%, transparent 70%),
-    var(--fond);
+  /* ══ ET L'APLAT A DISPARU (Story 11.2, 2026-08-25) ═════════════════════════════════════════
+     Retour de Julian : « je ne dois pas avoir l'image de l'arbre, mais bien l'asset […] dans un
+     environnement d'étoiles ». La région posait un fond COUVRANT toute sa hauteur — d'abord uni,
+     puis en deux dégradés — et il cachait entièrement les étoiles, la lune et la voie lactée qui
+     vivent derrière la scène. L'arbre poussait sur un aplat.
+
+     ⚠️ LA RAISON DE L'APLAT RESTE ENTIÈRE : le texte ne doit jamais reposer sur l'imagerie
+     (UX-DR-39). Elle est re-satisfaite AUTREMENT et dans le même commit — par des voiles LOCAUX,
+     posés seulement sous ce qui porte du texte (la barre d'outils, la fiche de branche, l'état
+     vide). Un retrait livré sans ses voiles mettrait du texte blanc sur des étoiles.
+
+     ⚠️ ET AUCUN `backdrop-filter` POUR CES VOILES. C'est la propriété qu'on emploierait
+     spontanément pour « flouter derrière le texte » — et c'est exactement celle qui a fait tomber
+     la scène à 4 im/s (voir l'inventaire plus haut). Un aplat translucide suffit, et il est
+     composité. */
+  background: transparent;
   /* `auto` et non `hidden` : au zoom 200 %/400 % ou en paysage court, le contenu doit rester atteignable
      par défilement (WCAG 1.4.10 Reflow). Le canevas gère son propre pan/zoom, indépendant (revue 4.6). */
   overflow-y: auto;
@@ -1046,4 +1094,52 @@
   .indiceAttente {
     transition: none;
   }
+}
+
+/* ══ LES VOILES LOCAUX DE LA RÉGION ARBRE (Story 11.2, UX-DR-39) ═══════════════════════════════
+
+   Le fond de la région est devenu transparent pour laisser voir le ciel. Tout ce qui porte du
+   TEXTE dans cette région doit donc porter son propre fond — sinon on lit du texte clair sur des
+   étoiles, ce qui est illisible et ce qu'UX-DR-39 refuse.
+
+   ⚠️ UN APLAT, PAS UN FLOU. `backdrop-filter: blur()` est la réponse spontanée, et c'est celle qui
+   a fait tomber la scène à 4 images/seconde. Un aplat translucide est composité ; il ne coûte rien.
+
+   ⚠️ ET PAS DE `text-shadow` NON PLUS. Un contour porté par le texte lui-même donne un contraste
+   qui dépend du pixel qu'il y a derrière : sur une étoile claire il ne sauve rien, et la mesure de
+   contraste devient impossible à faire honnêtement (NFR-016 exige 4,5:1 sur le PIRE pixel).
+
+   Opacités : ≥ 85 % sous du texte courant, ≥ 70 % sous du grand texte — les deux seuils d'UX-DR-39. */
+.voileArbre {
+  background: color-mix(in srgb, var(--fond) 88%, transparent);
+  border-radius: var(--rayon-md);
+}
+.voileArbreLarge {
+  background: color-mix(in srgb, var(--fond) 74%, transparent);
+  border-radius: var(--rayon-md);
+}
+
+/* En contraste renforcé, les étoiles, la lune et la voie lactée sont déjà en `display: none` :
+   la région retombe alors sur un fond plein, et les voiles deviennent opaques — sans quoi on
+   superposerait deux transparences sur un fond uni, pour rien. */
+:global(:root[data-a11y="contraste"]) .regionArbre {
+  background: var(--fond);
+}
+:global(:root[data-a11y="contraste"]) .voileArbre,
+:global(:root[data-a11y="contraste"]) .voileArbreLarge {
+  background: var(--fond);
+}
+@media (prefers-contrast: more) {
+  :global(:root:not([data-a11y="nuit"])) .regionArbre {
+    background: var(--fond);
+  }
+}
+
+/* ⚠️ LE DÉCOR S'ÉTEINT AUSSI SUR LA RÉGION ARBRE — SINON IL Y A DEUX ARBRES À L'ÉCRAN.
+   `.arbreMonde` est le décor d'ambiance : un arbre calme peint derrière toute la scène. Il était
+   caché par l'aplat de `.regionArbre` ; le fond devenu transparent, il réapparaîtrait DERRIÈRE
+   l'arbre réel. Deux arbres superposés serait pire que le problème qu'on répare. Même mécanisme
+   que `.arbreEnRetrait` (le jeton, jamais une seconde règle d'opacité). */
+.arbreEnRetraitArbre {
+  --imagerie-opacite: 0;
 }
