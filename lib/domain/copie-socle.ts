@@ -34,14 +34,13 @@ export interface PorteSocle {
  * deux jours après que le lien en avait été retiré, et rien n'a rougi — une garde qui saute ce
  * qu'elle ne trouve pas ne peut pas dire qu'un chemin a cessé d'exister.
  *
- * ⚠️ `URL_CORRIGER_LE_NOM` POINTE SUR `/profil` PARCE QUE LE FORMULAIRE DE NOM Y EST AUJOURD'HUI.
- * L'amendement du 2026-08-25 (`EXPERIENCE.md`, §6) fait disparaître `/profil` et déménage ce
- * formulaire vers `/reglages` ; c'est la Story 7.3 qui pose ce geste, et elle n'aura qu'UNE ligne à
- * changer — ici. Pointer d'avance sur `/reglages` créerait un lien mort dans l'intervalle.
+ * ✅ `URL_CORRIGER_LE_NOM` POINTE SUR `/reglages` DEPUIS LE 2026-08-25 (Story 7.3b). Le formulaire
+ * de nom y a déménagé et `/profil` a disparu — ce que l'amendement d'`EXPERIENCE.md` (§6) prévoyait
+ * et que la ligne 77 spécifiait depuis le 2026-07-21. Une seule ligne a changé, comme annoncé.
  */
 export const URL_CORRIGER_LE_NOM: PorteSocle = Object.freeze({
   libelle: "Ton nom complet",
-  url: "/profil",
+  url: "/reglages",
 });
 
 export const URL_AJOUTER_SON_HEURE: PorteSocle = Object.freeze({
@@ -103,12 +102,12 @@ export const PORTES_DU_SOCLE: readonly { readonly titre: string; readonly quoi: 
        * (expression, intime, personnalité). C'est une entrée du socle avant d'être un réglage —
        * `RAISON_NOMBRE` le dit déjà quand ils manquent.
        *
-       * L'amendement du 2026-08-25 (§6) déménage ce formulaire vers `/reglages` et fait disparaître
-       * `/profil`. Ce jour-là, une seule ligne change : celle-ci et `URL_CORRIGER_LE_NOM`.
+       * Le formulaire vit dans `/reglages` depuis le 2026-08-25 (Story 7.3b), ce qu'`EXPERIENCE.md`
+       * ligne 77 spécifiait depuis le 2026-07-21.
        */
       titre: "Ton nom",
       quoi: "Le prénom qu’Anam emploie, et le nom complet dont viennent trois de tes nombres.",
-      url: "/profil",
+      url: "/reglages",
     },
   ]);
 

@@ -5,6 +5,7 @@ import { HEURE_PAR_DEFAUT, HEURES_CHOISISSABLES, palierHonoreLHeure } from "@/li
 import * as copie from "@/lib/domain/copie-reglages";
 import * as copieDonnees from "@/lib/domain/copie-mes-donnees";
 import Reglages from "@/render/reglages/Reglages";
+import FormulaireNom from "@/render/reglages/FormulaireNom";
 import s from "@/render/reglages/reglages.module.css";
 import {
   abonnerAppareil,
@@ -15,6 +16,7 @@ import {
 } from "./actions";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
+import { enregistrerNom } from "./actions";
 
 // NFR-015 / identité de route — « Anam » partout, jamais un titre qui dit l'intimité de la page.
 export const metadata = { title: "Anam" };
@@ -80,7 +82,7 @@ export default async function PageReglages() {
 
   // Deux lectures sous le JWT de l'utilisatrice, jamais `service_role` (AD-12). Les policies de 0053
   // ne lui montrent que ses propres lignes — c'est la base qui le garantit, pas ce fichier.
-  const [{ data: preference }, { count }, { data: courriel }] = await Promise.all([
+  const [{ data: preference }, { count }, { data: courriel }, { data: identite }] = await Promise.all([
     supabase.from("preference_socle").select("heure").eq("utilisatrice_id", user.id).maybeSingle(),
     supabase.from("abonnement_poussee").select("id", { count: "exact", head: true }),
     // Revue Epic 6 (R7) : la policy de lecture propriétaire de 0034 suffit — pas de RPC pour LIRE.
@@ -91,12 +93,36 @@ export default async function PageReglages() {
       .select("refuse_le")
       .eq("utilisatrice_id", user.id)
       .maybeSingle(),
+    // Le nom, arrivé ici avec son formulaire le 2026-08-25 (Story 7.3b). Repli sûr : un nom
+    // illisible n'empêche ni de régler son rythme, ni d'arrêter les courriels.
+    supabase
+      .from("utilisatrice")
+      .select("prenom, nom_complet")
+      .eq("id", user.id)
+      .maybeSingle<{ prenom: string | null; nom_complet: string | null }>(),
   ]);
   const courrielsArretes = Boolean(courriel?.refuse_le);
 
   return (
     <main className={s.halte}>
       <h1 className={s.titreHalte}>{copie.TITRE_HALTE}</h1>
+
+      {/* ⚠️ EN TÊTE, ET CE N'EST PAS DE LA MISE EN PAGE. `EXPERIENCE.md` ligne 77 range le prénom
+          dans Réglages depuis le 2026-07-21, et c'est ce qu'on vient changer le plus souvent ici —
+          le rythme quotidien se règle une fois. */}
+      <FormulaireNom
+        section={copie.SECTION_NOM}
+        description={copie.NOM_DESCRIPTION}
+        labelPrenom={copie.LABEL_PRENOM}
+        labelNomComplet={copie.LABEL_NOM_COMPLET}
+        aideNomComplet={copie.AIDE_NOM_COMPLET}
+        previent={copie.NOM_PREVIENT_LES_NOMBRES}
+        actionEnregistrer={copie.ACTION_ENREGISTRER}
+        prenom={identite?.prenom ?? ""}
+        nomComplet={identite?.nom_complet ?? ""}
+        enregistrer={enregistrerNom}
+      />
+
       <Reglages
         // La copie descend d'ici : `render/` est un adaptateur muet et n'importe pas `lib/domain`
         // (AD-7, gardé par arc-architecture et scene-architecture). Même geste qu'en `/ancrages`.

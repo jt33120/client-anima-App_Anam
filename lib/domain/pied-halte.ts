@@ -42,7 +42,6 @@ export type IdHalte =
   | "memoire"
   | "mes-donnees"
   | "reglages"
-  | "profil"
   | "reperes"
   | "socle"
   | "synthese";
@@ -97,11 +96,6 @@ const MENTION_DUE: Readonly<Record<IdHalte, { readonly mention: boolean; readonl
       motif: "l’exercice guidé est composé pour elle (5.9) — même régime que la restitution",
     },
     reglages: { mention: false, motif: "des cases à cocher et une adresse ; aucun texte produit" },
-    profil: {
-      mention: false,
-      motif:
-        "un menu de compte et un formulaire de nom ; aucun texte produit par un modèle",
-    },
     reperes: {
       mention: false,
       motif:

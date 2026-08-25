@@ -137,13 +137,33 @@ describe("[7.2/AC2-AC3] ce qui entre, ce qui n'entre pas, et pourquoi", () => {
 });
 
 describe("[7.2/AC6] il n'existe qu'UNE seule liste d'entrées de compte dans le dépôt", () => {
-  it("[LE CŒUR] `copie-profil.ts` ne porte plus de liste d'entrées", () => {
+  it("[LE CŒUR] `/profil` a disparu, et son formulaire de nom N'EST PAS PERDU", () => {
     // Deux listes divergent au premier ajout : une entrée nouvelle dans l'une, absente de l'autre,
-    // et rien ne rougit. C'est exactement ce qui s'est passé entre `/profil` (2026-08-23) et
-    // l'ordre d'`EXPERIENCE.md` écrit un mois plus tôt.
-    const src = lire("lib/domain/copie-profil.ts").replace(/\/\*[\s\S]*?\*\//g, "");
-    expect(src).not.toMatch(/export const ENTREES\b/);
-    expect(src, "le formulaire de nom, lui, RESTE — il n'existe nulle part ailleurs").toContain("SECTION_NOM");
+    // et rien ne rougit. C'est ce qui s'est passé entre `/profil` (2026-08-23) et l'ordre
+    // d'`EXPERIENCE.md` écrit un mois plus tôt. La 7.3b a supprimé la page ; ce test garde
+    // désormais le DÉMÉNAGEMENT, qui est l'endroit où une fonctionnalité se perd en silence.
+    expect(existsSync(resolve(RACINE, "app/profil/page.tsx")), "`/profil` existe encore").toBe(false);
+    expect(existsSync(resolve(RACINE, "lib/domain/copie-profil.ts")), "sa copie existe encore").toBe(false);
+    expect(existsSync(resolve(RACINE, "render/profil")), "son rendu existe encore").toBe(false);
+
+    // ⚠️ ET LA MOITIÉ QUI COMPTE : ce qui n'existait NULLE PART AILLEURS est arrivé quelque part.
+    const reglages = lire("lib/domain/copie-reglages.ts");
+    for (const cle of ["SECTION_NOM", "LABEL_PRENOM", "LABEL_NOM_COMPLET", "NOM_PREVIENT_LES_NOMBRES"]) {
+      expect(reglages, `${cle} a disparu avec /profil au lieu de déménager`).toContain(`export const ${cle}`);
+    }
+    // ⚠️ ON REFUSE UN MONTAGE CONDITIONNEL, ET UN MUTANT L'A EXIGÉ. La première version cherchait
+    // `<FormulaireNom` n'importe où : `{false && <FormulaireNom` la laissait VERTE, et le
+    // formulaire n'était plus rendu du tout. Deuxième fois de la journée qu'une garde lit un texte
+    // au lieu d'un câblage (voir P9 sur `entrees={ENTREES_MENU}`).
+    const page = lire("app/reglages/page.tsx");
+    const i = page.indexOf("<FormulaireNom");
+    expect(i, "le formulaire n'est pas monté").toBeGreaterThan(-1);
+    const avant = page.slice(Math.max(0, i - 60), i);
+    expect(avant, "le formulaire est monté sous condition — il doit l'être toujours").not.toMatch(/&&|\?\s*$/);
+    expect(page, "l'action d'enregistrement n'est pas branchée").toMatch(/enregistrer=\{\s*enregistrerNom\s*\}/);
+    expect(lire("app/reglages/actions.ts"), "l'action d'enregistrement n'a pas suivi").toContain(
+      "export async function enregistrerNom",
+    );
   });
 
   it("[LE CŒUR] aucun autre module ne déclare un catalogue d'entrées de compte", () => {
@@ -173,15 +193,14 @@ describe("[7.2/AC6] il n'existe qu'UNE seule liste d'entrées de compte dans le 
     expect(urls, "le motif de détection ne reconnaît même pas le catalogue réel").toBeGreaterThanOrEqual(3);
   });
 
-  it("[LE CŒUR] `/profil` consomme le catalogue au lieu d'en porter un", () => {
-    // ⚠️ ON VÉRIFIE LE CÂBLAGE, PAS L'IMPORT — ET LE MUTANT L'A PROUVÉ. La première version
-    // cherchait la chaîne « ENTREES_MENU » n'importe où dans le fichier : remplacer
+  it("[LE CŒUR] la feuille du menu consomme le catalogue au lieu d'en porter un", () => {
+    // ⚠️ ON VÉRIFIE LE CÂBLAGE, PAS L'IMPORT — ET UN MUTANT L'A PROUVÉ le 2026-08-25. La première
+    // version cherchait la chaîne « ENTREES_MENU » n'importe où dans le fichier : remplacer
     // `entrees={ENTREES_MENU}` par `entrees={[]}` la laissait VERTE, puisque la ligne d'import
-    // contient toujours le mot. La page servait alors un menu vide, et rien ne rougissait.
-    const src = lire("app/profil/page.tsx");
-    expect(src, "le catalogue n'est pas branché sur la propriété `entrees`").toMatch(
-      /entrees=\{\s*ENTREES_MENU\s*\}/,
-    );
-    expect(src).not.toMatch(/copie\.ENTREES\b/);
+    // contient toujours le mot. La surface servait alors un menu vide, et rien ne rougissait.
+    //
+    // La cible a changé avec la 7.3b (`/profil` a disparu) ; l'invariant, lui, n'a pas bougé.
+    const src = lire("app/page.tsx");
+    expect(src, "le catalogue n'est pas branché sur la scène").toMatch(/entrees:\s*ENTREES_MENU/);
   });
 });

@@ -131,7 +131,7 @@ describe("[7.5/AC2] une absence se DIT — jamais un tiret, jamais une ligne vid
     const { container } = dessiner(sansHeureNiNom);
     const manques = container.querySelectorAll("div[class*='manque']");
     expect(manques.length, "aucune absence dite : le défaut est le silence, pas l'absence").toBeGreaterThan(0);
-    const liens = container.querySelectorAll("a[href='/profil']");
+    const liens = container.querySelectorAll("a[href='/reglages']");
     expect(liens.length, "une absence réparable sans lien est un reproche déguisé").toBeGreaterThan(0);
   });
 
@@ -222,10 +222,15 @@ describe("[7.5 · 7.2] les deux portes du socle", () => {
     const portes = container.querySelectorAll("li[class*='porte']");
     expect(portes.length).toBe(3);
     const cibles = [...portes].flatMap((p) => [...p.querySelectorAll("a")].map((a) => a.getAttribute("href")));
-    // ⚠️ `/profil` EST LÀ PARCE QUE LA 7.3 A RETIRÉ LE MOT « Profil » DE LA SURIMPRESSION. Sans
-    // cette porte, changer son prénom n'aurait plus aucun chemin dans le produit — une
-    // fonctionnalité perdue par déplacement.
-    expect(cibles.sort()).toEqual(["/enneagramme", "/heure-naissance", "/profil"]);
+    // ⚠️ LA PORTE « TON NOM » EST LÀ PARCE QUE LA 7.3 A RETIRÉ LE MOT « Profil » DE LA
+    // SURIMPRESSION, et la 7.3b a supprimé la page. Sans elle, changer son prénom n'aurait plus
+    // aucun chemin visible dans le produit — une fonctionnalité perdue par déplacement.
+    expect(cibles.sort()).toEqual(["/enneagramme", "/heure-naissance", "/reglages"]);
+    // ⚠️ ET LES TITRES, PAS SEULEMENT LES CIBLES — un mutant l'a exigé. Vérifier les seules URL
+    // laissait passer une porte renommée en n'importe quoi : le lien menait au bon endroit et ne
+    // disait plus où il menait, ce qui est une porte perdue pour qui la cherche des yeux.
+    const titres = [...portes].map((p) => (p.querySelector("a")?.textContent ?? "").trim()).sort();
+    expect(titres).toEqual(["Ton heure de naissance", "Ton nom", "Ton type"]);
   });
 
   it("chaque porte dit ce qu'il y a derrière", () => {

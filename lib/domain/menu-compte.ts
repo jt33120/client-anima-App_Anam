@@ -147,6 +147,6 @@ export const HORS_MENU: Readonly<Record<string, string>> = Object.freeze({
     "même raison que l’heure de naissance — c’est une porte du socle, pas une entrée de compte",
   reperes:
     "le mode d’emploi est replié dans /aide depuis le 2026-08-23 ; deux portes vers le même contenu divergeraient",
-  profil:
-    "il DISPARAÎT (amendement du 2026-08-25, §6) — ce menu est ce qui le remplace ; il ne peut pas se lister lui-même",
+  // ⚠️ `/profil` N'EST PLUS LISTÉ ICI PARCE QU'IL N'EXISTE PLUS (Story 7.3b, 2026-08-25). Une
+  // exclusion qui désigne une page disparue est un mensonge que le test des « fantômes » refuse.
 });

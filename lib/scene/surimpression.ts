@@ -46,16 +46,6 @@ export const URL_ABONNEMENT = "/abonnement";
  */
 export const URL_REPERES = "/reperes";
 
-/**
- * Story « Profil » (2026-08-23) — « il manque un bouton Profil avec les paramètres, où on peut
- * réinitialiser ses infos, changer son nom, gérer son abonnement ».
- *
- * ⚠️ IL REMPLACE « L'ABONNEMENT » DANS LA SURIMPRESSION, IL NE S'Y AJOUTE PAS. Trois liens
- * flottants tenaient déjà juste sur 390 px (mesuré : « Anam est une IA » finit à 152, « Repères »
- * 206–272, « Aide » 326–370) ; un quatrième les ferait se toucher. L'abonnement n'est pas perdu —
- * il devient une entrée du profil, qui est l'endroit où on va le chercher.
- */
-export const URL_PROFIL = "/profil";
 
 export interface Surimpression {
   /**
