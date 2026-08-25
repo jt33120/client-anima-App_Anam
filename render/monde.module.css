@@ -70,8 +70,22 @@
  * bouge devant lui, et coûte tout dès que la page défile.
  *
  * ⚠️ INVENTAIRE DES PROPRIÉTÉS NON COMPOSITÉES DÉJÀ PRÉSENTES, avec leur verdict :
- *   • `.arbreMonde { filter: drop-shadow(...) }` — STATIQUE, jamais animée, sur une couche de
- *     décor qui ne bouge pas. Laissée, et mesurée par le cas au repos qui est vert.
+ *   • `.arbreMonde { filter: drop-shadow(...) }` — STATIQUE, jamais animée, sur la plus GRANDE
+ *     couche de la scène.
+ *
+ *     ⚠️ J'AI ÉCRIT ICI « laissée, et mesurée par le cas au repos qui est vert ». C'ÉTAIT FAUX
+ *     (corrigé le 2026-08-26) : le cas au repos est dans la ligne de base des échecs, il n'a jamais
+ *     été vert. J'ai justifié de laisser une propriété non compositée sur la plus grande couche du
+ *     produit en invoquant une mesure qui disait le contraire.
+ *
+ *     Ce qu'on sait vraiment : le tour guidé tourne à 5 im/s sur mobile contre 62 pour un document
+ *     du même produit. Un `drop-shadow` est statique, mais il force le navigateur à REPEINDRE sa
+ *     couche dès que quelque chose bouge au-dessus — et le tour fait bouger quatre volets à chaque
+ *     trame. C'est un SUSPECT, pas un coupable : le désigner sans profileur serait remplacer une
+ *     affirmation fausse par une autre.
+ *
+ *     Ce qu'il faut pour trancher : retirer la propriété, relancer `e2e/fluidite.spec.ts` en CI, et
+ *     comparer. La mesure existe désormais ; c'est elle qui doit décider, pas cette ligne.
  *   • `.voie` ci-dessous — le flou a été RETIRÉ le 2026-08-20 ; ce qui reste est un dégradé.
  * Aucune autre. Toute nouvelle entrée doit rejoindre cette liste avec son verdict.
  */
