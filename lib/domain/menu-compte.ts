@@ -53,6 +53,18 @@ export interface EntreeMenu {
   readonly url: string;
 }
 
+/**
+ * Le nom ACCESSIBLE du glyphe. Le dessin, lui, est décoratif (`aria-hidden`).
+ *
+ * ⚠️ UN PICTOGRAMME QUI REMPLACE UN MOT SANS LE RENDRE AU NOM ACCESSIBLE est la façon la plus
+ * courante de casser une porte sans s'en apercevoir : le lecteur d'écran, la recherche vocale et la
+ * tabulation cessent de trouver ce qu'ils trouvaient avant. Même leçon que le « ? » du 2026-08-23,
+ * qui garde `aria-label="Aide"`.
+ */
+export const LIBELLE_GLYPHE = "Ton compte";
+export const TITRE_FEUILLE = "Ton compte";
+export const LIBELLE_FERMER = "Fermer";
+
 export const ENTREES_MENU: readonly EntreeMenu[] = Object.freeze([
   {
     // FR-077 — première, toujours. Aucune entrée ne passe devant, et le « ? » de la surimpression

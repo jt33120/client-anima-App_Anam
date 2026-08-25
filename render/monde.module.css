@@ -863,13 +863,14 @@
    chemin de service, pas une offre. Aucun fond, aucun bord, aucune pastille, aucune majuscule — la
    surimpression n'est pas une barre et ne le devient pas parce qu'on y ajoute un mot.
 
-   `margin-left: auto` ici ET sur .porteSecours : l'espace libre se répartit entre les deux, les deux
-   liens flottent à droite avec le même intervalle, et « Aide » reste le dernier. La position d'« Aide »
-   change donc légèrement quand ce lien apparaît — c'est le seul compromis de ce placement, et il est
-   préférable à l'alternative (poser « L'abonnement » à gauche, où il se retrouverait au bord de l'écran
-   sur les régions sans mention IA). */
+   ⚠️ IL PORTAIT `margin-left: auto`, ET C'ÉTAIT LE DÉFAUT (corrigé le 2026-08-25, Story 7.3).
+   Trois éléments en portaient un — celui-ci, `.cheminProfil` et `.porteSecours` — et flexbox
+   PARTAGE l'espace libre entre les marges automatiques. « Profil » atterrissait à x = 143→191 sur
+   390 px, c'est-à-dire au centre horizontal de l'écran. La marge vit désormais sur `.groupeDroite`,
+   UNE fois, et elle pousse le groupe entier au bord quels que soient les éléments présents ce
+   jour-là — ce qui règle aussi l'ancien « compromis » de ce commentaire : la position d'« Aide » ne
+   bouge plus quand ce lien apparaît. */
 .cheminAbonnement {
-  margin-left: auto;
   flex: none;
   pointer-events: auto;
   min-height: var(--cible-tactile);
@@ -899,36 +900,23 @@
   border-radius: var(--rayon-sm);
 }
 
-/* « Repères » — MÊME grammaire que .cheminAbonnement et .porteSecours, délibérément : c'est un
-   chemin de service, pas une invitation. Aucun fond, aucun bord, aucune pastille, aucune icône.
-   `margin-left: auto` comme les deux autres : l'espace libre se répartit, et « Aide » reste à
-   droite, dernier. */
-.cheminProfil {
+/* ⚠️ LE GROUPE DE DROITE, ET SA MARGE AUTOMATIQUE UNIQUE (Story 7.3, 2026-08-25).
+
+   Ce bloc remplace `.cheminProfil`, retiré avec le mot « Profil » qu'il peignait. Il porte
+   l'abonnement (si abonnée), le glyphe de compte et la porte de secours — et il est le SEUL endroit
+   de la surimpression à porter `margin-left: auto`.
+
+   C'est la correction du défaut mesuré le 2026-08-25 : trois marges automatiques concurrentes se
+   partageaient l'espace libre, et le premier des trois éléments finissait au milieu de l'écran.
+   Une seule marge, sur un conteneur, pousse le groupe entier au bord quelle que soit sa
+   composition — un compte gratuit n'a pas d'abonnement à afficher, et le résultat est le même. */
+.groupeDroite {
   margin-left: auto;
   flex: none;
-  pointer-events: auto;
-  min-height: var(--cible-tactile);
-  /* La largeur minimale vaut pour les trois liens flottants (QA du 2026-08-19 : « Aide » mesurait
-     43,7 px, sous le seuil d'un tiers de pixel). Ils partagent la grammaire, ils partagent la garde. */
-  min-width: var(--cible-tactile);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--esp-1) var(--esp-2);
-  color: var(--texte-doux);
-  text-decoration: none;
-  transition: color var(--duree-standard) var(--courbe);
-}
-.cheminProfil:hover {
-  color: var(--texte);
-}
-.cheminProfil .t-meta {
-  color: inherit;
-}
-.cheminProfil:focus-visible {
-  outline: 2px solid var(--bordure-forte);
-  outline-offset: 2px;
-  border-radius: var(--rayon-sm);
+  gap: var(--esp-1);
+  pointer-events: auto;
 }
 
 /* ⚠️ LE GLYPHE « ? » A BESOIN D'UN CONTOUR, ET C'EST UNE QUESTION DE LISIBILITÉ, PAS DE DÉCOR.
@@ -947,7 +935,9 @@
 /* Porte de secours — un mot « Aide », discret, TOUJOURS au même endroit (à droite). Jamais
    rouge / --alerte / pastille / icône / majuscule (FR-077, AD-9). Même grammaire que .navLien. */
 .porteSecours {
-  margin-left: auto; /* aligné à droite, position stable */
+  /* ⚠️ PLUS DE `margin-left: auto` ICI (2026-08-25). C'est `.groupeDroite` qui aligne, une fois
+     pour les trois. Le remettre ici recréerait exactement le défaut : deux marges automatiques se
+     partagent l'espace, et l'élément d'avant part au milieu. */
   flex: none;
   pointer-events: auto;
   min-height: var(--cible-tactile);

@@ -31,7 +31,7 @@ import {
 } from "@/lib/scene";
 import ArbreVivant from "./arbre-vivant";
 import ArbreInteractif from "./arbre/ArbreInteractif";
-import Surimpression from "./surimpression";
+import Surimpression, { type CopieMenu } from "./surimpression";
 import Conversation from "./conversation/Conversation";
 import EchangeSource from "./conversation/EchangeSource";
 import Bibliotheque from "./accueil/Bibliotheque";
@@ -117,6 +117,15 @@ export interface ProprietesSceneRendue {
     readonly terminer: string;
     readonly quitter: string;
   };
+  /**
+   * LE MENU DE COMPTE (Story 7.3) — son catalogue et sa copie, décidés hors du rendu.
+   *
+   * ⚠️ REQUIS, CONTRAIREMENT À `guide`. Un tour guidé absent est un état légitime (on l'a déjà
+   * fait) ; un menu de compte absent ne l'est pas — c'est le seul chemin vers l'aide, les données,
+   * l'abonnement et le consentement. Optionnel, une erreur de câblage retirerait ces neuf portes
+   * EN SILENCE, et rien n'aurait rougi : c'est exactement la panne que ce menu existe pour réparer.
+   */
+  menu: CopieMenu;
 }
 
 /* Étoiles générées côté client APRÈS montage → aucun décalage d'hydratation. */
@@ -215,6 +224,7 @@ export default function SceneDom({
   onSeuilFranchi,
   seuilDejaFranchi = false,
   guide,
+  menu,
 }: ProprietesSceneRendue) {
   const [etat, dispatch] = useReducer(
     reducteurVue,
@@ -548,6 +558,7 @@ export default function SceneDom({
           region,
           projection.abonnementGerable === true,
         )}
+        menu={menu}
         prepare={anamPrepare}
       />
 

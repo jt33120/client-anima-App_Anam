@@ -89,6 +89,27 @@ export const PORTES_DU_SOCLE: readonly { readonly titre: string; readonly quoi: 
       quoi: "Le test d’ennéagramme : court, interruptible, et repris là où tu l’as laissé.",
       url: "/enneagramme",
     },
+    {
+      /**
+       * ⚠️ CETTE TROISIÈME PORTE BOUCHE UN TROU QUE LA STORY 7.3 CREUSAIT (2026-08-25).
+       *
+       * Le glyphe de compte remplace le mot « Profil » de la surimpression — et `/profil` était le
+       * SEUL chemin vers le formulaire de nom. Le menu de compte, lui, mène à « Réglages », qui ne
+       * porte aujourd'hui que le rythme quotidien. Sans cette entrée, changer son prénom devenait
+       * impossible autrement qu'en tapant une URL : une fonctionnalité perdue par déplacement, ce
+       * qui est la façon la plus discrète d'en perdre une.
+       *
+       * Sa place ici n'est pas un pis-aller : le nom complet DÉTERMINE trois des six nombres
+       * (expression, intime, personnalité). C'est une entrée du socle avant d'être un réglage —
+       * `RAISON_NOMBRE` le dit déjà quand ils manquent.
+       *
+       * L'amendement du 2026-08-25 (§6) déménage ce formulaire vers `/reglages` et fait disparaître
+       * `/profil`. Ce jour-là, une seule ligne change : celle-ci et `URL_CORRIGER_LE_NOM`.
+       */
+      titre: "Ton nom",
+      quoi: "Le prénom qu’Anam emploie, et le nom complet dont viennent trois de tes nombres.",
+      url: "/profil",
+    },
   ]);
 
 /**

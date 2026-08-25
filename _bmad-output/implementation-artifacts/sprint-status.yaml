@@ -293,7 +293,7 @@ development_status:
   epic-7: in-progress
   7-1-ecrire-halte-ton-socle-architecture-information: done  # amendement d'EXPERIENCE.md + garde de CI (tests/architecture-information.test.ts)
   7-2-catalogue-menu-compte-modele-garde-frontiere: done  # garde écrite AVANT le composant ; P9 a survécu puis été tué
-  7-3-glyphe-feuille-bouge-pixel: backlog
+  7-3-glyphe-feuille-bouge-pixel: done  # la feuille est là ; /profil survit jusqu'à 7.3b (formulaire de nom)
   7-4-resilier-trois-clics-compte-clic-lu: backlog
   7-5-halte-ton-socle-premiere-fois-fr: done  # prise AVANT 7.2/7.3 : sinon lien mort puis compte sans surface
   7-6-univers-creer-matiere: backlog

@@ -7,23 +7,31 @@
  *
  * Présence flottante, SANS BORD ni fond barré : sa lisibilité tient au VOILE (même mécanisme
  * que .voile-seuil, orienté vers le bas), jamais à une barre. Porte, dans l'ordre : signe
- * d'Anam, mention IA, porte de secours. La porte de secours est TOUJOURS là ; le signe et la
- * mention n'apparaissent qu'en conversation. Aucune animation : le contenu change
- * INSTANTANÉMENT avec la région → jamais « dissous » au défilement (AC1/AC6).
+ * d'Anam, mention IA, puis le GROUPE DE DROITE — l'abonnement (si abonnée), le glyphe de compte,
+ * et la porte de secours en dernier. La porte de secours est TOUJOURS là ; le signe et la mention
+ * n'apparaissent qu'en conversation. Aucune animation : le contenu change INSTANTANÉMENT avec la
+ * région → jamais « dissous » au défilement (AC1/AC6).
  *
- * Tabulation (AC3) : rendue en TÊTE de la scène et hors de tout `inert` → la mention (si
- * présente) puis la porte de secours sont les tout premiers arrêts (au plus 2 pour « Aide »).
+ * Tabulation (AC3) : rendue en TÊTE de la scène et hors de tout `inert` → ses liens sont les tout
+ * premiers arrêts de la page, et la porte de secours est le DERNIER de la surimpression.
+ *
+ * ⚠️ « AU PLUS 2 ARRÊTS POUR AIDE » A ÉTÉ RETIRÉ DE CET EN-TÊTE (2026-08-25), PARCE QUE C'ÉTAIT
+ * FAUX. En conversation, pour une abonnée, la mention IA puis « L'abonnement » précédaient déjà la
+ * porte de secours : trois arrêts, pas deux, et le chiffre traînait ici depuis la Story 1.8. Ce que
+ * FR-077 protège n'est pas une DISTANCE, c'est une GARANTIE : la porte est toujours présente,
+ * toujours au même endroit, indépendante de toute détection et du menu de compte, et elle reste le
+ * dernier arrêt. C'est ce qu'`e2e/clavier.spec.ts` vérifie, et c'est ce qui compte.
  */
 
 import Link from "next/link";
 import {
   URL_AIDE,
   URL_ABONNEMENT,
-  URL_PROFIL,
   MENTION_IA,
   URL_TRANSPARENCE,
   type Surimpression,
 } from "@/lib/scene";
+import MenuCompte, { type EntreeMenuVue } from "./menu/MenuCompte";
 import s from "./monde.module.css";
 
 /**
@@ -47,11 +55,21 @@ function SigneAnam({ prepare }: { prepare: boolean }) {
   );
 }
 
+export interface CopieMenu {
+  readonly entrees: readonly EntreeMenuVue[];
+  readonly libelleGlyphe: string;
+  readonly titreFeuille: string;
+  readonly libelleFermer: string;
+}
+
 export default function Surimpression({
   modele,
+  menu,
   prepare = false,
 }: {
   modele: Surimpression;
+  /** La copie du menu de compte — elle DESCEND du domaine, le rendu n'y touche pas (AD-7/AD-10). */
+  menu: CopieMenu;
   prepare?: boolean;
 }) {
   return (
@@ -67,54 +85,63 @@ export default function Surimpression({
         </Link>
       )}
 
-      {/* QA manuelle du 2026-08-19 — « on est lancé dans le grand bain, on comprend rien ». Le lieu
-          se présentait une fois, à l'accueil, et nulle part on ne pouvait le RELIRE. Ce mot-ci est
-          le seul chemin permanent vers cette relecture.
+      {/* ⚠️ UN SEUL GROUPE À DROITE, ET UNE SEULE MARGE AUTOMATIQUE (Story 7.3, 2026-08-25).
+          Avant : « Profil », « L'abonnement » et le « ? » portaient CHACUN `margin-left: auto`.
+          Flexbox PARTAGE l'espace libre entre les marges automatiques — « Profil » atterrissait à
+          x = 143→191 sur 390 px, c'est-à-dire au centre horizontal de l'écran. La marge vit
+          désormais sur `.groupeDroite`, une fois, et elle pousse le groupe entier au bord quels que
+          soient les éléments qui le composent ce jour-là. */}
+      <div className={s.groupeDroite}>
+        {/* Story 3.5 (FR-060) — LA SORTIE.
+            ⚠️ JE L'AVAIS RETIRÉE, ET C'ÉTAIT AFFAIBLIR UN ENGAGEMENT EN SILENCE. En déplaçant
+            l'abonnement dans le profil (2026-08-23), ce lien devenait un doublon — sauf que FR-060
+            exige « aussi simple que la souscription », et qu'on souscrit en UNE carte, en pleine
+            conversation. Passer par le menu ajoute un geste à la sortie et pas à l'entrée : c'est
+            exactement l'asymétrie que la story interdit. Il reste donc là, EN PLUS de l'entrée de
+            menu — même figure que la porte de secours. */}
+        {modele.cheminAbonnement && (
+          <Link className={s.cheminAbonnement} href={URL_ABONNEMENT}>
+            <span className="t-meta">L&rsquo;abonnement</span>
+          </Link>
+        )}
 
-          ⚠️ AVANT « AIDE », JAMAIS À SA PLACE. « Aide » mène à des personnes, pas à une
-          explication : ce sont deux besoins distincts, et les confondre les dessert tous les deux.
-          L'ordre du DOM est aussi l'ordre de tabulation — la porte de secours ne cède sa place à
-          rien, et reste le dernier arrêt (FR-077). */}
-      {/* LE PROFIL (2026-08-23) — son nom, ses réglages, ses données, son abonnement. Il prend la
-          place qu'occupait « Repères », parti dans la page d'aide sur décision produit : quatre
-          liens flottants ne tiennent pas sur 390 px sans se toucher.
+        {/* LE MENU DE COMPTE (Story 7.3) — `EXPERIENCE.md` ligne 84 le spécifiait depuis le
+            2026-07-21. Il remplace le mot « Profil », qui flottait au centre de l'écran. */}
+        {modele.menuCompte && (
+          <MenuCompte
+            entrees={menu.entrees}
+            libelleGlyphe={menu.libelleGlyphe}
+            titreFeuille={menu.titreFeuille}
+            libelleFermer={menu.libelleFermer}
+          />
+        )}
 
-          ⚠️ AVANT « AIDE », TOUJOURS. L'ordre du DOM est l'ordre de tabulation, et la porte de
-          secours ne cède sa place à rien (FR-077). */}
-      {modele.cheminProfil && (
-        <Link className={s.cheminProfil} href={URL_PROFIL}>
-          <span className="t-meta">Profil</span>
+        {/* ⚠️ RENDU ICI, HORS DU COMPOSANT DE MENU, ET C'EST UN REFUS TENU. FR-077 exige une entrée
+            vers les ressources « toujours présente ET INDÉPENDANTE du menu de compte »
+            (`EXPERIENCE.md` lignes 151, 216, 429). « Aide et ressources » est la PREMIÈRE entrée de
+            la feuille — EN PLUS de ce « ? », JAMAIS à sa place. Un menu qui absorberait la porte de
+            secours la rendrait dépendante d'un état d'ouverture, donc perdable au pire moment. Elle
+            reste aussi le DERNIER arrêt de tabulation : elle ne cède sa place à rien.
+
+            ⚠️ UN POINT D'INTERROGATION, PAS LE MOT « AIDE » (demandé le 2026-08-23) — et le mot
+            reste SON NOM ACCESSIBLE. Le glyphe est décoratif (`aria-hidden`) ; `aria-label` porte
+            « Aide », pour que le lecteur d'écran, la recherche vocale et la tabulation trouvent
+            exactement ce qu'ils trouvaient avant.
+
+            ⚠️ ET C'EST UN ÉCART ÉCRIT AVEC `EXPERIENCE.md` LIGNE 151, qui exige « un mot simple —
+            Aide » et « jamais d'icône ». L'écart a été demandé le 2026-08-23 et il est TENU, pas
+            corrigé : sur 390 px, trois libellés flottants se touchaient. Il est daté ici et dans
+            l'amendement du 2026-08-25 plutôt que laissé implicite — et il ne coûte rien au nom
+            accessible, qui est ce que la règle protège réellement.
+
+            Ce n'est PAS un cercle plein, PAS un fond, PAS une couleur d'alerte : AD-9 veut que le
+            filet rassure, pas qu'il alarme. */}
+        <Link className={`${s.porteSecours} ${s.porteSecoursGlyphe}`} href={URL_AIDE} aria-label="Aide">
+          <span className="t-meta" aria-hidden>
+            ?
+          </span>
         </Link>
-      )}
-
-      {/* Story 3.5 (FR-060) — LA SORTIE.
-          ⚠️ JE L'AVAIS RETIRÉE, ET C'ÉTAIT AFFAIBLIR UN ENGAGEMENT EN SILENCE. En déplaçant
-          l'abonnement dans le profil (2026-08-23), ce lien devenait un doublon — sauf que FR-060
-          exige « aussi simple que la souscription », et qu'on souscrit en UNE carte, en pleine
-          conversation. Passer par le profil ajoute un geste à la sortie et pas à l'entrée : c'est
-          exactement l'asymétrie que la story interdit. Il reste donc là, et il n'apparaît que pour
-          qui a quelque chose à résilier.
-          Placé AVANT la porte de secours : « Aide » ne cède sa place à rien. */}
-      {modele.cheminAbonnement && (
-        <Link className={s.cheminAbonnement} href={URL_ABONNEMENT}>
-          <span className="t-meta">L&rsquo;abonnement</span>
-        </Link>
-      )}
-
-      {/* ⚠️ UN POINT D'INTERROGATION, PAS LE MOT « AIDE » (demandé le 2026-08-23) — et le mot reste
-          SON NOM ACCESSIBLE. Le glyphe est décoratif (`aria-hidden`) ; `aria-label` porte « Aide »,
-          pour que le lecteur d'écran, la recherche vocale et la tabulation trouvent exactement ce
-          qu'ils trouvaient avant. Un pictogramme qui remplace un mot sans le rendre au nom
-          accessible est la façon la plus courante de casser une porte de secours sans s'en
-          apercevoir (FR-077).
-
-          Ce n'est PAS un cercle, PAS un fond, PAS une couleur d'alerte : AD-9 veut que le filet
-          rassure, pas qu'il alarme. Un « ? » dans la même graisse et la même teinte que le reste. */}
-      <Link className={`${s.porteSecours} ${s.porteSecoursGlyphe}`} href={URL_AIDE} aria-label="Aide">
-        <span className="t-meta" aria-hidden>
-          ?
-        </span>
-      </Link>
+      </div>
     </div>
   );
 }

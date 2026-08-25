@@ -147,7 +147,17 @@ describe("[2026-08-25] Chaque étape du tour désigne quelque chose que la SCÈN
     // Sans ceci, tout ce fichier serait vert sur un corpus vide — le défaut que la version
     // précédente de cette garde a effectivement commis.
     expect(SCENE.length, "la clôture d’imports de la scène est vide").toBeGreaterThan(15);
-    expect(HREFS.size, "aucun href résolu : les constantes ne se résolvent plus").toBeGreaterThan(3);
+    // ⚠️ UN SEUIL NUMÉRIQUE DÉRIVE, ET IL A DÉRIVÉ (2026-08-25). Il valait « > 3 » quand la
+    // surimpression portait quatre liens ; la Story 7.3 a retiré « Profil » au profit d'un glyphe,
+    // et ce témoin est passé au rouge — pour une bonne raison mécanique, mais sans rien dire de ce
+    // qui manquait. Un témoin d'anti-vacuité doit prouver que le RÉSOLVEUR marche, pas qu'un compte
+    // n'a pas bougé. On nomme donc les chemins qu'il doit savoir résoudre : s'il en trouve moins,
+    // c'est le résolveur qui est cassé, et le message le dit.
+    expect(
+      [...HREFS].sort(),
+      "le résolveur de constantes ne retrouve plus les chemins permanents de la scène",
+    ).toEqual(expect.arrayContaining(["/aide", "/abonnement"]));
+    expect(HREFS.size, "aucun href résolu : les constantes ne se résolvent plus").toBeGreaterThan(1);
     expect(CLASSES.size, "aucune classe de module trouvée").toBeGreaterThan(20);
     expect(avecCible.length, "plus aucune étape ciblée").toBeGreaterThan(3);
   });

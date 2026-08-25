@@ -19,6 +19,12 @@ import { phraseDOuverture, estUneArrivee } from "@/lib/domain/ouverture-seance";
 import { lirePrenom } from "@/lib/data/lire-prenom";
 import { lireFaitsRetenus } from "@/lib/data/lire-memoire";
 import { ETAPES, SUIVANT, TERMINER, QUITTER } from "@/lib/domain/copie-guide";
+import {
+  ENTREES_MENU,
+  LIBELLE_GLYPHE,
+  TITRE_FEUILLE,
+  LIBELLE_FERMER,
+} from "@/lib/domain/menu-compte";
 
 /**
  * ⚠️ RENDUE À LA DEMANDE, ET C'EST UNE GARDE (revue adversariale, R5).
@@ -174,6 +180,15 @@ export default async function Page() {
       // Le tour guidé (retour du 2026-08-20). La copie vit dans `lib/domain` ; le rendu n'a pas le
       // droit de l'importer (AD-7/AD-10), donc elle descend d'ici.
       guide={{ etapes: ETAPES, suivant: SUIVANT, terminer: TERMINER, quitter: QUITTER }}
+      // Le menu de compte (Story 7.3). Le catalogue et sa copie vivent dans `lib/domain` ; le rendu
+      // n'a pas le droit de les importer (AD-7/AD-10), donc ils descendent d'ici — même patron que
+      // le tour guidé juste au-dessus.
+      menu={{
+        entrees: ENTREES_MENU,
+        libelleGlyphe: LIBELLE_GLYPHE,
+        titreFeuille: TITRE_FEUILLE,
+        libelleFermer: LIBELLE_FERMER,
+      }}
     />
   );
 }

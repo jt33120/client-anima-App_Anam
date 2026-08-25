@@ -102,7 +102,7 @@ export interface Surimpression {
    * Type littéral `true`, comme la porte de secours : ses réglages doivent être atteignables d'où
    * qu'elle soit, y compris au seuil. Le rendre facultatif ne compile pas.
    */
-  readonly cheminProfil: true;
+  readonly menuCompte: true;
 }
 
 /**
@@ -118,6 +118,6 @@ export function surimpressionPour(region: IdRegion, abonnee = false): Surimpress
     signeAnam: enConversation,
     mentionIA: enConversation,
     cheminAbonnement: abonnee,
-    cheminProfil: true,
+    menuCompte: true,
   };
 }

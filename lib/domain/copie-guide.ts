@@ -55,10 +55,24 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
        le même écran : au lecteur d'écran, on ne peut plus les distinguer, et une garde qui en
        cherchait un en trouvait deux. On nomme l'étape par ce qu'elle dit, pas par ce qu'elle
        répète. */
+    /**
+     * ⚠️ CE TEXTE DISAIT « PAS DE MENU CACHÉ, PAS DE SOUS-MENUS », ET IL A CESSÉ D'ÊTRE VRAI LE
+     * 2026-08-25 : la Story 7.3 pose un glyphe de compte qui ouvre une feuille.
+     *
+     * Il est réécrit DANS LE MÊME COMMIT que le menu, et pas plus tard, pour une raison mesurée
+     * cinq jours plus tôt : `Guide.tsx` FRANCHIT SANS BRUIT une étape dont la cible est absente —
+     * c'est voulu (un compte sans arbre saute l'étape de l'arbre) — donc une garde de tour ne peut
+     * pas dire qu'un TEXTE a cessé d'être vrai. Le 2026-08-23, une étape a décrit pendant deux
+     * jours une interface qui n'existait plus, et la CI est restée verte.
+     *
+     * Ce que le tour promet désormais est ce qui reste vrai : trois LIEUX, et tout le reste du
+     * compte derrière une seule porte nommée. Ce n'est pas « pas de menu » — c'est « un seul ».
+     */
     titre: "Le lieu tient en trois endroits",
     texte:
-      "Ce lieu tient en trois endroits. Pas de menu caché, pas de sous-menus : ce que tu vois est " +
-      "ce qu’il y a. Je te les montre une par une.",
+      "Ce lieu tient en trois endroits, et je te les montre un par un. Tout ce qui te concerne — " +
+      "tes nombres, tes données, ton abonnement, l’aide — vit derrière la silhouette en haut à " +
+      "droite. Une seule porte, jamais un labyrinthe.",
   },
   {
     region: "accueil",
@@ -115,7 +129,8 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
     titre: "Et si tu perds le fil",
     texte:
       "Le « ? » en haut reste là, sur chaque écran, quoi qu’il arrive : il mène directement à des " +
-      "personnes joignables, si ça ne va pas. Tout ce que je viens de dire y est aussi écrit en " +
-      "plus long, et tu peux refaire ce tour quand tu veux.",
+      "personnes joignables, si ça ne va pas. Il ne dépend pas du menu à côté de lui — même fermé, " +
+      "même en panne, il est là. Tout ce que je viens de dire y est aussi écrit en plus long, et tu " +
+      "peux refaire ce tour quand tu veux.",
   },
 ]);

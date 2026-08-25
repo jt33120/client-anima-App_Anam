@@ -220,9 +220,12 @@ describe("[7.5 · 7.2] les deux portes du socle", () => {
     // deux-là ne vivent plus dans `/profil` : c'est ici, ou nulle part.
     const { container } = dessiner(complete);
     const portes = container.querySelectorAll("li[class*='porte']");
-    expect(portes.length).toBe(2);
+    expect(portes.length).toBe(3);
     const cibles = [...portes].flatMap((p) => [...p.querySelectorAll("a")].map((a) => a.getAttribute("href")));
-    expect(cibles.sort()).toEqual(["/enneagramme", "/heure-naissance"]);
+    // ⚠️ `/profil` EST LÀ PARCE QUE LA 7.3 A RETIRÉ LE MOT « Profil » DE LA SURIMPRESSION. Sans
+    // cette porte, changer son prénom n'aurait plus aucun chemin dans le produit — une
+    // fonctionnalité perdue par déplacement.
+    expect(cibles.sort()).toEqual(["/enneagramme", "/heure-naissance", "/profil"]);
   });
 
   it("chaque porte dit ce qu'il y a derrière", () => {
