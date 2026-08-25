@@ -47,6 +47,7 @@ export const INVENTAIRE_EFFACEMENT: readonly EntreeEffacement[] = [
   { table: "signal_reconceptualisation", verdict: "efface", motif: "les bascules repérées" },
   { table: "theme_natal", verdict: "efface", motif: "le socle calculé, gravé une fois" },
   { table: "enneagramme", verdict: "efface", motif: "le type retenu et son origine" },
+  { table: "carte_contexte", verdict: "efface", motif: "la carte de contexte — ce qu’Anam avait compris d’elle" },
   { table: "enneagramme_hypothese", verdict: "efface", motif: "les hypothèses de type" },
   { table: "enneagramme_tentative", verdict: "efface", motif: "les réponses au questionnaire" },
   { table: "tirage", verdict: "efface", motif: "les tirages, graine comprise" },

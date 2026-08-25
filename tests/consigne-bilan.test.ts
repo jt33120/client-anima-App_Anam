@@ -104,8 +104,17 @@ describe("[revue 1-4] la consigne de clôture vaut pour LE tour qui clôt, pas p
     );
   });
 
-  it("`construire` n’a rien à contraindre, et l’absence d’arc non plus", () => {
-    expect(consignePhaseDuTour({ etat: { phase: "construire" }, beat: null }, true)).toBeNull();
-    expect(consignePhaseDuTour(null, true)).toBeNull();
+  it("SANS ARC, rien n’est contraint — et `construire`, lui, contraint désormais", () => {
+    // ⚠️ CETTE GARDE AFFIRMAIT QUE `construire` NE CONTRAINT RIEN, et c'était l'état du produit :
+    // `consigne-phase.ts` y valait `null`. Le 2026-08-25 ce `null` a été identifié comme le défaut
+    // le plus coûteux du produit — la phase la plus fréquente, et la totalité d'une première fois,
+    // n'envoyaient aucune instruction au modèle. « Ça fait vraiment juste parler à ChatGPT. »
+    //
+    // Ce qui reste vrai, et qui est la propriété de CETTE fonction : sans arc, il n'y a pas de
+    // phase, donc rien à contraindre. C'est le repli, et il ne doit jamais fabriquer une consigne.
+    expect(consignePhaseDuTour(null, true), "sans arc, une consigne est apparue").toBeNull();
+    const c = consignePhaseDuTour({ etat: { phase: "construire" }, beat: null }, true);
+    expect(c, "`construire` est redevenue muette").not.toBeNull();
+    expect(c!.content, "l’accueil ne cherche plus le déclencheur").toMatch(/juste avant|pourquoi ce soir/i);
   });
 });

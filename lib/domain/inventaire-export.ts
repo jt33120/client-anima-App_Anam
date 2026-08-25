@@ -106,6 +106,26 @@ export const INVENTAIRE_EXPORT: readonly EntreeInventaire[] = [
     retraits: ["cle_p256dh", "cle_auth"],
   },
 
+  {
+    table: "carte_contexte",
+    verdict: "inclus",
+    titre: "Ce qu’Anam a compris de toi",
+    // ⚠️ INVISIBLE DANS LE PRODUIT, ET POURTANT ICI — les deux tiennent ensemble.
+    //
+    // Décision du 2026-08-25 : la carte ne se montre sur AUCUN écran, et Anam ne la récite jamais.
+    // Montrer une formulation la transforme en verdict, et c'est FR-023 qui tombe.
+    //
+    // Mais le droit d'accès (art. 15) porte sur TOUTE donnée personnelle, et une carte tenue sur
+    // quelqu'un en est une. L'export n'est pas une surface produit : c'est la voie légale, demandée
+    // par elle, servie une fois. « Invisible dans l'application » et « accessible sur demande » ne
+    // se contredisent pas — les confondre serait tenir un dossier secret, ce que ce produit refuse.
+    // ⚠️ AUCUN RETRAIT, ET C'EST UNE GARDE QUI L'A EXIGÉ. `compacte_jusqu_a` avait été retiré comme
+    // « détail de plomberie » ; `[ANTI-VACUITÉ] on ne retire QUE des capacités, jamais un contenu »
+    // a rougi. Elle a raison : un retrait sert à ne pas livrer de quoi agir en son nom (une clé, un
+    // jeton), jamais à décider pour elle ce qui l'intéresse. Un horodatage sort avec le reste.
+    motif: "la carte de contexte (ce qu’elle amène, ce qui l’a déclenchée, ce qui l’entretient, ce qui tient déjà)",
+  },
+
   // ── Hors export, et chaque ligne dit pourquoi ───────────────────────────────────────────────
   {
     table: "environnement",
