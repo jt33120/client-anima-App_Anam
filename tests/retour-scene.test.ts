@@ -167,3 +167,25 @@ describe("[7.13] le câblage : la scène emporte, la halte rend", () => {
     }
   });
 });
+
+describe("[7.13] une erreur de retour ne coûte JAMAIS la page", () => {
+  it("[LE CŒUR] `undefined` et `null` retombent sur le foyer au lieu de lever", () => {
+    // ⚠️ DIX HALTES APPELLENT CETTE FONCTION PENDANT LEUR RENDU SERVEUR. Une lecture d'index sur
+    // `undefined` lèverait un `TypeError` EN PLEIN RENDU, et la page entière tomberait — pour un
+    // chemin de retour, c'est-à-dire pour un confort. Le repli est celui de partout : le foyer.
+    expect(() => regionDeRetour(undefined)).not.toThrow();
+    expect(() => regionDeRetour(null)).not.toThrow();
+    expect(regionDeRetour(undefined)).toBe(REGION_FOYER);
+    expect(urlRetourScene(undefined)).toBe("/");
+    expect(urlRetourScene(null)).toBe("/");
+  });
+
+  it("un objet aux formes inattendues ne lève pas davantage", () => {
+    for (const bizarre of [{ de: null }, { de: 42 }, { de: {} }, { autre: "arbre" }]) {
+      expect(
+        () => urlRetourScene(bizarre as Record<string, string | string[] | undefined>),
+        `${JSON.stringify(bizarre)} a levé`,
+      ).not.toThrow();
+    }
+  });
+});

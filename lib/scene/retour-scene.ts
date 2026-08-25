@@ -54,15 +54,25 @@ export function versHalte(url: string, depuis: IdRegion): string {
  * ne sert qu'à comparer —, mais le second rouvrirait le RIDEAU D'ENTRÉE sur un compte qui l'a déjà
  * franchi, ce qui se lit comme une déconnexion.
  */
-export function regionDeRetour(parametres: Record<string, string | string[] | undefined>): IdRegion {
-  const brut = parametres[PARAM_ORIGINE];
+export function regionDeRetour(
+  parametres: Record<string, string | string[] | undefined> | undefined | null,
+): IdRegion {
+  // ⚠️ ON TOLÈRE L'ABSENCE D'OBJET, ET CE N'EST PAS DE LA COMPLAISANCE DE TYPE. Dix haltes
+  // appellent cette fonction pendant leur rendu serveur. Si l'une reçoit `undefined` — un appel
+  // hors de Next, un test qui monte la page à la main, une future route qui oublie la propriété —
+  // la lecture d'index lèverait un `TypeError` EN PLEIN RENDU, et la page entière tomberait.
+  //
+  // Une erreur de retour ne doit jamais coûter la page. Le repli est celui de partout : le foyer.
+  const brut = parametres?.[PARAM_ORIGINE];
   const valeur = Array.isArray(brut) ? brut[0] : brut;
   if (typeof valeur !== "string" || !estRegion(valeur) || valeur === "seuil") return REGION_FOYER;
   return valeur;
 }
 
 /** L'URL de retour vers la scène, région comprise. Rendue au composant, qui ne décide rien. */
-export function urlRetourScene(parametres: Record<string, string | string[] | undefined>): string {
+export function urlRetourScene(
+  parametres: Record<string, string | string[] | undefined> | undefined | null,
+): string {
   const region = regionDeRetour(parametres);
   return region === REGION_FOYER ? "/" : `/?${PARAM_ORIGINE}=${encodeURIComponent(region)}`;
 }
