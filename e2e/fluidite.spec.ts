@@ -79,7 +79,16 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
     mesurees,
     "la boucle n'a pas parcouru les trois régions : le test se serait vidé au lieu d'échouer",
   ).toEqual(["Moi", "Anam", "Mon arbre"]);
-  expect(Object.keys(releves), "un relevé manque").toHaveLength(3);
+
+  // ⚠️ ON VÉRIFIE LA PRÉSENCE DES CLÉS, PAS LEUR NOMBRE — ET MA PREMIÈRE VERSION S'EST TROMPÉE
+  // (2026-08-26). Elle exigeait `toHaveLength(3)` en oubliant que `releves` est PRÉ-REMPLI avec le
+  // relevé du seuil : il en contient quatre. Le témoin rougissait donc sur une exécution
+  // parfaitement correcte — et, plus grave, il s'arrêtait AVANT le verdict, masquant les images par
+  // seconde réellement mesurées. Un témoin qui empêche de lire la mesure qu'il protège est pire
+  // qu'aucun témoin.
+  for (const region of mesurees) {
+    expect(releves[region], `aucun relevé pour « ${region} »`).toBeGreaterThan(0);
+  }
 
   const trop = Object.entries(releves).filter(([, v]) => v < reference * PART_MINIMALE);
   expect(

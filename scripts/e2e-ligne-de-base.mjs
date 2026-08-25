@@ -97,7 +97,16 @@ function compterEchecs(json) {
         const echec = (t.results ?? []).find((r) => r.error?.message);
         const brut = echec?.error?.message ?? "";
         // Les séquences de couleur du terminal rendent le journal de CI illisible : on les retire.
-        const message = brut.replace(/\u001b\[[0-9;]*m/g, "").split("\n")[0].slice(0, 160);
+        // ⚠️ TROIS LIGNES, PAS UNE — ET UN ÉCHEC L'A EXIGÉ le 2026-08-26. Le message « Aide n'est
+        // plus le dernier arrêt : » met la LISTE des fautifs sur les lignes suivantes : couper à la
+        // première rendait le journal exact et inutile, il disait le symptôme sans le sujet.
+        const message = brut
+          .replace(/\u001b\[[0-9;]*m/g, "")
+          .split("\n")
+          .filter((l) => l.trim().length > 0)
+          .slice(0, 3)
+          .join(" | ")
+          .slice(0, 300);
         titres.get(cle).push({ titre: [nom, spec.title].filter(Boolean).join(" › "), message });
         total += 1;
       }
