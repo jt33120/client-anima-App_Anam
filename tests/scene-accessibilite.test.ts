@@ -20,6 +20,44 @@ function sansCommentaires(src: string): string {
 const css = sansCommentaires(readFileSync(resolve(racine, "render/monde.module.css"), "utf-8"));
 const scene = sansCommentaires(readFileSync(resolve(racine, "render/scene-dom.tsx"), "utf-8"));
 
+describe("[2026-08-25] La région courante se voit — et le CSS suit le DOM, pas l’inverse", () => {
+  /**
+   * ⚠️ CE SÉLECTEUR N'A JAMAIS RIEN SÉLECTIONNÉ, ET RIEN NE LE DISAIT.
+   *
+   * `scene-dom.tsx` pose `aria-current="location"` sur l'onglet de la région active — la valeur
+   * juste, puisqu'on désigne un LIEU dans une scène et non une étape ou une page. Le CSS, lui,
+   * ciblait `[aria-current="true"]`. Résultat : depuis la Story 1.7, la barre de régions affichait
+   * trois libellés strictement identiques, et rien à l'écran ne disait dans laquelle on se trouvait.
+   *
+   * Un sélecteur CSS qui ne mord sur rien est le défaut le plus silencieux qui soit : il ne casse
+   * pas, il ne lève pas, il ne rougit pas — il ne fait simplement rien, pour toujours.
+   *
+   * ⚠️ CETTE GARDE NE FIGE PAS LA VALEUR. Elle la LIT dans le composant et exige que le sélecteur
+   * la suive. Écrire `expect(css).toMatch(/location/)` aurait interdit de changer d'avis sur la
+   * valeur ARIA ; ce qu'on protège, c'est que les deux ne DIVERGENT pas.
+   */
+  const valeurDom = /aria-current=\{[^}]*\?\s*"([a-z]+)"/.exec(scene)?.[1];
+
+  it("le composant pose bien une valeur `aria-current` sur l’onglet actif", () => {
+    expect(valeurDom, "plus aucun `aria-current` dans la barre de régions").toBeTruthy();
+  });
+
+  it("[LE CŒUR] le sélecteur CSS cible EXACTEMENT la valeur que le DOM écrit", () => {
+    const selecteurs = [...css.matchAll(/\[aria-current="([a-z]+)"\]/g)].map((m) => m[1]);
+    expect(selecteurs.length, "plus aucun style d’onglet actif : la région courante redevient invisible").toBeGreaterThan(0);
+    for (const s of selecteurs) {
+      expect(s, `le CSS cible "${s}" alors que le DOM écrit "${valeurDom}" — le sélecteur ne mord sur rien`).toBe(valeurDom);
+    }
+  });
+
+  it("et l’onglet actif se distingue RÉELLEMENT des autres (une déclaration, pas un bloc vide)", () => {
+    // Anti-vacuité : un sélecteur juste dont le bloc est vide ne distingue rien non plus.
+    const bloc = new RegExp(`\\[aria-current="${valeurDom}"\\]\\s*\\{([^}]*)\\}`).exec(css);
+    expect(bloc, "le bloc de l’onglet actif a disparu").not.toBeNull();
+    expect(bloc![1].trim().length, "le bloc de l’onglet actif est vide").toBeGreaterThan(0);
+  });
+});
+
 describe("Fondu de région + reduced-motion (AC1/AC4)", () => {
   it("la région se relie en FONDU (transition d'opacité sur --duree-longue)", () => {
     expect(css).toMatch(/\.region\b[\s\S]*?transition:[\s\S]*?opacity/);

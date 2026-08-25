@@ -52,8 +52,38 @@ export default function PageAide() {
   return (
     <main className={s.page}>
       <article className={s.contenu}>
-        {/* Sortie rapide (FR-074) : en tête, navigue vers un site neutre + remplace l'historique. */}
-        <SortieRapide />
+        {/*
+          ── L'EN-TÊTE À DEUX SORTIES, ET POURQUOI IL EN FAUT DEUX (retour du 2026-08-25) ────────
+
+          Cette page n'avait qu'UN contrôle : « Quitter », la sortie de secours FR-074, qui navigue
+          vers un site neutre et écrase l'historique. Julian a fait le geste que tout le monde fera —
+          cliquer sur le seul bouton de la page pour revenir dans Anima — et il s'est retrouvé sur
+          Météo France, sans retour arrière possible. « trop bizarre à vraiment régler ».
+
+          Les deux gestes existaient dans une seule commande, et rien ne les distinguait :
+            • « je referme l'aide et je rentre » — le geste de tous les jours ;
+            • « je m'efface d'ici tout de suite » — le geste de quelqu'un qui n'est pas seule.
+
+          ⚠️ LA SORTIE DE SECOURS N'EST PAS RETIRÉE, ET NE DOIT JAMAIS L'ÊTRE. Elle protège
+          quelqu'un qui lit ces lignes avec un tiers dangereux derrière l'épaule ; elle a déjà été
+          cassée une fois (voir plus haut, 2026-08-18, la CSP l'avait rendue inerte). Ce qui change,
+          c'est qu'elle cesse d'être la seule issue et qu'elle dit ce qu'elle fait.
+
+          Le retour est un `<Link>` NU vers la scène, sans JavaScript de navigation et sans lecture
+          de session : `/aide` est la page qui doit marcher quand tout le reste est cassé (AD-15),
+          et elle est publique (FR-077). Un `router.back()` aurait été plus fidèle et aurait échoué
+          exactement dans le cas qui compte — celle qui arrive ici par un lien direct, en détresse,
+          n'a pas d'entrée précédente où revenir.
+
+          L'ordre du DOM place le retour en premier : les ressources restent au-dessus de la ligne
+          de flottaison (FR-077), et la sortie de secours reste atteignable au deuxième arrêt.
+        */}
+        <div className={s.enTete}>
+          <Link className={s.retour} href="/">
+            <span className="t-bouton">Retour</span>
+          </Link>
+          <SortieRapide />
+        </div>
         <p className="t-surtitre">Anam</p>
         <h1 className="t-titre">Aide</h1>
 

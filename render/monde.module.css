@@ -743,7 +743,14 @@
 .navLien:hover {
   color: var(--texte);
 }
-.navLien[aria-current="true"] {
+/* ⚠️ `location`, ET PAS `true` — CE SÉLECTEUR N'A JAMAIS RIEN SÉLECTIONNÉ (trouvé le 2026-08-25).
+   `scene-dom.tsx` écrit `aria-current="location"` (la valeur JUSTE : on désigne un lieu dans la
+   scène, pas une étape ni une page). Le CSS, lui, attendait `"true"`. La région courante n'a donc
+   jamais été distinguée des deux autres depuis la 1.7 : la barre de régions montrait trois libellés
+   identiques, et rien ne disait où l'on était. Aucune garde ne tenait ce lien — il y en a une
+   maintenant, et c'est une garde de PARITÉ : elle relit la valeur dans le composant et exige que le
+   sélecteur la suive, sans figer laquelle des deux est la bonne. */
+.navLien[aria-current="location"] {
   color: var(--texte);
 }
 .navLien:focus-visible {

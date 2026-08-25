@@ -20,8 +20,37 @@
 }
 
 /* Sortie rapide (FR-074) — en tête, alignée à droite, discrète. Cible ≥ 44px, jamais alarmante. */
+/* L'en-tête à deux sorties : le retour à gauche (le geste de tous les jours), la sortie de secours
+   à droite (le geste rare). Deux commandes visiblement distinctes — c'est tout le correctif. */
+.enTete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+/* Le retour porte la même cible tactile et le même anneau que la sortie : ce sont deux commandes de
+   même rang. Ce qui les sépare, c'est le NOM et la place, jamais une hiérarchie visuelle — mettre
+   le retour en avant reviendrait à enterrer la sortie de secours (FR-074). */
+.retour {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--cible-tactile);
+  padding: var(--esp-2) var(--esp-4);
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon);
+  color: var(--texte-doux);
+  text-decoration: none;
+}
+.retour:hover {
+  color: var(--texte);
+}
+.retour:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
 .sortieRapide {
-  align-self: flex-end;
   min-height: var(--cible-tactile);
   padding: var(--esp-2) var(--esp-4);
   background: transparent;

@@ -94,12 +94,28 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
       "vu venir.",
   },
   {
+    /**
+     * ⚠️ CETTE ÉTAPE DISAIT UNE CHOSE FAUSSE, ET LE FILET NE POUVAIT PAS LE VOIR (2026-08-25).
+     *
+     * Elle visait `a[href='/reperes']` et affirmait « "Repères" est là en haut de chaque écran ».
+     * Le lien a été retiré de la surimpression le 2026-08-23, quand Repères a été replié dans
+     * `/aide`. Deux choses ont alors masqué le défaut :
+     *   • `Guide.tsx` FRANCHIT SANS BRUIT une étape dont la cible est absente — c'est voulu (un
+     *     compte sans arbre saute l'étape de l'arbre), et c'est ce qui a rendu la CI muette ;
+     *   • mais `premier-passage.tsx` rend encore un lien vers `/reperes` (« Le lieu en entier »),
+     *     et le tour guidé se joue PRÉCISÉMENT au premier passage. La cible était donc trouvée,
+     *     l'étape s'affichait, et elle décrivait une interface qui n'existait plus.
+     *
+     * Une garde qui saute ce qu'elle ne trouve pas ne peut pas dire qu'un texte a cessé d'être
+     * vrai. Ce que le tour désigne doit donc être ce qui est RÉELLEMENT permanent : la porte de
+     * secours, qui est le seul contrôle du produit dont FR-077 exige qu'il soit toujours là.
+     */
     region: "accueil",
-    cible: "a[href='/reperes']",
+    cible: "[class*='porteSecours']",
     titre: "Et si tu perds le fil",
     texte:
-      "« Repères » est là en haut de chaque écran : tout ce que je viens de dire y est écrit, en " +
-      "plus long, et tu peux refaire ce tour quand tu veux. À côté, « Aide » ne sert pas à ça : " +
-      "elle mène directement à des personnes, si ça ne va pas.",
+      "Le « ? » en haut reste là, sur chaque écran, quoi qu’il arrive : il mène directement à des " +
+      "personnes joignables, si ça ne va pas. Tout ce que je viens de dire y est aussi écrit en " +
+      "plus long, et tu peux refaire ce tour quand tu veux.",
   },
 ]);

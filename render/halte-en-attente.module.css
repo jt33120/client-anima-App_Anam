@@ -1,0 +1,50 @@
+/* ══════════════════════════════════════════════════════════════════════════════════════════════
+   halte-en-attente.module.css — LA COQUE D'UNE HALTE QUI ARRIVE
+   ══════════════════════════════════════════════════════════════════════════════════════════════
+
+   Reprend EXACTEMENT la coque de toutes les haltes (`.page` / `.contenu` de `profil.module.css`,
+   `reglages.module.css`, `memoire.module.css`… — elles sont identiques) pour que l'arrivée de la
+   vraie page ne déplace rien. Un squelette qui ne tombe pas au même endroit que le contenu est pire
+   que pas de squelette : il fait sauter la page deux fois.
+
+   ⚠️ AUCUNE ANIMATION, ET C'EST LA CHARTE, PAS UNE ÉCONOMIE. `render/surimpression.tsx` l'écrit :
+   « SANS animation cyclique — jamais trois points qui rebondissent ». Un squelette qui pulse est un
+   spinner déguisé. Ici : des blocs immobiles, à peine posés sur le fond. Ils disent « ça arrive »
+   sans rien réclamer de l'œil. */
+
+.page {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: var(--esp-8) var(--marge-mobile);
+  background: var(--fond);
+}
+
+.contenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-6);
+  width: 100%;
+  max-width: var(--mesure);
+}
+
+/* Trois blocs muets. Les hauteurs suivent l'échelle typographique des haltes : un titre, puis deux
+   paragraphes. Ce ne sont pas des mesures inventées — ce sont celles que la page va occuper. */
+.bloc {
+  border-radius: var(--rayon);
+  background: var(--surface);
+}
+
+.titre {
+  height: 2rem;
+  width: 55%;
+}
+
+.ligne {
+  height: 1rem;
+}
+
+.ligneCourte {
+  height: 1rem;
+  width: 70%;
+}

@@ -64,7 +64,13 @@ describe("Adaptateur Mistral — boot-guard art. 9 (AC3) + stateless-only (AC2)"
       readFileSync(resolve(process.cwd(), "lib/ai/adapters/mistral.ts"), "utf-8"),
     );
     expect(src).toMatch(/chat\.(complete|stream)/);
-    for (const stateful of ["agents", "conversations", "batch", "fineTuning", "libraries"]) {
+    // ⚠️ `voices` AJOUTÉ LE 2026-08-25, ALORS QUE PERSONNE NE FAIT DE VOIX. C'est exactement le
+    // moment de le poser : la surface `voices` du SDK Mistral est STATEFUL (une voix clonée est un
+    // objet stocké chez le fournisseur), donc hors du chemin ZDR d'AD-3 — au même titre qu'`agents`.
+    // Le jour où le chantier vocal s'ouvrira, personne ne se souviendra de cette nuance, et le
+    // premier essai passera par là. Une garde écrite avant le besoin coûte une ligne ; écrite après,
+    // elle coûte un incident de conformité sur des données de santé.
+    for (const stateful of ["agents", "conversations", "batch", "fineTuning", "libraries", "voices"]) {
       expect(src, `endpoint stateful interdit : ${stateful}`).not.toMatch(
         new RegExp(`\\.${stateful}\\b`),
       );

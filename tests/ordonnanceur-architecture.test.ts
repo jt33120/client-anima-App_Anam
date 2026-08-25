@@ -311,6 +311,44 @@ function intervalleMinimalDuCron(schedule: string): number {
 const CHEMIN_VERCEL = resolve(RACINE, "vercel.json");
 
 /**
+ * ══ LA RÉGION DE DÉPLOIEMENT EST UNE GARDE DE CONFORMITÉ, PAS UN RÉGLAGE DE PERFORMANCE ═════════
+ *
+ * `vercel.json` ne portait QUE `crons` (constaté le 2026-08-25). Sans clé `regions`, Vercel déploie
+ * en `iad1` — Washington. Or c'est la fonction serveur qui compose le contexte, appelle le modèle et
+ * traverse la frontière d'egress : tout le chemin art. 9 tournait donc aux États-Unis, contre une
+ * base en `eu-west-1` (Irlande).
+ *
+ * Deux conséquences, et la seconde est la vraie :
+ *   • chaque lecture Supabase payait un aller-retour transatlantique — c'est une part du « les
+ *     boutons sont très lents » remonté par Julian ;
+ *   • AD-4 place le traitement art. 9 en UE. Une région américaine le contredit en silence, sans
+ *     qu'aucun test, aucune revue ni aucun écran ne puisse le dire.
+ *
+ * ⚠️ CETTE GARDE NE FIGE PAS `cdg1`. Elle exige que la région déclarée soit dans l'UE — déménager de
+ * Paris à Francfort reste libre, quitter l'Union ne l'est pas.
+ */
+const REGIONS_UE = ["arn1", "cdg1", "dub1", "fra1"];
+
+describe("[AD-4] Le chemin art. 9 s’exécute dans l’Union", () => {
+  it("[LE CŒUR] `vercel.json` déclare une région, et elle est européenne", () => {
+    expect(existsSync(CHEMIN_VERCEL), "vercel.json a disparu").toBe(true);
+    const conf = JSON.parse(readFileSync(CHEMIN_VERCEL, "utf-8")) as { regions?: unknown };
+    expect(
+      Array.isArray(conf.regions) && conf.regions.length > 0,
+      "aucune région déclarée : Vercel déploie en iad1 (Washington) et le chemin art. 9 quitte l’UE",
+    ).toBe(true);
+    const hors = (conf.regions as string[]).filter((r) => !REGIONS_UE.includes(r));
+    expect(hors, `région hors UE déclarée : ${hors.join(", ")}`).toEqual([]);
+  });
+
+  it("[ANTI-VACUITÉ] la liste des régions UE mord — une région américaine serait refusée", () => {
+    // Sans ce contrôle, une liste vide ou trop large rendrait la garde ci-dessus toujours vraie.
+    expect(REGIONS_UE).not.toContain("iad1");
+    expect(REGIONS_UE.length).toBeGreaterThan(1);
+  });
+});
+
+/**
  * Le schedule réellement déployé — lu, jamais recopié.
  *
  * ⚠️ `existsSync` d'abord : sans lui la garde casserait en `ENOENT` plutôt que de rougir, et un

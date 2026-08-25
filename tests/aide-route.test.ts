@@ -116,6 +116,57 @@ describe("/aide — sortie rapide (FR-074, Story 2.6)", () => {
     expect(sortie).toMatch(/https?:\/\//); // une URL neutre absolue
   });
 
+  /**
+   * ══ LES DEUX SORTIES, ET POURQUOI IL EN FAUT DEUX (retour de Julian, 2026-08-25) ═════════════
+   *
+   * « trop bizarre à vraiment régler : quand je quitte la page aide je suis redirigé vers météo
+   * france !!! » — et le code faisait exactement ce qui était écrit. `/aide` ne portait qu'UN
+   * contrôle, la sortie de secours FR-074, qui navigue vers un site neutre et ÉCRASE l'historique.
+   * Il s'appelait « Quitter ». Quiconque voulait simplement refermer l'aide et rentrer dans Anima
+   * cliquait dessus et quittait le produit, sans retour arrière possible.
+   *
+   * Une sortie de secours que tout le monde déclenche par erreur n'en est plus une.
+   *
+   * ⚠️ CE QUI EST GARDÉ ICI EST STRUCTUREL, PAS LEXICAL. On n'épelle pas les libellés — ils sont
+   * PROVISOIRES et attendent la relecture d'un juriste et d'un professionnel (voir l'en-tête de
+   * `SortieRapide.tsx`). Ce qu'on interdit, c'est que la page redevienne un cul-de-sac : deux
+   * commandes distinctes, l'une qui rentre, l'autre qui sort.
+   */
+  it("[LE CŒUR] la page porte un RETOUR vers le produit — sa seule issue ne mène plus dehors", () => {
+    expect(src, "aucun retour interne : qui veut refermer l’aide quitte Anima").toMatch(
+      /<Link[^>]*href="\/"/,
+    );
+  });
+
+  it("[LE CŒUR] le retour et la sortie de secours sont DEUX commandes, pas une seule à deux rôles", () => {
+    // C'est la confusion exacte du défaut : un seul contrôle portait les deux gestes.
+    expect(src).toMatch(/<SortieRapide\s*\/>/);
+    const enTete = /<div className=\{s\.enTete\}>([\s\S]*?)<\/div>/.exec(src);
+    expect(enTete, "l’en-tête à deux sorties a disparu").not.toBeNull();
+    expect(enTete![1], "le retour n’est plus dans l’en-tête").toMatch(/href="\/"/);
+    expect(enTete![1], "la sortie de secours n’est plus dans l’en-tête").toMatch(/SortieRapide/);
+  });
+
+  it("le retour reste un lien NU — aucun JavaScript de navigation sur la page qui doit toujours marcher", () => {
+    // AD-15 : `/aide` est la porte de secours, elle doit fonctionner quand tout le reste est cassé.
+    // Un `router.back()` aurait de plus échoué précisément dans le cas qui compte : celle qui arrive
+    // ici par un lien direct, en détresse, n’a aucune entrée d’historique où revenir.
+    // ⚠️ ON DÉCOMMENTE AVANT DE CHERCHER, et la garde a rougi sur MA PROPRE PROSE : le commentaire
+    // de `page.tsx` explique justement pourquoi on n’emploie pas `router.back()`, et le mot y était.
+    // Une garde « corrigée » en retirant l’explication aurait échangé la raison contre le vert.
+    const codeSeul = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+    expect(codeSeul, "la page d’aide s’est mise à naviguer en JavaScript").not.toMatch(
+      /useRouter|router\.(back|push)/,
+    );
+  });
+
+  it("et la sortie de secours, elle, mène TOUJOURS dehors en écrasant l’historique", () => {
+    // Anti-vacuité des deux gardes ci-dessus : elles seraient toutes deux vraies d’une page dont on
+    // aurait simplement fait pointer la « sortie » vers `/`. Ce serait détruire FR-074.
+    expect(sortie).toMatch(/location\.replace\(\s*URL_NEUTRE\s*\)/);
+    expect(sortie).toMatch(/const URL_NEUTRE = "https:\/\/[^"]+"/);
+  });
+
   it("préserve l'étanchéité de /aide : aucune session, aucune IA, aucun traceur", () => {
     expect(sortie).not.toMatch(/@\/lib\/(data|ai)|supabase|getUser/);
     expect(sortie).not.toMatch(/analytics|gtag|mixpanel|posthog|plausible/i);
