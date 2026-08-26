@@ -158,7 +158,10 @@ test.describe("Le seuil", () => {
             if (x > droite) droite = x;
             if (y === 0 || y === c.height - 1 || x === 0 || x === c.width - 1) touche++;
           }
-      return { touche, encre, marge: Math.min(haut, c.height - 1 - bas, gauche, c.width - 1 - droite) };
+      const marge = Math.min(haut, c.height - 1 - bas, gauche, c.width - 1 - droite);
+      // La marge RAPPORTÉE à la taille du tampon : c'est la seule forme qui garde son sens quand
+      // le tampon change de taille. Voir l'assertion plus bas.
+      return { touche, encre, marge, part: marge / Math.min(c.width, c.height) };
     });
     expect(bord, "aucun canevas d'arbre à mesurer").not.toBeNull();
     expect(bord!.encre, "témoin : le canevas est vide, la mesure ne prouverait rien").toBeGreaterThan(10_000);
@@ -169,7 +172,24 @@ test.describe("Le seuil", () => {
     // premier cadrage exact posait l'encre à UN pixel du haut, et la moindre dérive du générateur
     // — un bouquet de plus, un halo plus large — recoupait la cime sans que rien ne rougisse. Un
     // dessin qui frôle sa boîte est un dessin coupé qui n'a pas encore eu lieu.
-    expect(bord!.marge, "le dessin frôle sa boîte : la prochaine dérive du générateur le coupera").toBeGreaterThanOrEqual(8);
+    //
+    // ⚠️ LE SEUIL ÉTAIT EN PIXELS ABSOLUS, ET C'ÉTAIT LA MAUVAISE UNITÉ (corrigé le 2026-08-26).
+    // Il exigeait `marge >= 8` — huit pixels DU TAMPON. Le 2026-08-26, le tampon du canevas a été
+    // dimensionné à ce qui est réellement affiché (2816 → 416 px de large sur bureau) : la marge
+    // absolue est passée à 4 px et la garde a rougi, alors que la marge RELATIVE avait DOUBLÉ
+    // (0,57 % → 0,96 % du tampon). Le dessin était plus à l'abri qu'avant, et le test disait
+    // l'inverse.
+    //
+    // Ce que cette garde protège n'a jamais été un nombre de pixels : c'est une PROPORTION de
+    // réserve avant que la prochaine dérive du générateur ne coupe la cime. Un seuil absolu sur un
+    // tampon dont la taille peut changer mesure la résolution, pas le cadrage.
+    //
+    // 0,5 % conserve exactement la protection d'avant (8/1408 = 0,57 %) sans dépendre de la taille.
+    expect(
+      bord!.part,
+      `le dessin frôle sa boîte (${bord!.marge} px de marge sur un tampon de ${bord!.encre} pixels ` +
+        `d'encre) : la prochaine dérive du générateur le coupera`,
+    ).toBeGreaterThanOrEqual(0.005);
   });
 
   test("[LA PORTE N'A PAS DE CONTOURNEMENT] la barre n'apparaît qu'après le seuil", async ({ page }) => {
