@@ -123,11 +123,23 @@ async function traverser(page: Page, plafond = 40, ou = ""): Promise<Arret[]> {
     //
     // La surcouche de Next porte son texte dans un `shadowRoot` : on va le chercher. C'est la seule
     // façon qu'un passage de CI — vingt minutes — rende la CAUSE et pas seulement le symptôme.
+    //
+    // ⚠️ ET IL FAUT RETIRER LES `<style>` AVANT DE LIRE, SANS QUOI ON NE LIT QU'EUX (2026-08-26,
+    // second tour). `textContent` descend DANS les balises `<style>` et en rend le CSS comme du
+    // texte — et la feuille de la surcouche commence par l'intégralité du reset « Bootstrap
+    // Reboot v4.4.1 », plusieurs milliers de caractères. Le premier passage de ce diagnostic a
+    // rougi en produisant fidèlement ce CSS, et rien du message d'erreur qu'il était censé montrer
+    // n'entrait dans les 400 premiers caractères. Un diagnostic qui cite la feuille de style au
+    // lieu de l'erreur a déplacé le problème sans le résoudre.
     const texte = await page
       .evaluate(() => {
         const portail = document.querySelector("nextjs-portal");
         const racine = (portail as unknown as { shadowRoot?: ShadowRoot } | null)?.shadowRoot;
-        return (racine?.textContent ?? portail?.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 400);
+        const source = racine ?? portail;
+        if (!source) return "";
+        const copie = source.cloneNode(true) as ParentNode;
+        copie.querySelectorAll("style, script").forEach((n) => n.remove());
+        return (copie.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 400);
       })
       .catch(() => "");
     throw new Error(
