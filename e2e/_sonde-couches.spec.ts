@@ -135,6 +135,23 @@ async function avecLeRemede(page: Page, r: Remede): Promise<number | null> {
   return im;
 }
 
+/**
+ * ⚠️ ELLE NE S'EXÉCUTE QUE SUR DEMANDE — ET C'EST LA SEULE FORME HONNÊTE (2026-08-26).
+ *
+ * Cette sonde échoue PAR CONSTRUCTION : c'est le seul canal par lequel ses nombres atteignent le
+ * rapport. Laissée active, elle rendrait `scripts/e2e-ligne-de-base.mjs` rouge sur `mobile` et
+ * `bureau` à chaque passage, pour toujours — une CI rouge en permanence ne signale plus rien, et
+ * c'est le contraire de ce que ce dépôt construit depuis deux jours.
+ *
+ * La supprimer serait détruire le juge avant l'audience : le remède posé le 2026-08-26
+ * (`will-change: opacity` sur `.etoile`) n'a JAMAIS été mesuré, GitHub Actions ayant cessé de
+ * démarrer ses travaux à 02:45 ce jour-là. Si `e2e/fluidite.spec.ts` reste rouge au premier
+ * passage qui redémarre, c'est cette sonde qui dira lequel des cinq remèdes prendre ensuite.
+ *
+ *     SONDE=1 npx playwright test e2e/_sonde-couches.spec.ts --project=mobile
+ */
+test.skip(!process.env.SONDE, "instrument sur demande — voir l'en-tête, SONDE=1 pour l'exécuter");
+
 test("[SONDE 2] quel remède rend les étoiles gratuites — à supprimer une fois lue", async ({ page }) => {
   // Cinq remèdes, chacun encadré de deux pauses et d'une mesure de 1,5 s, plus l'ouverture d'un
   // compte : très au-delà des 45 s par défaut. La leçon du premier tour, qui les a dépassées.

@@ -71,6 +71,17 @@
  * AUTORISÉES : `opacity` et `transform`, et elles seules — ce sont les deux que le compositeur sait
  * traiter sans repasser par la peinture.
  *
+ * ⚠️ ET « AUTORISÉE » NE VEUT PAS DIRE « GRATUITE » : IL FAUT ENCORE QUE LA COUCHE SOIT COMPOSÉE.
+ * Mesuré le 2026-08-26 (`e2e/ligne-de-base.json`, `_mesure_des_couches_2026-08-26`) : le champ
+ * d'étoiles — quatre-vingts `opacity` animées, donc QUE des propriétés de cette liste blanche —
+ * coûtait à lui seul 57 des 62 images par seconde du mobile. Cinq au seuil ; soixante-deux sans
+ * lui. La liste blanche était respectée à la lettre et la scène était injouable.
+ *
+ * L'explication la plus économe : ces animations n'étaient PAS promues en couches, donc chaque
+ * scintillement d'un point de deux pixels forçait à repeindre ce qu'il y avait dessous — quatre
+ * dégradés, une lune floutée et le blit du canevas de l'arbre. Une `opacity` non composée est une
+ * repeinture qui ne dit pas son nom : elle passe tous les inventaires de cette page.
+ *
  * ⚠️ DEUX STORIES VONT REPEINDRE CES COUCHES : la 11.2 (le ciel étoilé sous l'arbre) et la 7.10
  * (le bandeau du jour au-dessus du pli). Elles ne fusionnent ni l'une ni l'autre avant que
  * `e2e/fluidite.spec.ts` mesure un DÉFILEMENT — un fond ne coûte presque rien tant que rien ne
@@ -188,6 +199,25 @@
   border-radius: var(--rayon-full);
   background: var(--lueur);
   opacity: 0;
+  /* ⚠️ CETTE LIGNE NE DÉPLACE PAS UN PIXEL, ET C'EST TOUT SON INTÉRÊT (2026-08-26).
+   *
+   * Elle demande au navigateur de donner à cette étoile SA PROPRE couche, au lieu de la repeindre
+   * dans le tampon partagé — où faire varier l'opacité d'un point de deux pixels oblige à repeindre
+   * tout ce qui est dessous. Voir l'inventaire en tête de fichier : le champ d'étoiles coûtait
+   * 57 des 62 images par seconde du mobile en ne respectant QUE des propriétés autorisées.
+   *
+   * ⚠️ C'EST L'EXPLICATION LA PLUS ÉCONOME DU PROFIL MESURÉ, PAS UNE CERTITUDE — ET ELLE N'A PAS
+   * ENCORE ÉTÉ VÉRIFIÉE. Les trois relevés qui accusent les étoiles sont concordants ; le fait que
+   * la PROMOTION soit le remède ne l'est pas. Si les quatre-vingts animations étaient déjà
+   * accélérées, cette ligne est sans effet et il faudra RÉDUIRE le nombre d'étoiles au lieu d'en
+   * promouvoir davantage. `e2e/fluidite.spec.ts` rendra le verdict au premier passage de CI qui
+   * redémarre ; `e2e/_sonde-couches.spec.ts` (sur demande) dira lequel des deux mondes on habite.
+   *
+   * ⚠️ ET C'EST LE SEUL `will-change` DU DÉPÔT, POSÉ SUR QUATRE-VINGTS ÉLÉMENTS — ce que la
+   * plateforme déconseille en général, parce qu'un tampon par couche coûte de la mémoire. Ici
+   * chaque couche fait deux à trois pixels de côté : l'inquiétude ne porte pas. Elle porterait sur
+   * une couche plein écran, et c'est exactement ce que le bloc `prefers-reduced-motion` relâche. */
+  will-change: opacity;
   animation: scintille var(--duree-etoile, 4200ms) var(--courbe) infinite;
   animation-delay: var(--retard, 0ms);
 }
@@ -1103,6 +1133,18 @@
   .etoile {
     animation: none;
     opacity: 0.55;
+    /* ⚠️ SANS CETTE LIGNE, LE REMÈDE SE RETOURNE CONTRE CEUX QUI ONT DEMANDÉ MOINS DE MOUVEMENT.
+     *
+     * `animation: none` fige le ciel — mais un `will-change: opacity` hérité MAINTIENDRAIT les
+     * quatre-vingts couches vivantes, avec leurs tampons, pour une image qui ne bouge plus. On
+     * ferait payer une optimisation de fluidité à la personne qui a précisément demandé qu'il n'y
+     * ait plus rien à fluidifier.
+     *
+     * ⚠️ ET AUCUNE GARDE DE PIXELS NE POURRAIT LE VOIR. `will-change` ne peint rien : la
+     * comparaison octet à octet de `e2e/barre-basse.spec.ts`, qui photographie justement cet
+     * écran sous `prefers-reduced-motion`, resterait identique au pixel près. Ce relâchement n'est
+     * tenu que par une garde de source, `tests/scene-accessibilite.test.ts`. */
+    will-change: auto;
   }
 }
 
