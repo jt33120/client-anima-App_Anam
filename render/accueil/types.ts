@@ -60,20 +60,22 @@ export interface CarteVue {
  * `ligne` est la seule chose qui varie, et c'est du TEXTE DÉJÀ ÉCRIT — le rendu ne formate ni date, ni
  * mot, ni rien (AD-7).
  */
-export interface CarteAnamVue {
+export interface ActionUniversVue {
+  readonly libelle: string;
+  readonly url: string;
+}
+
+export interface UniversVue {
+  readonly cle: "astrologie" | "numerologie" | "psychologie";
   readonly titre: string;
-  readonly presence: string;
-  readonly ligne: string | null;
+  readonly accroche: string;
+  readonly url: string;
+  readonly action: ActionUniversVue | null;
 }
 
 export interface BibliothequeVue {
   readonly cartes: readonly CarteVue[];
-  /**
-   * La carte d'Anam. REQUISE, et c'est la moitié de la garde : une carte qui apparaît et disparaît
-   * selon qu'Anam a quelque chose à dire EST une pastille — simplement dessinée avec la carte au lieu
-   * d'un point rouge. Le champ obligatoire interdit l'omission ; le `ligne: null` porte l'absence.
-   */
-  readonly anam: CarteAnamVue;
+  readonly univers: readonly UniversVue[];
   /** La clé de la carte mise en avant, ou `null` si aucune n'a rien à montrer aujourd'hui. */
   readonly enAvant: string | null;
   /**

@@ -36,17 +36,65 @@
  * qui revient, qui est le cas le plus fréquent. Le retour du 2026-08-25 le dit sans détour :
  * « dès que je viens sur Anam, je veux qu'elle me dise bonjour ; là ça fait juste parler à ChatGPT ».
  *
- * Ce qu'on mesure maintenant est l'ÉCART depuis le dernier tour. Une pause de vingt minutes au
- * milieu d'un échange n'est pas une arrivée — la resaluer serait absurde, et se lirait comme un
- * bug. Une reprise après quelques heures en est une.
- *
- * Trois heures : au-delà d'une pause plausible dans une même séance, en deçà d'une demi-journée.
- * La valeur est un choix de produit, pas une mesure — elle est ici pour se relire et se changer.
+ * La remarque du 2026-08-26 tranche plus précisément : la frontière n'est pas une durée arbitraire,
+ * c'est le JOUR CIVIL de la personne. Une pause de quatre heures le même jour ne doit pas produire
+ * un second accueil ; le premier accès du lendemain doit en produire un, même dix minutes après
+ * minuit. Le fuseau explicite est Europe/Paris, celui du quotidien déjà affiché sur « Moi ».
  */
-export const REPRISE_HEURES = 3;
+export const FUSEAU_JOUR_ANAM = "Europe/Paris";
+
+const FORMATEUR_JOUR = new Intl.DateTimeFormat("fr-CA", {
+  timeZone: FUSEAU_JOUR_ANAM,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** Clé stable YYYY-MM-DD du jour parisien, ou `null` pour une date invalide. */
+export function cleJourParis(date: Date): string | null {
+  if (!Number.isFinite(date.getTime())) return null;
+  const morceaux = Object.fromEntries(
+    FORMATEUR_JOUR.formatToParts(date)
+      .filter((p) => p.type === "year" || p.type === "month" || p.type === "day")
+      .map((p) => [p.type, p.value]),
+  );
+  return morceaux.year && morceaux.month && morceaux.day
+    ? `${morceaux.year}-${morceaux.month}-${morceaux.day}`
+    : null;
+}
 
 /**
- * Est-ce une ARRIVÉE ? Aucun tour, ou un dernier tour plus vieux que l'écart.
+ * Durée, calculée depuis l'horloge serveur, jusqu'au prochain changement de jour parisien.
+ * Une recherche bornée évite toute arithmétique d'offset fragile aux changements d'heure. Le
+ * navigateur n'a ensuite qu'un minuteur relatif : une horloge locale fausse ne peut supprimer
+ * l'ouverture du lendemain.
+ */
+export function delaiAvantProchainJourParis(maintenant: Date): number | null {
+  const depart = maintenant.getTime();
+  const jour = cleJourParis(maintenant);
+  if (!Number.isFinite(depart) || jour === null) return null;
+
+  let bas = depart + 1;
+  let haut = depart + 27 * 60 * 60 * 1_000;
+  if (cleJourParis(new Date(haut)) === jour) return null;
+
+  while (bas < haut) {
+    const milieu = Math.floor((bas + haut) / 2);
+    if (cleJourParis(new Date(milieu)) === jour) bas = milieu + 1;
+    else haut = milieu;
+  }
+  return Math.max(1, haut - depart);
+}
+
+export function estLeJourParis(instantIso: string, maintenant: Date): boolean {
+  const instant = new Date(instantIso);
+  const jourInstant = cleJourParis(instant);
+  const jourCourant = cleJourParis(maintenant);
+  return jourInstant !== null && jourCourant !== null && jourInstant === jourCourant;
+}
+
+/**
+ * Est-ce la première ARRIVÉE du jour ? Aucun tour, ou un dernier tour d'un autre jour parisien.
  *
  * ⚠️ UN HORODATAGE ILLISIBLE COMPTE COMME UNE ARRIVÉE, et c'est le repli le moins coûteux : le
  * pire cas est une salutation en trop, contre un silence sur l'écran dont tout le propos est
@@ -54,9 +102,10 @@ export const REPRISE_HEURES = 3;
  */
 export function estUneArrivee(derniereParoleIso: string | null, maintenant: Date): boolean {
   if (!derniereParoleIso) return true;
-  const t = Date.parse(derniereParoleIso);
-  if (!Number.isFinite(t)) return true;
-  return maintenant.getTime() - t >= REPRISE_HEURES * 3_600_000;
+  const dernierJour = cleJourParis(new Date(derniereParoleIso));
+  const jourCourant = cleJourParis(maintenant);
+  if (dernierJour === null || jourCourant === null) return true;
+  return dernierJour !== jourCourant;
 }
 
 export interface MatiereOuverture {
@@ -68,14 +117,15 @@ export interface MatiereOuverture {
    */
   readonly branchesVivantes: readonly string[];
   /** A-t-elle déjà parlé à Anam ? Distinct de « il y a des branches » : on peut avoir parlé sans rien nommer. */
-  readonly dejaVenue: boolean;
+  readonly dejaVenue: boolean | null;
 }
 
 /**
  * ⚠️ TROIS PHRASES AU MAXIMUM, ET ELLE FINIT PAR UNE QUESTION. La voix (2.8) plafonne à trois
  * phrases et demande « pose plus que tu n'affirmes » ; une ouverture qui n'appelle rien laisse
- * exactement le silence qu'on répare. Aucune salutation d'heure (le serveur est en UTC — QA du
- * 2026-08-19), aucun « bienvenue », aucun point d'exclamation.
+ * exactement le silence qu'on répare. Aucun mot dépendant de l'heure (le serveur est en UTC — QA
+ * du 2026-08-19), aucun « bienvenue », aucun point d'exclamation. « Te voilà / Te revoilà » accuse
+ * réception de son arrivée sans prétendre connaître l'heure locale.
  */
 /**
  * ⚠️ SANS PRÉNOM, LA PHRASE DOIT QUAND MÊME COMMENCER PAR UNE MAJUSCULE — et c'est une garde qui a
@@ -83,10 +133,44 @@ export interface MatiereOuverture {
  * avec un prénom on lisait « Louise, qu'est-ce qui… », sans prénom on lisait « qu'est-ce qui… ».
  * Un cas sur deux, et le plus fréquent au début, sortait bancal.
  */
-const adresser = (prenom: string | null, suite: string): string =>
-  prenom ? `${prenom}, ${suite}` : suite.charAt(0).toUpperCase() + suite.slice(1);
+const accueillir = (prenom: string | null, dejaVenue: boolean | null, suite: string): string => {
+  const arrivee = dejaVenue === true ? "Te revoilà" : "Te voilà";
+  return prenom ? `${arrivee}, ${prenom} — ${suite}` : `${arrivee} — ${suite}`;
+};
+
+/**
+ * Salue sans prétendre savoir davantage. Sert quand une ouverture précise (pause, proposition,
+ * hypothèse…) remplace la question générique : une seule parole, mais Anam accuse bien réception
+ * de l'arrivée.
+ */
+export function salutationDOuverture(
+  m: Pick<MatiereOuverture, "prenom" | "dejaVenue">,
+): string {
+  const arrivee = m.dejaVenue === true ? "Te revoilà" : "Te voilà";
+  return m.prenom ? `${arrivee}, ${m.prenom}.` : `${arrivee}.`;
+}
+
+/** Une ouverture événementielle reste UN tour et commence par la salutation attendue. */
+export function saluerOuvertureEvenement(
+  phrase: string,
+  m: Pick<MatiereOuverture, "prenom" | "dejaVenue">,
+): string {
+  const salutation = salutationDOuverture(m).replace(/\.$/, "");
+  // Le tiret rattache l'accueil à la première phrase : un événement déjà long de trois phrases
+  // ne franchit pas silencieusement le plafond de voix en devenant une quatrième phrase.
+  return `${salutation} — ${phrase}`;
+}
 
 export function phraseDOuverture(m: MatiereOuverture): string {
+  if (m.dejaVenue === null) {
+    // La lecture du journal a échoué : ni « première fois », ni « retour » ne sont établis. On
+    // accueille sans fabriquer de biographie, puis on pose la question minimale.
+    return accueillir(
+      m.prenom,
+      null,
+      `je suis là. Qu’est-ce qui t’occupe en ce moment ? Commence par où tu veux.`,
+    );
+  }
   if (!m.dejaVenue) {
     // ⚠️ ON DIT L'IGNORANCE PLUTÔT QUE DE LA MASQUER. Une première phrase qui fait semblant de
     // connaître quelqu'un est le mensonge le moins coûteux à écrire et le plus coûteux à porter.
@@ -98,8 +182,9 @@ export function phraseDOuverture(m: MatiereOuverture): string {
     // ⚠️ LE PRÉNOM NE PREND PAS UNE PHRASE À LUI, et c'est encore une garde qui l'a dit : « Louise. »
     // en ouverture faisait quatre phrases là où la voix en plafonne trois. Il s'attache à la
     // première, où il sert d'adresse au lieu de compter pour une salutation.
-    return adresser(
+    return accueillir(
       m.prenom,
+      false,
       `je ne sais rien de toi pour l’instant, et on va faire avec. ` +
         `Qu’est-ce qui t’occupe en ce moment ? Même mal dit, même sans savoir par où prendre.`,
     );
@@ -109,12 +194,17 @@ export function phraseDOuverture(m: MatiereOuverture): string {
   if (branche) {
     // Le nom de la branche est SON mot. On le lui rend, et on lui laisse le refuser dans la même
     // phrase : reprendre n'est pas une consigne.
-    return adresser(
+    return accueillir(
       m.prenom,
+      true,
       `on avait laissé « ${branche} » en chemin. ` +
         `On peut reprendre là, ou partir d’ailleurs — qu’est-ce qui t’occupe aujourd’hui ?`,
     );
   }
 
-  return adresser(m.prenom, `qu’est-ce qui t’occupe aujourd’hui ? Commence par où tu veux, même par le milieu.`);
+  return accueillir(
+    m.prenom,
+    true,
+    `qu’est-ce qui t’occupe aujourd’hui ? Commence par où tu veux, même par le milieu.`,
+  );
 }

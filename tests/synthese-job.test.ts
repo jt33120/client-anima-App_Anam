@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { executerSyntheseAvec, NOM_JOB, BAIL_PERSONNE_S } from "@/lib/ordonnanceur/jobs/synthese";
+import {
+  executerSyntheseAvec as executerSyntheseAvecReel,
+  NOM_JOB,
+  BAIL_PERSONNE_S,
+  type DepsSynthese,
+} from "@/lib/ordonnanceur/jobs/synthese";
 import { creerPortCourrielFactice } from "@/lib/courriel/adaptateurs/factice";
 import {
   LOT_PAR_TICK,
@@ -18,6 +23,12 @@ import type { DepotOrdonnanceur, EtatOrdonnanceur, TypeIncident } from "@/lib/da
 import type { AiPort, ReponseIa, RequeteIa } from "@/lib/ai/port";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ContexteJob } from "@/lib/ordonnanceur/registre";
+import type { MetrageUsage } from "@/lib/ai/metrage";
+
+/** Les anciens scénarios restent centrés sur leur invariant ; le test de câblage ci-dessous observe le métrage. */
+function executerSyntheseAvec(ctx: ContexteJob, deps: Omit<DepsSynthese, "metrerUsage">): Promise<void> {
+  return executerSyntheseAvecReel(ctx, { ...deps, metrerUsage: async () => undefined });
+}
 
 /**
  * Story 4.9 (T7) — LE JOB, sur doublures. La base prouve les clauses (`synthese-sql`) ; ici on prouve
@@ -216,6 +227,61 @@ function contexte(depot: DepotOrdonnanceur, echeanceDansMs = 3_600_000, instant 
 const INSTANT_SOIR = new Date("2026-08-05T20:00:00Z");
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[comptabilité IA] le coût de la synthèse périodique", () => {
+  it("est attribué à la personne et à la période même si la sortie modèle est ensuite rejetée", async () => {
+    const { depot: ordo } = depotOrdoFactice();
+    const { depot, trace } = depotSyntheseFactice();
+    const { ia } = iaFactice({ texte: "   " });
+    const usages: MetrageUsage[] = [];
+
+    await executerSyntheseAvecReel(contexte(ordo), {
+      depot,
+      ia,
+      supabase: supabaseFactice().client,
+      courriel: creerPortCourrielFactice(),
+      metrerUsage: async (usage) => {
+        usages.push(usage);
+      },
+    });
+
+    expect(usages).toEqual([
+      {
+        utilisatriceId: "u1",
+        cleIdempotence: "synthese:2026-08-01T10:00:00.000Z:2026-08-05T04:00:00.000Z",
+        operation: "synthese_periodique",
+        capacite: "synthese",
+        tier: "fort",
+        modele: "factice",
+        tokensEntree: 1,
+        tokensSortie: 1,
+        premiumAuMomentAppel: true,
+        exempteQuota: true,
+        comptabiliseFinancierement: true,
+      },
+    ]);
+    expect(trace.enregistrements, "la sortie vide ne doit toujours pas entrer en base").toEqual([]);
+  });
+
+  it("un registre de coût qui pend est borné et ne bloque jamais la persistance de la synthèse", async () => {
+    const { depot: ordo } = depotOrdoFactice();
+    const { depot, trace } = depotSyntheseFactice();
+    const { ia } = iaFactice();
+    const erreur = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await executerSyntheseAvecReel(contexte(ordo), {
+      depot,
+      ia,
+      supabase: supabaseFactice().client,
+      courriel: creerPortCourrielFactice(),
+      metrerUsage: () => new Promise<void>(() => {}),
+      delaiMetrageMs: 5,
+    });
+
+    expect(trace.enregistrements).toHaveLength(1);
+    erreur.mockRestore();
+  });
+});
 
 describe("[D4 / revue 4.10] LE RATTRAPAGE D'ANNONCE, câblé dans le job", () => {
   /**

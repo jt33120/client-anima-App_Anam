@@ -1,7 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { ENTREES_MENU, HORS_MENU, type EntreeMenu } from "@/lib/domain/menu-compte";
+import {
+  ENTREES_MENU,
+  GROUPES_MENU,
+  HORS_MENU,
+  type EntreeMenu,
+} from "@/lib/domain/menu-compte";
 import { HALTES } from "@/lib/domain/pied-halte";
 
 /**
@@ -23,7 +28,17 @@ const RACINE = process.cwd();
 const lire = (f: string) => readFileSync(resolve(RACINE, f), "utf-8");
 
 describe("[7.2/AC1] l'ordre est invariable, et il est vérifié POSITION PAR POSITION", () => {
-  it("[LE CŒUR] les neuf entrées, dans l'ordre exact d'EXPERIENCE.md ligne 86 (amendée)", () => {
+  it("[LE CŒUR] sépare les portes en quatre groupes stables et compréhensibles", () => {
+    expect(GROUPES_MENU.map((groupe) => groupe.titre)).toEqual([
+      "Aide",
+      "Explorer",
+      "Compte",
+      "Confidentialité",
+    ]);
+    expect(GROUPES_MENU.map((groupe) => groupe.entrees.length)).toEqual([1, 4, 2, 2]);
+  });
+
+  it("[LE CŒUR] dérive les neuf entrées dans l'ordre visuel des groupes", () => {
     // ⚠️ `toEqual` SUR UN TABLEAU, PAS `toContain` NEUF FOIS. L'appartenance à un ensemble serait
     // vraie sur n'importe quel tri — alphabétique, par fréquence, par récence — et c'est
     // précisément ce qu'« invariable » interdit : atteindre une entrée sans la lire, au bout de
@@ -35,9 +50,9 @@ describe("[7.2/AC1] l'ordre est invariable, et il est vérifié POSITION PAR POS
       "La synthèse",
       "Mes lectures",
       "L’abonnement",
+      "Réglages",
       "Mes données",
       "Ce que j’ai accepté",
-      "Réglages",
     ]);
   });
 
@@ -53,6 +68,15 @@ describe("[7.2/AC1] l'ordre est invariable, et il est vérifié POSITION PAR POS
 
   it("le catalogue est gelé — un tri en place ne peut pas le réordonner", () => {
     expect(Object.isFrozen(ENTREES_MENU)).toBe(true);
+    expect(Object.isFrozen(GROUPES_MENU)).toBe(true);
+    expect(GROUPES_MENU.every((groupe) => Object.isFrozen(groupe.entrees))).toBe(true);
+  });
+
+  it("les descriptions restent courtes : le menu n'est plus un mur de texte", () => {
+    for (const entree of ENTREES_MENU) {
+      expect(entree.quoi.length, `${entree.titre} n'explique plus sa destination`).toBeGreaterThan(20);
+      expect(entree.quoi.length, `${entree.titre} redevient trop dense`).toBeLessThanOrEqual(55);
+    }
   });
 });
 
@@ -201,6 +225,8 @@ describe("[7.2/AC6] il n'existe qu'UNE seule liste d'entrées de compte dans le 
     //
     // La cible a changé avec la 7.3b (`/profil` a disparu) ; l'invariant, lui, n'a pas bougé.
     const src = lire("app/page.tsx");
-    expect(src, "le catalogue n'est pas branché sur la scène").toMatch(/entrees:\s*ENTREES_MENU/);
+    expect(src, "les groupes du catalogue ne sont pas branchés sur la scène").toMatch(
+      /groupes:\s*GROUPES_MENU/,
+    );
   });
 });

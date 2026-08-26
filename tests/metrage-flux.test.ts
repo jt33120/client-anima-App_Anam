@@ -15,6 +15,13 @@ const secret = process.env.SUPABASE_SECRET_KEY!;
 const admin = createClient(url, secret, { auth: { autoRefreshToken: false, persistSession: false } });
 
 const t = Date.now();
+const dimensionsConversation = {
+  operation: "conversation" as const,
+  capacite: "echange" as const,
+  premiumAuMomentAppel: false,
+  exempteQuota: false,
+  comptabiliseFinancierement: true,
+};
 
 describe("Métrage du flux — exactement une fois (NFR-014, AD-2)", () => {
   const u = { email: `mf-${t}@exemple.fr`, password: "test-mf-123!", id: "" };
@@ -40,15 +47,28 @@ describe("Métrage du flux — exactement une fois (NFR-014, AD-2)", () => {
     await metrerUsageIa({
       utilisatriceId: u.id,
       cleIdempotence: cle,
+      ...dimensionsConversation,
       tier: "leger",
-      modele: "factice",
+      modele: "mistral-small-2603",
       tokensEntree: 7,
       tokensSortie: 42,
     });
     const { data } = await admin.from("usage_ia").select("*").eq("cle_idempotence", cle);
     expect(data).toHaveLength(1);
     expect(data![0].tokens_sortie).toBe(42);
-    expect(data![0].modele).toBe("factice");
+    expect(data![0]).toMatchObject({
+      utilisatrice_id: u.id,
+      operation: "conversation",
+      capacite: "echange",
+      modele: "mistral-small-2603",
+      premium_au_moment_appel: false,
+      exempte_quota: false,
+      comptabilise_financierement: true,
+      tarif_version: "mistral-public-2026-08-26",
+      tarif_connu: true,
+      devise: "USD",
+    });
+    expect(Number(data![0].cout_usd)).toBe(0.00002625);
   });
 
   it("REJEU de la même clé (retry après avortement) → toujours UNE ligne", async () => {
@@ -56,6 +76,7 @@ describe("Métrage du flux — exactement une fois (NFR-014, AD-2)", () => {
     const base = {
       utilisatriceId: u.id,
       cleIdempotence: cle,
+      ...dimensionsConversation,
       tier: "leger" as const,
       modele: "factice",
       tokensEntree: 3,
@@ -74,6 +95,7 @@ describe("Métrage du flux — exactement une fois (NFR-014, AD-2)", () => {
     await metrerUsageIa({
       utilisatriceId: u.id,
       cleIdempotence: cle,
+      ...dimensionsConversation,
       tier: "leger",
       modele: "factice",
       tokensEntree: 5,

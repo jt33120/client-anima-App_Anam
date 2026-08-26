@@ -329,6 +329,7 @@
    `opacity: var(--imagerie-opacite)` : écrire ici `opacity: 0` mettrait deux règles de même
    spécificité en concurrence, et l'ordre des feuilles déciderait. Éteindre le jeton localement
    est la MÊME grammaire que le mode contraste renforcé, qui l'éteint à la racine. */
+/* Moi laisse place à ses cartes ; Anam laisse place à son ciel et à sa propre image. */
 .arbreEnRetrait {
   --imagerie-opacite: 0;
 }

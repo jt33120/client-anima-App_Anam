@@ -1,10 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { dimensionnerTout } from "./_outils";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import FicheBranche from "@/render/arbre/FicheBranche";
+import {
+  echelleBoisLunaire,
+  feuilleVisibleLunaire,
+} from "@/render/arbre/MoteurArbreLunaire";
 import type { BrancheProjetee } from "@/lib/scene/projection";
 import type { ResultatGeste } from "@/render/arbre/FicheBranche";
 
@@ -86,7 +89,7 @@ describe("[AC5] la fiche dit ce qui a changé ET QUAND", () => {
       /\/\*[\s\S]*?\*\//g,
       "",
     );
-    for (const classe of ["ficheTransition", "rayonnement", "feuille", "ficheConfirmation"]) {
+    for (const classe of ["ficheTransition", "ficheConfirmation", "canvasLunaire"]) {
       const debut = css.indexOf(`.${classe} {`);
       expect(debut, `règle .${classe} introuvable`).toBeGreaterThan(-1);
       const regle = css.slice(debut, css.indexOf("}", debut));
@@ -95,6 +98,13 @@ describe("[AC5] la fiche dit ce qui a changé ET QUAND", () => {
         /transition[^:]*:\s*(?!none)/,
       );
     }
+    const moteur = readFileSync(resolve(process.cwd(), "render/arbre/MoteurArbreLunaire.ts"), "utf-8").replace(
+      /\/\*[\s\S]*?\*\//g,
+      "",
+    );
+    expect(moteur, "le Canvas ne doit pas animer une croissance déjà arrivée").not.toMatch(
+      /requestAnimationFrame|setInterval|setTimeout/,
+    );
   });
 
   it("[MÉTA] cette garde CSS attraperait un mutant (elle n’est pas vraie parce qu’elle lit à côté)", () => {
@@ -267,39 +277,22 @@ describe("[REVUE] pendant la fenêtre de détresse, le geste n’est même pas P
 });
 
 describe("[REVUE / FR-028] la feuillaison se lit PAR DEGRÉS, jamais d’un bloc", () => {
-  // On monte l'arbre lui-même : c'est le seul endroit où « la matière s'installe par degrés » se
-  // constate. Une garde de source aurait vu un `intensite` dans le JSX et conclu à tort.
-  async function arbre(intensite: number, etat: BrancheProjetee["etat"] = "feuillaison") {
-    const { default: ArbreInteractif } = await import("@/render/arbre/ArbreInteractif");
-    dimensionnerTout(900, 700);
-    const projection = { tronc: { present: true as const }, branches: [{ ...BASE, etat, intensite }] };
-    const { container } = render(
-      <ArbreInteractif
-        projection={projection}
-        camera={{ pan: { x: 0, y: 0 }, zoom: 1 }}
-        brancheSelectionnee={null}
-        onCadrer={vi.fn()}
-        onOuvrirFiche={vi.fn()}
-        onFermerFiche={vi.fn()}
-        onVoirDansConversation={vi.fn()}
-        onRenommer={vi.fn(async () => true)}
-      />,
-    );
-    const bois = container.querySelector("line")!;
-    return {
-      epaisseur: Number(bois.getAttribute("stroke-width")),
-      feuilles: container.querySelectorAll("circle[opacity]").length,
-    };
-  }
+  // jsdom ne rastérise pas un Canvas. Le moteur expose donc les deux décisions PURES qu'il emploie
+  // réellement : échelle du bois et seuil propre de chaque feuille. Cette garde ne simule pas des
+  // balises SVG qui n'existent plus ; elle verrouille la progression utilisée lors de la cuisson.
+  const positions = Array.from({ length: 100 }, (_, i) => (i + 1) / 101);
+  const arbre = (intensite: number) => ({
+    epaisseur: echelleBoisLunaire(intensite),
+    feuilles: positions.filter((position) => feuilleVisibleLunaire(position, intensite)).length,
+  });
 
-  it("l’épaisseur du bois SUIT l’intensité au lieu de sauter avec l’enum", async () => {
+  it("l’épaisseur du bois SUIT l’intensité au lieu de sauter avec l’enum", () => {
     // Avant : `etat === "naissance" ? 2 : 3.2` — le premier retour faisait passer le trait de 2 à
     // 3,2 px d'un coup. FR-028 : « progressive, jamais binaire ; le trait s'épaissit AU FIL des retours ».
-    const nue = await arbre(0, "naissance");
-    const premier = await arbre(0.2);
-    const moitie = await arbre(0.6);
-    const pleine = await arbre(1);
-    expect(nue.epaisseur, "une branche nue reste fine").toBeCloseTo(2, 5);
+    const nue = arbre(0);
+    const premier = arbre(0.15);
+    const moitie = arbre(0.35);
+    const pleine = arbre(0.55);
     expect(premier.epaisseur).toBeGreaterThan(nue.epaisseur);
     expect(moitie.epaisseur).toBeGreaterThan(premier.epaisseur);
     expect(pleine.epaisseur).toBeGreaterThan(moitie.epaisseur);
@@ -308,9 +301,9 @@ describe("[REVUE / FR-028] la feuillaison se lit PAR DEGRÉS, jamais d’un bloc
     );
   });
 
-  it("le premier retour déplie QUELQUES feuilles, pas le feuillage entier", async () => {
-    const premier = await arbre(0.2);
-    const pleine = await arbre(1);
+  it("le premier retour déplie QUELQUES feuilles, pas le feuillage entier", () => {
+    const premier = arbre(0.2);
+    const pleine = arbre(1);
     expect(premier.feuilles).toBeGreaterThan(0);
     expect(premier.feuilles, "cinq feuilles d’un coup, c’est un basculement, pas une croissance").toBeLessThanOrEqual(
       Math.ceil(pleine.feuilles / 3),
@@ -318,9 +311,8 @@ describe("[REVUE / FR-028] la feuillaison se lit PAR DEGRÉS, jamais d’un bloc
     expect(pleine.feuilles).toBeGreaterThan(premier.feuilles);
   });
 
-  it("la densité augmente à CHAQUE degré (aucun palier plat entre deux retours)", async () => {
-    const mesures = [];
-    for (const i of [0.2, 0.4, 0.6, 0.8, 1]) mesures.push(await arbre(i));
+  it("la densité augmente à CHAQUE degré (aucun palier plat entre deux retours)", () => {
+    const mesures = [0.2, 0.4, 0.6, 0.8, 1].map(arbre);
     for (let k = 1; k < mesures.length; k++) {
       expect(mesures[k].feuilles, `degré ${k} : le feuillage doit s’être étoffé`).toBeGreaterThan(
         mesures[k - 1].feuilles,

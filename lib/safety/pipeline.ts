@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AiPort, MessageIa, NiveauSecurite } from "@/lib/ai/port";
+import type { UsageModeleIa } from "@/lib/ai/metrage";
 import type { RaisonRefus } from "@/lib/ai/egress-guard";
 import { detecterDetresse } from "./detecteur-detresse";
 import { classerDetresse, type DecisionSecurite, type VerdictSecurite } from "./classer-detresse";
@@ -56,12 +57,23 @@ export interface DepsPipeline {
   adaptateur: AiPort;
   /** Émet l'audit (l'implémentation route capture utilisatrice_id + clé d'idempotence). */
   emettreAudit: (audit: AuditDetresse) => Promise<void>;
+  /**
+   * Publie immédiatement l'usage fournisseur, AVANT les écritures d'audit/épisode. Synchrone et
+   * best-effort : l'implémentation route ne fait qu'enregistrer un `after()`.
+   */
+  publierUsageDetection?: (usage: UsageModeleIa) => void;
   /** État d'épisode cross-tour (Story 2.4). Défaut : placeholder no-op. */
   depotEpisode?: DepotEpisode;
 }
 
 export type ResultatSecurite =
-  | { bloque: false; verdict: VerdictSecurite; limitesLevees: boolean }
+  | {
+      bloque: false;
+      verdict: VerdictSecurite;
+      limitesLevees: boolean;
+      /** Coût technique de la détection ; jamais son texte ni son verdict clinique. */
+      usageDetection: UsageModeleIa | null;
+    }
   | { bloque: true; raison: RaisonRefus };
 
 export async function evaluerSecuriteDuTour(
@@ -76,6 +88,19 @@ export async function evaluerSecuriteDuTour(
   if (detection.bloque) {
     // Egress bloqué (consentement / minorité / ZDR) → tour arrêté en amont. Rien classé, pas d'audit.
     return detection;
+  }
+
+  // La réponse fournisseur existe déjà. Publier son usage AVANT toute persistance métier garantit
+  // qu'une panne du plancher, de l'audit ou de l'épisode ne l'efface pas de la comptabilité.
+  if (detection.usage) {
+    try {
+      deps.publierUsageDetection?.(detection.usage);
+    } catch (e) {
+      // Le métrage ne peut jamais dégrader le chemin de sécurité ; aucun contenu ni verdict journalisé.
+      console.error("securite: publication usage détection impossible", {
+        nom: e instanceof Error ? e.name : "inconnu",
+      });
+    }
   }
 
   // 2. niveauEffectif : le forçage vaut pour TOUT l'épisode (Story 2.4), pas seulement ce tour.
@@ -104,7 +129,7 @@ export async function evaluerSecuriteDuTour(
   // (paywall à vie). Renvoie l'état des limites APRÈS le tour (Story 2.5 : garde de montage paywall).
   const { limitesLevees } = await depot.enregistrerTour(detection.verdict.niveau);
 
-  return { bloque: false, verdict, limitesLevees };
+  return { bloque: false, verdict, limitesLevees, usageDetection: detection.usage };
 }
 
 /**

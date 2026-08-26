@@ -91,8 +91,8 @@ describe("[6.9/T13] Anam prépare : un signe EN BAS DU FIL", () => {
       resolve(__dirname, "../../render/conversation/Conversation.tsx"),
       "utf-8",
     );
-    expect(src, "l'attente ne s'annonce plus").toMatch(
-      /if \(prepare\) setAnnonce\(ANNONCE_ATTENTE\);/,
+    expect(src, "l’attente ne s’annonce plus").toMatch(
+      /const attend\s*=\s*[\s\S]{0,220}?prepare[\s\S]{0,220}?if \(attend\) setAnnonce\(ANNONCE_ATTENTE\);/,
     );
     expect(src).toMatch(/const ANNONCE_ATTENTE = "[^"]+";/);
     // …et elle est passée à la région existante, jamais à une nouvelle.

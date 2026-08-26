@@ -2,11 +2,11 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { dimensionnerTout } from "./_outils";
-import { CHEMIN_TRONC } from "@/render/arbre/Tronc";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
 import {
   ACTION_AJOUTER_HEURE,
   ACTION_OU_TROUVER,
+  ARIA_CANEVAS,
   ARIA_TRONC_A_COMPLETER,
   URL_HEURE_NAISSANCE,
   BASCULE_LISTE,
@@ -250,84 +250,33 @@ describe("[5.3 / AC3 / DUR] le mot « incomplet » n'est nulle part, aria compri
 // Story 5.6 (T9) — LE TRONC EST DESSINÉ MÊME QUAND L'ARBRE EST VIDE (FR-088, dette de la 3.3)
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-describe("[5.6/AC9 · FR-088] l'état vide dessine le tronc", () => {
-  /**
-   * ⚠️ CE MANQUE EST RESTÉ INVISIBLE PENDANT TROIS STORIES, et pour une raison instructive : la 5.3
-   * a rendu la FICHE du tronc atteignable dans les trois états, donc rien n'était inaccessible.
-   * Seul le DESSIN manquait — et il manquait exactement au moment où FR-088 compte le plus, le
-   * premier jour, quand aucune branche n'existe encore.
-   *
-   * L'état vide REMPLACE le canevas (vérifié : le mutant qui retire le tronc de `EtatVideArbre`
-   * rougit ces trois tests, donc le canevas n'est bien pas rendu en parallèle).
-   */
+describe("[5.6/AC9 · FR-088] l'étape 0 vit dans le canevas lunaire", () => {
   const VIDE: ProjectionScene = { tronc: { present: true }, branches: [] };
-  /**
-   * ⚠️ LE CHEMIN EST IMPORTÉ, PAS RECOPIÉ — ET C'EST UN REDESSIN QUI L'A EXIGÉ. Cette garde gravait
-   * `"M 500 950 L 500 560"`. Le 2026-08-20, la base du tronc est descendue de quatre pixels pour
-   * naître d'une graine, et la garde a annoncé « aucun tronc dessiné » sur un écran qui en montrait
-   * un. Ce qu'elle doit prouver, c'est qu'un tronc EST DESSINÉ ; le tracé exact est du dessin, et le
-   * dessin a le droit de changer sans qu'un test se prenne pour un cahier des charges graphique.
-   */
-  const cheminsTronc = (c: HTMLElement) =>
-    Array.from(c.querySelectorAll("path")).filter(
-      (p) => (p.getAttribute("d") ?? "") === CHEMIN_TRONC,
-    );
 
-  it("[« OÙ EST SA GRAINE ? »] la base porte une graine, et les racines DESCENDENT", () => {
-    // ⚠️ RETOUR DU 2026-08-20, MOT POUR MOT. L'ancien chemin partait de la base vers (430, 880) et
-    // (570, 880) — vers le HAUT, en repère SVG. Un trait vertical surmonté de deux obliques qui
-    // remontent : une pointe de flèche. Personne ne l'avait lu comme un arbre, et la question posée
-    // était la bonne.
-    //
-    // Deux propriétés distinctes, parce qu'aucune ne suffit : la graine EXISTE (une surface pleine,
-    // la seule du dessin), et les racines vont vers le BAS (`y` plus grand que la base du tronc).
+  it("[« OÙ EST SA GRAINE ? »] le premier jour rend l'étape graine dans le même ciel, jamais un SVG alternatif", () => {
     const { container } = monter(VIDE);
-    const graine = container.querySelector("circle[class*='graine']");
-    expect(graine, "aucune graine : le dessin n’a pas de point de départ").not.toBeNull();
-
-    const ordonnees = [...CHEMIN_TRONC.matchAll(/[ML]\s+\d+\s+(\d+)|,?\s(\d+)\s(\d+)(?=\s|$)/g)];
-    expect(ordonnees.length, "témoin : le chemin n’a pas pu être lu").toBeGreaterThan(0);
-    // La base du tronc, d'où tout part.
-    const base = Number(/M\s+500\s+(\d+)\s+L/.exec(CHEMIN_TRONC)?.[1]);
-    expect(Number.isFinite(base), "témoin : la base du tronc est introuvable").toBe(true);
-    const finsDeRacines = [...CHEMIN_TRONC.matchAll(/C[^MLC]*?(\d+)\s+(\d+)(?=\s|$)/g)].map((m) =>
-      Number(m[2]),
-    );
-    expect(finsDeRacines.length, "témoin : aucune racine dans le chemin").toBeGreaterThan(1);
-    const quiRemontent = finsDeRacines.filter((y) => y <= base);
-    expect(
-      quiRemontent,
-      `des racines finissent AU-DESSUS de la base (${quiRemontent.join(", ")} ≤ ${base}) : ` +
-        "le dessin redevient une flèche",
-    ).toEqual([]);
+    const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
+    expect(canvas.getAttribute("data-etape-arbre")).toBe("graine");
+    expect(container.querySelector("svg"), "l'ancien dessin de secours est revenu").toBeNull();
   });
 
-  it("[LE TEST QUI COMPTE] un arbre sans branche montre quand même un tronc", () => {
-    const { container } = monter(VIDE);
-    expect(
-      cheminsTronc(container).length,
-      "aucun tronc dessiné dans l'état vide — FR-088 dit « elle voit son tronc, y compris incomplet »",
-    ).toBeGreaterThan(0);
+  it("la matière du futur tronc reste marquée en réserve quand l'heure manque, sans changer d'asset", () => {
+    const complet = monter(VIDE);
+    const canvasComplet = screen.getByRole("img", { name: ARIA_CANEVAS });
+    expect(canvasComplet.hasAttribute("data-tronc-reserve")).toBe(false);
+    complet.unmount();
+
+    monter(VIDE_INCOMPLET);
+    const canvasReserve = screen.getByRole("img", { name: ARIA_CANEVAS });
+    expect(canvasReserve.getAttribute("data-etape-arbre")).toBe("graine");
+    expect(canvasReserve.hasAttribute("data-tronc-reserve")).toBe(true);
   });
 
-  it("le tronc de l'état vide est en RÉSERVE quand l'heure manque, entier sinon", () => {
-    const classes = (c: HTMLElement) =>
-      cheminsTronc(c)
-        .map((p) => p.getAttribute("class") ?? "")
-        .join(" ");
-    const complet = classes(monter(VIDE).container);
-    const incomplet = classes(monter(VIDE_INCOMPLET).container);
-    expect(complet, "témoin : le tronc complet est bien dessiné").toContain("tronc");
-    expect(incomplet, "la matière en réserve ne se distingue pas (5.3/AC3)").not.toBe(complet);
-  });
-
-  it("[5.3-AC3] le tronc dessiné n'ANNONCE rien — « incomplet » n'atteint jamais l'écran", () => {
-    // L'écran vide dit déjà en toutes lettres ce qu'il a à dire, et le chemin vers la fiche passe
-    // par un bouton nommé. Un tronc annoncé ferait entendre deux fois la même chose.
+  it("[5.3-AC3] le canevas n'ANNONCE jamais « incomplet » ; la fiche reste accessible par son bouton", () => {
     const { container } = monter(VIDE_INCOMPLET);
-    expect(cheminsTronc(container).length, "témoin : le tronc est bien là").toBeGreaterThan(0);
-    for (const el of Array.from(container.querySelectorAll("svg"))) {
-      expect((el.getAttribute("aria-label") ?? "").toLowerCase()).not.toContain("incomplet");
-    }
+    const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
+    expect((canvas.getAttribute("aria-label") ?? "").toLowerCase()).not.toContain("incomplet");
+    expect(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER })).toBeTruthy();
+    expect(container.querySelector("svg")).toBeNull();
   });
 });

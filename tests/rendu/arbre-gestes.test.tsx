@@ -2,15 +2,21 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
-import { ACTION_RENOMMER, ACTION_CENTRER, CHAMP_RENOMMER_LABEL } from "@/render/arbre/copie-arbre";
+import {
+  ACTION_RENOMMER,
+  ACTION_CENTRER,
+  CHAMP_RENOMMER_LABEL,
+  VIDE_TITRE,
+  BASCULE_LISTE,
+} from "@/render/arbre/copie-arbre";
 import type { BrancheProjetee, ProjectionScene } from "@/lib/scene";
 import { dimensionnerTout } from "./_outils";
 
 /**
  * Story 4.6 — LES GESTES sur le canevas, montés pour de vrai. Quatre défauts de la RE-REVUE, tous
  * indétectables en lisant la source :
- *  • les zones cliquables faisaient 44 px CONSTANTS pendant que l'écartement entre branches décroît en 1/N :
- *    à partir d'une dizaine de branches, on ouvrait la fiche de LA VOISINE ;
+ *  • réduire les zones denses empêchait leur chevauchement, mais violait le plancher tactile de 44 px :
+ *    le zoom, le clavier et la vue liste portent désormais la désambiguïsation sans réduire la cible ;
  *  • le canevas étant l'ANCÊTRE de la fiche, les flèches et les glissers émis DANS le champ de renommage
  *    remontaient au canevas et déplaçaient l'arbre au lieu du curseur ;
  *  • sans capture de pointeur, un bouton relâché hors du canevas laissait l'arbre suivre le curseur ;
@@ -31,8 +37,12 @@ const scene = (n: number): ProjectionScene => ({
   branches: Array.from({ length: n }, (_, i) => branche(i)),
 });
 
-function monter(n: number, extra: Partial<Record<string, unknown>> = {}) {
-  dimensionnerTout(800, 600);
+function monter(
+  n: number,
+  extra: Partial<Record<string, unknown>> = {},
+  viewport = { largeur: 800, hauteur: 600 },
+) {
+  dimensionnerTout(viewport.largeur, viewport.hauteur);
   const props = {
     projection: scene(n),
     camera: { pan: { x: 0, y: 0 }, zoom: 1 },
@@ -48,55 +58,59 @@ function monter(n: number, extra: Partial<Record<string, unknown>> = {}) {
   return { ...vue, props };
 }
 
-/** Les accroches, avec leur position (en % de la boîte carrée) et leur taille à l'écran (px). */
+/** Les accroches et leur taille déclarée à l'écran (px). */
 function accroches() {
   return screen.getAllByRole("button", { name: /^Branche : / }).map((b) => {
     const el = b as HTMLElement;
     return {
       el,
-      gauchePct: parseFloat(el.style.left),
-      hautPct: parseFloat(el.style.top),
       taille: parseFloat(el.style.width) || 44,
     };
   });
 }
 
-describe("[HAUTE / re-revue] une cible n'ouvre JAMAIS la branche voisine", () => {
-  for (const n of [2, 9, 15, 25]) {
-    it(`à ${n} branches, deux zones cliquables ne se recouvrent pas`, () => {
-      monter(n);
-      const COTE = 600; // min(800, 600) — le carré effectif mesuré
-      const a = accroches();
-      expect(a).toHaveLength(n);
-
-      for (let i = 0; i < a.length; i++) {
-        for (let j = i + 1; j < a.length; j++) {
-          const dx = ((a[i].gauchePct - a[j].gauchePct) / 100) * COTE;
-          const dy = ((a[i].hautPct - a[j].hautPct) / 100) * COTE;
-          const distance = Math.hypot(dx, dy);
-          const recouvrement = (a[i].taille + a[j].taille) / 2;
-          expect(
-            distance,
-            `à ${n} branches, les cibles ${i} et ${j} se recouvrent (${distance.toFixed(1)} px pour ${recouvrement.toFixed(1)} px de cible)`,
-          ).toBeGreaterThanOrEqual(recouvrement);
+describe("[WCAG / revue] chaque branche garde une cible tactile de 44 px", () => {
+  const viewports = [
+    { largeur: 390, hauteur: 844 },
+    { largeur: 768, hauteur: 1024 },
+    { largeur: 1440, hauteur: 900 },
+  ];
+  for (const viewport of viewports) {
+    for (const n of [1, 13, 60]) {
+      it(`${n} branches à ${viewport.largeur}px restent toutes à 44×44 px`, () => {
+        monter(n, {}, viewport);
+        const cibles = accroches();
+        expect(cibles).toHaveLength(n);
+        for (const cible of cibles) {
+          expect(cible.taille).toBe(44);
+          expect(parseFloat(cible.el.style.height)).toBe(44);
         }
-      }
-    });
+      });
+    }
   }
 
-  it("une branche SEULE garde une cible pleine taille (44 px)", () => {
-    monter(1);
-    expect(accroches()[0].taille).toBe(44);
+  it("le contre-zoom conserve 44 px écran tout en séparant les ancres", () => {
+    monter(60, { camera: { pan: { x: 0, y: 0 }, zoom: 3 } });
+    for (const cible of accroches()) {
+      expect(cible.taille).toBe(44);
+      expect(cible.el.style.transform).toContain(`scale(${1 / 3})`);
+    }
   });
 
-  it("ZOOMER fait REGRANDIR les cibles (l'écartement à l'écran croît avec le zoom)", () => {
-    const { unmount } = monter(15);
-    const petite = accroches()[0].taille;
-    unmount();
+  it("les 60 cibles restent activables au clavier malgré les recouvrements spatiaux", () => {
+    const { props } = monter(60);
+    for (const cible of accroches()) fireEvent.click(cible.el, { detail: 0 });
+    expect(props.onOuvrirFiche).toHaveBeenCalledTimes(60);
+    expect(new Set(props.onOuvrirFiche.mock.calls.map(([id]) => id))).toEqual(
+      new Set(Array.from({ length: 60 }, (_, i) => `b${i}`)),
+    );
+  });
 
-    monter(15, { camera: { pan: { x: 0, y: 0 }, zoom: 3 } });
-    const grande = accroches()[0].taille;
-    expect(grande, "zoomer doit rendre les branches denses adressables").toBeGreaterThan(petite);
+  it("la vue liste fournit 60 accès non spatiaux à pleine taille", async () => {
+    const u = userEvent.setup();
+    monter(60);
+    await u.click(screen.getByRole("button", { name: BASCULE_LISTE }));
+    expect(screen.getAllByRole("listitem")).toHaveLength(60);
   });
 });
 
@@ -140,6 +154,47 @@ describe("[re-revue] le pointeur est CAPTURÉ : un relâchement hors cadre n'arm
     props.onCadrer.mockClear();
     fireEvent.pointerMove(canevas, { pointerId: 1, clientX: 400, clientY: 400 });
     expect(props.onCadrer, "l'arbre suit le curseur sans bouton pressé").not.toHaveBeenCalled();
+  });
+
+  it("un glisser bloque son clic de relâchement, mais jamais le clic clavier qui suit", () => {
+    const { props, container } = monter(1);
+    const canevas = container.querySelector("[role='group']") as HTMLElement;
+    const branche = screen.getByRole("button", { name: /^Branche : / });
+
+    fireEvent.pointerDown(canevas, { pointerId: 1, clientX: 100, clientY: 100 });
+    fireEvent.pointerMove(canevas, { pointerId: 1, clientX: 180, clientY: 180 });
+    fireEvent.pointerUp(canevas, { pointerId: 1, clientX: 180, clientY: 180 });
+    fireEvent.click(branche, { detail: 1 });
+    expect(props.onOuvrirFiche, "le clic terminal du glisser a ouvert une fiche").not.toHaveBeenCalled();
+
+    fireEvent.click(branche, { detail: 0 });
+    expect(props.onOuvrirFiche, "un glisser antérieur a condamné l'accès clavier").toHaveBeenCalledWith("b0");
+  });
+
+  it("un pincement qui commence à distance nulle ne produit jamais un zoom infini", () => {
+    const { props, container } = monter(1);
+    const canevas = container.querySelector("[role='group']") as HTMLElement;
+
+    fireEvent.pointerDown(canevas, { pointerId: 1, clientX: 100, clientY: 100 });
+    fireEvent.pointerDown(canevas, { pointerId: 2, clientX: 100, clientY: 100 });
+    fireEvent.pointerMove(canevas, { pointerId: 2, clientX: 140, clientY: 100 });
+
+    for (const [camera] of props.onCadrer.mock.calls) {
+      expect(Number.isFinite((camera as { zoom: number }).zoom)).toBe(true);
+    }
+  });
+});
+
+describe("[étape graine] la copie défile sans piloter le zoom derrière elle", () => {
+  it("la molette dans la carte vide reste à la carte", () => {
+    const { props } = monter(0);
+    const texte = screen.getByText(VIDE_TITRE);
+    const evenement = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 120 });
+
+    texte.dispatchEvent(evenement);
+
+    expect(evenement.defaultPrevented).toBe(false);
+    expect(props.onCadrer).not.toHaveBeenCalled();
   });
 });
 

@@ -39,8 +39,11 @@ import Bibliotheque from "./accueil/Bibliotheque";
 import PremierPassage, { type PremierPassageVue } from "./premier-passage";
 import Guide, { type EtapeGuideVue } from "./guide/Guide";
 import type { BibliothequeVue } from "./accueil/types";
-import type { TourHistorique } from "./conversation/types";
-import type { OuvertureData } from "./conversation/types";
+import type {
+  ResultatOuvertureCourante,
+  ResultatOuvertureDuJour,
+  TourHistorique,
+} from "./conversation/types";
 import type { ResultatGeste } from "./arbre/FicheBranche";
 import s from "./monde.module.css";
 
@@ -48,11 +51,13 @@ export interface ProprietesSceneRendue {
   /** Domain-projection serveur, en lecture seule (AD-7). Le rendu ne l'écrit jamais. */
   projection: ProjectionScene;
   /**
-   * Story 4.5, arbitrée en 4.10 — ce que le SERVEUR a décidé d'ouvrir : une proposition de branche, une
-   * invitation à faire vivre celle qui attend (FR-030), ou rien. Générique, aucun art. 9, et surtout
-   * AUCUN COMPTE (FR-031/AC5 [DUR]) : le chiffre est mort côté serveur.
+   * La première parole quotidienne, réclamée seulement quand la région Anam devient visible.
+   * L'action serveur rend la ligne persistée qui fait foi et distingue une panne d'un jour déjà
+   * commencé. Le rendu ne peut donc jamais transformer une indisponibilité en silence définitif.
    */
-  ouverture?: OuvertureData | null;
+  onReclamerOuvertureQuotidienne?: () => Promise<ResultatOuvertureDuJour>;
+  /** Réévalue un événement après un geste confirmé, sans rejouer le bonjour quotidien. */
+  onChargerOuvertureCourante?: () => Promise<ResultatOuvertureCourante>;
   /**
    * La mention de complétion du socle a ATTEINT L'ÉCRAN (revue du 2026-08-12, B3).
    *
@@ -216,7 +221,8 @@ const CORPS: Record<IdRegion, string> = {
 
 export default function SceneDom({
   projection,
-  ouverture,
+  onReclamerOuvertureQuotidienne,
+  onChargerOuvertureCourante,
   onSocleAnnonce,
   onHypotheseDite,
   bibliotheque,
@@ -525,11 +531,8 @@ export default function SceneDom({
     if (regionPrec.current !== region) {
       entetes.current[region]?.focus();
       regionPrec.current = region;
-      // En ENTRANT dans l'arbre, on redemande la projection au serveur : une branche née pendant la séance
-      // (Story 4.5) doit y apparaître. Le rendu ne lit pas la base — il demande un nouveau rendu serveur.
-      if (region === "arbre") router.refresh();
     }
-  }, [region, router]);
+  }, [region]);
 
   const seuilActif = region === "seuil";
 
@@ -591,7 +594,7 @@ export default function SceneDom({
       {projection.tronc.present && (
         <div
           className={`${s.arbreMonde} ${region === "seuil" ? s.arbreAuSeuil : ""} ${
-            region === "accueil" ? s.arbreEnRetrait : ""
+            region === "accueil" || region === "anam" ? s.arbreEnRetrait : ""
           } ${region === "arbre" ? s.arbreEnRetraitArbre : ""} imagerie`}
           aria-hidden
         >
@@ -703,7 +706,12 @@ export default function SceneDom({
                 <div className={echangeExtrait ? s.masque : s.transparent}>
                   <Conversation
                     onPreparation={setAnamPrepare}
-                    ouverture={ouverture}
+                    // La projection ne change qu'après un geste serveur confirmé. Rafraîchir ici,
+                    // pendant qu'elle est encore dans le fil, garde la nouvelle branche sans faire
+                    // attendre chaque clic ultérieur sur « Mon arbre ».
+                    onBrancheCreee={() => router.refresh()}
+                    onReclamerOuvertureQuotidienne={onReclamerOuvertureQuotidienne}
+                    onChargerOuvertureCourante={onChargerOuvertureCourante}
                     historique={historique}
                     onAllerVersBranche={allerVersBranche}
                     onAllerVersHypothese={allerVersHypothese}

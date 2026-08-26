@@ -30,6 +30,11 @@
 .glyphe:hover {
   color: var(--texte);
 }
+.glyphe[aria-expanded="true"] {
+  color: var(--accent);
+  background: var(--accent-doux);
+  border-radius: var(--rayon-full);
+}
 
 /* ⚠️ L'ÉTAT D'APPUI EXISTE ENFIN, ET C'EST LA MOITIÉ DE LA PLAINTE « L'UI FAIT PAS TRÈS PRO ».
    Sur un écran tactile, `:hover` n'existe pas : au 2026-08-25, `grep -n ":active"` sur
@@ -47,8 +52,8 @@
 }
 
 .glypheDessin {
-  width: 20px;
-  height: 20px;
+  width: var(--esp-5);
+  height: var(--esp-5);
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
@@ -98,19 +103,34 @@
     left: auto;
     top: var(--esp-5);
     bottom: auto;
-    width: 24rem;
+    width: var(--contenu-max);
+    max-width: calc(100vw - var(--esp-6));
     margin-right: var(--esp-3);
     border: 1px solid var(--bordure);
     border-radius: var(--rayon-lg);
     max-height: 78vh;
   }
+
+  .groupes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
 }
 
 .enTete {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--esp-2);
+  padding-bottom: var(--esp-2);
+  background: var(--surface);
+}
+
+.enTeteTexte {
+  min-width: 0;
 }
 
 .titre {
@@ -118,6 +138,12 @@
   font-weight: 400;
   color: var(--texte);
   margin: 0;
+}
+
+.etatNavigation {
+  min-height: var(--esp-5);
+  margin: var(--esp-1) 0 0;
+  color: var(--accent);
 }
 
 .fermer {
@@ -133,17 +159,37 @@
   cursor: pointer;
   transition: color var(--duree-standard) var(--courbe);
 }
-.fermer:hover {
+.fermer:hover:not(:disabled) {
   color: var(--texte);
 }
-.fermer:active {
+.fermer:active:not(:disabled) {
   color: var(--texte);
   transform: scale(0.94);
+}
+.fermer:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 .fermer:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
   border-radius: var(--rayon-sm);
+}
+
+.groupes {
+  display: grid;
+  gap: var(--esp-5);
+}
+
+.groupe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.groupeTitre {
+  margin: 0;
+  color: var(--texte-doux);
 }
 
 .liste {
@@ -152,6 +198,10 @@
   padding: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
 }
 
 /* Une entrée : son titre, puis ce qu'il y a derrière. Deux étages, jamais une ligne sèche — c'est
@@ -160,20 +210,39 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: var(--esp-1);
   min-height: var(--cible-tactile);
-  padding: var(--esp-2) 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--texte-doux) 22%, transparent);
+  padding: var(--esp-3);
+  border-bottom: 1px solid var(--bordure);
   text-decoration: none;
-  transition: opacity var(--duree-standard) var(--courbe);
+  transition: background-color var(--duree-courte) var(--courbe);
+}
+.liste li:last-child .entree {
+  border-bottom: none;
+}
+.entree:hover {
+  background: var(--surface);
 }
 .entree:active {
-  opacity: 0.62;
+  background: var(--accent-doux);
 }
 .entree:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
   border-radius: var(--rayon-sm);
+}
+
+.entreeEnCours {
+  background: var(--accent-doux);
+}
+.entreeEnCours .entreeTitre {
+  color: var(--accent);
+}
+.entree[aria-disabled="true"] {
+  cursor: wait;
+}
+.entree[aria-disabled="true"]:not(.entreeEnCours) {
+  opacity: 0.58;
 }
 
 .entreeTitre {
@@ -184,10 +253,9 @@
 }
 
 /* ── L'indice d'attente ────────────────────────────────────────────────────────────────────────
-   Un filet qui s'allume sous l'entrée touchée, APRÈS 100 ms : en dessous, la navigation est déjà
-   finie et l'indice ne ferait que clignoter — ce qui se lit comme un défaut, pas comme une réponse.
-   Une propriété, à sens unique, grammaire de `.signeAnamPrepare`. Jamais un tourniquet, jamais
-   trois points qui rebondissent (`EXPERIENCE.md` ligne 200). */
+   Un filet qui s'allume après 100 ms : c'est l'accusé de réception qui manquait lorsque la route
+   met plusieurs secondes à répondre, sans clignoter sur une navigation instantanée. Une propriété,
+   `.signeAnamPrepare`. Jamais un tourniquet, jamais trois points qui rebondissent. */
 .indice {
   position: absolute;
   left: 0;
@@ -196,7 +264,7 @@
   width: 100%;
   background: var(--texte);
   opacity: 0;
-  transition: opacity var(--duree-standard) var(--courbe) 100ms;
+  transition: opacity var(--duree-courte) var(--courbe) 100ms;
   pointer-events: none;
 }
 .indiceActif {

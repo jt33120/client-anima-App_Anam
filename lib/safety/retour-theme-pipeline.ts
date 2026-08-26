@@ -7,6 +7,7 @@ import { doitExecuterTravailSchema } from "./pipeline";
 import { journaliserIncidentSecurite } from "./rpc-repli";
 import type { VerdictSecurite } from "./classer-detresse";
 import { avecDelai } from "@/lib/domain/delai";
+import { resoudreUsageReponse } from "@/lib/ai/metrage";
 
 /**
  * Story 4.7 (T3) — l'orchestrateur du RETOUR SUR LE THÈME, l'étage qui fait FEUILLER l'arbre. Frère
@@ -85,13 +86,14 @@ export async function evaluerRetourThemeDuTour(
 
   // (c) UNE confirmation FORTE sous egress art. 9. Budget borné : un hang du fort en tâche de fond ne
   // doit pas traîner derrière la réponse déjà rendue.
+  const requete = requeteRetourTheme(args.messages, candidats);
   let res;
   try {
     res = await avecDelai(
       envoyerSousEgressArt9({
         supabase: deps.supabase,
         adaptateur: deps.adaptateur,
-        requete: requeteRetourTheme(args.messages, candidats),
+        requete,
       }),
       deps.delaiMs ?? DELAI_RETOUR_MS,
       "retour_theme_timeout",
@@ -102,12 +104,7 @@ export async function evaluerRetourThemeDuTour(
   }
   if (res.bloque) return { supprime: false, progressions: 0, usage: null };
 
-  const usage: UsageRetourTheme = {
-    tier: res.reponse.tier,
-    modele: res.reponse.modele,
-    tokensEntree: res.reponse.usage.tokensEntree,
-    tokensSortie: res.reponse.usage.tokensSortie,
-  };
+  const usage: UsageRetourTheme = resoudreUsageReponse(res.reponse, requete.messages);
 
   const { indices } = lireRetoursTheme(res.reponse.texte, candidats.length);
   if (indices.length === 0) return { supprime: false, progressions: 0, usage };

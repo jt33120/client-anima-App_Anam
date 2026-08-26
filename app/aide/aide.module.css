@@ -23,27 +23,41 @@
 /* L'en-tête à deux sorties : le retour à gauche (le geste de tous les jours), la sortie de secours
    à droite (le geste rare). Deux commandes visiblement distinctes — c'est tout le correctif. */
 .enTete {
+  position: sticky;
+  top: var(--esp-3);
+  z-index: 1;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: var(--esp-3);
+  padding: var(--esp-2);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
 }
 
 /* Le retour porte la même cible tactile et le même anneau que la sortie : ce sont deux commandes de
    même rang. Ce qui les sépare, c'est le NOM et la place, jamais une hiérarchie visuelle — mettre
    le retour en avant reviendrait à enterrer la sortie de secours (FR-074). */
 .retour {
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
   display: inline-flex;
   align-items: center;
   min-height: var(--cible-tactile);
-  padding: var(--esp-2) var(--esp-4);
-  border: 1px solid var(--bordure-forte);
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
   border-radius: var(--rayon);
-  color: var(--texte-doux);
+  color: var(--texte);
   text-decoration: none;
 }
 .retour:hover {
-  color: var(--texte);
+  border-color: var(--bordure-forte);
+}
+.retour:active {
+  background: var(--accent-doux);
 }
 .retour:focus-visible {
   outline: 2px solid var(--bordure-forte);
@@ -51,16 +65,29 @@
 }
 
 .sortieRapide {
+  flex: 1;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-height: var(--cible-tactile);
-  padding: var(--esp-2) var(--esp-4);
+  padding: var(--esp-2) var(--esp-3);
   background: transparent;
-  border: 1px solid var(--bordure-forte);
+  border: 1px solid var(--bordure);
   border-radius: var(--rayon);
   color: var(--texte-doux);
   cursor: pointer;
 }
 .sortieRapide:hover {
   color: var(--texte);
+  border-color: var(--bordure-forte);
+}
+.sortieRapide:active {
+  background: var(--accent-doux);
+}
+
+.commandeDetail {
+  color: inherit;
 }
 .sortieRapide:focus-visible {
   outline: 2px solid var(--bordure-forte);
@@ -71,6 +98,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--esp-3);
+}
+
+.panneau {
+  padding: var(--esp-5);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
 }
 
 /* Date de vérification (gouvernance FR-044) — discrète, jamais alarmante. */
@@ -153,6 +187,10 @@
 }
 .places div {
   margin: 0;
+  padding: var(--esp-3);
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
 }
 .places dt {
   margin: 0 0 var(--esp-1);
@@ -166,6 +204,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--esp-3);
+  padding: var(--esp-4);
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
 }
 .sousSection h3 {
   margin: 0;

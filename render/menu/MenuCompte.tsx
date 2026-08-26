@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link, { useLinkStatus } from "next/link";
+import { usePathname } from "next/navigation";
 import s from "./menu-compte.module.css";
+
+/**
+ * Une route réellement lente reste prioritaire pendant ce délai. Au-delà, l'absence de changement
+ * de pathname est traitée comme une navigation interrompue : la feuille redevient utilisable au
+ * lieu de garder tout le compte verrouillé jusqu'au prochain rechargement.
+ */
+const DELAI_RECUPERATION_NAVIGATION_MS = 10_000;
 
 /**
  * MenuCompte.tsx — LE GLYPHE ET LA FEUILLE (Story 7.3). Rendu MUET (AD-7).
@@ -43,6 +51,11 @@ export interface EntreeMenuVue {
   readonly url: string;
 }
 
+export interface GroupeMenuVue {
+  readonly titre: string;
+  readonly entrees: readonly EntreeMenuVue[];
+}
+
 /**
  * L'INDICE D'ATTENTE (Story 8.2 · retour du 2026-08-25 : « quand je clique sur profil, rien ne se
  * passe et d'un coup, quelques secondes après, la page s'ouvre »).
@@ -56,9 +69,14 @@ export interface EntreeMenuVue {
  * Grammaire de `.signeAnamPrepare` : une propriété qui change, à sens unique. Jamais un tourniquet,
  * jamais trois points qui rebondissent (`EXPERIENCE.md` ligne 200).
  */
-function IndiceAttente() {
+function IndiceAttente({ immediat }: { readonly immediat: boolean }) {
   const { pending } = useLinkStatus();
-  return <span aria-hidden className={`${s.indice} ${pending ? s.indiceActif : ""}`} />;
+  return (
+    <span
+      aria-hidden
+      className={`${s.indice} ${pending || immediat ? s.indiceActif : ""}`}
+    />
+  );
 }
 
 function GlypheCompte() {
@@ -71,7 +89,7 @@ function GlypheCompte() {
 }
 
 export interface ProprietesMenuCompte {
-  readonly entrees: readonly EntreeMenuVue[];
+  readonly groupes: readonly GroupeMenuVue[];
   /**
    * Fabrique l'URL d'une entrée EN EMPORTANT la région d'où l'on part (Story 7.13).
    *
@@ -90,25 +108,54 @@ export interface ProprietesMenuCompte {
 }
 
 export default function MenuCompte({
-  entrees,
+  groupes,
   lienVers,
   libelleGlyphe,
   titreFeuille,
   libelleFermer,
 }: ProprietesMenuCompte) {
+  const pathname = usePathname();
   const [ouvert, setOuvert] = useState(false);
+  const [destinationEnCours, setDestinationEnCours] = useState<string | null>(null);
   const glyphe = useRef<HTMLButtonElement>(null);
   const feuille = useRef<HTMLDivElement>(null);
+  const pathnameObserve = useRef(pathname);
   const idFeuille = useId();
   const idTitre = useId();
 
+  // Une navigation achevée peut conserver ce composant monté (layout partagé, transition ou
+  // redirection). Le pathname est alors l'acquittement autoritaire : on retire le verrou et la
+  // feuille, sans rendre le focus à un glyphe qui appartient désormais à la page précédente.
+  useEffect(() => {
+    if (pathnameObserve.current === pathname) return;
+    pathnameObserve.current = pathname;
+    setDestinationEnCours(null);
+    setOuvert(false);
+  }, [pathname]);
+
+  // Next ne fournit pas de callback d'échec sur Link. Si la route ne change jamais (hors-ligne,
+  // erreur de chargement ou navigation annulée), ce filet rend les destinations et la fermeture
+  // à nouveau disponibles. Le cleanup empêche un ancien délai de réarmer une navigation suivante.
+  useEffect(() => {
+    if (destinationEnCours === null) return;
+    const delai = window.setTimeout(
+      () => setDestinationEnCours(null),
+      DELAI_RECUPERATION_NAVIGATION_MS,
+    );
+    return () => window.clearTimeout(delai);
+  }, [destinationEnCours]);
+
   const fermer = useCallback(() => {
+    // Une navigation Next est déjà partie : fermer puis rouvrir réarmait auparavant les liens et
+    // permettait de lancer une seconde destination avant la fin de la première. Le composant sera
+    // démonté par le changement de route ; jusque-là, la feuille reste le statut visible du geste.
+    if (destinationEnCours !== null) return;
     setOuvert(false);
     // ⚠️ LE FOCUS REVIENT AU GLYPHE (`EXPERIENCE.md` ligne 216). Sans ça, fermer la feuille au
     // clavier renvoie le focus au `<body>` : la tabulation suivante repart du tout début de la
     // page, et quelqu'un qui navigue au clavier perd sa place sans comprendre pourquoi.
     glyphe.current?.focus();
-  }, []);
+  }, [destinationEnCours]);
 
   useEffect(() => {
     if (!ouvert) return;
@@ -131,11 +178,16 @@ export default function MenuCompte({
       // sort pas (`EXPERIENCE.md` ligne 216) — sinon on tabule « derrière » un panneau visible,
       // ce qui est le défaut d'accessibilité le plus courant des feuilles modales. Elle en sort par
       // Échap ou par le bouton de fermeture, jamais par accident.
-      const focusables = [...(feuille.current?.querySelectorAll<HTMLElement>("a, button") ?? [])];
+      const focusables = [
+        ...(feuille.current?.querySelectorAll<HTMLElement>("a, button:not(:disabled)") ?? []),
+      ];
       if (focusables.length === 0) return;
       const premierF = focusables[0];
       const dernierF = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === premierF) {
+      if (
+        e.shiftKey &&
+        (document.activeElement === feuille.current || document.activeElement === premierF)
+      ) {
         e.preventDefault();
         dernierF.focus();
       } else if (!e.shiftKey && document.activeElement === dernierF) {
@@ -167,7 +219,10 @@ export default function MenuCompte({
         aria-expanded={ouvert}
         aria-haspopup="dialog"
         aria-controls={ouvert ? idFeuille : undefined}
-        onClick={() => setOuvert((o) => !o)}
+        onClick={() => {
+          if (destinationEnCours !== null) return;
+          setOuvert((o) => !o);
+        }}
       >
         <GlypheCompte />
       </button>
@@ -185,6 +240,7 @@ export default function MenuCompte({
             className={s.feuille}
             role="dialog"
             aria-modal="true"
+            aria-busy={destinationEnCours !== null}
             aria-labelledby={idTitre}
             tabIndex={-1}
             onPointerDown={stopper}
@@ -192,25 +248,89 @@ export default function MenuCompte({
             onPointerUp={stopper}
           >
             <div className={s.enTete}>
-              <h2 id={idTitre} className={`t-titre-sm ${s.titre}`}>
-                {titreFeuille}
-              </h2>
-              <button type="button" className={s.fermer} onClick={fermer}>
+              <div className={s.enTeteTexte}>
+                <h2 id={idTitre} className={`t-titre-sm ${s.titre}`}>
+                  {titreFeuille}
+                </h2>
+                <p className={`t-meta ${s.etatNavigation}`} role="status">
+                  {destinationEnCours
+                    ? `Ouverture de « ${destinationEnCours} »…`
+                    : "\u00a0"}
+                </p>
+              </div>
+              <button
+                type="button"
+                className={s.fermer}
+                onClick={fermer}
+                disabled={destinationEnCours !== null}
+              >
                 <span className="t-meta">{libelleFermer}</span>
               </button>
             </div>
 
-            <ul className={s.liste}>
-              {entrees.map((e) => (
-                <li key={e.url}>
-                  <Link className={s.entree} href={lienVers(e.url)}>
-                    <span className={`t-corps ${s.entreeTitre}`}>{e.titre}</span>
-                    <span className={`t-meta ${s.entreeQuoi}`}>{e.quoi}</span>
-                    <IndiceAttente />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <nav className={s.groupes} aria-label="Rubriques de ton espace">
+              {groupes.map((groupe) => {
+                const idGroupe = `${idFeuille}-${groupe.titre
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "")
+                  .toLowerCase()}`;
+                return (
+                  <section className={s.groupe} key={groupe.titre} aria-labelledby={idGroupe}>
+                    <h3 id={idGroupe} className={`t-surtitre ${s.groupeTitre}`}>
+                      {groupe.titre}
+                    </h3>
+                    <ul className={s.liste}>
+                      {groupe.entrees.map((e) => {
+                        const enCours = destinationEnCours === e.titre;
+                        const navigationVerrouillee = destinationEnCours !== null;
+                        return (
+                          <li key={e.url}>
+                            <Link
+                              className={`${s.entree} ${enCours ? s.entreeEnCours : ""}`}
+                              href={lienVers(e.url)}
+                              aria-busy={enCours}
+                              aria-disabled={navigationVerrouillee || undefined}
+                              onClick={(evenement) => {
+                                if (destinationEnCours !== null) {
+                                  // Une navigation Next est déjà partie. Cette feuille est alors
+                                  // réellement désactivée (`aria-disabled`) jusqu'au changement de
+                                  // route : aucune deuxième destination ne part en parallèle.
+                                  evenement.preventDefault();
+                                  return;
+                                }
+                                if (
+                                  evenement.button === 0 &&
+                                  !evenement.metaKey &&
+                                  !evenement.ctrlKey &&
+                                  !evenement.shiftKey &&
+                                  !evenement.altKey
+                                ) {
+                                  setDestinationEnCours(e.titre);
+                                }
+                              }}
+                              onAuxClick={(evenement) => {
+                                if (destinationEnCours !== null) evenement.preventDefault();
+                              }}
+                              onNavigate={(evenement) => {
+                                if (destinationEnCours !== null) {
+                                  evenement.preventDefault();
+                                  return;
+                                }
+                                setDestinationEnCours(e.titre);
+                              }}
+                            >
+                              <span className={`t-corps ${s.entreeTitre}`}>{e.titre}</span>
+                              <span className={`t-meta ${s.entreeQuoi}`}>{e.quoi}</span>
+                              <IndiceAttente immediat={enCours} />
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                );
+              })}
+            </nav>
           </div>
         </>
       )}

@@ -1,6 +1,7 @@
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/data/supabase/admin";
-import type { TierIa } from "./port";
+import type { CapaciteIa, MessageIa, ReponseIa, TierIa } from "./port";
+import { tariferUsageIa } from "./tarification";
 
 /**
  * Métrage IA (Story 2.2, NFR-014) — écrit l'usage du tour dans `usage_ia`.
@@ -17,13 +18,40 @@ import type { TierIa } from "./port";
  * une fois PAR TOUR LOGIQUE » (un retry ne recompte ni tokens ni allocation résiduelle). Repli sur un UUID
  * serveur par requête si le jeton est absent/mal formé. [dette 2.2/2.4/2.7/2.9 close]
  */
-export interface MetrageUsage {
-  utilisatriceId: string;
-  cleIdempotence: string;
+/** Opération métier : plus précise que la capacité technique envoyée au port. */
+export type OperationIa =
+  | "conversation"
+  | "detection_detresse"
+  | "detection_reconceptualisation"
+  | "detection_retour_theme"
+  | "hypothese_enneagramme"
+  | "compactage_contexte"
+  | "extraction_arc"
+  | "restitution_lecture"
+  | "bilan_seance"
+  | "synthese_periodique";
+
+/** Compteurs techniques rendus par un appel modèle, sans identité ni dimension produit. */
+export interface UsageModeleIa {
   tier: TierIa;
   modele: string;
   tokensEntree: number;
   tokensSortie: number;
+}
+
+export interface MetrageUsage extends UsageModeleIa {
+  utilisatriceId: string;
+  cleIdempotence: string;
+  /** Ce que le produit accomplissait ; aucun contenu libre ni art. 9. */
+  operation: OperationIa;
+  /** Capacité déclarée au port, source du tier serveur (AD-5). */
+  capacite: CapaciteIa;
+  /** Instantané pris au départ du tour/appel. `null` si la lecture a échoué : ne jamais inventer. */
+  premiumAuMomentAppel: boolean | null;
+  /** Vrai = hors limites produit, même si le coût fournisseur reste comptabilisé (FR-043). */
+  exempteQuota: boolean;
+  /** Vrai pour tout appel fournisseur réel à inclure dans la comptabilité interne. */
+  comptabiliseFinancierement: boolean;
   /**
    * Story 3.4 : `true` = tour d'ALLOCATION RÉSIDUELLE (servi après la clôture de la 1ʳᵉ séance) → compté
    * dans le quota mensuel gratuit (FR-079). Posé UNIQUEMENT sur la ligne PRINCIPALE d'un tour post-séance ;
@@ -34,20 +62,38 @@ export interface MetrageUsage {
 
 export async function metrerUsageIa(usage: MetrageUsage): Promise<void> {
   try {
+    const tarif = tariferUsageIa(usage.modele, usage.tokensEntree, usage.tokensSortie);
     const admin = createSupabaseAdminClient(); // peut lever si l'env admin manque → capté ici
     const { error } = await admin.from("usage_ia").upsert(
       {
         utilisatrice_id: usage.utilisatriceId,
         cle_idempotence: usage.cleIdempotence,
+        operation: usage.operation,
+        capacite: usage.capacite,
         tier: usage.tier,
         modele: usage.modele,
         tokens_entree: usage.tokensEntree,
         tokens_sortie: usage.tokensSortie,
         post_premiere_seance: usage.postPremiereSeance ?? false, // Story 3.4 — marque d'allocation résiduelle
+        unite_usage: tarif.uniteUsage,
+        premium_au_moment_appel: usage.premiumAuMomentAppel,
+        exempte_quota: usage.exempteQuota,
+        comptabilise_financierement: usage.comptabiliseFinancierement,
+        tarif_version: tarif.tarifVersion,
+        tarif_connu: tarif.tarifConnu,
+        devise: tarif.devise,
+        prix_entree_usd_par_million: tarif.prixEntreeUsdParMillion,
+        prix_sortie_usd_par_million: tarif.prixSortieUsdParMillion,
+        cout_usd: tarif.coutUsd,
       },
       { onConflict: "utilisatrice_id,cle_idempotence", ignoreDuplicates: true },
     );
     if (error) console.error("usage_ia métrage échoué", { code: error.code });
+    else if (!tarif.tarifConnu) {
+      // Le modèle n'est pas du contenu utilisateur. Dire l'écart évite qu'un nouveau modèle reste à
+      // coût NULL pendant des semaines sans que personne ne voie le catalogue périmé (NFR-022).
+      console.error("usage_ia tarif inconnu", { modele: usage.modele });
+    }
   } catch (e) {
     // Ne jamais laisser fuiter (appelé dans after(), hors du cycle de réponse) — NFR-022.
     console.error("usage_ia métrage : exception", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -77,11 +123,35 @@ export interface EtatFlux {
   modeleServeur: string;
 }
 
-export type UsageResolu = Omit<MetrageUsage, "utilisatriceId" | "cleIdempotence">;
+export type UsageResolu = UsageModeleIa;
 
 /** ≈ 4 caractères par token — repli HOMOGÈNE en tokens (jamais de caractères dans une colonne token). */
 export function estimerTokens(chars: number): number {
   return Math.ceil(Math.max(0, chars) / 4);
+}
+
+/**
+ * Normalise l'usage des réponses non streamées. Certains fournisseurs/adaptateurs rendent `0` quand
+ * les compteurs sont absents ; zéro ne doit jamais devenir un faux appel gratuit. Même règle que le
+ * flux principal : chaque sens manquant retombe séparément sur une estimation homogène en tokens.
+ */
+export function resoudreUsageReponse(
+  reponse: ReponseIa,
+  messages: readonly MessageIa[],
+): UsageModeleIa {
+  const charsEntree = messages.reduce((total, message) => total + message.content.length, 0);
+  return {
+    tier: reponse.tier,
+    modele: reponse.modele,
+    tokensEntree:
+      reponse.usage.tokensEntree > 0
+        ? reponse.usage.tokensEntree
+        : estimerTokens(charsEntree),
+    tokensSortie:
+      reponse.usage.tokensSortie > 0
+        ? reponse.usage.tokensSortie
+        : estimerTokens(reponse.texte.length),
+  };
 }
 
 /**

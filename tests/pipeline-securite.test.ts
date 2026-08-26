@@ -32,7 +32,7 @@ function adaptateur(texte: string): AiPort {
       texte,
       tier: "fort",
       modele: "factice",
-      usage: { tokensEntree: 0, tokensSortie: 0 },
+      usage: { tokensEntree: 2, tokensSortie: 3 },
     }),
     diffuser: async function* () {},
   };
@@ -64,6 +64,7 @@ describe("evaluerSecuriteDuTour — pipeline sécurité-d'abord", () => {
       bloque: false,
       verdict: { niveau: 0, decision: "poursuivre", supprimerTravailSchema: false },
       limitesLevees: false,
+      usageDetection: { tier: "fort", modele: "factice", tokensEntree: 2, tokensSortie: 3 },
     });
     expect(audits).toEqual([{ niveau: 0, decision: "poursuivre", tier: "fort" }]);
     expect(enregistrerTour).toHaveBeenCalledWith(0);
@@ -77,7 +78,10 @@ describe("evaluerSecuriteDuTour — pipeline sécurité-d'abord", () => {
       messages,
     );
     expect(r.bloque).toBe(false);
-    if (!r.bloque) expect(r.verdict.niveau).toBe(2);
+    if (!r.bloque) {
+      expect(r.verdict.niveau).toBe(2);
+      expect(r.usageDetection).toEqual({ tier: "fort", modele: "factice", tokensEntree: 2, tokensSortie: 3 });
+    }
     expect(audits[0]).toEqual({ niveau: 2, decision: "intervenir", tier: "fort" });
     expect(enregistrerTour).toHaveBeenCalledWith(2);
   });
@@ -108,6 +112,35 @@ describe("evaluerSecuriteDuTour — pipeline sécurité-d'abord", () => {
     expect(r).toEqual({ bloque: true, raison: "consentement" });
     expect(audits).toHaveLength(0);
     expect(enregistrerTour).not.toHaveBeenCalled();
+  });
+
+  it("publie l'usage fournisseur AVANT le plancher/audit, même si une persistance métier échoue", async () => {
+    const publierUsageDetection = vi.fn();
+    const depotEpisode: DepotEpisode = {
+      plancherEpisode: async () => {
+        throw new Error("plancher_indisponible");
+      },
+      enregistrerTour: async () => ({ limitesLevees: false }),
+    };
+
+    await expect(
+      evaluerSecuriteDuTour(
+        {
+          supabase: supabaseFactice(),
+          adaptateur: adaptateur("NIVEAU: 2"),
+          depotEpisode,
+          emettreAudit: async () => undefined,
+          publierUsageDetection,
+        },
+        messages,
+      ),
+    ).rejects.toThrow("plancher_indisponible");
+    expect(publierUsageDetection).toHaveBeenCalledWith({
+      tier: "fort",
+      modele: "factice",
+      tokensEntree: 2,
+      tokensSortie: 3,
+    });
   });
 
   it("sans depotEpisode injecté : placeholder honnête (aucun épisode ouvert) → le tour vaut son niveau détecté, limites non levées", async () => {

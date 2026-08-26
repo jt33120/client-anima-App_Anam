@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { PHRASE_INVITATION, SEUIL_BRANCHES_OUVERTES } from "@/lib/domain/arbitrage-ouverture";
+import {
+  ouvertureDepuisInconnu,
+  PHRASE_INVITATION,
+  SEUIL_BRANCHES_OUVERTES,
+} from "@/lib/domain/arbitrage-ouverture";
 
 /**
  * Story 4.10 (T7) — [AC5 DUR / FR-031] LE COMPTE NE TRAVERSE PAS LA FRONTIÈRE, ET C'EST LE TYPE QUI LE
@@ -90,13 +94,34 @@ const VARIANTES = [
   '"invitation"',
   '"socle-complete"',
   '"hypothese-enneagramme"',
-  // `premiere-parole` (Story 6.9) est la cinquième déclarée ici et la SIXIÈME de l'union : elle est
-  // née dans le miroir de rendu seul, et c'est la garde des champs — pas le compilateur — qui l'a vu.
-  '"premiere-parole"',
+  '"pause"',
 ] as const;
 
 const DOMAINE = "lib/domain/arbitrage-ouverture.ts";
 const RENDU = "render/conversation/types.ts";
+
+describe("[frontière persistée] seule l'enveloppe publique revient au rendu", () => {
+  it("reconstruit chaque forme interactive et retire les paramètres internes", () => {
+    expect(
+      ouvertureDepuisInconnu({
+        type: "invitation",
+        phrase: "Te voilà — Tu veux regarder ça ?",
+        brancheCibleId: "branche-1",
+        interne: { fenetreHeures: 168 },
+      }),
+    ).toEqual({
+      type: "invitation",
+      phrase: "Te voilà — Tu veux regarder ça ?",
+      brancheCibleId: "branche-1",
+    });
+  });
+
+  it("refuse un type inconnu, une phrase vide ou l'identifiant manquant", () => {
+    expect(ouvertureDepuisInconnu({ type: "inconnu", phrase: "x" })).toBeNull();
+    expect(ouvertureDepuisInconnu({ type: "pause", phrase: "  " })).toBeNull();
+    expect(ouvertureDepuisInconnu({ type: "proposition", phrase: "x" })).toBeNull();
+  });
+});
 
 describe("[AC5 DUR] aucun champ NUMÉRIQUE dans le contrat d'ouverture", () => {
   it("[LE CŒUR] `Ouverture` (serveur) ne déclare aucun `number`", () => {

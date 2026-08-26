@@ -8,7 +8,14 @@ import { useFluxAnam, type MessageEnvoi } from "./useFluxAnam";
 import { insererTour } from "./fil-ops";
 import { LIGNE_QUOTA_EPUISEE } from "./ligne-quota";
 import { REPONSE_REFUS, CONFIRME_NAISSANCE, ECHEC_NAISSANCE } from "./copie-proposition";
-import type { Tour, OuvertureData, TourHistorique } from "./types";
+import type {
+  OuvertureData,
+  OuvertureLieeAuTour,
+  ResultatOuvertureCourante,
+  ResultatOuvertureDuJour,
+  Tour,
+  TourHistorique,
+} from "./types";
 import { toursApresRejeu, blocRessourcesDejaPresent } from "./rejeu";
 import s from "./conversation.module.css";
 
@@ -68,13 +75,6 @@ function cleDOuverture(o?: OuvertureData | null): string | null {
       // Story 6.4 — au plus une par fenêtre d'apaisement (0055) : la clé n'a rien à distinguer, et
       // sa constance est exactement ce qui empêche un rafraîchissement de rejouer le tour.
       return "r:pause";
-    case "premiere-parole":
-      // ⚠️ LA CLÉ PORTE LA PHRASE, ET C'EST CE QUI EMPÊCHE ANAM DE SE RÉPÉTER. Elle n'a pas
-      // d'identifiant en base : deux séances successives produiraient une clé constante, donc un
-      // rafraîchissement rejouerait la même parole en tête d'un fil qui la contient déjà. La
-      // phrase change avec la matière (le prénom, la branche qu'on reprend) ; quand elle ne change
-      // pas, c'est qu'il n'y a rien de neuf à dire, et la reposer serait un doublon.
-      return `o:${o.phrase}`;
   }
 }
 
@@ -96,40 +96,47 @@ function cleDOuverture(o?: OuvertureData | null): string | null {
 function toursDHistorique(historique?: readonly TourHistorique[]): Tour[] {
   return (historique ?? []).map((t) =>
     t.role === "anam"
-      ? ({ id: t.id, role: "anam", texte: t.texte, etat: "complet" } as const)
-      : ({ id: t.id, role: "utilisatrice", texte: t.texte } as const),
+      ? ({ id: t.id, role: "anam", texte: t.texte, etat: "complet", separateurAvant: t.separateurAvant } as const)
+      : ({ id: t.id, role: "utilisatrice", texte: t.texte, separateurAvant: t.separateurAvant } as const),
   );
 }
 
 /** Le ou les tours à ajouter au fil pour cette ouverture. Vide s'il n'y a rien à ouvrir. */
-function toursDOuverture(o?: OuvertureData | null): Tour[] {
+function toursDOuverture(
+  o?: OuvertureData | null,
+  separateurAvant = false,
+  idForce?: string,
+): Tour[] {
   if (!o) return [];
+  const id = idForce ?? nouvelId();
+  const reperer = (tour: Tour): Tour =>
+    separateurAvant ? { ...tour, separateurAvant: true } : tour;
   switch (o.type) {
     case "invitation":
       return [
-        {
-          id: nouvelId(),
+        reperer({
+          id,
           role: "invitation-integration",
           phrase: o.phrase,
           brancheCibleId: o.brancheCibleId,
-        },
+        }),
       ];
     case "proposition":
       return [
-        { id: nouvelId(), role: "proposition-branche", signalId: o.signalId, phrase: o.phrase, etat: "propose" },
+        reperer({ id, role: "proposition-branche", signalId: o.signalId, phrase: o.phrase, etat: "propose" }),
       ];
     case "socle-complete":
       // Story 5.3 (AC4) — un TOUR D'ANAM ORDINAIRE, et c'est le point. Pas de rôle dédié, pas de
       // bouton, pas de carte : il n'y a rien à faire de cette phrase. Lui fabriquer une forme
       // propre en ferait un événement — donc une récompense — alors que FR-051 demande « un motif
       // de retour honnête, jamais une carotte ». Elle se lit, et elle s'en va avec le fil.
-      return [{ id: nouvelId(), role: "anam", texte: o.phrase, etat: "complet" }];
+      return [reperer({ id, role: "anam", texte: o.phrase, etat: "complet" })];
     case "hypothese-enneagramme":
       // Story 5.5 (AC2) — un rôle DÉDIÉ, contrairement à `socle-complete`, et pour la raison
       // inverse : cette phrase-ci pose une question, donc elle doit mener quelque part. Une
       // question sans issue est un reproche (leçon 4.10).
       return [
-        { id: nouvelId(), role: "hypothese-enneagramme", phrase: o.phrase, hypotheseId: o.hypotheseId },
+        reperer({ id, role: "hypothese-enneagramme", phrase: o.phrase, hypotheseId: o.hypotheseId }),
       ];
     case "pause":
       // Story 6.4 (AC1/AC2) — un TOUR D'ANAM ORDINAIRE, comme `socle-complete`, et pour une raison
@@ -139,21 +146,108 @@ function toursDOuverture(o?: OuvertureData | null): Tour[] {
       // verrouillage, aucune minuterie, aucun écran "tu as assez utilisé l'app" »).
       //
       // Elle se lit, et elle s'en va avec le fil. Le composeur, lui, n'est jamais touché.
-      return [{ id: nouvelId(), role: "anam", texte: o.phrase, etat: "complet" }];
-    case "premiere-parole":
-      // Retour du 2026-08-23 — un TOUR D'ANAM ORDINAIRE, comme `socle-complete` et `pause`, et
-      // pour la même raison poussée d'un cran : ce doit être une PAROLE, pas un dispositif. Une
-      // carte d'accueil, un bandeau « bonjour » ou une bulle de bienvenue en feraient un décor
-      // qu'on apprend à ignorer. Elle se lit, on lui répond, et elle s'en va avec le fil.
-      return [{ id: nouvelId(), role: "anam", texte: o.phrase, etat: "complet" }];
+      return [reperer({ id, role: "anam", texte: o.phrase, etat: "complet" })];
   }
+}
+
+/**
+ * Réconcilie le fil relu après le verrou.
+ *
+ * Le serveur est la colonne vertébrale : il décide de l'ordre et de TOUT le contenu des ids qu'il
+ * connaît. La forme interactive ne devient donc pas une seconde parole ajoutée en queue : elle
+ * remplace la ligne persistée à sa position, et reprend son texte immuable. Les tours absents de la
+ * relecture (cartes, bilans, ressources ou vieux tours hors fenêtre) restent dans leur ordre local,
+ * juste après leur dernière ancre persistée ; ceux qui précèdent la première ancre restent juste
+ * avant elle. Cette fusion par intervalles préserve ainsi les blocs locaux sans contredire l'ordre
+ * chronologique certain du journal.
+ *
+ * Tous les anciens repères sont retirés, puis le premier repère rendu par le serveur est reposé :
+ * même face à une entrée corrompue, le DOM ne porte jamais deux « Aujourd'hui ».
+ */
+export function fusionnerEntreeDuJour(
+  precedents: readonly Tour[],
+  historiqueServeur: readonly TourHistorique[],
+  ouvertureDuJour: OuvertureLieeAuTour | null,
+): Tour[] {
+  const idsVus = new Set<string>();
+  const serveur: Tour[] = [];
+  for (const retrouve of toursDHistorique(historiqueServeur)) {
+    if (idsVus.has(retrouve.id)) continue;
+    idsVus.add(retrouve.id);
+
+    if (
+      retrouve.id === ouvertureDuJour?.tourId &&
+      retrouve.role === "anam"
+    ) {
+      const donneesServeur = {
+        ...ouvertureDuJour.donnees,
+        phrase: retrouve.texte,
+      } as OuvertureData;
+      serveur.push(...toursDOuverture(donneesServeur, false, retrouve.id));
+      continue;
+    }
+    serveur.push({ ...retrouve, separateurAvant: undefined } as Tour);
+  }
+
+  const idsServeur = new Set(serveur.map((tour) => tour.id));
+  const premiereAncreLocale = precedents.find((tour) => idsServeur.has(tour.id))?.id ?? null;
+  const avantPremiereAncre: Tour[] = [];
+  const locauxApresAncre = new Map<string, Tour[]>();
+  let ancrePrecedente: string | null = null;
+
+  for (const tour of precedents) {
+    if (idsServeur.has(tour.id)) {
+      ancrePrecedente = tour.id;
+      continue;
+    }
+    const local = { ...tour, separateurAvant: undefined } as Tour;
+    if (!ancrePrecedente) {
+      avantPremiereAncre.push(local);
+      continue;
+    }
+    const intervalle = locauxApresAncre.get(ancrePrecedente) ?? [];
+    intervalle.push(local);
+    locauxApresAncre.set(ancrePrecedente, intervalle);
+  }
+
+  const fusion: Tour[] = [];
+  let locauxDeTetePlaces = false;
+  for (const tour of serveur) {
+    if (!locauxDeTetePlaces && tour.id === premiereAncreLocale) {
+      fusion.push(...avantPremiereAncre);
+      locauxDeTetePlaces = true;
+    }
+    fusion.push(tour);
+    fusion.push(...(locauxApresAncre.get(tour.id) ?? []));
+  }
+  // Aucun id commun : le fil local est vraisemblablement l'ancien préfixe sorti de la fenêtre de
+  // lecture. Il reste devant les nouveaux tours serveur au lieu d'être perdu ou déplacé en queue.
+  if (!locauxDeTetePlaces) fusion.unshift(...avantPremiereAncre);
+
+  const repereServeur = historiqueServeur.find((tour) => tour.separateurAvant)?.id;
+  const repereId =
+    repereServeur ??
+    (ouvertureDuJour && idsServeur.has(ouvertureDuJour.tourId)
+      ? ouvertureDuJour.tourId
+      : null);
+  let reperePose = false;
+  return fusion.map((tour) => {
+    const porteRepere = !reperePose && tour.id === repereId;
+    if (porteRepere) reperePose = true;
+    return {
+      ...tour,
+      separateurAvant: porteRepere ? true : undefined,
+    } as Tour;
+  });
 }
 
 export default function Conversation({
   onPreparation,
-  ouverture,
   historique,
+  onReclamerOuvertureQuotidienne,
+  onChargerOuvertureCourante,
   onAllerVersBranche,
+  onBrancheCreee,
   onAllerVersHypothese,
   onHypotheseDite,
   regionActive = true,
@@ -161,19 +255,25 @@ export default function Conversation({
 }: {
   onPreparation?: (prepare: boolean) => void;
   /**
-   * Story 4.5, arbitrée en 4.10 — ce que le SERVEUR a décidé d'ouvrir : une proposition de branche, une
-   * invitation à faire vivre celle qui attend, ou rien. Amorce le fil au montage. Aucun compte n'y figure
-   * (AC5 [DUR]) : le rendu ne peut pas afficher un chiffre qu'il n'a pas reçu.
-   */
-  ouverture?: OuvertureData | null;
-  /**
    * QA tour 1 (T3) — les tours déjà écrits, lus par le serveur sous JWT. Le fil s'amorce avec eux,
    * AVANT l'ouverture du jour : l'ordre de lecture est chronologique, et ce qu'Anam ouvre
    * aujourd'hui vient après ce qui s'est dit hier.
-   */
+  */
   historique?: readonly TourHistorique[];
+  /**
+   * Action serveur INSERT-OU-RELIT, appelée seulement une fois la région réellement visible.
+   * Elle rend la ligne persistée ; le rendu n'affiche jamais la phrase candidate avant ce retour.
+   */
+  onReclamerOuvertureQuotidienne?: () => Promise<ResultatOuvertureDuJour>;
+  /** Réévalue une ouverture après un geste serveur confirmé, indépendamment du bonjour quotidien. */
+  onChargerOuvertureCourante?: () => Promise<ResultatOuvertureCourante>;
   /** L'invitation doit MENER quelque part, sinon c'est un reproche : ceci ouvre la fiche de la branche visée. */
   onAllerVersBranche?: (brancheId: string) => void;
+  /**
+   * Une branche vient d'être confirmée par le serveur. La scène peut alors seulement rafraîchir sa
+   * projection, au lieu de refaire toute la page à chaque ouverture de « Mon arbre ».
+   */
+  onBrancheCreee?: () => void;
   /** Story 5.5 (AC2) — l'hypothèse mène à la halte `/enneagramme`. */
   onAllerVersHypothese?: () => void;
   /** Story 5.5 — appelé UNE FOIS quand l'hypothèse a réellement atteint l'écran (patron B3). */
@@ -192,25 +292,12 @@ export default function Conversation({
   /** Appelé UNE FOIS quand la mention de complétion a réellement atteint l'écran. */
   onSocleAnnonce?: () => void;
 }) {
-  // ⚠️ `ouverture` EST RÉACTIVE, et ça n'a rien d'optionnel (revue 4.10, défaut le plus grave trouvé).
-  //
-  // Cette Conversation reste MONTÉE en permanence (voir `scene-dom.tsx` : la démonter détruisait le fil
-  // de la séance en cours). Un initialiseur de `useState` ne s'exécute qu'au montage — jamais ensuite.
-  // Or entrer dans la région arbre déclenche `router.refresh()`, qui ré-exécute `app/page.tsx`, donc
-  // `chargerOuverture()`, donc — quand le seuil est franchi — `reserverParole()`, QUI ÉCRIT.
-  //
-  // Le parcours est ordinaire : elle nomme sa 3ᵉ branche, elle clique sur l'onglet arbre. La fenêtre de
-  // sept jours était alors CONSOMMÉE, la nouvelle prop arrivait, l'initialiseur ne rejouait pas, et
-  // l'invitation n'était JAMAIS affichée. Anam se taisait une semaine de plus au moment précis où elle
-  // devait parler — sans trace, sans erreur, sans que rien ne le dise.
-  //
-  // Le patron employé ici est celui déjà validé pour `projLocale` dans `scene-dom.tsx` (« props-into-state
-  // figé — revue 4.6 ») : ajustement d'état PENDANT le rendu, comparé sur une CLÉ STABLE. La clé, et pas
-  // l'identité de l'objet : deux rafraîchissements qui rendent la même proposition ne doivent pas
-  // l'empiler deux fois dans le fil.
-  const cle = cleDOuverture(ouverture);
-  const [tours, setTours] = useState<Tour[]>(() => [...toursDHistorique(historique), ...toursDOuverture(ouverture)]);
-  const [clePrec, setClePrec] = useState(cle);
+  const [tours, setTours] = useState<Tour[]>(() => toursDHistorique(historique));
+  const toursCourants = useRef<readonly Tour[]>(tours);
+  toursCourants.current = tours;
+  const [ouvertureAffichee, setOuvertureAffichee] = useState<OuvertureData | null>(null);
+  const clesOuverturesServies = useRef<Set<string>>(new Set());
+  const generationOuvertures = useRef(0);
 
   // ── B3 : LA MENTION SE DÉPENSE QUAND ELLE EST LUE, PAS QUAND ELLE EST RENDUE ──────────────────
   //
@@ -221,7 +308,7 @@ export default function Conversation({
   // `annonce` garde la trace pour que le rappel ne parte qu'une fois : le composant reste monté
   // toute la séance et se rend à chaque frappe du composeur.
   const [socleAnnonce, setSocleAnnonce] = useState(false);
-  const socleDansLeFil = ouverture?.type === "socle-complete";
+  const socleDansLeFil = ouvertureAffichee?.type === "socle-complete";
   useEffect(() => {
     if (!socleDansLeFil || !regionActive || socleAnnonce) return;
     setSocleAnnonce(true);
@@ -239,22 +326,187 @@ export default function Conversation({
   // qui ne tient pas. C'est pourquoi le germe reste `en_attente` tant qu'elle n'a pas répondu, et
   // que seule `dite_le` — une colonne dont seule la NULLITÉ décide — est consommée ici.
   const [hypotheseAnnoncee, setHypotheseAnnoncee] = useState<string | null>(null);
-  const hypotheseDansLeFil = ouverture?.type === "hypothese-enneagramme" ? ouverture.hypotheseId : null;
+  const hypotheseDansLeFil =
+    ouvertureAffichee?.type === "hypothese-enneagramme"
+      ? ouvertureAffichee.hypotheseId
+      : null;
   useEffect(() => {
     if (!hypotheseDansLeFil || !regionActive || hypotheseAnnoncee === hypotheseDansLeFil) return;
     setHypotheseAnnoncee(hypotheseDansLeFil);
     onHypotheseDite?.(hypotheseDansLeFil);
   }, [hypotheseDansLeFil, regionActive, hypotheseAnnoncee, onHypotheseDite]);
-  if (cle !== clePrec) {
-    setClePrec(cle);
-    const nouveaux = toursDOuverture(ouverture);
-    if (nouveaux.length > 0) setTours((prev) => [...prev, ...nouveaux]);
-  }
   const [annonce, setAnnonce] = useState("");
+  const [entreeRegion, setEntreeRegion] = useState(regionActive ? 1 : 0);
+  const [regionObservee, setRegionObservee] = useState(regionActive);
+  const derniereEntreeTentativee = useRef(0);
+  const tentativeCourante = useRef(0);
+  const [jourTraite, setJourTraite] = useState(false);
+  const [etatOuverture, setEtatOuverture] = useState<"repos" | "en-cours" | "echec">("repos");
+  const attenteRegistre = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rearmementJour = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const regionActiveRef = useRef(regionActive);
+  regionActiveRef.current = regionActive;
+  const { prepare, enCours, envoyer } = useFluxAnam();
+
+  useEffect(
+    () => () => {
+      if (attenteRegistre.current) clearTimeout(attenteRegistre.current);
+      if (rearmementJour.current) clearTimeout(rearmementJour.current);
+    },
+    [],
+  );
+
+  // Ajustement PENDANT le rendu : React recommence ce rendu avant le commit. Le premier frame visible
+  // d'Anam a donc déjà le composeur bloqué ; aucun brouillon ne peut gagner le verrou entre le clic
+  // de navigation et l'effet suivant. Le navigateur ne calcule AUCUN jour : il reçoit seulement du
+  // serveur un délai relatif jusqu'à minuit Paris, ce qui reste juste même si son horloge est fausse.
+  if (regionObservee !== regionActive) {
+    setRegionObservee(regionActive);
+    if (regionActive) setEntreeRegion((precedente) => precedente + 1);
+  }
+
+  const actionOuverture = onReclamerOuvertureQuotidienne;
+  const ouvertureQuotidienneDue =
+    regionActive &&
+    !!actionOuverture &&
+    !jourTraite &&
+    entreeRegion > derniereEntreeTentativee.current;
+
+  /*
+   * LE GESTE QUI FAIT EXISTER LA PREMIÈRE PAROLE.
+   *
+   * La conversation est montée sous `inert` dès l'ouverture de « Moi ». Déclencher cette action au
+   * montage écrirait et consommerait une visite d'Anam qui n'a jamais eu lieu. On attend donc
+   * `regionActive`, puis on affiche uniquement la ligne rendue par la transaction atomique. Deux
+   * onglets reçoivent les mêmes ids persistés. La réponse contient ensuite l'éventuelle parole
+   * proactive choisie pour CET instant ; le client pose `[fil, événement]` en un seul commit.
+   */
+  useEffect(() => {
+    if (
+      !ouvertureQuotidienneDue ||
+      !actionOuverture ||
+      etatOuverture === "en-cours" ||
+      enCours ||
+      prepare
+    ) return;
+
+    const numeroEntree = entreeRegion;
+    const idTentative = tentativeCourante.current + 1;
+    tentativeCourante.current = idTentative;
+    derniereEntreeTentativee.current = numeroEntree;
+    setEtatOuverture("en-cours");
+    setAnnonce(ANNONCE_ATTENTE);
+
+    void actionOuverture()
+      .then((resultat) => {
+        if (tentativeCourante.current !== idTentative) return;
+        if (resultat.statut === "indisponible") {
+          setAnnonce("");
+          setEtatOuverture("echec");
+          return;
+        }
+        if (resultat.statut === "en-cours") {
+          attenteRegistre.current = setTimeout(() => {
+            if (tentativeCourante.current !== idTentative) return;
+            setEtatOuverture("repos");
+            setEntreeRegion((precedente) => precedente + 1);
+          }, resultat.reessayerApresMs);
+          return;
+        }
+
+        setJourTraite(true);
+        if (rearmementJour.current) clearTimeout(rearmementJour.current);
+        rearmementJour.current = setTimeout(() => {
+          // Les clés ne valent que pour le jour traité. Une invitation légitimement resservie le
+          // lendemain sur la même branche ne doit pas être confondue avec un rejeu de cette session.
+          generationOuvertures.current += 1;
+          clesOuverturesServies.current.clear();
+          setJourTraite(false);
+          if (regionActiveRef.current) setEntreeRegion((precedente) => precedente + 1);
+        }, resultat.rearmementMs);
+        const idsAvantRelecture = new Set(toursCourants.current.map((tour) => tour.id));
+        // L'outbox conserve sa métadonnée plus longtemps que la fenêtre des 40 tours. Elle ne devient
+        // interactive — et surtout ne se marque « dite » — que si SA ligne est réellement revenue dans
+        // le fil. Sinon on fabriquerait une phrase fantôme dans l'aria-live et on brûlerait une annonce
+        // de socle / hypothèse que personne n'a vue.
+        const ouvertureLiee =
+          resultat.ouverture &&
+          resultat.tours.some(
+            (tour) =>
+              tour.id === resultat.ouverture?.tourId &&
+              tour.role === "anam" &&
+              tour.texte === resultat.ouverture.donnees.phrase,
+          )
+            ? resultat.ouverture
+            : null;
+        setTours((precedents) =>
+          fusionnerEntreeDuJour(precedents, resultat.tours, ouvertureLiee),
+        );
+        const ouvertureRendue = ouvertureLiee?.donnees ?? null;
+        const cleOuverture = cleDOuverture(ouvertureRendue);
+        if (cleOuverture) clesOuverturesServies.current.add(cleOuverture);
+        setOuvertureAffichee(ouvertureRendue);
+        const premiereParoleNouvelle = resultat.tours.find(
+          (tour) =>
+            tour.separateurAvant &&
+            tour.role === "anam" &&
+            !idsAvantRelecture.has(tour.id),
+        )?.texte;
+        // Un rechargement relit la même parole dans le DOM, mais ne la rejoue pas comme une nouvelle
+        // annonce live. Seule une ligne effectivement ajoutée à ce montage prend la parole.
+        setAnnonce(
+          premiereParoleNouvelle ? ouvertureRendue?.phrase ?? premiereParoleNouvelle : "",
+        );
+        setEtatOuverture("repos");
+      })
+      .catch(() => {
+        if (tentativeCourante.current !== idTentative) return;
+        setAnnonce("");
+        setEtatOuverture("echec");
+      });
+  }, [
+    actionOuverture,
+    entreeRegion,
+    enCours,
+    etatOuverture,
+    ouvertureQuotidienneDue,
+    prepare,
+  ]);
+
+  const relancerOuverture = useCallback(() => {
+    setJourTraite(false);
+    setEtatOuverture("repos");
+    setEntreeRegion((precedente) => precedente + 1);
+  }, []);
+  const ouvertureBloquante =
+    regionActive &&
+    !!actionOuverture &&
+    !jourTraite &&
+    (ouvertureQuotidienneDue || etatOuverture === "en-cours" || etatOuverture === "echec");
+
+  /**
+   * Réévaluation explicite après un geste. C'est le vrai chemin réactif de la 4.10 : la Server
+   * Component ne réserve plus rien au rendu, et une clé stable empêche un résultat rejoué de
+   * s'empiler dans cette séance.
+   */
+  const chargerOuvertureApresGeste = useCallback(async () => {
+    if (!onChargerOuvertureCourante) return;
+    const generation = generationOuvertures.current;
+    const resultat = await onChargerOuvertureCourante();
+    // Une lecture partie avant minuit ne doit pas déposer après minuit un événement de la veille,
+    // précisément au moment où le registre de déduplication vient d'être remis à zéro.
+    if (generationOuvertures.current !== generation) return;
+    if (resultat.statut !== "disponible" || !resultat.ouverture) return;
+    const cleOuverture = cleDOuverture(resultat.ouverture);
+    if (!cleOuverture || clesOuverturesServies.current.has(cleOuverture)) return;
+    clesOuverturesServies.current.add(cleOuverture);
+    setTours((precedents) => [...precedents, ...toursDOuverture(resultat.ouverture)]);
+    setOuvertureAffichee(resultat.ouverture);
+    setAnnonce(resultat.ouverture.phrase);
+  }, [onChargerOuvertureCourante]);
   // Allocation résiduelle épuisée (3.4, AC4) : le composeur passe désactivé-visible avec un motif.
   // Persistant pour la session (le fil est éphémère ; le mois se réévalue au prochain chargement réel).
   const [quotaEpuise, setQuotaEpuise] = useState(false);
-  const { prepare, enCours, envoyer } = useFluxAnam();
 
   // Beat « ouverture » monté au démarrage (2.2, AC6) ; « nommer » piloté par l'arc de séance (2.7,
   // via onBeat) ; « cloture » = seam 2.9. Passif : l'apparition ne vole jamais le focus au composeur.
@@ -283,9 +535,16 @@ export default function Conversation({
   // `aria-atomic` fait relire la région entière : l'annonce d'attente est donc REMPLACÉE par le
   // message complet à la fin, jamais empilée avec lui.
   useEffect(() => {
-    onPreparation?.(prepare);
-    if (prepare) setAnnonce(ANNONCE_ATTENTE);
-  }, [prepare, onPreparation]);
+    const attend =
+      prepare || etatOuverture === "en-cours" || ouvertureQuotidienneDue;
+    onPreparation?.(attend);
+    if (attend) setAnnonce(ANNONCE_ATTENTE);
+  }, [
+    etatOuverture,
+    ouvertureQuotidienneDue,
+    onPreparation,
+    prepare,
+  ]);
 
   // Clavier virtuel mobile (AC8) : `dvh` seul ne suffit pas (Chromium ne rétrécit pas les unités
   // viewport à l'ouverture du clavier). On lit `visualViewport` (resize + scroll) et on expose le
@@ -309,7 +568,9 @@ export default function Conversation({
 
   const lancer = useCallback(
     (messages: MessageEnvoi[], jeton: string) => {
-      const idAnam = nouvelId();
+      // Même identité que `lireFilRecent` reconstruira depuis `cle_tour` : une relecture après
+      // minuit fusionne les tours optimistes au lieu de les dupliquer sous leurs UUID de table.
+      const idAnam = `anam:${jeton}`;
       // Id du bilan de CE tour (ancre de la carte d'abonnement 3.2). Capturé dans la même clôture que
       // les rappels de flux → `onPaywall` insère la carte sous le bon bilan, sans état partagé.
       let idBilanCourant: string | null = null;
@@ -446,10 +707,14 @@ export default function Conversation({
             t.role === "lecture",
         )
         .map((t) => ({ role: t.role === "utilisatrice" ? "user" : "assistant", content: t.texte }));
-      setTours((prev) => [...prev, { id: nouvelId(), role: "utilisatrice", texte }]);
       // Nouveau tour LOGIQUE → nouveau jeton stable (3.4, AC1). Dans un handler d'événement (jamais au
       // rendu) → aucun risque de mismatch d'hydratation.
-      lancer([...histo, { role: "user", content: texte }], crypto.randomUUID());
+      const jeton = crypto.randomUUID();
+      setTours((prev) => [
+        ...prev,
+        { id: `utilisatrice:${jeton}`, role: "utilisatrice", texte },
+      ]);
+      lancer([...histo, { role: "user", content: texte }], jeton);
     },
     [tours, lancer],
   );
@@ -538,11 +803,13 @@ export default function Conversation({
           majEtatProposition(id, "nee", nom);
           setNommage(null);
           setAnnonce(CONFIRME_NAISSANCE); // #2 a11y : la naissance est annoncée.
+          onBrancheCreee?.();
+          void chargerOuvertureApresGeste();
           requestAnimationFrame(() => champRef.current?.focus()); // #2 focus : jamais sur <body>.
         })
         .catch(echoue);
     },
-    [majEtatProposition],
+    [chargerOuvertureApresGeste, majEtatProposition, onBrancheCreee],
   );
 
   return (
@@ -561,9 +828,17 @@ export default function Conversation({
         nommage={nommage}
         quotaEpuise={quotaEpuise}
       />
+      {etatOuverture === "echec" && ouvertureBloquante ? (
+        <div className={s.repriseOuverture} role="status">
+          <p className="t-meta">Anam n’a pas pu ouvrir la session.</p>
+          <button type="button" className={s.reessayerOuverture} onClick={relancerOuverture}>
+            <span className="t-bouton">Réessayer</span>
+          </button>
+        </div>
+      ) : null}
       <Composeur
         onEnvoyer={surEnvoi}
-        occupe={enCours}
+        occupe={enCours || ouvertureBloquante}
         champRef={champRef}
         motifDesactive={quotaEpuise ? LIGNE_QUOTA_EPUISEE : undefined}
       />

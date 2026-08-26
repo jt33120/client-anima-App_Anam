@@ -221,3 +221,11 @@ Revue multi-agents (6 angles Sonnet × vérification adversariale Opus ; **15 ex
 | 2026-07-29 | v0.1 | create-story — contexte exhaustif ; conception du gate serveur + jeton de tour + allocation config-lue ; décision ouverte tours vs tokens | Julian + Claude |
 | 2026-07-30 | v1.0 | dev-story TDD (T1→T7) — jeton de tour stable, allocation résiduelle config-lue, gate serveur post-sécurité, UX quota. 956 tests verts, tsc/eslint/build propres. Statut → review | Claude |
 | 2026-07-30 | v1.1 | revue adversariale (13 retenues) — 6 corrigés + mutation-vérifiés (gate idempotent au retry, comptage non pollué par premium, 3× a11y, garde de test) ; 4 différés avec raison (2 HAUTES dormantes derrière la porte ops, à acter). **963 tests verts.** | Claude |
+
+## Amendement 2026-08-26 — réservation atomique du quota gratuit
+
+Le comptage préalable de `usage_ia` laissait deux tours concurrents franchir ensemble la dernière place. Le correctif 0083 sépare désormais l'admission du coût : une réservation durable est prise dans `reservation_quota_ia` sous verrou transactionnel `(utilisatrice, mois UTC)` avant les appels conversationnels. La même clé reste admise idempotemment ; deux clés différentes au seuil ne peuvent plus gagner ensemble. Premium, détresse, première séance et configuration absente ne réservent rien ; une panne SQL reste fail-open. Il n'existe volontairement ni finalisation, ni annulation, ni expiration d'une réservation admise.
+
+Le déploiement reprend uniquement le mois UTC courant puis réconcilie, sous le même verrou, une éventuelle écriture legacy arrivée pendant le rollout. `usage_ia` conserve sa fonction exclusive : décrire le coût fournisseur réellement engagé ; il fournit seulement la trace de reprise, sans servir de mutex ni de compteur à la décision. La RPC est bornée côté route, ses erreurs portent un code technique non sensible, et le UUID est canonisé puis typé `uuid` à la frontière SQL.
+
+La revue Blind + Edge maintient explicitement la porte OPS fermée pour un usage hostile : le jeton reste choisi par le client et peut être réemployé volontairement sur plusieurs contenus (F2/F6). La course concurrente demandée est corrigée ; une clé de tour liée ou émise côté serveur reste nécessaire avant d'activer `ALLOCATION_RESIDUELLE_TOURS` comme véritable barrière économique.

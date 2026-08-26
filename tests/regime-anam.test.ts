@@ -238,22 +238,15 @@ function familleMotif(): Map<string, string> {
   return new Map([...corps.matchAll(/when\s+'([^']+)'\s*then\s*'([^']+)'/g)].map((m) => [m[1], m[2]]));
 }
 
-/** Les motifs que `motifs_anam_du()` rend — lus dans la migration 0054. */
-function motifsRendusInApp(): string[] {
-  const src = sansCommentairesSql(lireSource("supabase/migrations/0054_motifs_anam_in_app.sql"));
-  return [...src.matchAll(/select\s+'([a-z_]+)'::text/g)].map((m) => m[1]).sort();
-}
-
 const COURRIEL = MOTIFS_ANAM.filter((m) => regleDe(m)!.canal === "courriel").slice().sort();
 const IN_APP = MOTIFS_ANAM.filter((m) => regleDe(m)!.canal === "in-app").slice().sort();
 
 describe("[AC1] les extracteurs voient quelque chose — sans ce témoin, tous les miroirs sont vrais sur du vide", () => {
-  it("les quatre sources sont lues et non vides", () => {
-    // Le mode d'échec exact d'une garde dont l'extracteur casse : trois `[]` qui coïncident.
+  it("les trois sources sortantes sont lues et non vides", () => {
+    // Le mode d'échec exact d'une garde dont l'extracteur casse : des `[]` qui coïncident.
     expect(motifsCourriel().length, "MotifCourriel").toBeGreaterThan(0);
     expect(motifsDuCheck().length, "le CHECK SQL").toBeGreaterThan(0);
     expect(familleMotif().size, "famille_motif").toBeGreaterThan(0);
-    expect(motifsRendusInApp().length, "motifs_anam_du").toBeGreaterThan(0);
   });
 
   it("les extracteurs prennent la DERNIÈRE définition, pas la première", () => {
@@ -300,27 +293,13 @@ describe("[AC1] l'ensemble fermé est le MIROIR des trois vérités existantes, 
   });
 });
 
-describe("[AC8] ce qui est ANNONCÉ est là à l'ARRIVÉE — même source des deux côtés", () => {
-  it("[LE CŒUR] `motifs_anam_du()` rend EXACTEMENT l'ensemble du régime", () => {
-    // ⚠️ C'EST LA GARDE DE LA STORY ENTIÈRE. Le trou qu'elle répare : un courriel disait « ta
-    // synthèse est prête » et l'application ne le disait nulle part. Les deux dérivent maintenant du
-    // même ensemble — et cette égalité le PROUVE au lieu de l'espérer.
-    //
-    // Le sens « tout motif du régime est rendu » interdit qu'une annonce parte sans écran ;
-    // le sens « tout motif rendu est du régime » interdit qu'un écran affiche un motif clandestin.
-    expect(motifsRendusInApp()).toEqual(MOTIFS_ANAM.slice().sort());
+describe("[RETRAIT DE LA CARTE ANAM] aucune API in-app fantôme ne reste exposée", () => {
+  it("la migration forward-only supprime `motifs_anam_du()`", () => {
+    const src = sansCommentairesSql(
+      lireSource("supabase/migrations/0085_supprimer_motifs_anam_du.sql"),
+    );
+    expect(src).toMatch(/drop function if exists public\.motifs_anam_du\(\)/i);
   });
-
-  it("la migration 0054 n'ajoute AUCUN motif sortant (AC9)", () => {
-    // Mutation-cible : glisser un `alter table … motif_check` ou une branche à `famille_motif` dans
-    // 0054. Le CHECK et `famille_motif` doivent rester définis par 0053, `reserver_notification` par
-    // 0036 — la story ne rouvre aucun de ces fichiers.
-    const src = sansCommentairesNiChaines(lireSource("supabase/migrations/0054_motifs_anam_in_app.sql"));
-    for (const interdit of ["notification_envoyee_motif_check", "famille_motif", "reserver_notification"]) {
-      expect(src, `0054 touche à ${interdit}`).not.toContain(interdit);
-    }
-  });
-
 });
 
 describe("[AC3] l'aperçu ne porte JAMAIS la spécificité — et c'est prouvé, pas espéré", () => {
@@ -418,15 +397,13 @@ describe("[AC4 / AC5] aucune relance de réengagement, et la garde balaie la sou
     "lib/courriel/gabarits.ts",
     "lib/courriel/port.ts",
     "lib/data/depot-canal-courriel.ts",
-    "lib/data/depot-motifs-anam.ts",
     "lib/domain/regime-anam.ts",
-    "lib/domain/carte-anam.ts",
   ].filter((f) => existsSync(resolve(racine, f)));
 
   it("[CONTRÔLE DU CONTRÔLE] le chemin est réellement balayé, et l'extracteur attrape le connu-mauvais", () => {
     // Sans ces deux lignes, une liste vide ou un `sansCommentaires` trop gourmand rendrait tous les
     // refus ci-dessous vrais sur du vide.
-    expect(CHEMIN.length, "des fichiers du chemin ont disparu — relire la liste").toBeGreaterThanOrEqual(8);
+    expect(CHEMIN.length, "des fichiers du chemin ont disparu — relire la liste").toBeGreaterThanOrEqual(7);
     const faux = sansCommentaires('const requete = "select * from x where derniere_connexion < now()";');
     expect(RELANCE.some((r) => faux.toLowerCase().includes(r)), "l'extracteur ne voit plus rien").toBe(true);
   });
@@ -442,8 +419,6 @@ describe("[AC4 / AC5] aucune relance de réengagement, et la garde balaie la sou
     "lib/ordonnanceur/jobs/synthese.ts",
     "lib/ordonnanceur/jobs/rappel-echeance.ts",
     "lib/courriel/gabarits.ts",
-    "lib/data/depot-motifs-anam.ts",
-    "lib/domain/carte-anam.ts",
   ]) {
     it(`${f} ne sélectionne ni ne parle sur l'inactivité`, () => {
       const src = sansCommentaires(readFileSync(resolve(racine, f), "utf-8")).toLowerCase();

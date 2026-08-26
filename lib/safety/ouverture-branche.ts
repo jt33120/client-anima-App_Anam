@@ -3,12 +3,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { creerDepotSignalReconcept } from "@/lib/data/depot-reconceptualisation";
 import { creerDepotArbitrage } from "@/lib/data/depot-arbitrage";
 import { creerDepotRythme } from "@/lib/data/depot-rythme";
-import { PHRASE_PAUSE, seuilFranchi } from "@/lib/domain/rythme-pause";
+import {
+  APAISEMENT_JOURS,
+  PHRASE_PAUSE,
+  seuilFranchi,
+} from "@/lib/domain/rythme-pause";
 import { phraseProposition } from "@/lib/domain/branche";
 import {
   FENETRE_INVITATION_HEURES,
   PHRASE_INVITATION,
   PHRASE_SOCLE_COMPLETE,
+  SEUIL_BRANCHES_OUVERTES,
   tropDeBranchesOuvertes,
   type Ouverture,
 } from "@/lib/domain/arbitrage-ouverture";
@@ -21,8 +26,8 @@ import { PHRASE_OUVERTURE_HYPOTHESE } from "@/lib/domain/enneagramme-hypothese";
  * Story 4.5 (T4), ARBITRÉE PAR LA 4.10 — LE SEUL ENDROIT DU PRODUIT OÙ L'ON DÉCIDE D'OUVRIR UNE BRANCHE.
  *
  * C'est ce qui rend FR-030 implémentable proprement : l'arbitrage ne s'AJOUTE pas à côté de la proposition,
- * il SE SUBSTITUE à ce point unique. Appelé par `app/page.tsx` (Server Component sous JWT) au
- * franchissement du seuil, APRÈS la garde onboarding.
+ * il SE SUBSTITUE à ce point unique. Appelé par une Server Action sous JWT seulement quand la
+ * région Anam est visible, APRÈS la garde onboarding et — pour le jour — après un bail exclusif.
  *
  * ── L'ARBITRAGE, EN TROIS TEMPS ───────────────────────────────────────────────────────────────────────
  *
@@ -68,11 +73,57 @@ import { PHRASE_OUVERTURE_HYPOTHESE } from "@/lib/domain/enneagramme-hypothese";
  */
 export type { Ouverture } from "@/lib/domain/arbitrage-ouverture";
 
-export async function chargerOuverture(
+/**
+ * Paramètres internes nécessaires pour réserver la parole DANS la transaction qui grave le tour.
+ * Ils ne traversent jamais le rendu : seule `ouverture` en sort après la finalisation.
+ */
+export type ReservationOuverture =
+  | {
+      readonly type: "pause";
+      readonly seances: number;
+      readonly minutes: number;
+      readonly apaisementJours: number;
+    }
+  | {
+      readonly type: "invitation";
+      readonly fenetreHeures: number;
+      /** Règle produit transmise à la transaction, jamais recopiée en constante SQL. */
+      readonly seuilBranches: number;
+    };
+
+export interface OuverturePreparee {
+  readonly ouverture: Ouverture;
+  readonly reservation: ReservationOuverture | null;
+}
+
+type ModeOuverture = "reserver" | "preparer";
+
+function rendreDecision(
+  mode: ModeOuverture,
+  ouverture: Ouverture,
+  reservation: ReservationOuverture | null = null,
+): Ouverture | OuverturePreparee {
+  return mode === "preparer" ? { ouverture, reservation } : ouverture;
+}
+
+async function choisirOuverture(
   supabase: SupabaseClient,
   utilisatriceId: string,
-  maintenant: Date = new Date(),
-): Promise<Ouverture | null> {
+  maintenant: Date,
+  mode: "reserver",
+): Promise<Ouverture | null>;
+async function choisirOuverture(
+  supabase: SupabaseClient,
+  utilisatriceId: string,
+  maintenant: Date,
+  mode: "preparer",
+): Promise<OuverturePreparee | null>;
+async function choisirOuverture(
+  supabase: SupabaseClient,
+  utilisatriceId: string,
+  maintenant: Date,
+  mode: ModeOuverture,
+): Promise<Ouverture | OuverturePreparee | null> {
   try {
 
     // ══════════════════════════════════════════════════════════════════════════════════════════
@@ -105,8 +156,16 @@ export async function chargerOuverture(
       // ⚠️ `seuilFranchi` est la SEULE lecture de la mesure qui existe. Il n'y a pas de branche
       // « et si elle vient peu ? » — l'AC4 dit qu'aucune absence n'est constatée, jamais, et
       // l'absence de la fonction inverse EST cette garantie (voir `rythme-pause.ts`).
-      if (seuilFranchi(mesure) && (await rythme.reserver(mesure))) {
-        return { type: "pause", phrase: PHRASE_PAUSE };
+      if (seuilFranchi(mesure)) {
+        const ouverture = { type: "pause" as const, phrase: PHRASE_PAUSE };
+        const reservation = {
+          type: "pause" as const,
+          seances: mesure.seances,
+          minutes: mesure.minutes,
+          apaisementJours: APAISEMENT_JOURS,
+        };
+        if (mode === "preparer") return rendreDecision(mode, ouverture, reservation);
+        if (await rythme.reserver(mesure)) return rendreDecision(mode, ouverture, reservation);
       }
     } catch (e) {
       journaliserIncidentSecurite("ouverture_pause_rythme", e);
@@ -135,8 +194,8 @@ export async function chargerOuverture(
     try {
       // ⚠️ LECTURE SEULE DEPUIS UN RENDU SERVEUR (revue du 2026-08-12, B3 — migration 0045).
       //
-      // Cet appel dépensait la mention. Or il part d'`app/page.tsx`, donc à chaque rendu de la
-      // scène — et la scène monte ses trois régions en permanence, `inert` sauf l'active. Une
+      // Cet appel dépensait jadis la mention depuis `app/page.tsx`, donc à chaque rendu de la scène
+      // — qui monte ses trois régions en permanence, `inert` sauf l'active. Une
       // utilisatrice qui arrive dans la région ARBRE faisait consommer sa phrase par un rendu qui
       // la plaçait dans une région qu'aucun lecteur d'écran n'annonce. Un rechargement avant
       // d'ouvrir la conversation, et la phrase était perdue POUR TOUJOURS.
@@ -145,7 +204,10 @@ export async function chargerOuverture(
       // rendu. La dépense vit maintenant dans `marquerAnnonceSocleDite`, appelée quand la phrase a
       // atteint l'écran.
       if (await creerDepotArbitrage(supabase).annonceSocleDue()) {
-        return { type: "socle-complete", phrase: PHRASE_SOCLE_COMPLETE };
+        return rendreDecision(mode, {
+          type: "socle-complete",
+          phrase: PHRASE_SOCLE_COMPLETE,
+        });
       }
     } catch (e) {
       journaliserIncidentSecurite("ouverture_socle_complete", e);
@@ -166,9 +228,9 @@ export async function chargerOuverture(
     // L'hypothèse, elle, reste `en_attente` en base : elle repart au prochain chargement. La règle
     // est constante dans ce fichier — ce qui ne revient pas de soi-même passe devant.
     //
-    // ⚠️ LECTURE SEULE, ET C'EST LA TROISIÈME FOIS QUE CE DÉPÔT L'ÉCRIT. Ce chemin part
-    // d'`app/page.tsx`, donc à chaque rendu de la scène — et la scène monte ses trois régions en
-    // permanence, `inert` sauf l'active. Une parole marquée « dite » ici se dépenserait sans avoir
+    // ⚠️ LECTURE SEULE, ET C'EST LA TROISIÈME FOIS QUE CE DÉPÔT L'ÉCRIT. Ce chemin part désormais
+    // d'une action visible ; la scène monte néanmoins ses trois régions en permanence, `inert` sauf
+    // l'active. Une parole marquée « dite » ici se dépenserait sans avoir
     // jamais atteint un écran : la faute a été payée en revue 4.10 (`reserver_invitation_integration`
     // consommée par un `router.refresh()`) puis en migration 0045. La dépense vit dans
     // `marquerHypotheseDite`, appelée par le CLIENT quand la région est active.
@@ -186,11 +248,11 @@ export async function chargerOuverture(
       // même prédicat que `charger_proposition_branche`, dont le germe a la même forme.
       const h = await chargerHypotheseADire(supabase);
       if (h.statut === "calcule") {
-        return {
+        return rendreDecision(mode, {
           type: "hypothese-enneagramme",
           phrase: PHRASE_OUVERTURE_HYPOTHESE,
           hypotheseId: h.hypothese.id,
-        };
+        });
       }
     } catch (e) {
       journaliserIncidentSecurite("ouverture_hypothese_enneagramme", e);
@@ -248,17 +310,49 @@ export async function chargerOuverture(
         // La réservation ÉCRIT : elle EST la décision, et elle est atomique — deux onglets ne peuvent pas
         // dire deux fois la même chose. Un refus veut dire « Anam a déjà dit ça récemment, et rien n'a
         // bougé depuis » : silence, et le germe reste intact.
+        const ouverture = {
+          type: "invitation" as const,
+          phrase: PHRASE_INVITATION,
+          brancheCibleId: faits.brancheCibleId,
+        };
+        const reservation = {
+          type: "invitation" as const,
+          fenetreHeures: FENETRE_INVITATION_HEURES,
+          seuilBranches: SEUIL_BRANCHES_OUVERTES,
+        };
+        if (mode === "preparer") return rendreDecision(mode, ouverture, reservation);
         const parole = await arbitrage.reserverParole(FENETRE_INVITATION_HEURES);
         if (!parole) return null;
-        return { type: "invitation", phrase: PHRASE_INVITATION, brancheCibleId: faits.brancheCibleId };
+        return rendreDecision(mode, ouverture, reservation);
       }
     } catch (e) {
       journaliserIncidentSecurite("ouverture_arbitrage", e);
     }
 
-    return proposition;
+    return rendreDecision(mode, proposition);
   } catch (e) {
     journaliserIncidentSecurite("ouverture_branche", e);
     return null;
   }
+}
+
+/** Chemin historique : la réservation est immédiatement consommée par une parole courante. */
+export async function chargerOuverture(
+  supabase: SupabaseClient,
+  utilisatriceId: string,
+  maintenant: Date = new Date(),
+): Promise<Ouverture | null> {
+  return choisirOuverture(supabase, utilisatriceId, maintenant, "reserver");
+}
+
+/**
+ * Chemin du bonjour quotidien : choisit sans écrire. Le registre réservera et gravera ensuite dans
+ * UNE transaction ; un crash entre ces deux gestes ne peut donc plus brûler une pause/invitation.
+ */
+export async function preparerOuverture(
+  supabase: SupabaseClient,
+  utilisatriceId: string,
+  maintenant: Date = new Date(),
+): Promise<OuverturePreparee | null> {
+  return choisirOuverture(supabase, utilisatriceId, maintenant, "preparer");
 }

@@ -769,3 +769,49 @@ lit ce fichier, `epics.md` et `lib/domain/bibliotheque.ts`, et **échoue** si :
 - les **quatre** valeurs de plancher divergent : celle de la ligne 144, celle de cette section, celle
   d'UX-DR-30 dans `epics.md`, celle de l'assertion de `lib/domain/bibliotheque.ts` ;
 - le refus de la grille d'icônes-rubriques (§4) disparaît sans que l'issue B soit écrite à sa place.
+
+## Amendement du 2026-08-26 — Issue B choisie : « Moi » devient la porte des univers
+
+La demande du 2026-08-26 tranche l'alternative laissée ouverte au §4 : **Issue B est choisie**. Le
+refus de la grille d'icônes-rubriques ne s'applique plus. Cette grille **remplace** la bibliothèque ;
+elle ne s'y ajoute pas.
+
+### 1. Nouvelle grammaire de « Moi »
+
+Au-dessus du pli restent seulement le jour, **Ton ciel du jour** et **Le mantra du jour**. Ils forment
+un même moment quotidien, calme et impersonnel. En défilant, une transition verticale de lumière
+conduit à trois portes de rang égal : **Astrologie**, **Numérologie** et **Psychologie**. **Human
+Design** vit dans Psychologie, avec l'Ennéagramme et Big Five : le rendre aussi au premier niveau
+dupliquerait la même destination et brouillerait la hiérarchie. Les portes sont illustrées par des glyphes célestes, légèrement scintillants, sans badge,
+compteur, jauge, cadenas ni état de complétude.
+
+Les objets stables — thème natal, nombres, type et futurs outils psychologiques — vivent derrière ces
+portes. Ils ne reviennent plus comme cartes quotidiennes. « Moi » reste un lieu, pas un tableau de
+bord : aucune donnée administrative, juridique ou d'abonnement n'entre dans cette région.
+
+### 2. Anam ne se répète plus dans « Moi »
+
+La carte **« Anam se manifeste » disparaît**. Elle faisait doublon avec la région Anam et mélangeait
+les deux rythmes que le PRD sépare : quotidien calculé d'un côté, relation de l'autre. Toute parole
+spécifique d'Anam appartient désormais à son fil, où elle est lisible, datée et actionnable.
+
+### 3. Psychologie : une porte réelle, pas une promesse vague
+
+L'univers Psychologie montre immédiatement l'Ennéagramme existant. Quand le test n'a pas été passé,
+un bouton explicite et nommé mène à `/enneagramme`. L'ancienne interdiction de CTA portée par la
+Story 7.8 est annulée.
+
+Big Five et Human Design ne doivent pas être remplis par le prototype de référence : son Big Five
+n'est pas étalonné et son Human Design est une valeur codée en dur. Human Design n'est pas présenté
+comme un QCM ; sa porte explique qu'il nécessite un calcul déterministe à partir de la naissance et
+reste fermée tant que moteur, références de validation et droits d'usage ne sont pas établis.
+
+### 4. Conséquences de garde
+
+- Le plancher de cartes et la rotation `CATALOGUE_CARTES` sont retirés avec l'ancienne grammaire.
+- La garde FR-031 se reporte sur les types des portes : aucune mesure ni état numérique ne traverse.
+- Les Stories 7.7, 7.8 et 7.10 sont remplacées par les stories de l'Epic 13 du correctif de cap.
+- L'accueil doit rester fluide : les trois routes sont des `Link` préchargeables, portent un état
+  `pending` sans déplacement de mise en page, et les haltes dynamiques ont un `loading.tsx`.
+- Les glyphes et leurs lueurs utilisent les tokens existants ; au plus trois animations d'opacité,
+  toutes supprimées sous `prefers-reduced-motion` et en lisibilité renforcée.

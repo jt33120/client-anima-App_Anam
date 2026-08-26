@@ -1,9 +1,21 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, cleanup, fireEvent } from "@testing-library/react";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
+import { act, render, cleanup, fireEvent, waitFor } from "@testing-library/react";
+
+const navigation = vi.hoisted(() => ({ pathname: "/" }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => navigation.pathname,
+}));
+
 import MenuCompte from "@/render/menu/MenuCompte";
 import Surimpression from "@/render/surimpression";
 import { surimpressionPour } from "@/lib/scene";
-import { ENTREES_MENU, LIBELLE_GLYPHE, TITRE_FEUILLE, LIBELLE_FERMER } from "@/lib/domain/menu-compte";
+import {
+  ENTREES_MENU,
+  GROUPES_MENU,
+  LIBELLE_GLYPHE,
+  TITRE_FEUILLE,
+  LIBELLE_FERMER,
+} from "@/lib/domain/menu-compte";
 
 /**
  * menu-compte-rendu.test.tsx — [7.3] LE GLYPHE, LA FEUILLE, ET CE QUI NE DOIT PAS BOUGER.
@@ -23,7 +35,7 @@ import { ENTREES_MENU, LIBELLE_GLYPHE, TITRE_FEUILLE, LIBELLE_FERMER } from "@/l
  */
 const COPIE = {
   lienVers: (url: string) => url,
-  entrees: ENTREES_MENU,
+  groupes: GROUPES_MENU,
   libelleGlyphe: LIBELLE_GLYPHE,
   titreFeuille: TITRE_FEUILLE,
   libelleFermer: LIBELLE_FERMER,
@@ -31,7 +43,14 @@ const COPIE = {
 
 const menuSeul = () => render(<MenuCompte {...COPIE} />);
 
-afterEach(cleanup);
+beforeEach(() => {
+  navigation.pathname = "/";
+});
+
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 describe("[7.3] le glyphe", () => {
   it("[LE CŒUR] il porte un nom accessible, un état d'ouverture, et il est fermé au départ", () => {
@@ -68,6 +87,21 @@ describe("[7.3] la feuille", () => {
     expect(liens.map((a) => a.getAttribute("href"))).toEqual(ENTREES_MENU.map((e) => e.url));
   });
 
+  it("[LE CŒUR] rend les quatre familles sans mélanger exploration et administration", () => {
+    const { container } = menuSeul();
+    fireEvent.click(container.querySelector("button")!);
+    const titres = [...container.querySelectorAll("[role='dialog'] nav h3")].map(
+      (titre) => titre.textContent,
+    );
+    expect(titres).toEqual(["Aide", "Explorer", "Compte", "Confidentialité"]);
+
+    const groupes = [...container.querySelectorAll("[role='dialog'] nav section")];
+    expect(groupes[1].querySelector("a[href='/socle']")).not.toBeNull();
+    expect(groupes[1].querySelector("a[href='/abonnement']")).toBeNull();
+    expect(groupes[2].querySelector("a[href='/abonnement']")).not.toBeNull();
+    expect(groupes[3].querySelector("a[href='/mes-donnees']")).not.toBeNull();
+  });
+
   it("[FR-077] « Aide et ressources » est le PREMIER lien de la feuille", () => {
     const { container } = menuSeul();
     fireEvent.click(container.querySelector("button")!);
@@ -75,12 +109,99 @@ describe("[7.3] la feuille", () => {
     expect(premier.getAttribute("href")).toBe("/aide");
   });
 
-  it("chaque entrée dit ce qu'il y a derrière — jamais une ligne sèche", () => {
+  it("chaque entrée dit brièvement ce qu'il y a derrière — jamais une ligne sèche ni un paragraphe", () => {
     const { container } = menuSeul();
     fireEvent.click(container.querySelector("button")!);
     for (const a of container.querySelectorAll("[role='dialog'] a")) {
-      expect((a.textContent ?? "").length, `entrée sans phrase : ${a.getAttribute("href")}`).toBeGreaterThan(40);
+      const texte = a.textContent ?? "";
+      expect(texte.length, `entrée sans phrase : ${a.getAttribute("href")}`).toBeGreaterThan(30);
+      expect(texte.length, `entrée redevenue trop dense : ${a.getAttribute("href")}`).toBeLessThan(90);
     }
+  });
+
+  it("accuse réception immédiatement et nomme la destination pendant la navigation", () => {
+    const { container } = menuSeul();
+    fireEvent.click(container.querySelector("button")!);
+    const lien = container.querySelector<HTMLAnchorElement>("a[href='/socle']")!;
+    fireEvent.click(lien);
+    expect(lien.getAttribute("aria-busy")).toBe("true");
+    expect(container.querySelector("[role='status']")?.textContent).toContain("Ton socle");
+    expect(container.querySelector("[role='dialog']")?.getAttribute("aria-busy")).toBe("true");
+  });
+
+  it("verrouille les activations normales suivantes pendant la première navigation", () => {
+    const { container } = menuSeul();
+    fireEvent.click(container.querySelector("button")!);
+    const socle = container.querySelector<HTMLAnchorElement>("a[href='/socle']")!;
+    const abonnement = container.querySelector<HTMLAnchorElement>("a[href='/abonnement']")!;
+
+    fireEvent.click(socle);
+    expect(abonnement.getAttribute("aria-disabled")).toBe("true");
+    expect(fireEvent.click(abonnement), "le deuxième clic doit être annulé").toBe(false);
+    expect(container.querySelector("[role='status']")?.textContent).toContain("Ton socle");
+    expect(container.querySelector("[role='status']")?.textContent).not.toContain("abonnement");
+  });
+
+  it("Échap, fermer, le fond et le glyphe ne réarment pas les destinations pendant la route", () => {
+    const { container } = menuSeul();
+    const glyphe = container.querySelector<HTMLButtonElement>("button[aria-haspopup='dialog']")!;
+    fireEvent.click(glyphe);
+    const socle = container.querySelector<HTMLAnchorElement>("a[href='/socle']")!;
+    fireEvent.click(socle);
+
+    const dialogue = container.querySelector<HTMLElement>("[role='dialog']")!;
+    const fermer = dialogue.querySelector<HTMLButtonElement>("button")!;
+    const fond = dialogue.previousElementSibling as HTMLElement;
+    expect(fermer.disabled).toBe(true);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.click(fermer);
+    fireEvent.click(fond);
+    fireEvent.click(glyphe);
+
+    expect(container.querySelector("[role='dialog']")).toBe(dialogue);
+    expect(glyphe.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector("[role='status']")?.textContent).toContain("Ton socle");
+    const abonnement = container.querySelector<HTMLAnchorElement>("a[href='/abonnement']")!;
+    expect(fireEvent.click(abonnement), "la fermeture ne doit pas avoir libéré le second lien").toBe(false);
+    expect(container.querySelector("[role='status']")?.textContent).not.toContain("abonnement");
+  });
+
+  it("réarme la feuille si la navigation n'a produit aucun changement de route", () => {
+    vi.useFakeTimers();
+    const { container } = menuSeul();
+    fireEvent.click(container.querySelector("button[aria-haspopup='dialog']")!);
+    const socle = container.querySelector<HTMLAnchorElement>("a[href='/socle']")!;
+    const abonnement = container.querySelector<HTMLAnchorElement>("a[href='/abonnement']")!;
+    const fermer = container.querySelector<HTMLButtonElement>("[role='dialog'] button")!;
+
+    fireEvent.click(socle);
+    expect(fermer.disabled).toBe(true);
+    expect(abonnement.getAttribute("aria-disabled")).toBe("true");
+
+    act(() => vi.advanceTimersByTime(10_000));
+
+    expect(fermer.disabled).toBe(false);
+    expect(abonnement.getAttribute("aria-disabled")).toBeNull();
+    expect(container.querySelector("[role='dialog']")?.getAttribute("aria-busy")).toBe("false");
+    fireEvent.click(fermer);
+    expect(container.querySelector("[role='dialog']")).toBeNull();
+  });
+
+  it("acquitte et ferme l'attente dès que le pathname change", async () => {
+    const vue = menuSeul();
+    const glyphe = vue.container.querySelector<HTMLButtonElement>("button[aria-haspopup='dialog']")!;
+    fireEvent.click(glyphe);
+    fireEvent.click(vue.container.querySelector<HTMLAnchorElement>("a[href='/socle']")!);
+    expect(vue.container.querySelector("[role='dialog']")?.getAttribute("aria-busy")).toBe("true");
+
+    navigation.pathname = "/socle";
+    vue.rerender(<MenuCompte {...COPIE} />);
+
+    await waitFor(() => expect(vue.container.querySelector("[role='dialog']")).toBeNull());
+    expect(glyphe.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(glyphe);
+    expect(vue.container.querySelector("[role='dialog'] a")?.getAttribute("aria-disabled")).toBeNull();
   });
 
   it("elle est un dialogue modal, nommé par son titre", () => {
@@ -166,6 +287,18 @@ describe("[7.3] l'ouverture, la fermeture, et le focus", () => {
     focusables[focusables.length - 1].focus();
     fireEvent.keyDown(document, { key: "Tab" });
     expect(document.activeElement).toBe(focusables[0]);
+  });
+
+  it("[PIÈGE À FOCUS BORNÉ] Shift+Tab depuis la feuille initiale va au dernier élément", () => {
+    const { container } = menuSeul();
+    fireEvent.click(container.querySelector("button")!);
+    const feuille = container.querySelector<HTMLElement>("[role='dialog']")!;
+    const focusables = [...feuille.querySelectorAll<HTMLElement>("a, button")];
+    expect(document.activeElement).toBe(feuille);
+
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+
+    expect(document.activeElement).toBe(focusables[focusables.length - 1]);
   });
 });
 

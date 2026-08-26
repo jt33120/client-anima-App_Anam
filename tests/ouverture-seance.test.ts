@@ -1,8 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { phraseDOuverture, type MatiereOuverture, estUneArrivee, REPRISE_HEURES } from "@/lib/domain/ouverture-seance";
-import { tourDepuisLigne } from "@/lib/data/depot-fil";
+import {
+  cleJourParis,
+  delaiAvantProchainJourParis,
+  phraseDOuverture,
+  saluerOuvertureEvenement,
+  type MatiereOuverture,
+  estUneArrivee,
+} from "@/lib/domain/ouverture-seance";
+import { marquerPremierTourDuJour, tourDepuisLigne } from "@/lib/data/depot-fil";
 
 /**
  * ouverture-seance.test.ts — C'EST ANAM QUI PARLE LA PREMIÈRE (retour du 2026-08-23).
@@ -28,6 +35,7 @@ describe("[ELLE PARLE, ET ELLE MÈNE]", () => {
       { dejaVenue: true, prenom: "Louise" },
       { dejaVenue: true, branchesVivantes: ["le déménagement"] },
       { dejaVenue: true, prenom: "Louise", branchesVivantes: ["le déménagement", "ma sœur"] },
+      { dejaVenue: null },
     ];
     for (const c of cas) {
       expect(dire(c), `sans question : « ${dire(c)} »`).toMatch(/\?/);
@@ -41,19 +49,35 @@ describe("[ELLE PARLE, ET ELLE MÈNE]", () => {
     }
   });
 
-  it("aucune salutation d'heure, aucun « bienvenue », aucun point d'exclamation", () => {
+  it("accueille explicitement sans salutation dépendante de l'heure", () => {
     // ⚠️ « Bonsoir » a été relevé à 9 h 55 puis à 10 h 15 du matin (QA du 2026-08-19) : le serveur
     // est en UTC, et une salutation fausse sur le premier écran dit à quelqu'un que le lieu ne le
     // regarde pas. La leçon vaut ici aussi, et pour toutes les ouvertures.
     for (const c of [{}, { prenom: "Louise" }, { dejaVenue: true, branchesVivantes: ["ma sœur"] }]) {
+      expect(dire(c)).toMatch(/^Te (re)?voilà/);
       expect(dire(c)).not.toMatch(/bonjour|bonsoir|bienvenue|salut\b|!/i);
     }
+  });
+
+  it("une ouverture précise porte la salutation dans le même tour", () => {
+    expect(
+      saluerOuvertureEvenement("Tu veux regarder ça avec moi ?", {
+        prenom: "Louise",
+        dejaVenue: true,
+      }),
+    ).toBe("Te revoilà, Louise — Tu veux regarder ça avec moi ?");
   });
 });
 
 describe("[ELLE SAIT, OU ELLE DIT QU'ELLE NE SAIT PAS]", () => {
   it("première fois : elle admet l'ignorance plutôt que de faire semblant", () => {
     expect(dire({})).toMatch(/je ne sais rien de toi/i);
+  });
+
+  it("lecture du passé impossible : elle ne prétend ni première fois ni retour", () => {
+    const phrase = dire({ dejaVenue: null });
+    expect(phrase).toMatch(/^Te voilà/);
+    expect(phrase).not.toMatch(/revoilà|je ne sais rien de toi/i);
   });
 
   it("le prénom est repris quand il existe, jamais inventé quand il manque", () => {
@@ -88,48 +112,51 @@ describe("[ELLE SAIT, OU ELLE DIT QU'ELLE NE SAIT PAS]", () => {
 describe("[CÂBLAGE] elle ne prend la place de personne", () => {
   const page = readFileSync(resolve(process.cwd(), "app/page.tsx"), "utf-8");
 
-  it("elle n'ouvre QUE s'il n'y a rien d'autre à ouvrir — la priorité est intacte", () => {
-    // Empilée sur une proposition de branche, elle ferait parler Anam deux fois avant qu'on ait dit
-    // un mot. Le `??` est ce qui la met EN DERNIER, et cette moitié-là ne bouge pas.
-    //
-    // ⚠️ LA SECONDE MOITIÉ DE CETTE GARDE ÉPELAIT `historique.length === 0`, c'est-à-dire la
-    // CONDITION du 23 août — et cette condition était le défaut. Une garde qui recopie une ligne
-    // de code ne protège pas une propriété : elle interdit de la corriger. La règle d'arrivée est
-    // mesurée pour ce qu'elle FAIT, dans le bloc « ANAM OUVRE À CHAQUE ARRIVÉE » plus bas.
-    expect(page).toMatch(/ouverture\s*\?\?/);
+  it("l'ouverture quotidienne et la réévaluation après geste ont deux actions explicites", () => {
+    expect(page).toMatch(/onReclamerOuvertureQuotidienne=\{reclamerOuvertureDuJour\}/);
+    expect(page).toMatch(/onChargerOuvertureCourante=\{chargerOuvertureCourante\}/);
   });
 
-  it("[LE CŒUR] la clé d'ouverture porte la PHRASE — sans quoi Anam se répète", () => {
-    // Sans identifiant en base, une clé constante ferait rejouer la même parole en tête d'un fil
-    // qui la contient déjà, à chaque rafraîchissement.
-    const conv = readFileSync(resolve(process.cwd(), "render/conversation/Conversation.tsx"), "utf-8");
-    expect(conv).toMatch(/case "premiere-parole":[\s\S]{0,600}return `o:\$\{o\.phrase\}`/);
+  it("[LE CŒUR] aucune première parole éphémère ne subsiste dans le contrat de rendu", () => {
+    const types = readFileSync(resolve(process.cwd(), "render/conversation/types.ts"), "utf-8");
+    expect(types).not.toContain('type: "premiere-parole"');
   });
 });
 
-describe("[2026-08-25] ANAM OUVRE À CHAQUE ARRIVÉE, pas seulement sur un fil vide", () => {
-  // ⚠️ LE DÉFAUT QUE CETTE GARDE FERME. La condition était « le fil est vide », et le fil couvre
-  // 24 h glissantes : quelqu'un qui avait parlé la veille au soir revenait sur un fil NON vide,
-  // donc sans un mot d'Anam. Elle n'ouvrait que pour une absente de plus d'un jour — c'est-à-dire
-  // jamais pour celle qui revient. Retour d'usage : « ça fait juste parler à ChatGPT ».
-  const T = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
-  const maintenant = new Date();
+describe("[2026-08-26] ANAM OUVRE AU PREMIER ACCÈS DU JOUR PARISIEN", () => {
+  const maintenant = new Date("2026-08-26T10:00:00Z"); // midi à Paris
 
-  it("[LE CŒUR] un fil NON vide mais ancien est une arrivée — c'est tout le correctif", () => {
-    expect(estUneArrivee(T(4), maintenant), "4 h de silence : elle doit ouvrir").toBe(true);
-    expect(estUneArrivee(T(20), maintenant), "20 h : dans la fenêtre du fil, et pourtant une arrivée").toBe(true);
+  it("[LE CŒUR] quatre heures le même jour ne produisent pas une seconde ouverture", () => {
+    expect(estUneArrivee("2026-08-26T06:00:00Z", maintenant)).toBe(false);
   });
 
-  it("[LE CŒUR] une pause DANS un échange n'en est pas une — la resaluer serait un bug", () => {
-    expect(estUneArrivee(T(0.1), maintenant), "six minutes").toBe(false);
-    expect(estUneArrivee(T(1), maintenant), "une heure").toBe(false);
+  it("[LE CŒUR] une parole à 23 h 59 la veille déclenche l'ouverture du nouveau jour", () => {
+    expect(estUneArrivee("2026-08-25T21:59:00Z", maintenant)).toBe(true);
   });
 
-  it("l'écart est de plusieurs heures — ni un seuil de minutes, ni un jour entier", () => {
-    // Une valeur trop courte resalue au milieu d'une conversation ; trop longue, on retombe dans
-    // le défaut qu'on vient de corriger. La borne est mesurée, pas décrite en prose.
-    expect(REPRISE_HEURES).toBeGreaterThanOrEqual(2);
-    expect(REPRISE_HEURES).toBeLessThanOrEqual(8);
+  it("une parole à 00 h 01 appartient déjà à aujourd'hui, même si elle est proche de minuit", () => {
+    expect(estUneArrivee("2026-08-25T22:01:00Z", maintenant)).toBe(false);
+  });
+
+  it("le changement d'heure d'hiver ne change pas la définition du jour", () => {
+    expect(cleJourParis(new Date("2026-01-15T23:05:00Z"))).toBe("2026-01-16");
+    expect(estUneArrivee("2026-01-15T22:55:00Z", new Date("2026-01-15T23:05:00Z"))).toBe(true);
+  });
+
+  it("le passage à l'heure d'été garde une seule clé civile", () => {
+    expect(cleJourParis(new Date("2026-03-29T00:30:00Z"))).toBe("2026-03-29");
+    expect(cleJourParis(new Date("2026-03-29T01:30:00Z"))).toBe("2026-03-29");
+  });
+
+  it("l'heure répétée au retour d'hiver ne fabrique pas deux journées", () => {
+    expect(cleJourParis(new Date("2026-10-25T00:30:00Z"))).toBe("2026-10-25");
+    expect(cleJourParis(new Date("2026-10-25T01:30:00Z"))).toBe("2026-10-25");
+  });
+
+  it("le serveur rend un délai relatif juste jusqu'à minuit, y compris aux changements d'heure", () => {
+    expect(delaiAvantProchainJourParis(new Date("2026-08-26T10:00:00Z"))).toBe(12 * 3_600_000);
+    expect(delaiAvantProchainJourParis(new Date("2026-03-28T23:00:00Z"))).toBe(23 * 3_600_000);
+    expect(delaiAvantProchainJourParis(new Date("2026-10-24T22:00:00Z"))).toBe(25 * 3_600_000);
   });
 
   it("aucun tour, ou un horodatage illisible → arrivée (le repli parle plutôt que de se taire)", () => {
@@ -138,16 +165,20 @@ describe("[2026-08-25] ANAM OUVRE À CHAQUE ARRIVÉE, pas seulement sur un fil v
     expect(estUneArrivee("", maintenant)).toBe(true);
   });
 
-  it("[ANTI-VACUITÉ] la fonction DISCRIMINE — sinon les quatre tests ci-dessus sont gratuits", () => {
-    // Une implémentation `() => true` passerait tout ce qui précède sauf ceci.
-    expect(new Set([estUneArrivee(T(0.1), maintenant), estUneArrivee(T(20), maintenant)]).size).toBe(2);
+  it("[ANTI-VACUITÉ] la fonction discrimine bien hier d'aujourd'hui", () => {
+    expect(
+      new Set([
+        estUneArrivee("2026-08-25T21:59:00Z", maintenant),
+        estUneArrivee("2026-08-25T22:01:00Z", maintenant),
+      ]).size,
+    ).toBe(2);
   });
 
-  it("la PAGE consulte l'écart, et ne demande plus si le fil est vide", () => {
-    // Garde de câblage : la règle peut être parfaite et n'être appelée par personne. C'est
-    // exactement ce qui rendait l'ancienne condition invisible — elle vivait dans la page.
+  it("la PAGE ne décide plus depuis un historique glissant ni depuis un fil vide", () => {
+    // La date est vérifiée au geste par l'action/RPC : une page restée ouverte à minuit ne doit
+    // jamais garder la décision calculée lors de son rendu initial.
     const page = readFileSync(resolve(process.cwd(), "app/page.tsx"), "utf-8");
-    expect(page, "la page n'appelle pas la règle d'arrivée").toMatch(/estUneArrivee\(derniereParole, maintenant\)/);
+    expect(page.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "")).not.toMatch(/estUneArrivee|derniereParole/);
     expect(page.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, ""), "la page décide encore sur un fil vide").not.toMatch(
       /historique\.length === 0/,
     );
@@ -167,6 +198,21 @@ describe("[LE FIL REND L'HORODATAGE] sans lui, la règle d'arrivée retombe sur 
     });
   });
 
+  it("`cle_tour` devient la même identité que les tours optimistes du navigateur", () => {
+    expect(
+      tourDepuisLigne({
+        ...ligne,
+        cle_tour: "11111111-1111-4111-8111-111111111111",
+      })?.id,
+    ).toBe("anam:11111111-1111-4111-8111-111111111111");
+    const source = readFileSync(
+      resolve(process.cwd(), "render/conversation/Conversation.tsx"),
+      "utf8",
+    );
+    expect(source).toContain("const idAnam = `anam:${jeton}`");
+    expect(source).toContain("id: `utilisatrice:${jeton}`");
+  });
+
   it("une ligne SANS horodatage est écartée — jamais rendue avec un champ vide", () => {
     expect(tourDepuisLigne({ ...ligne, cree_le: undefined })).toBeNull();
     expect(tourDepuisLigne({ ...ligne, cree_le: "" })).toBeNull();
@@ -181,12 +227,24 @@ describe("[LE FIL REND L'HORODATAGE] sans lui, la règle d'arrivée retombe sur 
   });
 
   it("[LA COUTURE] ce que le fil rend nourrit DIRECTEMENT la règle d'arrivée", () => {
-    // Le bout à bout, sans base : une ligne d'il y a cinq heures est une arrivée, une d'il y a
-    // dix minutes n'en est pas une. C'est la seule chose que l'utilisatrice constate.
-    const ilYA = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
-    const vieux = tourDepuisLigne({ ...ligne, cree_le: ilYA(5) })!;
-    const frais = tourDepuisLigne({ ...ligne, cree_le: ilYA(0.17) })!;
-    expect(estUneArrivee(vieux.creeLe, new Date())).toBe(true);
-    expect(estUneArrivee(frais.creeLe, new Date())).toBe(false);
+    const maintenant = new Date("2026-08-26T10:00:00Z");
+    const hier = tourDepuisLigne({ ...ligne, cree_le: "2026-08-25T21:59:00Z" })!;
+    const aujourdhui = tourDepuisLigne({ ...ligne, cree_le: "2026-08-25T22:01:00Z" })!;
+    expect(estUneArrivee(hier.creeLe, maintenant)).toBe(true);
+    expect(estUneArrivee(aujourdhui.creeLe, maintenant)).toBe(false);
+  });
+
+  it("place le repère Aujourd'hui exactement avant le premier tour du jour", () => {
+    const maintenant = new Date("2026-08-26T10:00:00Z");
+    const tours = [
+      tourDepuisLigne({ ...ligne, id: "hier", cree_le: "2026-08-25T21:59:00Z" })!,
+      tourDepuisLigne({ ...ligne, id: "matin", cree_le: "2026-08-26T06:00:00Z" })!,
+      tourDepuisLigne({ ...ligne, id: "midi", cree_le: "2026-08-26T10:00:00Z" })!,
+    ];
+    expect(marquerPremierTourDuJour(tours, maintenant).map((t) => t.separateurAvant ?? false)).toEqual([
+      false,
+      true,
+      false,
+    ]);
   });
 });

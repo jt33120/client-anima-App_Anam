@@ -108,12 +108,9 @@ export interface CarteBibliotheque {
  * (Story 7.5), et le catalogue tombe à trois clés. La décision, son motif et son prix sont écrits
  * dans l'amendement du 2026-08-25 en fin d'`EXPERIENCE.md`, §3.
  *
- * ⚠️ CE QUE CETTE BORNE COMPTE : LES CLÉS DU CATALOGUE, PAS LES OBJETS À L'ÉCRAN. La carte « Anam »
- * (`lib/domain/carte-anam.ts`, `EXPERIENCE.md` ligne 145) est un composant distinct, rendu HORS de
- * la grille, et elle n'entre pas dans ce compte. La distinction n'est pas cosmétique : au
- * 2026-08-25, cette assertion comptait 5 pendant que `tests/rendu/carte-anam.test.tsx` en comptait
- * 6, les deux se réclamant d'UX-DR-30. Ce qui borne l'écran, c'est que l'accueil ne rend jamais
- * plus que le catalogue plus la carte d'Anam.
+ * ⚠️ CE QUE CETTE BORNE COMPTE : LES CLÉS DU CATALOGUE, DONC LES OBJETS DE CETTE GRILLE. L'ancienne
+ * carte « Anam se manifeste » a été retirée : la conversation est déjà son espace et la répéter
+ * ici brouillait « Moi ». La garde dédiée `tests/rendu/carte-anam.test.tsx` empêche son retour.
  *
  * ⚠️ LES QUATRE VALEURS SONT SOLIDAIRES, ET LA CI LE VÉRIFIE. Le plancher est écrit ici (commentaire
  * ET assertion), ligne 144 d'`EXPERIENCE.md`, dans son amendement, et dans UX-DR-30

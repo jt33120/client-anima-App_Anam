@@ -54,6 +54,8 @@ export const INVENTAIRE_EFFACEMENT: readonly EntreeEffacement[] = [
   { table: "lecture", verdict: "efface", motif: "les lectures et leurs restitutions" },
   { table: "seance", verdict: "efface", motif: "le déroulé de chacune de ses séances" },
   { table: "usage_ia", verdict: "efface", motif: "le métrage des appels au modèle" },
+  { table: "reservation_quota_ia", verdict: "efface", motif: "les admissions mensuelles au quota IA, rattachées à son compte" },
+  { table: "ouverture_jour_anam", verdict: "efface", motif: "les jours et la manière dont sa conversation avec Anam a commencé" },
   { table: "episode_detresse", verdict: "efface", motif: "les épisodes de détresse ouverts ou clos" },
   { table: "audit_securite", verdict: "efface", motif: "les classifications de sécurité la concernant" },
   { table: "pause_rythme", verdict: "efface", motif: "les pauses qu’Anam lui a proposées" },

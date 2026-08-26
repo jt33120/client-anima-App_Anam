@@ -7,6 +7,7 @@ import { doitExecuterTravailSchema } from "./pipeline";
 import { journaliserIncidentSecurite } from "./rpc-repli";
 import type { VerdictSecurite } from "./classer-detresse";
 import { avecDelai } from "@/lib/domain/delai";
+import { resoudreUsageReponse } from "@/lib/ai/metrage";
 
 /**
  * Orchestrateur de la DÉTECTION DE RECONCEPTUALISATION (Story 4.4, AD-16) — l'étage ordonné APRÈS la
@@ -92,13 +93,14 @@ export async function evaluerReconceptualisationDuTour(
   }
 
   // (b) AC2 — modèle FORT sous egress art. 9 (requeteReconceptualisation ⇒ tier fort). Budget borné.
+  const requete = requeteReconceptualisation(args.messages);
   let res;
   try {
     res = await avecDelai(
       envoyerSousEgressArt9({
         supabase: deps.supabase,
         adaptateur: deps.adaptateur,
-        requete: requeteReconceptualisation(args.messages),
+        requete,
       }),
       deps.delaiMs ?? DELAI_RECONCEPT_MS,
       "reconcept_timeout",
@@ -109,12 +111,7 @@ export async function evaluerReconceptualisationDuTour(
   }
   if (res.bloque) return { supprime: false, detecte: false, usage: null }; // egress bloqué (race) → aucun signal
 
-  const usage: UsageReconcept = {
-    tier: res.reponse.tier,
-    modele: res.reponse.modele,
-    tokensEntree: res.reponse.usage.tokensEntree,
-    tokensSortie: res.reponse.usage.tokensSortie,
-  };
+  const usage: UsageReconcept = resoudreUsageReponse(res.reponse, requete.messages);
   const { detecte } = detecterReconceptualisation(res.reponse.texte); // parser PUR
   if (!detecte) return { supprime: false, detecte: false, usage };
 

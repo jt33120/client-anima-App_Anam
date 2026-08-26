@@ -91,20 +91,46 @@ export type Ouverture =
    * personne ne peut lire cette table. « Tu as eu 7 séances cette semaine » serait statistiquement
    * vrai, produirait une preuve, et transformerait une proposition en bulletin (FR-031).
    */
-  | { readonly type: "pause"; readonly phrase: string }
-  /**
-   * Story 6.9 (retour du 2026-08-23) — ANAM PARLE LA PREMIÈRE, quand il n'y a rien d'autre à ouvrir.
-   *
-   * ⚠️ ELLE MANQUAIT ICI ALORS QUE LE SERVEUR L'ÉMETTAIT DÉJÀ (`app/page.tsx`), et le compilateur ne
-   * pouvait pas le voir : l'objet y était construit littéralement, jamais annoté `Ouverture`. Seule
-   * la garde de frontière l'a dit — en comptant les champs des deux copies. C'est exactement le
-   * défaut qu'elle décrit dans son propre commentaire : un miroir qui porte quelque chose que le
-   * contrat ne connaît pas. Elle est déclarée des deux côtés maintenant, et `page.tsx` l'annote.
-   *
-   * Comme `socle-complete` et `pause` : rien à ouvrir, rien à consommer, aucun nombre — la phrase
-   * naît d'un prénom et de NOMS de branches, jamais d'un compte (FR-031).
-   */
-  | { readonly type: "premiere-parole"; readonly phrase: string };
+  | { readonly type: "pause"; readonly phrase: string };
+
+/**
+ * Relit l'enveloppe JSON persistée avec le tour quotidien. La base est une frontière externe même
+ * quand nous l'avons écrite : on reconstruit exactement l'union publique et on abandonne tout champ
+ * interne de réservation avant que la valeur ne descende vers le rendu.
+ */
+export function ouvertureDepuisInconnu(valeur: unknown): Ouverture | null {
+  if (!valeur || typeof valeur !== "object" || Array.isArray(valeur)) return null;
+  const objet = valeur as Record<string, unknown>;
+  const phrase = typeof objet.phrase === "string" ? objet.phrase : "";
+  if (!phrase.trim()) return null;
+  const identifiant = (cle: string): string | null => {
+    const candidat = objet[cle];
+    return typeof candidat === "string" && candidat.trim() ? candidat : null;
+  };
+
+  switch (objet.type) {
+    case "pause":
+      return { type: "pause", phrase };
+    case "socle-complete":
+      return { type: "socle-complete", phrase };
+    case "proposition": {
+      const signalId = identifiant("signalId");
+      return signalId ? { type: "proposition", signalId, phrase } : null;
+    }
+    case "invitation": {
+      const brancheCibleId = identifiant("brancheCibleId");
+      return brancheCibleId ? { type: "invitation", brancheCibleId, phrase } : null;
+    }
+    case "hypothese-enneagramme": {
+      const hypotheseId = identifiant("hypotheseId");
+      return hypotheseId
+        ? { type: "hypothese-enneagramme", hypotheseId, phrase }
+        : null;
+    }
+    default:
+      return null;
+  }
+}
 
 /**
  * La voix de l'invitation — CONSTANTE, déterministe, jamais un modèle (patron `phraseProposition`).

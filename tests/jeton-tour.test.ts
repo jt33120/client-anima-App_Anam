@@ -16,9 +16,9 @@ describe("jetonTourValide — cœur pur (AC1)", () => {
     const u = "3f1a2b4c-5d6e-4f70-8a91-b2c3d4e5f607";
     expect(jetonTourValide(u)).toBe(u);
   });
-  it("accepte un UUID en MAJUSCULES (insensible à la casse) et le rend tel quel", () => {
+  it("canonise un UUID en MAJUSCULES pour préserver une seule identité logique", () => {
     const u = "3F1A2B4C-5D6E-4F70-8A91-B2C3D4E5F607";
-    expect(jetonTourValide(u)).toBe(u);
+    expect(jetonTourValide(u)).toBe("3f1a2b4c-5d6e-4f70-8a91-b2c3d4e5f607");
   });
   it("rejette tout ce qui n'est pas un UUID canonique → null (repli sur l'UUID serveur)", () => {
     for (const v of [

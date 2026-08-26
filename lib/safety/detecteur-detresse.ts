@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AiPort, MessageIa, RequeteIa } from "@/lib/ai/port";
+import { resoudreUsageReponse, type UsageModeleIa } from "@/lib/ai/metrage";
 import { envoyerSousEgressArt9, type RaisonRefus } from "@/lib/ai/egress-guard";
 import { classerDetresse, repliSur, type VerdictSecurite } from "./classer-detresse";
 import type { FamilleDanger } from "./ressources-aide";
@@ -36,7 +37,7 @@ const DELAI_DETECTION_MS = 8000;
 
 /** Course contre un délai : si `p` n'a pas résolu à temps, rejette (→ repli sûr en aval, AD-15). */
 export type ResultatDetection =
-  | { bloque: false; verdict: VerdictSecurite }
+  | { bloque: false; verdict: VerdictSecurite; usage: UsageModeleIa | null }
   | { bloque: true; raison: RaisonRefus };
 
 /**
@@ -130,7 +131,8 @@ export async function detecterDetresse(
     );
   } catch (e) {
     journaliserIncidentSecurite("appel_detection_echoue", e);
-    return { bloque: false, verdict: repliSur() };
+    // Aucun objet `ReponseIa` n'a été reçu : ne pas fabriquer de compteurs ni de ligne financière.
+    return { bloque: false, verdict: repliSur(), usage: null };
   }
 
   if (resultat.bloque) {
@@ -138,13 +140,17 @@ export async function detecterDetresse(
     return { bloque: true, raison: resultat.raison };
   }
 
+  // La réponse fournisseur a été consommée : son coût existe même si la sortie clinique est ensuite
+  // illisible et déclenche le repli sûr. Aucun texte ne remonte avec ces quatre compteurs.
+  const usage = resoudreUsageReponse(resultat.reponse, requete.messages);
+
   const niveau = extraireNiveau(resultat.reponse.texte);
   if (niveau === null) {
     journaliserIncidentSecurite("sortie_detection_illisible");
-    return { bloque: false, verdict: repliSur() };
+    return { bloque: false, verdict: repliSur(), usage };
   }
   // La famille (FR-074) enrichit le verdict sans jamais le sur-classer : le NIVEAU seul commande la
   // suppression du schéma et le forçage du fort ; la famille ne fait que router les bonnes ressources.
   const famille = extraireFamille(resultat.reponse.texte);
-  return { bloque: false, verdict: classerDetresse(niveau, famille) };
+  return { bloque: false, verdict: classerDetresse(niveau, famille), usage };
 }

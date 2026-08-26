@@ -5,7 +5,13 @@ import { diffuserSousEgressArt9, envoyerSousEgressArt9 } from "@/lib/ai/egress-g
 import { ENTETES_ART9 } from "@/lib/ai/entetes-art9";
 import { extraireMessages } from "@/lib/ai/valider-messages";
 import { modelePour, tierPour } from "@/lib/ai/politique-tier";
-import { metrerUsageIa, resoudreMetrage, type EtatFlux, type FinFlux } from "@/lib/ai/metrage";
+import {
+  metrerUsageIa,
+  resoudreMetrage,
+  resoudreUsageReponse,
+  type EtatFlux,
+  type FinFlux,
+} from "@/lib/ai/metrage";
 import { jetonTourValide } from "@/lib/ai/jeton-tour";
 import { ligneNdjson } from "@/lib/ai/flux-ndjson";
 import { evaluerSecuriteDuTour, type ResultatSecurite } from "@/lib/safety/pipeline";
@@ -51,10 +57,14 @@ import { lireContexteAnam } from "@/lib/data/lire-contexte-anam";
 import { consigneBilan } from "@/lib/domain/consigne-bilan";
 import { structurerBilan } from "@/lib/domain/bilan";
 import { doitProposerAbonnement } from "@/lib/domain/proposer-abonnement";
-import { doitCouperConversation } from "@/lib/domain/allocation-residuelle";
 import { estPremiumCourante } from "@/lib/data/lire-abonnement";
-import { compterToursResiduelsDuMois } from "@/lib/data/lire-allocation";
+import {
+  codeTechniqueReservationQuota,
+  reserverTourResiduelDuMois,
+} from "@/lib/data/lire-allocation";
 import { limiteAllocationResiduelle } from "@/lib/ai/allocation-config";
+import { deciderAdmissionQuota } from "@/lib/domain/admission-quota";
+import { avecDelai } from "@/lib/domain/delai";
 import { absorberDelta, etatTroncatureInitial } from "@/lib/domain/voix-anam";
 import {
   absorberSousControle,
@@ -94,6 +104,10 @@ export const maxDuration = 60;
 const CAPACITE: CapaciteIa = "echange";
 /** Latence tenue avant le 1er fragment (AC2 : 400–900 ms, même si la réponse est prête plus tôt). */
 const PLANCHER_LATENCE_MS = 500;
+/** Une lecture d'entitlement qui pend ne doit retenir ni le commerce ni les tâches `after()`. */
+const DELAI_PREMIUM_MS = 2_000;
+/** Le repli quota n'est réellement fail-open que si une RPC ou un verrou suspendu est borné. */
+const DELAI_RESERVATION_QUOTA_MS = 1_500;
 const attendre = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export async function POST(request: NextRequest) {
@@ -134,6 +148,23 @@ export async function POST(request: NextRequest) {
   }
   const cleIdempotence = jetonValide ?? crypto.randomUUID();
 
+  // Instantané d'entitlement lancé AU DÉPART DU TOUR, en parallèle de la détection : toutes les
+  // lignes financières de ce tour portent ainsi le même état observé, y compris la sécurité et les
+  // sous-appels `after()`. Une panne rend `null` (inconnu), jamais une fausse gratuite/premium. Les
+  // gardes commerciales continuent, elles, de transformer ce doute en accès (`?? true`). La source
+  // reste `abonnement.etat` via `estPremiumCourante()` — l'accès offert 0077 est donc premium sans
+  // aucune ligne ni identifiant Stripe inventé.
+  const premiumAuMomentAppel = avecDelai(
+    estPremiumCourante(),
+    DELAI_PREMIUM_MS,
+    "premium_metrage_timeout",
+  ).catch((e: unknown) => {
+    console.error("anam/message : instantané premium de métrage inconnu", {
+      nom: e instanceof Error ? e.name : "inconnu",
+    });
+    return null;
+  });
+
   // ── PIPELINE SÉCURITÉ-D'ABORD (Story 2.3, AD-16) ──────────────────────────────────────────────
   // La DÉTECTION de détresse (modèle FORT, sous egress) s'exécute AVANT toute génération et arbitre
   // le tour. `niveauSecurite` en découle (plus de hardcode 0) : au niveau ≥ 1, la RÉPONSE est aussi
@@ -147,6 +178,22 @@ export async function POST(request: NextRequest) {
         supabase,
         adaptateur,
         emettreAudit: (a) => journaliserAuditDetresse({ utilisatriceId: user.id, cleIdempotence, ...a }),
+        publierUsageDetection: (usageDetection) => {
+          // Enregistré dès la réponse fournisseur, avant audit/épisode : ces persistances peuvent
+          // échouer sans faire disparaître un coût réel. `after()` ne bloque jamais la sécurité.
+          after(async () => {
+            await metrerUsageIa({
+              utilisatriceId: user.id,
+              cleIdempotence: `${cleIdempotence}:detection_detresse`,
+              operation: "detection_detresse",
+              capacite: "detection",
+              ...usageDetection,
+              premiumAuMomentAppel: await premiumAuMomentAppel,
+              exempteQuota: true,
+              comptabiliseFinancierement: true,
+            });
+          });
+        },
         // Story 2.4 : le dépôt RÉEL d'épisode remplace le placeholder. Ouvre/rehausse/compte/éteint
         // `episode_detresse` à chaque tour, et rend `episodeOuvert()` réel (forçage cross-tour).
         // Story 2-4b : le jeton de tour rend l'enregistrement idempotent au « Réessayer » (un rejeu du
@@ -230,71 +277,60 @@ export async function POST(request: NextRequest) {
 
   // ── GATE ALLOCATION RÉSIDUELLE (Story 3.4, AC2/AC4/AC5/AC6) ────────────────────────────────────
   // APRÈS la sécurité (la détresse lève TOUTE limite via `limites_levees`, AC6/FR-043) et AVANT
-  // l'extraction FORT + la génération (un tour coupé ne dépense AUCUN appel modèle, ne métré RIEN).
+  // l'extraction FORT + la génération (un tour coupé ne dépense aucun appel conversationnel ; la
+  // détection sécurité déjà consommée reste comptabilisée hors quota).
   // Court-circuité si premium (AC5). Direction du DOUTE : l'ACCÈS — toute panne (lecture premium,
-  // comptage) → on ne coupe pas (FR-058, « jamais coupé à zéro »). Décision = dérivation UNIQUE.
+  // réservation) → on ne coupe pas (FR-058, « jamais coupé à zéro »).
   //
   // `tourAllocationResiduelle` : ce tour TIRE-t-il réellement sur l'allocation gratuite ? (non premium,
   // post-séance, hors détresse). Sert de marque de métrage `post_premiere_seance` (revue 3.4, F10) : un
   // tour PREMIUM (illimité, AC5) ou de DÉTRESSE (gate non entré) ne doit JAMAIS polluer le décompte —
   // sinon un downgrade premium→gratuit en cours de mois recompterait rétroactivement des tours illimités.
-  let tourAllocationResiduelle = false;
-  // `horsDetresse` et non `!limitesLevees` : voir la dérivation plus haut. La garde est DOUBLE —
-  // le domaine décide (`doitCouperConversation`), et la route ne dépense même pas la lecture
-  // premium ni le comptage sur un tour de détresse.
-  if (horsDetresse && seanceClose) {
-    let premiumConv = true; // défaut PRUDENT : lecture en échec → premium → aucune coupure (fail-open)
-    try {
-      premiumConv = await estPremiumCourante();
-    } catch (e) {
-      console.error("anam/message : lecture premium (quota) en repli — pas de coupure", { nom: e instanceof Error ? e.name : "inconnu" });
-      premiumConv = true;
-    }
-    if (!premiumConv) {
-      tourAllocationResiduelle = true; // non premium + post-séance + hors détresse → décompte réel
-      let couper = false;
-      try {
-        // Exclut la PROPRE ligne du tour LOGIQUE courant (même `cleIdempotence`) : au « Réessayer », la
-        // ligne écrite par une 1ʳᵉ tentative avortée ne doit pas murer la retentative (revue 3.4, F4/F5 —
-        // le gate devient idempotent par tour logique, comme le métrage ; FR-058 renforcé).
-        const toursConsommes = await compterToursResiduelsDuMois(user.id, cleIdempotence);
-        couper = doitCouperConversation({
-          premium: premiumConv,
-          limitesLevees: securite.limitesLevees,
-          // Le niveau EFFECTIF, plancher d'épisode compris (R8) : c'est la dérivation du domaine qui
-          // décide, jamais la seule condition d'entrée ci-dessus — un futur appelant l'oublierait.
-          niveauSecurite,
-          seanceClose,
-          toursConsommes,
-          limite: limiteAllocationResiduelle(),
-        });
-      } catch (e) {
-        console.error("anam/message : comptage allocation en repli — pas de coupure", { nom: e instanceof Error ? e.name : "inconnu" });
-        couper = false; // le doute ne coupe jamais (FR-058)
-      }
-      if (couper) {
-        // Allocation épuisée : le flux ne porte QUE la trame `quota` (aucune génération, aucun appel
-        // FORT, aucune ligne `usage_ia`). Ce n'est PAS un paywall — le client rend une ligne système +
-        // désactive le composeur, jamais « Passe au premium » (AC4). Le socle reste entièrement ouvert.
-        const corpsQuota = new ReadableStream<Uint8Array>({
-          start(controller) {
-            try {
-              controller.enqueue(new TextEncoder().encode(ligneNdjson({ t: "quota" })));
-            } catch {
-              /* client déjà parti */
-            }
-            try {
-              controller.close();
-            } catch {
-              /* déjà fermé */
-            }
-          },
-        });
-        return new Response(corpsQuota, {
-          headers: { ...ENTETES_ART9, "Content-Type": "application/x-ndjson; charset=utf-8" },
-        });
-      }
-    }
+  // La matrice est extraite dans un orchestrateur injecté et testé par mutation : détresse/première
+  // séance ne lisent même pas premium ; premium/doute ne lisent pas la limite ; limite absente ne
+  // touche pas la RPC. L'instantané premium est déjà parti en parallèle pour la comptabilité.
+  const admissionQuota = await deciderAdmissionQuota(
+    { horsDetresse, seanceClose },
+    {
+      lirePremium: () => premiumAuMomentAppel,
+      lireLimite: limiteAllocationResiduelle,
+      reserver: (limite) =>
+        avecDelai(
+          reserverTourResiduelDuMois(user.id, cleIdempotence, limite),
+          DELAI_RESERVATION_QUOTA_MS,
+          "reservation_quota_timeout",
+        ),
+    },
+  );
+  const tourAllocationResiduelle = admissionQuota.tourAllocationResiduelle;
+
+  if (admissionQuota.etat === "repli") {
+    console.error("anam/message : réservation allocation en repli — pas de coupure", {
+      code: codeTechniqueReservationQuota(admissionQuota.erreur),
+    });
+  }
+
+  if (!admissionQuota.autorisee) {
+    // Allocation épuisée : le flux ne porte QUE la trame `quota` (aucune génération ni coût
+    // conversationnel ; la détection déjà consommée reste métrée hors quota). Ce n'est PAS un
+    // paywall — le client rend une ligne système et désactive le composeur (AC4).
+    const corpsQuota = new ReadableStream<Uint8Array>({
+      start(controller) {
+        try {
+          controller.enqueue(new TextEncoder().encode(ligneNdjson({ t: "quota" })));
+        } catch {
+          /* client déjà parti */
+        }
+        try {
+          controller.close();
+        } catch {
+          /* déjà fermé */
+        }
+      },
+    });
+    return new Response(corpsQuota, {
+      headers: { ...ENTETES_ART9, "Content-Type": "application/x-ndjson; charset=utf-8" },
+    });
   }
 
   // ── ÉTAGE RECONCEPTUALISATION (Story 4.4, AD-16 : APRÈS la sécurité ; AD-5 : fort ; AD-17 : supprimé
@@ -320,7 +356,16 @@ export async function POST(request: NextRequest) {
           { messages, verdict: securite.verdict, cleTour: cleIdempotence },
         );
         if (reconcept.usage) {
-          await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence: `${cleIdempotence}:reconcept`, ...reconcept.usage });
+          await metrerUsageIa({
+            utilisatriceId: user.id,
+            cleIdempotence: `${cleIdempotence}:reconcept`,
+            operation: "detection_reconceptualisation",
+            capacite: "reconceptualisation",
+            ...reconcept.usage,
+            premiumAuMomentAppel: await premiumAuMomentAppel,
+            exempteQuota: false,
+            comptabiliseFinancierement: true,
+          });
         }
       } catch (e) {
         console.error("anam/message : étage reconceptualisation en repli", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -357,7 +402,16 @@ export async function POST(request: NextRequest) {
           },
         );
         if (retour.usage) {
-          await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence: `${cleIdempotence}:retour_theme`, ...retour.usage });
+          await metrerUsageIa({
+            utilisatriceId: user.id,
+            cleIdempotence: `${cleIdempotence}:retour_theme`,
+            operation: "detection_retour_theme",
+            capacite: "retour_theme",
+            ...retour.usage,
+            premiumAuMomentAppel: await premiumAuMomentAppel,
+            exempteQuota: false,
+            comptabiliseFinancierement: true,
+          });
         }
       } catch (e) {
         console.error("anam/message : étage retour sur le thème en repli", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -375,10 +429,11 @@ export async function POST(request: NextRequest) {
   let demandeLecture = false;
   if (etatArcCharge) {
     try {
+      const requeteArc = requeteExtractionArc(messages);
       const extraction = await envoyerSousEgressArt9({
         supabase,
         adaptateur,
-        requete: requeteExtractionArc(messages),
+        requete: requeteArc,
       });
       let signaux = SIGNAUX_NEUTRES; // egress bloqué (rare, race) → aucun signal : l'arc n'avance pas
       if (!extraction.bloque) {
@@ -389,13 +444,7 @@ export async function POST(request: NextRequest) {
         // pas à s'élargir) : deux lectures distinctes du même texte. Repli = pas de demande.
         demandeLecture = extraireDemandeLecture(extraction.reponse.texte);
         // L'extraction d'arc EST métrée (produit — FR-043 n'exempte QUE la détresse) : clé DISTINCTE.
-        const u = extraction.reponse.usage;
-        usageExtractionArc = {
-          tier: extraction.reponse.tier,
-          modele: extraction.reponse.modele,
-          tokensEntree: u.tokensEntree,
-          tokensSortie: u.tokensSortie,
-        };
+        usageExtractionArc = resoudreUsageReponse(extraction.reponse, requeteArc.messages);
       }
       arc = avancerArc(etatArcCharge, signaux, niveauSecurite, Date.now());
       await depotSeance.ecrire(arc.etat);
@@ -449,7 +498,16 @@ export async function POST(request: NextRequest) {
           { messages, verdict: securite.verdict },
         );
         if (hypothese.usage) {
-          await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence: `${cleIdempotence}:hypothese_enn`, ...hypothese.usage });
+          await metrerUsageIa({
+            utilisatriceId: user.id,
+            cleIdempotence: `${cleIdempotence}:hypothese_enn`,
+            operation: "hypothese_enneagramme",
+            capacite: "hypothese_enneagramme",
+            ...hypothese.usage,
+            premiumAuMomentAppel: await premiumAuMomentAppel,
+            exempteQuota: false,
+            comptabiliseFinancierement: true,
+          });
         }
       } catch (e) {
         console.error("anam/message : étage hypothèse d’ennéagramme en repli", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -491,7 +549,16 @@ export async function POST(request: NextRequest) {
           { verdict: securite.verdict },
         );
         if (compactage.usage) {
-          await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence: `${cleIdempotence}:compactage`, ...compactage.usage });
+          await metrerUsageIa({
+            utilisatriceId: user.id,
+            cleIdempotence: `${cleIdempotence}:compactage`,
+            operation: "compactage_contexte",
+            capacite: "compactage",
+            ...compactage.usage,
+            premiumAuMomentAppel: await premiumAuMomentAppel,
+            exempteQuota: false,
+            comptabiliseFinancierement: true,
+          });
         }
       } catch (e) {
         console.error("anam/message : étage compactage en repli", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -507,12 +574,7 @@ export async function POST(request: NextRequest) {
   // `doitProduireBilan` (pas de bilan en détresse → pas de trame `paywall`, émise sous le bilan).
   let premium = false;
   if (doitProduireBilan) {
-    try {
-      premium = await estPremiumCourante();
-    } catch (e) {
-      console.error("anam/message : lecture premium en repli (carte retenue)", { nom: e instanceof Error ? e.name : "inconnu" });
-      premium = true;
-    }
+    premium = (await premiumAuMomentAppel) ?? true;
   }
 
   // La capacité de génération SUIT la phase : en NOMMER, la formulation est une reconceptualisation
@@ -528,7 +590,16 @@ export async function POST(request: NextRequest) {
   if (usageExtractionArc) {
     const usageArc = usageExtractionArc;
     after(async () => {
-      await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence: `${cleIdempotence}:arc`, ...usageArc });
+      await metrerUsageIa({
+        utilisatriceId: user.id,
+        cleIdempotence: `${cleIdempotence}:arc`,
+        operation: "extraction_arc",
+        capacite: "reconceptualisation",
+        ...usageArc,
+        premiumAuMomentAppel: await premiumAuMomentAppel,
+        exempteQuota: false,
+        comptabiliseFinancierement: true,
+      });
     });
   }
 
@@ -591,15 +662,38 @@ export async function POST(request: NextRequest) {
     const ouverte = lectureOuverte;
     const sesMots = dernierMessage.content;
     try {
+      const requeteLecture: RequeteIa = {
+        capacite: "lecture",
+        messages: [consigneLecture(), ...messages],
+        contientArt9: true,
+        niveauSecurite: 0,
+      };
       const rendu = await envoyerSousEgressArt9({
         supabase,
         adaptateur,
         // ⚠️ LA CARTE N'EST PAS DANS LA REQUÊTE. Ni sa clé, ni sa description, ni son sens. Le modèle
         // ne reçoit que ce qu'ELLE dit avoir vu — lui donner l'image l'inviterait à corriger sa
         // projection, et FR-018 a déjà tranché : c'est sa projection qui fait foi.
-        requete: { capacite: "lecture", messages: [consigneLecture(), ...messages], contientArt9: true, niveauSecurite: 0 },
+        requete: requeteLecture,
       });
       if (rendu.bloque) return fluxDeTrames([{ t: "erreur" }]);
+
+      // La réponse fournisseur est déjà consommée : son coût existe même si le contrôle de sortie,
+      // la validation ou `cloreLecture` refuse ensuite le document. La clé du tour garde le rejeu
+      // idempotent ; le métrage reste best-effort et n'influence jamais le rituel.
+      const usageLecture = resoudreUsageReponse(rendu.reponse, requeteLecture.messages);
+      after(async () => {
+        await metrerUsageIa({
+          utilisatriceId: user.id,
+          cleIdempotence: `${cleIdempotence}:lecture`,
+          operation: "restitution_lecture",
+          capacite: "lecture",
+          ...usageLecture,
+          premiumAuMomentAppel: await premiumAuMomentAppel,
+          exempteQuota: false,
+          comptabiliseFinancierement: true,
+        });
+      });
       const texte = rendu.reponse.texte.trim();
       if (!texte) return fluxDeTrames([{ t: "erreur" }]);
 
@@ -639,17 +733,6 @@ export async function POST(request: NextRequest) {
         cleTourSource: cleIdempotence,
       });
 
-      const u = rendu.reponse.usage;
-      after(async () => {
-        await metrerUsageIa({
-          utilisatriceId: user.id,
-          cleIdempotence: `${cleIdempotence}:lecture`,
-          tier: rendu.reponse.tier,
-          modele: rendu.reponse.modele,
-          tokensEntree: u.tokensEntree,
-          tokensSortie: u.tokensSortie,
-        });
-      });
       return fluxDeTrames([{ t: "lecture", lectureId: ouverte.id, texte }, { t: "fin" }]);
     } catch (e) {
       console.error("anam/message : tour de lecture en échec (la carte reste ouverte)", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -671,17 +754,9 @@ export async function POST(request: NextRequest) {
       let acces;
       try {
         const causes = await causesRefusLecture(supabase);
-        let premiumLecture = false;
-        try {
-          premiumLecture = await estPremiumCourante();
-        } catch (e) {
-          // Direction du doute INVERSÉE par rapport au quota (3.4) : ici le doute SUSPEND le commerce
-          // — on présume premium, on ouvre le rituel, et on ne montre pas d'offre sur une panne de
-          // lecture. Le socle n'est jamais coupé ; une offre affichée à tort est un défaut, le
-          // rituel ouvert à tort n'en est pas un.
-          console.error("anam/message : lecture premium (rituel) en repli — offre retenue", { nom: e instanceof Error ? e.name : "inconnu" });
-          premiumLecture = true;
-        }
+        // Direction du doute INVERSÉE par rapport à une restriction : on présume premium, on ouvre
+        // le rituel et on ne montre pas d'offre sur une panne de lecture.
+        const premiumLecture = (await premiumAuMomentAppel) ?? true;
         acces = accesLecture(causes, premiumLecture);
       } catch (e) {
         // Les causes illisibles : on n'ouvre pas le rituel sur un doute (une carte tirée ne se
@@ -966,11 +1041,22 @@ export async function POST(request: NextRequest) {
           // PAS de bilan (jamais un bloc malformé) ; la clôture reste valide (Anam a clos, le fil continue).
           if (doitProduireBilan) {
             try {
+              const requeteBilan: RequeteIa = {
+                capacite: "synthese",
+                messages: [consigneBilan(), ...messages],
+                contientArt9: true,
+                niveauSecurite: 0,
+              };
               const bilan = await envoyerSousEgressArt9({
                 supabase,
                 adaptateur,
-                requete: { capacite: "synthese", messages: [consigneBilan(), ...messages], contientArt9: true, niveauSecurite: 0 },
+                requete: requeteBilan,
               });
+              // Une réponse fournisseur consommée est comptabilisée même si le garde de sortie
+              // refuse ensuite son texte ou si sa structure n'est pas exploitable.
+              if (!bilan.bloque) {
+                usageBilan = resoudreUsageReponse(bilan.reponse, requeteBilan.messages);
+              }
               // ⚠️ LE BILAN NON PLUS NE TRAVERSAIT PAS LE CONTRÔLE (revue Epic 5, R3). Il est généré
               // par une passe SÉPARÉE, hors du flux relu ligne 761 : `structurerBilan` ne fait que
               // découper un titre et des points. Trou de la même famille que la lecture, trouvé en
@@ -990,8 +1076,6 @@ export async function POST(request: NextRequest) {
                 // structuration a échoué (pas de bilan → pas de carte), ni si premium (gate serveur,
                 // AD-9). Prédicat PUR (source unique — pas de 2ᵉ dérivation de `limites_levees`, AD-17).
                 if (doitProposerAbonnement({ bilanEmis: !!structure, premium })) emettre({ t: "paywall" });
-                const u = bilan.reponse.usage; // produit → métré à part (clé distincte), jamais exempté
-                usageBilan = { tier: bilan.reponse.tier, modele: bilan.reponse.modele, tokensEntree: u.tokensEntree, tokensSortie: u.tokensSortie };
               }
             } catch (e) {
               console.error("anam/message : bilan de clôture en repli", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -1047,10 +1131,34 @@ export async function POST(request: NextRequest) {
     // post-séance, hors détresse). Un tour premium/détresse reste `false` → aucun résidu ne pollue le
     // comptage (un downgrade premium→gratuit ne recompte pas des tours illimités). Le tour de clôture
     // reste `false` (gate non entré : seanceClose=false à l'entrée) → gratuit (FR-059/AC2).
-    if (usage) await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence, ...usage, postPremiereSeance: tourAllocationResiduelle });
+    if (usage) {
+      await metrerUsageIa({
+        utilisatriceId: user.id,
+        cleIdempotence,
+        operation: "conversation",
+        capacite: capaciteGeneration,
+        ...usage,
+        premiumAuMomentAppel: await premiumAuMomentAppel,
+        // La sécurité reste toujours hors quota, tout en restant visible dans la comptabilité.
+        exempteQuota: !horsDetresse,
+        comptabiliseFinancierement: true,
+        postPremiereSeance: tourAllocationResiduelle,
+      });
+    }
     // Story 2.9 : le bilan de clôture (passe fort séparée) est métré à part — clé distincte, jamais
     // exempté ; `postPremiereSeance` reste false (sous-coût, pas un « tour » d'allocation, 3.4).
-    if (usageBilan) await metrerUsageIa({ utilisatriceId: user.id, cleIdempotence: `${cleIdempotence}:bilan`, ...usageBilan });
+    if (usageBilan) {
+      await metrerUsageIa({
+        utilisatriceId: user.id,
+        cleIdempotence: `${cleIdempotence}:bilan`,
+        operation: "bilan_seance",
+        capacite: "synthese",
+        ...usageBilan,
+        premiumAuMomentAppel: await premiumAuMomentAppel,
+        exempteQuota: false,
+        comptabiliseFinancierement: true,
+      });
+    }
   });
 
   return new Response(corpsFlux, {

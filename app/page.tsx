@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
-import { chargerOuverture } from "@/lib/safety/ouverture-branche";
-import type { Ouverture } from "@/lib/domain/arbitrage-ouverture";
 import { chargerProjectionArbre } from "@/lib/safety/projection-arbre";
 import { lireBibliotheque } from "@/lib/data/lire-bibliotheque";
 import { lireFilRecent } from "@/lib/data/depot-fil";
@@ -15,12 +13,13 @@ import { marquerHypotheseDite } from "@/app/_enneagramme/marquer-hypothese";
 import { marquerSeuilFranchi } from "@/app/_seuil/marquer-franchissement";
 import { creerDepotSeuil } from "@/lib/data/depot-seuil";
 import { premierPassage } from "@/lib/domain/premier-passage";
-import { phraseDOuverture, estUneArrivee } from "@/lib/domain/ouverture-seance";
-import { lirePrenom } from "@/lib/data/lire-prenom";
-import { lireFaitsRetenus } from "@/lib/data/lire-memoire";
+import {
+  chargerOuvertureCourante,
+  reclamerOuvertureDuJour,
+} from "@/app/_ouverture/reclamer-ouverture";
 import { ETAPES, SUIVANT, TERMINER, QUITTER } from "@/lib/domain/copie-guide";
 import {
-  ENTREES_MENU,
+  GROUPES_MENU,
   LIBELLE_GLYPHE,
   TITRE_FEUILLE,
   LIBELLE_FERMER,
@@ -94,13 +93,12 @@ export default async function Page() {
     estPremiumCourante().catch(() => false),
   ]);
 
-  // Story 4.5 / 4.10 : « le lendemain », y a-t-il un moment à ouvrir ? Story 4.6 : la PROJECTION
-  // RÉELLE de l'arbre. Story 5.6 : la bibliothèque du socle. Les trois sous JWT, en parallèle ;
+  // Story 4.6 : la PROJECTION RÉELLE de l'arbre. Story 5.6 : la bibliothèque du socle. Les lectures
+  // sous JWT partent en parallèle ;
   // jamais un 500 qui bloquerait l'ouverture de la scène — chacune a son repli sûr.
   const maintenant = new Date();
-  const [ouverture, projection, bibliotheque, historique, seuilFranchiLe, prenom, aDejaParle] =
+  const [projection, bibliotheque, historique, seuilFranchiLe] =
     await Promise.all([
-    chargerOuverture(supabase, user.id),
     chargerProjectionArbre(supabase, user.id, theme),
     // La bibliothèque n'est pas un chemin critique : une panne rend `null`, et la scène s'ouvre
     // quand même (AC7). L'accueil est une région parmi quatre — la conversation et l'arbre ne
@@ -117,53 +115,30 @@ export default async function Page() {
     // reste. Repli sur `null` (donc « jamais franchi », donc le texte est redit) : se répéter est
     // un accroc, ne jamais présenter le lieu est le constat H4 qui revient.
     creerDepotSeuil(supabase).lireFranchiLe().catch(() => null),
-    // Retour du 2026-08-23 — de quoi qu'Anam OUVRE la séance. Deux lectures minuscules, dans le
-    // même aller-retour que le reste : le prénom, et l'existence (pas le contenu) d'un souvenir.
-    lirePrenom(supabase, user.id).catch(() => null),
-    // ⚠️ `1`, PAS 200. On ne veut savoir QUE s'il en existe : une donnée d'article 9 qu'on ne
-    // demande pas est une donnée qui ne traverse aucune couche.
-    lireFaitsRetenus(supabase, 1).then((f) => f.length > 0).catch(() => false),
   ]);
   /* ── C'EST ANAM QUI PARLE LA PREMIÈRE (retour du 2026-08-23) ───────────────────────────────────
+   * Au geste d'entrée, l'action relit toute sa matière sous le JWT puis la RPC 0084 vérifie le jour
+   * courant et refuse une salutation tardive si un autre tour existe déjà. Une page restée ouverte
+   * à minuit garde ainsi le bon comportement, sans argument lié que le navigateur pourrait forger.
    *
-   * ⚠️ SEULEMENT S'IL N'Y A RIEN D'AUTRE À OUVRIR, ET SEULEMENT SI LE FIL EST VIDE. Les cinq
-   * ouvertures d'événement (proposition, invitation, socle, hypothèse, pause) ont quelque chose de
-   * précis à dire : elles passent avant, et les empiler ferait parler Anam deux fois d'affilée
-   * avant qu'on ait dit un mot. Et si le fil porte déjà des tours — la fenêtre de `lireFilRecent`
-   * n'est pas écoulée —, la séance est EN COURS : la rouvrir serait se présenter au milieu d'une
-   * phrase.
-   *
-   * Le prénom et les branches viennent de lectures déjà faites ci-dessus : aucun aller-retour de
-   * plus. `nom` est absent d'une branche dont le nom n'a pas encore été donné — elle n'entre alors
-   * pas dans l'ouverture, faute de mot à rendre.
+   * Les cinq paroles proactives sont choisies par cette MÊME action après l'obtention d'un bail
+   * exclusif. Si l'une est due, elle PORTE la salutation et remplace la question générique : Anam
+   * ouvre par une seule parole, jamais par deux messages empilés.
    */
-  // ⚠️ ANNOTÉ, ET C'EST LE CORRECTIF. Sans `: Ouverture | null`, l'objet ci-dessous se typait tout
-  // seul et pouvait porter n'importe quoi — un champ que le miroir de rendu ne connaît pas, ou une
-  // variante que le contrat n'a jamais déclarée. C'est exactement ce qui est arrivé.
-  // ⚠️ « LE FIL EST VIDE » ÉTAIT LA MAUVAISE QUESTION (retour du 2026-08-25). Le fil couvre 24 h
-  // glissantes : quelqu'un qui a parlé hier soir revenait sur un fil NON vide, donc sans un mot
-  // d'Anam. Elle n'ouvrait que pour une absente de plus d'un jour — jamais pour celle qui revient.
-  // On mesure maintenant l'ÉCART depuis le dernier tour (`estUneArrivee`, domaine pur).
-  const derniereParole = historique.length > 0 ? historique[historique.length - 1].creeLe : null;
-  const ouvertureFinale: Ouverture | null =
-    ouverture ??
-    (estUneArrivee(derniereParole, maintenant)
-      ? {
-          type: "premiere-parole" as const,
-          phrase: phraseDOuverture({
-            prenom,
-            branchesVivantes: projection.branches
-              .filter((b) => b.etat !== "rayonnement" && b.nom)
-              .map((b) => b.nom as string),
-            dejaVenue: aDejaParle || projection.branches.length > 0,
-          }),
-        }
-      : null);
-
+  /*
+   * La première parole quotidienne n'est NI affichée NI écrite par le simple rendu de « Moi ».
+   * `SceneDom` garde la région conversation montée mais invisible ; c'est donc le passage effectif
+   * à Anam qui réclame atomiquement la ligne persistée. La fonction liée ne transporte au client
+   * aucun identifiant manipulable et réaffirme la session avant l'écriture service-role.
+   *
+   * Une réponse serveur contient le fil qui fait foi et, éventuellement, la forme interactive de
+   * cette MÊME ligne persistée. Le client les commet ensemble : aucun doublon ni ordre qui bouge.
+   */
   return (
     <SceneDom
       projection={projection}
-      ouverture={ouvertureFinale}
+      onReclamerOuvertureQuotidienne={reclamerOuvertureDuJour}
+      onChargerOuvertureCourante={chargerOuvertureCourante}
       bibliotheque={bibliotheque}
       historique={historique}
       onSocleAnnonce={marquerAnnonceSocleDite}
@@ -184,7 +159,7 @@ export default async function Page() {
       // n'a pas le droit de les importer (AD-7/AD-10), donc ils descendent d'ici — même patron que
       // le tour guidé juste au-dessus.
       menu={{
-        entrees: ENTREES_MENU,
+        groupes: GROUPES_MENU,
         libelleGlyphe: LIBELLE_GLYPHE,
         titreFeuille: TITRE_FEUILLE,
         libelleFermer: LIBELLE_FERMER,

@@ -106,8 +106,16 @@ describe("/aide — le bloc ressources en FICHE, JAMAIS alarmant (AC3)", () => {
 describe("/aide — sortie rapide (FR-074, Story 2.6)", () => {
   const sortie = readFileSync(resolve(racine, "app/aide/SortieRapide.tsx"), "utf-8");
 
-  it("la page monte le contrôle « Quitter » en tête", () => {
+  it("la page monte le contrôle de sortie rapide en tête", () => {
     expect(src).toMatch(/SortieRapide/);
+  });
+
+  it("nomme sans ambiguïté le retour normal et la sortie vers un site neutre", () => {
+    expect(src).toContain("Retour à Anima");
+    expect(src).toContain("Fermer l&rsquo;aide");
+    expect(sortie).toMatch(/const LIBELLE = "Sortie rapide"/);
+    expect(sortie).toContain("Ouvrir un site neutre");
+    expect(sortie).not.toMatch(/const LIBELLE = "Quitter(?: le site)?"/);
   });
 
   it("navigue vers un site NEUTRE en REMPLAÇANT l'entrée d'historique (pratique standard violences)", () => {
@@ -170,6 +178,20 @@ describe("/aide — sortie rapide (FR-074, Story 2.6)", () => {
   it("préserve l'étanchéité de /aide : aucune session, aucune IA, aucun traceur", () => {
     expect(sortie).not.toMatch(/@\/lib\/(data|ai)|supabase|getUser/);
     expect(sortie).not.toMatch(/analytics|gtag|mixpanel|posthog|plausible/i);
+  });
+});
+
+describe("/aide — hiérarchie visuelle sobre", () => {
+  it("découpe le mode d'emploi et la transparence en panneaux sans filtre coûteux", () => {
+    expect(src.match(/s\.panneau/g)?.length).toBe(2);
+    expect(css).toMatch(/\.panneau\s*\{[\s\S]*?--surface/);
+    expect(css).not.toMatch(/(?:backdrop-)?filter\s*:/);
+  });
+
+  it("garde les deux sorties visibles dans un en-tête persistant et tactile", () => {
+    expect(css).toMatch(/\.enTete\s*\{[\s\S]*?position:\s*sticky/);
+    expect(css).toMatch(/\.retour\s*\{[\s\S]*?--cible-tactile/);
+    expect(css).toMatch(/\.sortieRapide\s*\{[\s\S]*?--cible-tactile/);
   });
 });
 

@@ -97,9 +97,8 @@
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
 }
-/* Le CARRÉ effectif : left/top/width/height sont posés en pixels par le composant (ResizeObserver) pour que
-   le SVG (viewBox carré, letterboxé par le navigateur) et les accroches partagent EXACTEMENT le même repère.
-   Positionner les accroches en % du CONTENEUR les décalait jusqu'à ~100 px du bois dessiné (revue 4.6). */
+/* Le portrait effectif : left/top/width/height sont posés en pixels par ResizeObserver pour que le
+   Canvas 1408×2503 et les accroches DOM partagent exactement le même repère. */
 .monde {
   position: absolute;
   transform-origin: 50% 50%; /* le zoom part du CENTRE (au coin, l'arbre fuyait hors cadre en 4 clics) */
@@ -108,58 +107,16 @@
 .mondeEstompe {
   opacity: 0.55; /* le reste de l'arbre s'estompe SANS FLOU (UX-DR-26) */
 }
-.svg {
+.canvasLunaire {
   display: block;
   width: 100%;
   height: 100%;
-  overflow: visible;
-}
-.tronc {
-  fill: none;
-  stroke: var(--arbre-tronc);
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-/* LA GRAINE (retour du 2026-08-20 : « où est sa graine ??? »). La seule surface REMPLIE de tout
-   l'arbre — c'est ce qui en fait un point de départ plutôt qu'un trait de plus. Elle partage la
-   teinte du tronc : ce n'est pas un objet posé sur l'arbre, c'est son origine. */
-.graine {
-  fill: var(--arbre-tronc);
-  stroke: none;
-}
-.graineEnReserve {
-  fill: var(--arbre-tronc);
-  opacity: 0.45;
-}
-
-/* Story 5.3 (AC3) — la MATIÈRE EN RÉSERVE.
-   Le contour reste ENTIER : ni `stroke-dasharray`, ni fantôme, ni rouge, ni cadenas. Seule la densité
-   de la matière change. Un tronc en pointillés dirait « cassé » ou « à débloquer » ; celui-ci dit
-   « pas encore rempli », ce qui est exactement l'état des faits. La différence reste perceptible
-   sans dépendre de la couleur seule : la fiche, elle, l'écrit en toutes lettres. */
-.troncEnReserve {
-  opacity: 0.55;
+  background: transparent;
 }
 /* La cible du tronc : même taille de touche que les accroches (≥44 px), sans point dessiné —
    le tronc EST son propre repère visuel, un pastille de plus ferait un objet qui n'existe pas. */
 .cibleTronc {
   cursor: pointer;
-}
-.branche {
-  fill: none;
-  stroke: var(--arbre-branche);
-  stroke-linecap: round;
-}
-.feuille {
-  fill: var(--arbre-feuillage);
-}
-.rayonnement {
-  fill: var(--lueur); /* pleine lumière nacre, STATIQUE — aucun objet-fruit, aucune animation */
-  opacity: 0.32;
-}
-.accrocheDot {
-  fill: var(--accent);
 }
 /* Le hit-target cliquable : taille CONSTANTE ≥ 44px (contre-échelle 1/zoom appliquée en style inline). */
 .accroche {
@@ -361,6 +318,34 @@
   min-height: 0;
   overflow-y: auto;
 }
+
+/* Étape 0 : le texte occupe une zone protégée bornée, jamais un voile qui remplace le ciel ou le
+   moteur lunaire. Le Canvas reste visible derrière et autour ; la carte ne couvre pas la graine. */
+.videSuperposition {
+  position: absolute;
+  z-index: 2;
+  top: var(--esp-2);
+  left: 50%;
+  width: min(calc(100% - 2 * var(--esp-4)), var(--mesure));
+  max-height: 34%;
+  transform: translateX(-50%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.videSuperposition .vide {
+  flex: none;
+  min-height: auto;
+  overflow: visible;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  padding: var(--esp-4);
+  background: color-mix(in srgb, var(--fond) 92%, transparent);
+}
+.videSuperposition .videExplication {
+  margin-top: var(--esp-2);
+}
 .videTitre {
   font-family: var(--pile-anam);
   color: var(--texte);
@@ -516,8 +501,6 @@
   font-family: var(--pile-ui);
 }
 
-/* Story 5.6 (T9) — le tronc dans l'ÉTAT VIDE, qui n'a pas de canevas (FR-088, dette de la 3.3).
-   Hauteur bornée : c'est le décor de l'écran, pas son sujet — le texte reste ce qu'on lit d'abord. */
 /* Les trois phrases qui disent ce qu'est l'arbre. Groupées, à la mesure de lecture, et un cran plus
    serrées que le reste : c'est un paragraphe, pas trois annonces. */
 .videExplication {
@@ -527,37 +510,6 @@
   max-width: var(--mesure);
   margin: var(--esp-4) auto 0;
   text-align: left;
-}
-
-.troncSeul {
-  display: block;
-  width: 100%;
-  max-width: 190px;
-  height: auto;
-  max-height: 180px;
-  margin: 0 auto var(--esp-2);
-  flex: none;
-}
-/* ⚠️ SUR UN ÉCRAN COURT, C'EST LE DESSIN QUI CÈDE — PAS LE TEXTE, PAS LE BOUTON. L'en-tête
-   ci-dessus le dit déjà : « c'est le décor de l'écran, pas son sujet ». Un défilement imbriqué
-   marche (voir `.vide`), mais faire défiler pour atteindre le seul bouton de l'écran est une
-   solution de repli, pas une mise en page. 70 px rendus ici suffisent à ce que tout tienne sur un
-   iPhone 14, où il en manquait 54. */
-@media (max-height: 720px) {
-  /* Les trois phrases qui disent ce qu'est l'arbre. Groupées, à la mesure de lecture, et un cran plus
-   serrées que le reste : c'est un paragraphe, pas trois annonces. */
-.videExplication {
-  display: flex;
-  flex-direction: column;
-  gap: var(--esp-3);
-  max-width: var(--mesure);
-  margin: var(--esp-4) auto 0;
-  text-align: left;
-}
-
-.troncSeul {
-    max-height: 110px;
-  }
 }
 
 /* En contraste renforcé, les étoiles sont déjà en `display: none` et la région retombe sur un fond

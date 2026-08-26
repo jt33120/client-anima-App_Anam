@@ -1,7 +1,7 @@
 "use client";
 
-import type { BibliothequeVue, CarteVue } from "./types";
-import CarteAnam from "./CarteAnam";
+import Link, { useLinkStatus } from "next/link";
+import type { BibliothequeVue, CarteVue, UniversVue } from "./types";
 import s from "./accueil.module.css";
 
 /**
@@ -38,31 +38,80 @@ export interface ProprietesBibliotheque {
 }
 
 export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
-  const { cartes, enAvant, jour, anam } = bibliotheque;
+  const { cartes, jour, univers } = bibliotheque;
   const date = `${jour.j} ${MOIS[jour.m - 1]}`;
+  const mantra = cartes.find((carte) => carte.cle === "mantra");
+  const ciel = cartes.find((carte) => carte.cle === "horoscope");
 
   return (
     <div className={s.bibliotheque}>
-      <p className={`t-meta ${s.jour}`}>{date}</p>
-      <ul className={s.grille}>
-        {cartes.map((carte) => (
-          <li key={carte.cle} className={s.item}>
-            <Carte carte={carte} enAvant={carte.cle === enAvant} />
-          </li>
-        ))}
-      </ul>
+      <section className={s.quotidien} aria-labelledby="moi-aujourdhui">
+        <div className={s.enteteQuotidien}>
+          <p className={`t-meta ${s.jour}`}>{date}</p>
+          <h2 id="moi-aujourdhui" className={`t-titre-sm ${s.titreQuotidien}`}>Aujourd’hui</h2>
+        </div>
+        <div className={s.cartesQuotidiennes}>
+          {ciel && <Carte carte={ciel} enAvant />}
+          {mantra && <Carte carte={mantra} enAvant={false} />}
+        </div>
+      </section>
 
-      {/* ── LA CARTE D'ANAM, HORS DE LA GRILLE (Story 6.3, D8) ─────────────────────────────────
-          Hors de la `<ul>` parce qu'elle n'est pas du catalogue : elle n'entre pas dans la
-          rotation du jour, et la mise en avant reste « la première de la grille ». La mettre
-          dedans obligerait à l'exclure du tri, donc à écrire une règle dans le rendu — ce que
-          ce fichier n'a pas le droit de faire (AD-7).
+      <div className={s.transitionUnivers} aria-hidden><span /></div>
 
-          ⚠️ ELLE COMPTE QUAND MÊME DANS UX-DR-30. Cinq cartes de catalogue plus celle-ci font
-          SIX objets rendus, soit exactement le plafond : une sixième carte de catalogue en
-          livrerait sept. La garde compte les objets rendus, pas les entrées du catalogue. */}
-      <CarteAnam carte={anam} />
+      <section className={s.univers} aria-labelledby="moi-univers">
+        <div className={s.enteteUnivers}>
+          <p className={`t-meta ${s.surtitreUnivers}`}>Ce qui te compose</p>
+          <h2 id="moi-univers" className="t-titre">Tes univers</h2>
+          <p className={`t-corps ${s.introUnivers}`}>Ils ne changent pas tous les jours. Ils restent ici, à leur place.</p>
+        </div>
+        <ul className={s.grilleUnivers}>
+          {univers.map((univers) => <PorteUnivers key={univers.cle} univers={univers} />)}
+        </ul>
+      </section>
     </div>
+  );
+}
+
+function IndicateurLien() {
+  const { pending } = useLinkStatus();
+  return <span className={`${s.indicateurLien} ${pending ? s.indicateurLienActif : ""}`} aria-hidden />;
+}
+
+function GlypheUnivers({ cle }: { readonly cle: UniversVue["cle"] }) {
+  if (cle === "astrologie") {
+    return <svg viewBox="0 0 64 64" aria-hidden><circle cx="32" cy="32" r="8" /><ellipse cx="32" cy="32" rx="25" ry="13" /><ellipse cx="32" cy="32" rx="13" ry="25" transform="rotate(35 32 32)" /></svg>;
+  }
+  if (cle === "numerologie") {
+    return <svg viewBox="0 0 64 64" aria-hidden><path d="M32 7 40 24 58 26 45 39 48 57 32 48 16 57 19 39 6 26 24 24Z" /><circle cx="32" cy="32" r="6" /></svg>;
+  }
+  if (cle === "psychologie") {
+    return <svg viewBox="0 0 64 64" aria-hidden><path d="M32 54C16 45 10 35 14 24c3-8 12-10 18-3 6-7 15-5 18 3 4 11-2 21-18 30Z" /><path d="M32 21v27M21 31c6 1 11 5 11 11M43 31c-6 1-11 5-11 11" /></svg>;
+  }
+  return null;
+}
+
+function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
+  return (
+    <li className={s.itemUnivers}>
+      <article className={s.porteUnivers}>
+        <Link className={s.lienUnivers} href={univers.url}>
+          <span className={s.eclat} aria-hidden />
+          <span className={s.glyphe}><GlypheUnivers cle={univers.cle} /></span>
+          <span className={s.texteUnivers}>
+            <span className={`t-titre-sm ${s.nomUnivers}`}>{univers.titre}</span>
+            <span className={`t-meta ${s.accrocheUnivers}`}>{univers.accroche}</span>
+          </span>
+          <span className={s.fleche} aria-hidden>→</span>
+          <IndicateurLien />
+        </Link>
+        {univers.action && (
+          <Link className={s.actionUnivers} href={univers.action.url}>
+            <span className="t-bouton">{univers.action.libelle}</span>
+            <IndicateurLien />
+          </Link>
+        )}
+      </article>
+    </li>
   );
 }
 

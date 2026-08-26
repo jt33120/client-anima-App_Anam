@@ -8,9 +8,263 @@
 .bibliotheque {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-4);
+  gap: var(--esp-7);
   width: 100%;
   max-width: var(--contenu-max);
+}
+
+.quotidien {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+}
+
+.enteteQuotidien {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+.titreQuotidien,
+.enteteUnivers h2 {
+  margin: 0;
+  color: var(--texte);
+}
+
+.cartesQuotidiennes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--esp-4);
+}
+
+@media (min-width: 640px) {
+  .cartesQuotidiennes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.transitionUnivers {
+  position: relative;
+  align-self: center;
+  width: 1px;
+  height: var(--esp-7);
+  background: linear-gradient(to bottom, transparent, var(--bordure-forte), transparent);
+}
+
+.transitionUnivers span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--esp-2);
+  height: var(--esp-2);
+  border-radius: var(--rayon-full);
+  background: var(--lueur);
+  transform: translate(-50%, -50%);
+  opacity: 0.7;
+}
+
+.univers,
+.enteteUnivers {
+  display: flex;
+  flex-direction: column;
+}
+
+.univers {
+  gap: var(--esp-5);
+}
+
+.enteteUnivers {
+  gap: var(--esp-2);
+}
+
+.surtitreUnivers,
+.introUnivers {
+  margin: 0;
+  color: var(--texte-doux);
+}
+
+.grilleUnivers {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--esp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .grilleUnivers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Human Design et Big Five vivent derrière Psychologie : la troisième porte assume donc la
+     largeur entière, au lieu de laisser une case vide qui ferait croire à un univers manquant. */
+  .itemUnivers:nth-child(3):last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.itemUnivers {
+  min-width: 0;
+}
+
+.porteUnivers {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
+  background:
+    radial-gradient(circle at 20% 12%, color-mix(in srgb, var(--lueur) 10%, transparent), transparent 38%),
+    var(--surface);
+}
+
+.lienUnivers {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--esp-4);
+  min-height: calc(var(--cible-tactile) * 3);
+  padding: var(--esp-5);
+  color: var(--texte);
+  text-decoration: none;
+  transition:
+    border-color var(--duree-courte) var(--courbe),
+    background var(--duree-courte) var(--courbe),
+    transform var(--duree-courte) var(--courbe);
+}
+
+.lienUnivers:hover {
+  background: color-mix(in srgb, var(--surface-elevee) 68%, transparent);
+  transform: translateY(-2px);
+}
+
+.lienUnivers:focus-visible,
+.actionUnivers:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
+.glyphe {
+  display: grid;
+  place-items: center;
+  width: calc(var(--cible-tactile) + var(--esp-2));
+  height: calc(var(--cible-tactile) + var(--esp-2));
+  color: var(--lueur);
+}
+
+.glyphe svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.texteUnivers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  min-width: 0;
+}
+
+.nomUnivers,
+.accrocheUnivers {
+  color: inherit;
+}
+
+.accrocheUnivers {
+  line-height: 1.55;
+}
+
+.fleche {
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.eclat {
+  position: absolute;
+  top: var(--esp-4);
+  right: var(--esp-5);
+  width: var(--esp-2);
+  height: var(--esp-2);
+  border-radius: var(--rayon-full);
+  background: var(--lueur);
+  opacity: 0.28;
+  animation: scintillementPorte var(--duree-respiration) var(--courbe) infinite;
+}
+
+.actionUnivers {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--cible-tactile);
+  margin: 0 var(--esp-5) var(--esp-5);
+  padding: var(--esp-2) var(--esp-4);
+  border-radius: var(--rayon);
+  background: var(--accent);
+  color: var(--sur-accent);
+  text-align: center;
+  text-decoration: none;
+}
+
+.indicateurLien {
+  position: absolute;
+  right: var(--esp-2);
+  bottom: var(--esp-2);
+  width: var(--esp-2);
+  height: var(--esp-2);
+  border-radius: var(--rayon-full);
+  background: currentColor;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.indicateurLienActif {
+  visibility: visible;
+  animation: attenteLien var(--duree-standard) var(--courbe) var(--duree-courte) infinite alternate;
+}
+
+@keyframes scintillementPorte {
+  50% { opacity: 0.7; }
+}
+
+@keyframes attenteLien {
+  to { opacity: 0.65; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eclat,
+  .indicateurLienActif {
+    animation: none;
+  }
+  .indicateurLienActif {
+    opacity: 0.65;
+  }
+  .lienUnivers {
+    transition: none;
+  }
+  .lienUnivers:hover {
+    transform: none;
+  }
+}
+
+:global(:root[data-a11y="contraste"]) .eclat {
+  display: none;
+}
+
+@media (prefers-contrast: more) {
+  :global(:root:not([data-a11y="nuit"])) .eclat {
+    display: none;
+  }
 }
 
 .jour {
@@ -109,18 +363,6 @@
 .nonEcrit {
   color: var(--texte-doux);
   font-style: italic;
-}
-
-/* ── LA CARTE D'ANAM (Story 6.3) ────────────────────────────────────────────────────────────────
-   Hors de la grille, donc pleine largeur par construction. AUCUNE variante « avec motif » : il n'y
-   a pas de classe qui s'allume quand Anam a quelque chose à dire, parce qu'un accent qui s'allume
-   est un badge sans le mot (FR-031). La seule différence est une ligne de texte en plus. */
-.carteAnam {
-  border-style: dashed;
-}
-
-.presenceAnam {
-  color: var(--texte-doux);
 }
 
 /* La voix du PRODUIT sur une carte (Story 7.8) — « le test n'a pas encore été passé ».

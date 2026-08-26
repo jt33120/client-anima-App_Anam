@@ -1,0 +1,121 @@
+.halte {
+  max-width: var(--contenu-max);
+  margin: 0 auto;
+  padding: var(--esp-7) var(--marge-mobile) var(--esp-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-6);
+}
+
+.titre,
+.introduction,
+.module h2,
+.corps,
+.etiquette {
+  margin: 0;
+}
+
+.introduction {
+  max-width: var(--mesure);
+  color: var(--texte-doux);
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--esp-4);
+}
+
+@media (min-width: 640px) {
+  .grille {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.module {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  min-height: calc(var(--cible-tactile) * 4);
+  padding: var(--esp-5);
+  overflow: hidden;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
+  background:
+    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 9%, transparent), transparent 34%),
+    var(--surface);
+}
+
+.moduleActif {
+  border-color: var(--bordure-forte);
+  background:
+    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 15%, transparent), transparent 38%),
+    var(--surface-elevee);
+}
+
+.methode {
+  background: transparent;
+}
+
+.etiquette {
+  color: var(--texte-doux);
+}
+
+.corps {
+  color: var(--texte-doux);
+  line-height: 1.65;
+}
+
+.constellation {
+  position: absolute;
+  top: var(--esp-4);
+  right: var(--esp-4);
+  color: var(--lueur);
+  font-size: 1.4rem;
+  opacity: 0.7;
+}
+
+.action {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--cible-tactile);
+  margin-top: auto;
+  padding: var(--esp-2) var(--esp-4);
+  border-radius: var(--rayon);
+  background: var(--accent);
+  color: var(--sur-accent);
+  text-decoration: none;
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
+.indicateur {
+  position: absolute;
+  right: var(--esp-2);
+  width: var(--esp-2);
+  height: var(--esp-2);
+  border-radius: var(--rayon-full);
+  background: currentColor;
+  opacity: 0;
+}
+
+.indicateurActif {
+  animation: attente var(--duree-standard) var(--courbe) var(--duree-courte) infinite alternate;
+}
+
+@keyframes attente {
+  to { opacity: 0.65; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicateurActif {
+    animation: none;
+    opacity: 0.65;
+  }
+}

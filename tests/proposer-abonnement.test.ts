@@ -32,9 +32,13 @@ const route = sansCommentaires(readFileSync(resolve(racine, "app/api/anam/messag
 describe("Story 3.2 — la route branche le gate serveur (AC1/AC6)", () => {
   it("la route DÉCIDE via le prédicat pur ET l'état premium PROVIENT de la lecture d'entitlement (source unique 3.1)", () => {
     expect(route).toMatch(/doitProposerAbonnement/);
-    // Le `premium` injecté dans la décision est bien CELUI produit par estPremiumCourante (pas une constante
-    // ni une autre source) : l'affectation `premium = await estPremiumCourante()` est exigée littéralement.
-    expect(route).toMatch(/premium\s*=\s*await\s+estPremiumCourante\(\)/);
+    // Le `premium` injecté dans la décision vient de l'instantané unique d'entitlement, partagé avec
+    // la comptabilité IA ; `null` conserve le repli commercial prudent (« le doute suspend »).
+    expect(route).toMatch(
+      /const\s+premiumAuMomentAppel\s*=\s*avecDelai\(\s*estPremiumCourante\(\)/,
+    );
+    expect(route).toMatch(/DELAI_PREMIUM_MS/);
+    expect(route).toMatch(/premium\s*=\s*\(await\s+premiumAuMomentAppel\)\s*\?\?\s*true/);
   });
 
   it("la trame `paywall` est émise APRÈS la trame `bilan` (la carte s'ancre SOUS le bilan)", () => {
@@ -52,12 +56,13 @@ describe("Story 3.2 — la route branche le gate serveur (AC1/AC6)", () => {
     expect(route).toMatch(/doitProposerAbonnement\(\s*\{\s*bilanEmis:\s*!!structure\s*,\s*premium\s*\}/);
   });
 
-  it("la lecture premium est IMBRIQUÉE dans le bloc `if (doitProduireBilan)` (aucun surcoût DB les autres tours)", () => {
-    // Portée réelle, pas simple ordre textuel : l'affectation premium suit l'OUVERTURE du bloc dans une
-    // fenêtre courte (≤ 220 car.) → elle est bien DANS le bloc gaté, pas ailleurs dans le fichier.
+  it("la décision paywall consomme l'instantané premium dans le bloc `if (doitProduireBilan)` sans seconde lecture DB", () => {
+    // L'instantané est désormais lancé au départ du tour pour attribuer aussi les coûts de sécurité ;
+    // le bloc commercial ne fait que le consommer, et la source n'est appelée qu'une fois.
     expect(
       route,
-      "la lecture premium doit vivre dans le bloc doitProduireBilan (gate de coût)",
-    ).toMatch(/if\s*\(doitProduireBilan\)\s*\{[\s\S]{0,220}?premium\s*=\s*await\s+estPremiumCourante\(\)/);
+      "la décision premium doit vivre dans le bloc doitProduireBilan",
+    ).toMatch(/if\s*\(doitProduireBilan\)\s*\{[\s\S]{0,220}?premium\s*=\s*\(await\s+premiumAuMomentAppel\)\s*\?\?\s*true/);
+    expect(route.match(/estPremiumCourante\(\)/g)).toHaveLength(1);
   });
 });

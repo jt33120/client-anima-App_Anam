@@ -35,10 +35,14 @@ vi.mock("@/lib/data/lire-enneagramme", () => ({
   chargerHypotheseADire: (...a: unknown[]) => lireHypothese(...a),
 }));
 
-import { chargerOuverture } from "@/lib/safety/ouverture-branche";
-import { SEUIL_BRANCHES_OUVERTES, PHRASE_INVITATION } from "@/lib/domain/arbitrage-ouverture";
+import { chargerOuverture, preparerOuverture } from "@/lib/safety/ouverture-branche";
+import {
+  FENETRE_INVITATION_HEURES,
+  SEUIL_BRANCHES_OUVERTES,
+  PHRASE_INVITATION,
+} from "@/lib/domain/arbitrage-ouverture";
 import { PHRASE_OUVERTURE_HYPOTHESE } from "@/lib/domain/enneagramme-hypothese";
-import { PHRASE_PAUSE } from "@/lib/domain/rythme-pause";
+import { APAISEMENT_JOURS, PHRASE_PAUSE } from "@/lib/domain/rythme-pause";
 
 /**
  * Story 3.3 — le client factice répond désormais à `est_premium_courante` : depuis D2-A, l'ouverture
@@ -82,6 +86,21 @@ beforeEach(() => {
 
 describe("[6.4/D4] la pause préempte, et elle préempte SANS RIEN DÉPENSER", () => {
   const RYTHME_INTENSE = { seances: 9, minutes: 140 };
+
+  it("le bail quotidien PRÉPARE la pause sans la réserver avant sa transaction finale", async () => {
+    mesurerRythmeDepot.mockResolvedValue(RYTHME_INTENSE);
+
+    await expect(preparerOuverture(supa, UID, MAINTENANT)).resolves.toEqual({
+      ouverture: { type: "pause", phrase: PHRASE_PAUSE },
+      reservation: {
+        type: "pause",
+        seances: 9,
+        minutes: 140,
+        apaisementJours: APAISEMENT_JOURS,
+      },
+    });
+    expect(reserverPause).not.toHaveBeenCalled();
+  });
 
   it("[LE CŒUR] seuil franchi + parole réservée ⇒ `pause`, et RIEN D'AUTRE N'A ÉTÉ LU", async () => {
     // ⚠️ C'EST LE TEST QUI JUSTIFIE LA POSITION DU BLOC, et il ne suffit pas de vérifier le type
@@ -170,6 +189,25 @@ describe("peu de branches ouvertes → Anam PROPOSE (comportement 4.5 inchangé)
 });
 
 describe("[AC4/AC5 DUR] trop de branches ouvertes → Anam INVITE", () => {
+  it("le bail quotidien prépare l'invitation sans consommer sa fenêtre", async () => {
+    chargerProposition.mockResolvedValue(SIGNAL_HIER);
+    faits.mockResolvedValue(TROP_DE_BRANCHES);
+
+    await expect(preparerOuverture(supa, UID, MAINTENANT)).resolves.toEqual({
+      ouverture: {
+        type: "invitation",
+        phrase: PHRASE_INVITATION,
+        brancheCibleId: "b-vieille",
+      },
+      reservation: {
+        type: "invitation",
+        fenetreHeures: FENETRE_INVITATION_HEURES,
+        seuilBranches: SEUIL_BRANCHES_OUVERTES,
+      },
+    });
+    expect(reserverParole).not.toHaveBeenCalled();
+  });
+
   it("[LE CŒUR] rend une `invitation`, pas une proposition", async () => {
     // Mutation-cible : passer `tropDeBranchesOuvertes(...)` en `false`. FR-030 disparaîtrait entièrement
     // sans qu'aucun autre test ne rougisse — la proposition marcherait toujours.

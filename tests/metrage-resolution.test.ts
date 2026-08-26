@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { resoudreMetrage, estimerTokens, type EtatFlux } from "@/lib/ai/metrage";
+import {
+  resoudreMetrage,
+  resoudreUsageReponse,
+  estimerTokens,
+  type EtatFlux,
+} from "@/lib/ai/metrage";
 
 /**
  * Story 2.2 (revue) — la DÉCISION de métrage, pure et testable (couvre le comportement que la route
@@ -65,5 +70,19 @@ describe("resoudreMetrage — métrage honnête et robuste (revue 2.2)", () => {
     expect(estimerTokens(4)).toBe(1);
     expect(estimerTokens(5)).toBe(2);
     expect(estimerTokens(-10)).toBe(0);
+  });
+
+  it("applique la même garde faux-zéro aux réponses non streamées, sens par sens", () => {
+    const usage = resoudreUsageReponse(
+      {
+        texte: "réponse de huit caractères environ",
+        tier: "fort",
+        modele: "mistral-large-2512",
+        usage: { tokensEntree: 0, tokensSortie: 3 },
+      },
+      [{ role: "user", content: "12345678" }],
+    );
+    expect(usage.tokensEntree).toBe(2);
+    expect(usage.tokensSortie).toBe(3);
   });
 });

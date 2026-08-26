@@ -7,7 +7,8 @@
  * Effet : un « Réessayer » ne recompte pas les tokens (upsert no-op) et ne sur-consomme pas
  * l'allocation résiduelle (3.4). Clôt la dette « jeton de tour stable » (2.2/2.4/2.7/2.9).
  *
- * Le serveur n'accepte qu'un UUID CANONIQUE (8-4-4-4-12 hex) — tout autre (absent, mal formé, non
+ * Le serveur n'accepte qu'un UUID CANONIQUE (8-4-4-4-12 hex) et le normalise en minuscules — tout
+ * autre (absent, mal formé, non
  * borné) retombe sur l'UUID SERVEUR par requête (repli sûr : jamais de chaîne attaquante non bornée en
  * base ; au pire on perd l'idempotence d'UN retour client, jamais la sécurité). Un jeton spoofé ne
  * collisionne que le PROPRE métrage de la spoofeuse (index scopé, revue 2.1).
@@ -17,5 +18,5 @@
 const UUID_CANONIQUE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function jetonTourValide(v: unknown): string | null {
-  return typeof v === "string" && UUID_CANONIQUE.test(v) ? v : null;
+  return typeof v === "string" && UUID_CANONIQUE.test(v) ? v.toLowerCase() : null;
 }

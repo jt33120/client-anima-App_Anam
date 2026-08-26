@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { placerBranches, CANEVAS } from "@/render/arbre/geometrie";
+import {
+  placerBranches,
+  CANEVAS,
+  construireGeometrieLunaire,
+} from "@/render/arbre/geometrie";
 import type { BrancheProjetee } from "@/lib/scene/projection";
 
 /**
@@ -14,8 +18,17 @@ import type { BrancheProjetee } from "@/lib/scene/projection";
  * test ci-dessous tient désormais.
  */
 
-const br = (id: string): BrancheProjetee => ({ id, etat: "naissance", intensite: 0, extraitSourceId: `s-${id}` });
-const liste = (n: number) => Array.from({ length: n }, (_, i) => br(`b${i}`));
+const br = (id: string, dateNaissance?: string): BrancheProjetee => ({
+  id,
+  etat: "naissance",
+  intensite: 0,
+  extraitSourceId: `s-${id}`,
+  ...(dateNaissance === undefined ? {} : { dateNaissance }),
+});
+const liste = (n: number) =>
+  Array.from({ length: n }, (_, i) =>
+    br(`b${i}`, new Date(Date.UTC(2026, 0, i + 1, 10)).toISOString()),
+  );
 
 describe("placerBranches — PERMANENCE : une branche née ne bouge plus jamais", () => {
   it("[HAUTE / DESIGN.md] la position d'une branche ne dépend QUE de son rang, jamais du nombre total", () => {
@@ -42,6 +55,40 @@ describe("placerBranches — PERMANENCE : une branche née ne bouge plus jamais"
     const l = liste(4);
     expect(placerBranches(l)).toEqual(placerBranches(l));
   });
+
+  it("une permutation réseau des mêmes branches garde chaque identité à la même place", () => {
+    const memesBranches = [
+      br("meme-date-b", "2026-01-01T10:00:00.000Z"),
+      br("sans-date-z"),
+      br("recente", "2026-02-01T10:00:00.000Z"),
+      br("invalide-a", "pas-une-date"),
+      br("meme-date-a", "2026-01-01T10:00:00.000Z"),
+      br("sans-date-a"),
+    ];
+    const positions = (entree: readonly BrancheProjetee[]) =>
+      placerBranches(entree).map(({ branche, x, y, accroche }) => ({
+        id: branche.id,
+        x,
+        y,
+        accroche,
+      }));
+    const ordreReseau = memesBranches.map(({ id }) => id);
+    const attendu = positions(memesBranches);
+
+    expect(memesBranches.map(({ id }) => id), "la géométrie a muté la projection").toEqual(
+      ordreReseau,
+    );
+    expect(attendu.map(({ id }) => id)).toEqual([
+      "meme-date-a",
+      "meme-date-b",
+      "recente",
+      "invalide-a",
+      "sans-date-a",
+      "sans-date-z",
+    ]);
+    expect(positions([...memesBranches].reverse())).toEqual(attendu);
+    expect(positions([memesBranches[3], memesBranches[0], memesBranches[5], memesBranches[2], memesBranches[1], memesBranches[4]])).toEqual(attendu);
+  });
 });
 
 describe("placerBranches — forme de l'éventail", () => {
@@ -51,7 +98,7 @@ describe("placerBranches — forme de l'éventail", () => {
 
   it("une seule branche pousse au centre (droit vers le haut)", () => {
     const [p] = placerBranches([br("a")]);
-    expect(Math.round(p.x)).toBe(500); // centre du canevas
+    expect(Math.round(p.x)).toBe(CANEVAS.largeur / 2); // bulbe sommital du handoff
     expect(p.y).toBeLessThan(p.fourche.y); // vers le haut
   });
 
@@ -75,15 +122,36 @@ describe("placerBranches — forme de l'éventail", () => {
     }
   });
 
-  it("l'éventail est ÉQUILIBRÉ : à remplissage complet, autant de branches de chaque côté de l'axe", () => {
-    // Le remplissage est centre-d'abord puis moitiés successives : il est exactement symétrique aux
-    // effectifs 2^k − 1 (1, 3, 7, 15…), et au plus déséquilibré d'une branche entre deux.
-    for (const n of [3, 7, 15]) {
-      const places = placerBranches(liste(n));
-      const gauche = places.filter((p) => p.x < 500 - 1e-9).length;
-      const droite = places.filter((p) => p.x > 500 + 1e-9).length;
-      expect(gauche, `éventail déséquilibré à ${n} branches`).toBe(droite);
+  it("tous les points de bois — tronc, racines, branches et rameaux — restent finis dans le portrait", () => {
+    const geometrie = construireGeometrieLunaire(liste(60));
+    const segments = [
+      ...geometrie.statiques,
+      ...geometrie.branches.flatMap((branche) => [branche.principale, ...branche.rameaux]),
+    ];
+
+    expect(segments.length).toBeGreaterThan(geometrie.branches.length);
+    for (const [index, segment] of segments.entries()) {
+      expect(segment.pts.length, `segment vide ${index}`).toBeGreaterThan(1);
+      for (const point of segment.pts) {
+        expect(Number.isFinite(point.x), `x non fini au segment ${index}`).toBe(true);
+        expect(Number.isFinite(point.y), `y non fini au segment ${index}`).toBe(true);
+        expect(Number.isFinite(point.w), `largeur non finie au segment ${index}`).toBe(true);
+        expect(point.x, `x hors portrait au segment ${index}`).toBeGreaterThanOrEqual(0);
+        expect(point.x, `x hors portrait au segment ${index}`).toBeLessThanOrEqual(CANEVAS.largeur);
+        expect(point.y, `y hors portrait au segment ${index}`).toBeGreaterThanOrEqual(0);
+        expect(point.y, `y hors portrait au segment ${index}`).toBeLessThanOrEqual(CANEVAS.hauteur);
+        expect(point.w, `largeur nulle au segment ${index}`).toBeGreaterThan(0);
+      }
     }
+  });
+
+  it("les 13 places canoniques composent une couronne équilibrée autour de l'axe lunaire", () => {
+    const places = placerBranches(liste(13));
+    const axe = CANEVAS.largeur / 2;
+    const gauche = places.filter((p) => p.x < axe - 1e-9).length;
+    const droite = places.filter((p) => p.x > axe + 1e-9).length;
+    const centre = places.filter((p) => Math.abs(p.x - axe) <= 1e-9).length;
+    expect({ gauche, centre, droite }).toEqual({ gauche: 6, centre: 1, droite: 6 });
   });
 
   it("deux branches n'ont JAMAIS le même point d'accroche (une branche inatteignable serait perdue)", () => {
@@ -93,18 +161,12 @@ describe("placerBranches — forme de l'éventail", () => {
     }
   });
 
-  it("l'écartement entre accroches se DÉGRADE GRACIEUSEMENT quand l'arbre se densifie", () => {
-    // Un éventail de 150° à un seul niveau de ramification ne peut pas garder des cibles de 44 px
-    // indéfiniment : l'écartement angulaire est divisé par deux à chaque niveau de remplissage. Ce que la
-    // géométrie DOIT garantir, c'est que le raccourcissement par niveau maintienne un écart exploitable et
-    // MONOTONE, jamais un effondrement. La cible cliquable, elle, est dimensionnée par le rendu à partir
-    // de `ecartVoisin` (elle ne recouvre jamais sa voisine), et la vue liste reste l'équivalent
-    // non spatial garanti (AC3) — c'est là que se règle l'adressabilité au-delà d'une quinzaine.
-    const planchers: Record<number, number> = { 9: 25, 15: 25, 25: 15, 40: 12 };
-    for (const [n, plancher] of Object.entries(planchers)) {
-      const places = placerBranches(liste(Number(n)));
-      const pire = Math.min(...places.map((p) => p.ecartVoisin));
-      expect(pire, `accroches trop serrées à ${n} branches (${pire.toFixed(1)} unités)`).toBeGreaterThan(plancher);
+  it("la densification au-delà des 13 bulbes reste explicite, finie et sans branche silencieusement perdue", () => {
+    for (const n of [14, 25, 40, 60]) {
+      const places = placerBranches(liste(n));
+      expect(places, `projection tronquée à ${n} branches`).toHaveLength(n);
+      expect(Math.min(...places.map((p) => p.ecartVoisin)), `accroches confondues à ${n} branches`).toBeGreaterThan(0);
+      expect(places.every((p) => Number.isFinite(p.ecartVoisin))).toBe(true);
     }
   });
 

@@ -31,7 +31,7 @@ import {
   URL_TRANSPARENCE,
   type Surimpression,
 } from "@/lib/scene";
-import MenuCompte, { type EntreeMenuVue } from "./menu/MenuCompte";
+import MenuCompte, { type GroupeMenuVue } from "./menu/MenuCompte";
 import s from "./monde.module.css";
 
 /**
@@ -72,7 +72,7 @@ function SigneAnam({ prepare }: { prepare: boolean }) {
 }
 
 export interface CopieMenu {
-  readonly entrees: readonly EntreeMenuVue[];
+  readonly groupes: readonly GroupeMenuVue[];
   readonly libelleGlyphe: string;
   readonly titreFeuille: string;
   readonly libelleFermer: string;
@@ -135,7 +135,7 @@ export default function Surimpression({
             2026-07-21. Il remplace le mot « Profil », qui flottait au centre de l'écran. */}
         {modele.menuCompte && (
           <MenuCompte
-            entrees={menu.entrees}
+            groupes={menu.groupes}
             lienVers={lienVers}
             libelleGlyphe={menu.libelleGlyphe}
             titreFeuille={menu.titreFeuille}

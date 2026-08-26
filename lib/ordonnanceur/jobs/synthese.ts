@@ -25,6 +25,7 @@ import { creneauDiurneOuvert } from "@/lib/domain/regime-anam";
 import { creerDepotSynthese, type DepotSynthese } from "@/lib/data/depot-synthese";
 import { creerAiPort } from "@/lib/ai/fabrique";
 import { envoyerSousEgressArt9Ordonnanceur } from "@/lib/ai/egress-guard";
+import { metrerUsageIa, resoudreUsageReponse, type MetrageUsage } from "@/lib/ai/metrage";
 import { createSupabaseAdminClient } from "@/lib/data/supabase/admin";
 import { creerPortCourriel } from "@/lib/courriel/fabrique";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -74,6 +75,8 @@ export const NOM_JOB = "synthese-hebdomadaire";
 
 /** Le bail d'une SEULE personne : le modèle fort peut prendre du temps, mais pas éternellement. */
 export const BAIL_PERSONNE_S = 180;
+/** Le registre de coût ne peut jamais retenir la validation/persistance d'une synthèse. */
+export const DELAI_METRAGE_SYNTHESE_MS = 1_500;
 
 export interface DepsSynthese {
   readonly depot: DepotSynthese;
@@ -84,6 +87,10 @@ export interface DepsSynthese {
    */
   readonly supabase: SupabaseClient;
   readonly courriel: PortCourriel;
+  /** Registre interne des coûts ; injecté pour prouver le câblage et l'idempotence du job. */
+  readonly metrerUsage: (usage: MetrageUsage) => Promise<void>;
+  /** Surcharge de test uniquement ; production utilise la borne ci-dessus. */
+  readonly delaiMetrageMs?: number;
 }
 
 /**
@@ -286,18 +293,19 @@ async function produirePour(
   //
   // `avecDelai` borne l'appel (T3-2) : sans lui, une seule réponse qui ne revient pas mangeait tout le
   // budget du fan-out, et comme rien n'était écrit, la même personne repassait première le lendemain.
+  const requeteSynthese = {
+    capacite: "synthese" as const,
+    // Le jeton rend les marqueurs du bloc journal imprévisibles : sans lui, une ligne écrite dans le
+    // journal peut imiter le délimiteur et se faire passer pour une consigne.
+    messages: [consigneSynthese(), ...messagesSynthese(materiau, randomUUID())],
+    contientArt9: true,
+  };
   const egress = await avecDelai(
     envoyerSousEgressArt9Ordonnanceur({
       supabase: deps.supabase,
       utilisatriceId,
       adaptateur: deps.ia,
-      requete: {
-        capacite: "synthese",
-        // Le jeton rend les marqueurs du bloc journal imprévisibles : sans lui, une ligne écrite dans le
-        // journal peut imiter le délimiteur et se faire passer pour une consigne.
-        messages: [consigneSynthese(), ...messagesSynthese(materiau, randomUUID())],
-        contientArt9: true,
-      },
+      requete: requeteSynthese,
     }),
     DELAI_MODELE_MS,
     "synthese_modele_timeout",
@@ -308,6 +316,35 @@ async function produirePour(
   if (egress.bloque) {
     journaliserIncidentSecurite("synthese_egress_bloque", { code: egress.raison });
     return "bloquee";
+  }
+
+  // L'appel fournisseur a bien eu lieu : le coût existe même si le contrôle de sortie, la validation
+  // ou l'écriture échouent ensuite. La période est aussi la clé d'idempotence métier de la synthèse ;
+  // un rejeu de la même tranche ne crée donc jamais une seconde ligne de coût.
+  const usage = resoudreUsageReponse(egress.reponse, requeteSynthese.messages);
+  try {
+    await avecDelai(
+      deps.metrerUsage({
+        utilisatriceId,
+        // Début + fin : un rejeu de la même tranche est dédoublonné, mais une tranche réellement
+        // élargie après un échec de validation correspond à un nouvel appel physique comptabilisable.
+        cleIdempotence: `synthese:${periode.debut}:${periode.fin}`,
+        operation: "synthese_periodique",
+        capacite: "synthese",
+        ...usage,
+        // `eligible_a_synthese`, relu immédiatement avant l'egress, exige un abonnement actif.
+        premiumAuMomentAppel: true,
+        // Le quota concerne les tours de conversation gratuits, pas le travail périodique interne.
+        exempteQuota: true,
+        comptabiliseFinancierement: true,
+      }),
+      deps.delaiMetrageMs ?? DELAI_METRAGE_SYNTHESE_MS,
+      "synthese_metrage_timeout",
+    );
+  } catch (e) {
+    // Le modèle a répondu : on continue à valider/persister. Le registre est best-effort, jamais un
+    // verrou de contenu ; l'incident ne porte ni texte ni identifiant de personne.
+    journaliserExploitation("synthese_metrage", { code: codeDErreur(e) });
   }
 
   // ── LE CONTRÔLE DE SORTIE — LA QUATRIÈME SORTIE DE GÉNÉRATION (revue des Epics 1 à 4) ─────────
@@ -434,5 +471,6 @@ export async function executerSynthese(ctx: ContexteJob): Promise<void> {
     ia: await creerAiPort(),
     supabase: createSupabaseAdminClient(),
     courriel: creerPortCourriel(),
+    metrerUsage: metrerUsageIa,
   });
 }

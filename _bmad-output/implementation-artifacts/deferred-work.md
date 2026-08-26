@@ -1509,3 +1509,32 @@ sert à rien » :
 **Ce qu'il faudra si le sujet revient :** une story qui commence par l'arbitrage du plafond, puis les
 trois obligations, puis le geste. Dans cet ordre. Le module supprimé est retrouvable dans l'historique
 git au commit qui porte cette note.
+
+---
+
+## Revue quota atomique 2026-08-26 — suites hors correctif de concurrence
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-reservation-atomique-quota-gratuit.md`
+  summary: Lier ou émettre côté serveur l'identité du tour avant d'activer le quota comme barrière hostile.
+  evidence: La RPC est atomique par clé mensuelle, mais un client direct peut réutiliser le même UUID sur des messages différents ; stocker un digest non protégé toucherait la posture art. 9 et un jeton serveur exige un nouveau protocole de retry.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-reservation-atomique-quota-gratuit.md`
+  summary: Versionner la limite dans une source transactionnelle si les déploiements à valeurs mixtes deviennent autorisés.
+  evidence: Le verrou sérialise les écritures mais chaque instance transmet encore sa valeur `ALLOCATION_RESIDUELLE_TOURS`; l'activation actuelle doit attendre la convergence de configuration.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-reservation-atomique-quota-gratuit.md`
+  summary: Remplacer `finProposee` par une preuve persistée de bilan livré.
+  evidence: Dette 3.4 préexistante confirmée par Blind Hunter ; le correctif traverse le port de séance et l'idempotence du bilan, hors de la course de quota.
+
+---
+
+## Revue ouverture quotidienne 2026-08-26 — événement réactif hors outbox
+
+- source_story: `14-4-ouvertures-reactives-outbox`
+  summary: Généraliser l'invariant « réserver et graver dans une même transaction » aux ouvertures
+  déclenchées après un geste dans une session déjà ouverte.
+  evidence: Le chemin quotidien passe désormais par l'outbox de `0084`, mais
+  `chargerOuvertureCourante` appelle encore le chemin historique `chargerOuverture` : une pause ou une
+  invitation peut être réservée, puis ne jamais atteindre le client si la réponse réseau est perdue.
+  La déduplication locale par type/branche empêche les doublons visibles dans la session, mais ne
+  constitue ni un accusé de livraison ni une identité persistante d'occurrence. Le correctif propre
+  exige une parole de journal liée à une métadonnée publique et relue au retry ; il ne faut pas
+  étendre silencieusement le registre du **premier tour quotidien** à tous les événements courants.

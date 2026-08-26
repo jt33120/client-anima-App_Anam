@@ -182,6 +182,28 @@ describe("le compactage se déclenche sur la LONGUEUR, jamais sur l’horloge", 
     expect(ecrit.carte.precipitant).toBe("un appel de sa mère");
     expect(ecrit.compacteJusquA).toBe(tranchePourCompactage(tours).borne);
   });
+
+  it("une écriture refusée conserve l'usage fournisseur pour la comptabilité", async () => {
+    const { adaptateur } = fauxAdaptateur(SORTIE_VALIDE);
+    const depot = fauxDepot();
+    depot.ecrire.mockRejectedValue(new Error("carte_indisponible"));
+    const erreur = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const r = await compacterSiNecessaire(
+      {
+        supabase: supabaseOk,
+        adaptateur,
+        depot,
+        lireTours: async () => toursAuDessusDuSeuil(),
+        fenetreDetresseActive: jamaisEnDetresse,
+      },
+      { verdict: verdictNeutre },
+    );
+
+    expect(r.ecrite).toBe(false);
+    expect(r.usage).toEqual({ tier: "fort", modele: "factice-test", tokensEntree: 9, tokensSortie: 3 });
+    erreur.mockRestore();
+  });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════

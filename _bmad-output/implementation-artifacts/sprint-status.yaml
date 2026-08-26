@@ -19,7 +19,7 @@
 # prod. Ce qui manque, c'est leur revue. C'est une dette réelle, pas un artefact de comptabilité.
 
 generated: 2026-08-07
-last_updated: 2026-08-25
+last_updated: 2026-08-26
 project: Anam
 project_key: ANAM
 tracking_system: file-system
@@ -332,7 +332,7 @@ development_status:
   epic-9-retrospective: optional
 
   # ── Epic 10 : Le coût, rendu lisible — sans une clé par personne ──
-  epic-10: backlog
+  epic-10: in-progress
   10-1-refus-ecrit-garde-pourquoi-jamais-cle: backlog
   10-2-porte-lancement-aujourd-hui-conversation-gratuite: backlog
   10-3-donner-prix-tokens-module-domaine-pur: backlog
@@ -341,26 +341,45 @@ development_status:
   10-6-lecture-script-ops-page: backlog
   10-7-seuil-alerte-lieu-couper: backlog
   10-8-six-portes-pre-lancement-chiffrees-datees: backlog
+  10-9-centre-cout-interne-par-utilisatrice: in-progress  # amendement 2026-08-26 — tranche verticale, une seule clé serveur
   epic-10-retrospective: optional
 
   # ── Epic 11 : L'arbre — un seul arbre, un seul style, sur le ciel ──
-  epic-11: backlog
+  epic-11: in-progress
   11-1-garde-fluidite-voit-defilement-avant-moindre: done  # 3e cas e2e : mesure PENDANT un défilement + inventaire des propriétés non compositées
   11-2-ciel-etoile-revient-sous-arbre-seul: done  # aplat retiré, voiles locaux, décor éteint sur la région arbre
   11-3-plus-pomme-nulle-part-seul-handoff: done  # cycle du fruit retiré appelant par appelant ; handoff périmé désamorcé
-  11-4-graine-ou-tronc-deux-cote-cote: backlog
-  11-5-trancher-plafond-13-branches-question-claude: backlog
-  11-6-porter-moteur-lunaire-meme-dessin-meme: backlog
+  11-4-etape-zero-graine-lunaire: done  # graine lunaire canonique, même ciel et même moteur
+  11-5-geometrie-sans-plafond-metier: done  # 60 branches testées, ordre stable et cibles 44 px
+  11-6-porter-moteur-lunaire-canonique: done
   epic-11-retrospective: optional
 
-  # ── Epic 12 : Elle l'écoute — la saisie vocale, et le refus de la voix de synthèse ──
-  epic-12: backlog
+  # ── Epic 12 : Voix — recherche et phase ultérieure, texte toujours complet ──
+  epic-12: in-progress
   12-1-porte-conformite-sous-traitant-art-9: backlog
   12-2-porte-latence-rien-cet-epic-avant: backlog
   12-3-sttport-transcription-passe-frontiere-egress-comme: backlog
   12-4-micro-composeur-transcription-reste-modifiable: backlog
-  12-5-refus-voix-synthese-ecrit-date-motive: backlog
+  12-5-recherche-go-no-go-stt-tts: in-progress  # recherche 2026-08-26 consignée ; mesures p75, décision produit et conformité encore dues
+  12-6-ecouter-tour-valide-option-future-revocable: backlog
   epic-12-retrospective: optional
+
+  # ── Epic 13 : Moi — quotidien, univers et Psychologie actionnable ──
+  epic-13: in-progress
+  13-1-moi-quotidien-trois-univers: done
+  13-2-psychologie-enneagramme-actionnable: done
+  13-3-menu-compte-navigation-immediate: done
+  13-4-big-five-instrument-tracable: backlog
+  13-5-human-design-moteur-deterministe: backlog
+  epic-13-retrospective: optional
+
+  # ── Epic 14 : Chaque journée commence avec Anam ──
+  epic-14: in-progress
+  14-1-fil-anam-ciel-seul: done
+  14-2-ouverture-jour-civil-parisien-idempotente: done
+  14-3-separateur-aujourd-hui: done
+  14-4-ouvertures-reactives-outbox: backlog  # dette préexistante : une réponse perdue peut brûler une réservation hors chemin quotidien
+  epic-14-retrospective: optional
 
 # Portes PRÉ-LANCEMENT — humaines, hors code, aucune story ne les débloque toute seule.
 # Elles ne bloquent pas le développement ; elles bloquent la MISE EN LIGNE.

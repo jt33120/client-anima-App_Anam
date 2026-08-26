@@ -13,6 +13,7 @@ import { doitExecuterTravailSchema } from "./pipeline";
 import { journaliserIncidentSecurite } from "./rpc-repli";
 import type { VerdictSecurite } from "./classer-detresse";
 import { avecDelai } from "@/lib/domain/delai";
+import { resoudreUsageReponse } from "@/lib/ai/metrage";
 
 /**
  * compactage-pipeline.ts — L'ÉTAGE QUI FABRIQUE LA CARTE (retour du 2026-08-25).
@@ -104,13 +105,14 @@ export async function compacterSiNecessaire(
   if (tranche.tours.length === 0 || tranche.borne === null) return RIEN;
 
   // (d) L'appel FORT, sous egress art. 9 (AD-13) et sous budget. Un hang n'écrit rien.
+  const requete = requeteCompactage(actuelle.carte, tranche.tours);
   let res;
   try {
     res = await avecDelai(
       envoyerSousEgressArt9({
         supabase: deps.supabase,
         adaptateur: deps.adaptateur,
-        requete: requeteCompactage(actuelle.carte, tranche.tours),
+        requete,
       }),
       deps.delaiMs ?? DELAI_COMPACTAGE_MS,
       "compactage_timeout",
@@ -121,12 +123,7 @@ export async function compacterSiNecessaire(
   }
   if (res.bloque) return { supprime: false, sousLeSeuil: false, ecrite: false, usage: null };
 
-  const usage: UsageCompactage = {
-    tier: res.reponse.tier,
-    modele: res.reponse.modele,
-    tokensEntree: res.reponse.usage.tokensEntree,
-    tokensSortie: res.reponse.usage.tokensSortie,
-  };
+  const usage: UsageCompactage = resoudreUsageReponse(res.reponse, requete.messages);
 
   // (e) L'analyse est un DÉCOUPAGE, jamais une interprétation : une sortie mal formée rend la carte
   //     INCHANGÉE (voir `analyserCompactage`). Les chiffres et les longueurs sont refusés ici ET par
@@ -137,6 +134,13 @@ export async function compacterSiNecessaire(
   // sortie hors gabarit laisserait la borne en place, le seuil resterait franchi, et le même
   // verbatim repartirait au tour suivant, puis au suivant — un appel FORT à chaque message, pour
   // toujours. La tranche a été LUE : elle est traitée, qu'elle ait produit une ligne ou non.
-  await deps.depot.ecrire({ carte: compactee, compacteJusquA: tranche.borne });
-  return { supprime: false, sousLeSeuil: false, ecrite: true, usage };
+  try {
+    await deps.depot.ecrire({ carte: compactee, compacteJusquA: tranche.borne });
+    return { supprime: false, sousLeSeuil: false, ecrite: true, usage };
+  } catch (e) {
+    // Le fournisseur a déjà répondu : l'usage doit remonter au registre même si la carte refuse
+    // ensuite l'écriture. Le compactage reste best-effort et ne casse jamais le tour.
+    journaliserIncidentSecurite("compactage_persist_exception", e);
+    return { supprime: false, sousLeSeuil: false, ecrite: false, usage };
+  }
 }

@@ -3,7 +3,7 @@
 import s from "./aide.module.css";
 
 /**
- * SortieRapide — le contrôle « Quitter le site » en tête de /aide. Pratique STANDARD des pages de
+ * SortieRapide — le contrôle « Sortie rapide » en tête de /aide. Pratique STANDARD des pages de
  * ressources sur les violences : navigue vers un site NEUTRE et REMPLACE l'entrée d'historique (le
  * bouton « précédent » ne ramène pas ici). Discret, jamais alarmant.
  *
@@ -55,7 +55,7 @@ import s from "./aide.module.css";
  * neutre, historique remplacé — est INCHANGÉ : c'est lui qui protège quelqu'un qui lit cette page
  * avec un tiers dangereux derrière l'épaule.
  */
-const LIBELLE = "Quitter le site";
+const LIBELLE = "Sortie rapide";
 
 /** Site neutre de repli — PROVISOIRE (à valider). Météo : anodin, crédible, sans trace du contexte. */
 const URL_NEUTRE = "https://www.meteofrance.com";
@@ -71,9 +71,10 @@ export default function SortieRapide() {
       type="button"
       className={s.sortieRapide}
       onClick={quitter}
-      aria-label="Quitter ce site et aller sur un site neutre"
+      aria-label="Sortie rapide : quitter Anima et ouvrir un site neutre"
     >
       <span className="t-bouton">{LIBELLE}</span>
+      <span className={`t-meta ${s.commandeDetail}`}>Ouvrir un site neutre</span>
     </button>
   );
 }

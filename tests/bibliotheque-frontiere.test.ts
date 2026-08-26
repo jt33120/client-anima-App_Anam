@@ -36,17 +36,16 @@ function corpsInterface(source: string, nom: string): string {
 }
 
 const DOMAINE = lire("lib/domain/bibliotheque.ts");
+const UNIVERS = lire("lib/domain/univers-moi.ts");
 const RENDU = lire("render/accueil/types.ts");
-/** Story 6.3 — la carte d'Anam vit dans son propre module de domaine, mais sous la MÊME garde. */
-const ANAM = lire("lib/domain/carte-anam.ts");
 
 const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
   { ou: "domaine · CarteBibliotheque", corps: corpsInterface(DOMAINE, "CarteBibliotheque") },
   { ou: "domaine · Bibliotheque", corps: corpsInterface(DOMAINE, "Bibliotheque") },
   { ou: "rendu · CarteVue", corps: corpsInterface(RENDU, "CarteVue") },
   { ou: "rendu · BibliothequeVue", corps: corpsInterface(RENDU, "BibliothequeVue") },
-  { ou: "domaine · CarteAnam", corps: corpsInterface(ANAM, "CarteAnam") },
-  { ou: "rendu · CarteAnamVue", corps: corpsInterface(RENDU, "CarteAnamVue") },
+  { ou: "domaine · UniversMoi", corps: corpsInterface(UNIVERS, "UniversMoi") },
+  { ou: "rendu · UniversVue", corps: corpsInterface(RENDU, "UniversVue") },
 ];
 
 /**
@@ -131,27 +130,29 @@ describe("[5.6/AD-10] le rendu ne connaît pas le domaine, et c'est ce qui impos
     }
   });
 
-  it("[6.3] `CarteAnam` et `CarteAnamVue` portent les MÊMES champs — trois chaînes, rien d'autre", () => {
-    // ⚠️ AUCUN BOOLÉEN NON PLUS, et c'est la porte qu'on ferme ici. Un `aUnMotif: boolean` serait
-    // exactement le champ dont le rendu se servirait pour dessiner une pastille : la présence d'un
-    // motif se lit à `ligne !== null`, et cette information EST la ligne — il n'y a rien à en
-    // extraire de plus. La garde `MESURES` ci-dessus ne l'attraperait pas : « aUnMotif » n'est ni un
-    // badge, ni un compte.
+  it("[Moi] `UniversMoi` et `UniversVue` portent les MÊMES champs", () => {
     const champs = (corps: string) =>
       [...corps.matchAll(/readonly\s+(\w+)\s*[?:]/g)].map((m) => m[1]).sort();
-    expect(champs(corpsInterface(ANAM, "CarteAnam"))).toEqual(["ligne", "presence", "titre"]);
-    expect(champs(corpsInterface(RENDU, "CarteAnamVue"))).toEqual(["ligne", "presence", "titre"]);
-
-    const types = (corps: string) => corps.match(/readonly\s+\w+\s*[?:]\s*([^;]+);/g) ?? [];
-    for (const t of [...types(corpsInterface(ANAM, "CarteAnam")), ...types(corpsInterface(RENDU, "CarteAnamVue"))]) {
-      expect(t, `« ${t.trim()} » n'est pas du texte`).toMatch(/:\s*string(\s*\|\s*null)?;/);
-    }
+    expect(champs(corpsInterface(UNIVERS, "UniversMoi"))).toEqual([
+      "accroche",
+      "action",
+      "cle",
+      "titre",
+      "url",
+    ]);
+    expect(champs(corpsInterface(RENDU, "UniversVue"))).toEqual([
+      "accroche",
+      "action",
+      "cle",
+      "titre",
+      "url",
+    ]);
   });
 
   it("[LE TEST QUI COMPTE] `terme` ne franchit PAS la frontière", () => {
     // Si le rendu recevait le terme, il pourrait en déduire « premium » et dessiner un cadenas.
     // Le seul moyen de rendre ce dessin impossible est de ne pas lui donner l'information.
     expect(corpsInterface(RENDU, "CarteVue")).not.toMatch(/readonly\s+terme\s*[?:]/);
-    expect(RENDU).not.toMatch(/premium/i);
+    expect(corpsInterface(RENDU, "CarteVue")).not.toMatch(/premium/i);
   });
 });

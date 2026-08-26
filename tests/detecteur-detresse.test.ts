@@ -22,7 +22,13 @@ function supabaseFactice(consenti = true, barre = false): SupabaseClient {
 
 /** Adaptateur IA factice : réponse `completer` paramétrable, enregistre la dernière requête reçue. */
 function adaptateurFactice(
-  opts: { texte?: string; leve?: boolean; zdr?: boolean; pend?: boolean } = {},
+  opts: {
+    texte?: string;
+    leve?: boolean;
+    zdr?: boolean;
+    pend?: boolean;
+    usage?: { tokensEntree: number; tokensSortie: number };
+  } = {},
 ): {
   port: AiPort;
   vueRequete: () => RequeteIa | null;
@@ -38,7 +44,7 @@ function adaptateurFactice(
         texte: opts.texte ?? "NIVEAU: 0",
         tier: "fort",
         modele: "factice",
-        usage: { tokensEntree: 0, tokensSortie: 0 },
+        usage: opts.usage ?? { tokensEntree: 2, tokensSortie: 3 },
       };
     },
     diffuser: async function* () {
@@ -99,6 +105,7 @@ describe("detecterDetresse — au modèle fort, sous egress (AC2)", () => {
     expect(r).toEqual({
       bloque: false,
       verdict: { niveau: 3, decision: "urgence", supprimerTravailSchema: true, famille: "violences_femmes" },
+      usage: { tier: "fort", modele: "factice", tokensEntree: 2, tokensSortie: 3 },
     });
   });
 
@@ -113,14 +120,32 @@ describe("detecterDetresse — au modèle fort, sous egress (AC2)", () => {
   it("classe le niveau retourné par le modèle", async () => {
     const a = adaptateurFactice({ texte: "NIVEAU: 2" });
     const r = await detecterDetresse({ supabase: supabaseFactice(), adaptateur: a.port }, messages);
-    expect(r).toEqual({ bloque: false, verdict: { niveau: 2, decision: "intervenir", supprimerTravailSchema: true } });
+    expect(r).toEqual({
+      bloque: false,
+      verdict: { niveau: 2, decision: "intervenir", supprimerTravailSchema: true },
+      usage: { tier: "fort", modele: "factice", tokensEntree: 2, tokensSortie: 3 },
+    });
+  });
+
+  it("ne transforme pas des compteurs fournisseur omis à zéro en détection gratuite", async () => {
+    const a = adaptateurFactice({ texte: "NIVEAU: 0", usage: { tokensEntree: 0, tokensSortie: 0 } });
+    const r = await detecterDetresse({ supabase: supabaseFactice(), adaptateur: a.port }, messages);
+    expect(r.bloque).toBe(false);
+    if (!r.bloque) {
+      expect(r.usage?.tokensEntree).toBeGreaterThan(0);
+      expect(r.usage?.tokensSortie).toBeGreaterThan(0);
+    }
   });
 
   it("REPLI SÛR : l'appel au modèle fort lève → verdict de repli, jamais le léger, incident journalisé", async () => {
     const err = vi.spyOn(console, "error").mockImplementation(() => {});
     const a = adaptateurFactice({ leve: true });
     const r = await detecterDetresse({ supabase: supabaseFactice(), adaptateur: a.port }, messages);
-    expect(r).toEqual({ bloque: false, verdict: { niveau: 1, decision: "repli_sur", supprimerTravailSchema: true } });
+    expect(r).toEqual({
+      bloque: false,
+      verdict: { niveau: 1, decision: "repli_sur", supprimerTravailSchema: true },
+      usage: null,
+    });
     expect(err).toHaveBeenCalled(); // incident (AD-15) : jamais un échec silencieux
     err.mockRestore();
   });
@@ -130,7 +155,11 @@ describe("detecterDetresse — au modèle fort, sous egress (AC2)", () => {
     const a = adaptateurFactice({ texte: "je ne sais pas trop" });
     const r = await detecterDetresse({ supabase: supabaseFactice(), adaptateur: a.port }, messages);
     expect(r.bloque).toBe(false);
-    if (!r.bloque) expect(r.verdict.decision).toBe("repli_sur");
+    if (!r.bloque) {
+      expect(r.verdict.decision).toBe("repli_sur");
+      // Le fournisseur a répondu : son coût existe même si sa sortie déclenche le repli sûr.
+      expect(r.usage).toEqual({ tier: "fort", modele: "factice", tokensEntree: 2, tokensSortie: 3 });
+    }
     err.mockRestore();
   });
 
@@ -156,7 +185,11 @@ describe("detecterDetresse — au modèle fort, sous egress (AC2)", () => {
     const err = vi.spyOn(console, "error").mockImplementation(() => {});
     const a = adaptateurFactice({ pend: true }); // completer ne résout jamais
     const r = await detecterDetresse({ supabase: supabaseFactice(), adaptateur: a.port, delaiMs: 20 }, messages);
-    expect(r).toEqual({ bloque: false, verdict: { niveau: 1, decision: "repli_sur", supprimerTravailSchema: true } });
+    expect(r).toEqual({
+      bloque: false,
+      verdict: { niveau: 1, decision: "repli_sur", supprimerTravailSchema: true },
+      usage: null,
+    });
     expect(err).toHaveBeenCalled();
     err.mockRestore();
   });

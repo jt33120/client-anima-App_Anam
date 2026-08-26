@@ -1,18 +1,71 @@
 import "server-only";
 import { createSupabaseAdminClient } from "./supabase/admin";
+import { jetonTourValide } from "../ai/jeton-tour";
+
+export class ErreurReservationQuota extends Error {
+  readonly codeTechnique: string;
+
+  constructor(codeTechnique: string) {
+    super("réservation allocation résiduelle indisponible.");
+    this.name = "ErreurReservationQuota";
+    this.codeTechnique = codeTechnique;
+  }
+}
+
+/** Code borné et non sensible pour distinguer timeout, permission et contrat RPC dans les logs. */
+export function codeTechniqueReservationQuota(erreur: unknown): string {
+  if (erreur instanceof ErreurReservationQuota) return erreur.codeTechnique;
+  if (erreur instanceof Error && erreur.message === "reservation_quota_timeout") return "timeout";
+  return "inconnu";
+}
 
 /**
- * lire-allocation.ts — Le COMPTAGE des tours d'allocation résiduelle consommés ce mois (Story 3.4,
- * AC2/AC3). Compte les lignes `usage_ia` marquées `post_premiere_seance` (tour servi APRÈS la clôture
- * de la 1ʳᵉ séance) créées depuis le début du mois courant (UTC). `usage_ia` est deny-by-default → lu
- * via le client admin (service_role, tâche système autorisée AD-12 ; NON-art. 9, aucun contenu).
+ * Réserve une unité de quota pour un tour LOGIQUE. La RPC calcule elle-même le mois UTC, sérialise
+ * les concurrentes qui partagent la même limite, puis vérifie la clé avant le plafond : un retry
+ * déjà admis reste donc autorisé sans nouvelle unité.
  *
- * Repli sûr (AD-15) : une panne de lecture LÈVE → l'appelant (la route) NE COUPE PAS (fail-open,
- * FR-058 : jamais coupé à zéro sur un doute). C'est l'INVERSE d'`estPremiumCourante` (où le doute
- * SUSPEND le commerce, 3.2) : ici le doute penche vers l'ACCÈS — le socle ne se ferme jamais par erreur.
- *
- * Fenêtre « ce mois-ci » = mois calendaire UTC (`Date.UTC(...,1)`). Le fuseau exact (Europe/Paris) est
- * un raffinement produit mineur (dérive de bord de mois) — cf. deferred-work.
+ * Le booléen est validé strictement. Une panne ou une forme inconnue LÈVE : la route transforme ce
+ * doute en accès (fail-open, FR-058), sans jamais inventer une décision de quota.
+ */
+export async function reserverTourResiduelDuMois(
+  utilisatriceId: string,
+  cleIdempotence: string,
+  limite: number,
+): Promise<boolean> {
+  const cleCanonique = jetonTourValide(cleIdempotence);
+  if (!utilisatriceId || !cleCanonique) {
+    throw new Error("réservation allocation résiduelle invalide.");
+  }
+  if (!Number.isSafeInteger(limite) || limite < 0) {
+    throw new Error("limite allocation résiduelle invalide.");
+  }
+
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin.rpc("reserver_quota_ia_atomique", {
+    p_utilisatrice: utilisatriceId,
+    p_cle_idempotence: cleCanonique,
+    p_limite: limite,
+  });
+  if (error) {
+    throw new ErreurReservationQuota(error.code ?? "rpc_inconnue");
+  }
+  if (typeof data !== "boolean") {
+    throw new ErreurReservationQuota("forme_invalide");
+  }
+  return data;
+}
+
+/** Premier jour du mois calendaire UTC, au format de la colonne PostgreSQL `date`. */
+export function premierJourMoisUtc(maintenant = new Date()): string {
+  if (Number.isNaN(maintenant.getTime())) throw new Error("date allocation résiduelle invalide.");
+  const annee = maintenant.getUTCFullYear();
+  const mois = String(maintenant.getUTCMonth() + 1).padStart(2, "0");
+  return `${annee}-${mois}-01`;
+}
+
+/**
+ * Lecture compatible pour l'exploitation et les tests : le quota vient désormais du registre
+ * d'admission `reservation_quota_ia`, jamais du coût fournisseur `usage_ia`.
  */
 export async function compterToursResiduelsDuMois(
   utilisatriceId: string,
@@ -20,19 +73,18 @@ export async function compterToursResiduelsDuMois(
 ): Promise<number> {
   const admin = createSupabaseAdminClient();
   const maintenant = new Date();
-  const debutMoisUtc = new Date(
-    Date.UTC(maintenant.getUTCFullYear(), maintenant.getUTCMonth(), 1),
-  ).toISOString();
+  const moisUtc = premierJourMoisUtc(maintenant);
   let requete = admin
-    .from("usage_ia")
+    .from("reservation_quota_ia")
     .select("*", { count: "exact", head: true })
     .eq("utilisatrice_id", utilisatriceId)
-    .eq("post_premiere_seance", true)
-    .gte("cree_le", debutMoisUtc);
-  // Le tour LOGIQUE courant ne se compte JAMAIS lui-même (revue 3.4, F4/F5) : au « Réessayer » (même
-  // jeton → même `cle_idempotence`), la ligne d'une 1ʳᵉ tentative avortée ne doit pas murer la
-  // retentative. Le gate devient idempotent par tour logique, comme le métrage ; jamais coupé à tort (FR-058).
-  if (cleIdempotenceCourante) requete = requete.neq("cle_idempotence", cleIdempotenceCourante);
+    .eq("mois_utc", moisUtc);
+  // Signature historique conservée pour les lecteurs d'exploitation. Le gate nominal n'exclut plus
+  // sa clé : il appelle la RPC, qui reconnaît atomiquement une réservation existante avant le plafond.
+  const cleExclue = cleIdempotenceCourante
+    ? jetonTourValide(cleIdempotenceCourante)
+    : null;
+  if (cleExclue) requete = requete.neq("cle_idempotence", cleExclue);
   const { count, error } = await requete;
   if (error) throw new Error(`comptage allocation résiduelle a échoué (${error.code ?? "inconnu"}).`);
   return count ?? 0;

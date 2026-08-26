@@ -80,6 +80,9 @@ export default async function Page({
    */
   readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const parametres = await searchParams;
+  const universBrut = Array.isArray(parametres.univers) ? parametres.univers[0] : parametres.univers;
+  const mode = universBrut === "astrologie" || universBrut === "numerologie" ? universBrut : "tout";
   const supabase = await createSupabaseServerClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) redirect("/entrer");
@@ -95,9 +98,9 @@ export default async function Page({
   if (etape === "revoque") redirect("/consentement/revoque");
 
   const [numerologie, theme, enneagramme] = await Promise.all([
-    lireNumerologie(supabase, auth.user.id, new Date()).catch(() => null),
-    lireThemeNatal(supabase, auth.user.id).catch(() => null),
-    lireEnneagramme(supabase, auth.user.id).catch(() => null),
+    mode === "astrologie" ? Promise.resolve(null) : lireNumerologie(supabase, auth.user.id, new Date()).catch(() => null),
+    mode === "numerologie" ? Promise.resolve(null) : lireThemeNatal(supabase, auth.user.id).catch(() => null),
+    mode === "tout" ? lireEnneagramme(supabase, auth.user.id).catch(() => null) : Promise.resolve(null),
   ]);
 
   // ⚠️ « JE N'ARRIVE PAS À LIRE » N'EST PAS « TU N'AS RIEN » (leçon 4.6 puis 4.9). Les deux raisons
@@ -126,12 +129,20 @@ export default async function Page({
   return (
     <main className={s.halte}>
       <RetourScene url={urlRetourScene(await searchParams)} />
-      <h1 className={`t-titre ${s.titreHalte}`}>{TITRE_HALTE}</h1>
+      <h1 className={`t-titre ${s.titreHalte}`}>
+        {mode === "astrologie" ? "Astrologie" : mode === "numerologie" ? "Numérologie" : TITRE_HALTE}
+      </h1>
 
       <FicheSocle
         fiche={fiche}
+        mode={mode}
         copie={{
-          introduction: INTRODUCTION,
+          introduction:
+            mode === "astrologie"
+              ? "Ton ciel de naissance, calculé à partir de ta date, de ton heure et de ton lieu. Rien ici n’est généré par un modèle."
+              : mode === "numerologie"
+                ? "Tes nombres, calculés à partir de ta naissance et de ton nom. Ils restent les mêmes d’un jour à l’autre."
+                : INTRODUCTION,
           titreNombres: TITRE_NOMBRES,
           titreCiel: TITRE_CIEL,
           titreAngles: TITRE_ANGLES,

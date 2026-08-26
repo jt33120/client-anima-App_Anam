@@ -76,6 +76,21 @@ test.describe("Le décor de l'arbre", () => {
     expect(o!).toBeGreaterThan(0.9);
   });
 
+  test("derrière Anam, l'arbre ne peint RIEN — la conversation garde seulement le ciel", async ({
+    page,
+  }) => {
+    await ouvrirUnCompteNeuf(page);
+    await page.goto("/");
+    await laisserRetomber(page);
+    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await passerLeTour(page);
+    await page.getByRole("button", { name: "Anam", exact: true }).click();
+    await laisserRetomber(page);
+
+    await expect(page.getByRole("heading", { name: "Anam", exact: true, level: 1 })).toBeVisible();
+    expect(await opaciteEffectiveArbre(page), "le feuillage reste visible derrière la conversation").toBe(0);
+  });
+
   test("[LE JETON MORT] en contraste renforcé, l'imagerie cède aux aplats — l'arbre compris", async ({
     page,
   }) => {

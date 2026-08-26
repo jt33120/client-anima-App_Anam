@@ -20,7 +20,6 @@ import {
   VIDE_OU_NAISSENT_LES_BRANCHES,
 } from "./copie-arbre";
 import BoutonTronc from "./BoutonTronc";
-import TroncSeul from "./Tronc";
 import s from "./arbre.module.css";
 
 export interface ProprietesEtatVideArbre {
@@ -32,8 +31,9 @@ export interface ProprietesEtatVideArbre {
   direOuNaissentLesBranches?: boolean;
   /**
    * Story 5.3 — le chemin vers la fiche du tronc, quand il manque son heure. Il vit ICI parce que
-   * l'écran vide REMPLACE le canevas : sans lui, la personne qui n'a encore aucune branche — c'est-à-dire
-   * exactement celle qui n'a pas donné son heure — n'aurait aucun moyen d'atteindre la fiche.
+   * la copie de l'étape graine se superpose au canevas : sans lui, la personne qui n'a encore aucune
+   * branche — c'est-à-dire exactement celle qui n'a pas donné son heure — n'aurait aucun moyen
+   * d'atteindre la fiche.
    * Absent ⇒ rien ne s'affiche : un tronc complet n'a aucune affordance (AC4).
    */
   onOuvrirTronc?: () => void;
@@ -42,19 +42,8 @@ export interface ProprietesEtatVideArbre {
 export default function EtatVideArbre({ direOuNaissentLesBranches, onOuvrirTronc }: ProprietesEtatVideArbre) {
   return (
     <div className={s.vide}>
-      {/*
-        Story 5.6 (T9) — LE TRONC EST DESSINÉ ICI AUSSI (FR-088, dette de la 3.3).
-
-        Cet écran REMPLACE le canevas : sans ce dessin, la personne qui n'a encore aucune branche —
-        c'est-à-dire tout le monde le premier jour — ne voyait jamais son tronc, alors que FR-088 dit
-        « elle voit son tronc, y compris incomplet ». La 5.3 avait rendu sa FICHE atteignable, ce qui
-        a masqué le manque : rien n'était inaccessible, seul le dessin était absent.
-
-        `enReserve` est DÉRIVÉ de `onOuvrirTronc` plutôt que reçu à part, et c'est délibéré : le
-        rappel n'existe que si le tronc est incomplet (voir la prop ci-dessus). Deux props séparées
-        pourraient se contredire ; celle-ci ne le peut pas.
-      */}
-      <TroncSeul enReserve={Boolean(onOuvrirTronc)} />
+      {/* Le dessin ne vit plus ici : l'étape 0 garde le même Canvas lunaire que l'arbre vivant.
+          Ce composant ne porte que la copie et le chemin nommé vers la fiche du tronc. */}
       <p className={s.videTitre}>{VIDE_TITRE}</p>
       <p className={s.videCorps}>{VIDE_CORPS}</p>
 

@@ -30,6 +30,23 @@
   scroll-behavior: auto;
 }
 
+/* Frontière du jour dans le fil : une respiration et un filet, jamais une carte ni une bulle. */
+.separateurJour {
+  display: grid;
+  grid-template-columns: minmax(var(--esp-4), 1fr) auto minmax(var(--esp-4), 1fr);
+  align-items: center;
+  gap: var(--esp-3);
+  color: var(--texte-doux);
+  letter-spacing: 0.04em;
+}
+
+.separateurJour::before,
+.separateurJour::after {
+  content: "";
+  height: 1px;
+  background: var(--bordure);
+}
+
 /* ── Le signe d'attente : il a DÉMÉNAGÉ (2026-08-24) ──────────────────────────────────────────
    `.attente`, `.lotus`, `.petale`, `.lotusEau` et `@keyframes lotus-scintille` vivaient ici. Ils
    sont maintenant dans `LotusAttente.module.css`, avec le dessin qu'ils animent — un module
@@ -108,6 +125,37 @@
   margin: 0;
   padding: var(--esp-2) var(--esp-4) 0;
   color: var(--texte-doux);
+}
+
+.repriseOuverture {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  margin: 0 var(--esp-2);
+  padding: var(--esp-2) var(--esp-3);
+  color: var(--texte-doux);
+  border-top: 1px solid var(--bordure);
+}
+
+.repriseOuverture p {
+  margin: 0;
+}
+
+.reessayerOuverture {
+  min-height: var(--cible-tactile);
+  padding: var(--esp-2) var(--esp-4);
+  color: var(--texte);
+  background: transparent;
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon);
+  cursor: pointer;
+}
+
+.reessayerOuverture:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
 }
 
 .composeur {

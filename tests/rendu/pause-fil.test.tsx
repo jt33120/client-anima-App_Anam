@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import Conversation from "@/render/conversation/Conversation";
 import { PHRASE_PAUSE } from "@/lib/domain/rythme-pause";
 import { MOTIFS_ANAM } from "@/lib/domain/regime-anam";
+import { actionAvecOuverture } from "./_ouverture";
 
 /**
  * pause-fil.test.tsx — LE GESTE DE PAUSE, MONTÉ POUR DE VRAI (Story 6.4, AC1/AC2/AC5).
@@ -25,8 +26,8 @@ const PAUSE = { type: "pause" as const, phrase: PHRASE_PAUSE };
 
 describe("[6.4/AC1] la phrase est un TOUR ORDINAIRE d'Anam", () => {
   it("elle apparaît dans le fil", async () => {
-    render(<Conversation ouverture={PAUSE} />);
-    expect(await screen.findByText(PHRASE_PAUSE)).toBeDefined();
+    render(<Conversation onReclamerOuvertureQuotidienne={actionAvecOuverture(PAUSE)} />);
+    expect(await screen.findAllByText(PHRASE_PAUSE)).not.toHaveLength(0);
   });
 
   it("[LE CŒUR] aucun BOUTON n'apparaît avec elle", async () => {
@@ -34,8 +35,8 @@ describe("[6.4/AC1] la phrase est un TOUR ORDINAIRE d'Anam", () => {
     // « Rappelle-moi demain »). Le réflexe est fort — une proposition semble appeler une réponse —
     // et c'est très exactement l'engagement que l'AC1 interdit d'extorquer. Il n'y a RIEN à faire de
     // cette phrase : elle se lit, et elle s'en va avec le fil.
-    render(<Conversation ouverture={PAUSE} />);
-    await screen.findByText(PHRASE_PAUSE);
+    render(<Conversation onReclamerOuvertureQuotidienne={actionAvecOuverture(PAUSE)} />);
+    await screen.findAllByText(PHRASE_PAUSE);
     const boutons = screen.queryAllByRole("button").map((b) => b.textContent ?? "");
     for (const mot of ["D'accord", "Plus tard", "Ignorer", "Fermer", "Compris", "Merci"]) {
       expect(boutons, `« ${mot} » transforme la proposition en dispositif`).not.toContain(mot);
@@ -46,8 +47,10 @@ describe("[6.4/AC1] la phrase est un TOUR ORDINAIRE d'Anam", () => {
     // ⚠️ C'est la seule ouverture du produit qui vient d'une mesure. Les deux compteurs meurent côté
     // serveur (la ligne de `pause_rythme` les garde, et personne ne peut lire cette table) : le
     // rendu ne peut donc pas afficher « 7 séances cette semaine », il n'a jamais reçu de 7.
-    const { container } = render(<Conversation ouverture={PAUSE} />);
-    await screen.findByText(PHRASE_PAUSE);
+    const { container } = render(
+      <Conversation onReclamerOuvertureQuotidienne={actionAvecOuverture(PAUSE)} />,
+    );
+    await screen.findAllByText(PHRASE_PAUSE);
     expect(container.textContent ?? "").not.toMatch(/\d/);
   });
 });
@@ -58,8 +61,8 @@ describe("[6.4/AC2 DUR] le produit n'IMPOSE rien — le composeur reste actif", 
     // intentions : « on l'aide en fermant doucement ». Or quelqu'un qui écrit beaucoup peut être
     // quelqu'un qui traverse quelque chose. Un produit qui ferme la porte au moment de l'intensité
     // la ferme au pire moment possible — et c'est aussi pourquoi la garde de détresse existe en base.
-    render(<Conversation ouverture={PAUSE} />);
-    await screen.findByText(PHRASE_PAUSE);
+    render(<Conversation onReclamerOuvertureQuotidienne={actionAvecOuverture(PAUSE)} />);
+    await screen.findAllByText(PHRASE_PAUSE);
 
     const saisie = screen.getByRole("textbox") as HTMLTextAreaElement;
     expect(saisie.disabled, "le composeur a été désactivé").toBe(false);
@@ -68,8 +71,10 @@ describe("[6.4/AC2 DUR] le produit n'IMPOSE rien — le composeur reste actif", 
   });
 
   it("[LE CŒUR] aucun MINUTEUR, aucun compte à rebours, aucun écran d'interruption", async () => {
-    const { container } = render(<Conversation ouverture={PAUSE} />);
-    await screen.findByText(PHRASE_PAUSE);
+    const { container } = render(
+      <Conversation onReclamerOuvertureQuotidienne={actionAvecOuverture(PAUSE)} />,
+    );
+    await screen.findAllByText(PHRASE_PAUSE);
     const texte = container.textContent ?? "";
     for (const interdit of [
       /assez utilis/i,
@@ -87,8 +92,8 @@ describe("[6.4/AC2 DUR] le produit n'IMPOSE rien — le composeur reste actif", 
   });
 
   it("[ANTI-VACUITÉ] le composeur EXISTE — sinon les deux gardes ci-dessus sont vides", async () => {
-    render(<Conversation ouverture={PAUSE} />);
-    await screen.findByText(PHRASE_PAUSE);
+    render(<Conversation onReclamerOuvertureQuotidienne={actionAvecOuverture(PAUSE)} />);
+    await screen.findAllByText(PHRASE_PAUSE);
     expect(screen.getByRole("textbox")).toBeDefined();
   });
 });

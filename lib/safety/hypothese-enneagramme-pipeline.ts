@@ -13,6 +13,7 @@ import { doitExecuterTravailSchema } from "./pipeline";
 import { journaliserIncidentSecurite } from "./rpc-repli";
 import type { VerdictSecurite } from "./classer-detresse";
 import { avecDelai } from "@/lib/domain/delai";
+import { resoudreUsageReponse } from "@/lib/ai/metrage";
 
 /**
  * hypothese-enneagramme-pipeline.ts — L'ÉTAGE QUI SÈME LE GERME (Story 5.5, T7 — AC2/AC4).
@@ -114,13 +115,14 @@ export async function evaluerHypotheseEnneagramme(
 
   // (c) UNE passe FORTE sous egress art. 9. Budget borné : un hang du fort en tâche de fond ne doit
   // pas traîner derrière la réponse déjà rendue.
+  const requete = requeteHypotheseEnneagramme(args.messages);
   let res;
   try {
     res = await avecDelai(
       envoyerSousEgressArt9({
         supabase: deps.supabase,
         adaptateur: deps.adaptateur,
-        requete: requeteHypotheseEnneagramme(args.messages),
+        requete,
       }),
       deps.delaiMs ?? DELAI_HYPOTHESE_MS,
       "hypothese_enneagramme_timeout",
@@ -131,12 +133,7 @@ export async function evaluerHypotheseEnneagramme(
   }
   if (res.bloque) return { supprime: false, germeId: null, usage: null };
 
-  const usage: UsageHypothese = {
-    tier: res.reponse.tier,
-    modele: res.reponse.modele,
-    tokensEntree: res.reponse.usage.tokensEntree,
-    tokensSortie: res.reponse.usage.tokensSortie,
-  };
+  const usage: UsageHypothese = resoudreUsageReponse(res.reponse, requete.messages);
 
   // (d) LE PARSER STRICT. `null` couvre trois cas qui méritent la même réponse — rien : le modèle a
   // dit `aucun`, il a bavardé, ou il a rendu autre chose qu'un chiffre. Aucun n'autorise à poser une

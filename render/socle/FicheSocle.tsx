@@ -31,6 +31,7 @@ function TexteAnima({ texte, silence }: { readonly texte: TexteVue; readonly sil
 
 export interface ProprietesFicheSocle {
   readonly fiche: FicheSocleVue;
+  readonly mode?: "tout" | "astrologie" | "numerologie";
   readonly copie: {
     readonly introduction: string;
     readonly titreNombres: string;
@@ -45,14 +46,14 @@ export interface ProprietesFicheSocle {
   };
 }
 
-export default function FicheSocle({ fiche, copie }: ProprietesFicheSocle) {
+export default function FicheSocle({ fiche, copie, mode = "tout" }: ProprietesFicheSocle) {
   const { nombres, ciel, type, portes } = fiche;
   return (
     <>
       <p className={`t-corps ${s.introduction}`}>{copie.introduction}</p>
 
       {/* ── Les nombres — les SIX, avec leurs SIX textes. C'est FR-055, enfin tenu. ───────────── */}
-      <section className={s.section} aria-labelledby="socle-nombres">
+      {(mode === "tout" || mode === "numerologie") && <section className={s.section} aria-labelledby="socle-nombres">
         <h2 id="socle-nombres" className={`t-titre-sm ${s.titreSection}`}>
           {copie.titreNombres}
         </h2>
@@ -78,10 +79,10 @@ export default function FicheSocle({ fiche, copie }: ProprietesFicheSocle) {
             <Lien reparation={m.reparation} />
           </div>
         ))}
-      </section>
+      </section>}
 
       {/* ── Le ciel — tout ce que le thème contient, plus jamais cinq corps. ──────────────────── */}
-      <section className={s.section} aria-labelledby="socle-ciel">
+      {(mode === "tout" || mode === "astrologie") && <section className={s.section} aria-labelledby="socle-ciel">
         <h2 id="socle-ciel" className={`t-titre-sm ${s.titreSection}`}>
           {copie.titreCiel}
         </h2>
@@ -151,10 +152,10 @@ export default function FicheSocle({ fiche, copie }: ProprietesFicheSocle) {
             ))}
           </div>
         )}
-      </section>
+      </section>}
 
       {/* ── Le type. Sans lui, c'est le TEST qui manque — pas un texte d'Anima. ───────────────── */}
-      <section className={s.section} aria-labelledby="socle-type">
+      {mode === "tout" && <section className={s.section} aria-labelledby="socle-type">
         <h2 id="socle-type" className={`t-titre-sm ${s.titreSection}`}>
           {copie.titreType}
         </h2>
@@ -166,12 +167,12 @@ export default function FicheSocle({ fiche, copie }: ProprietesFicheSocle) {
             <Lien reparation={type.absence.reparation} />
           </div>
         )}
-      </section>
+      </section>}
 
       {/* ── Les deux portes du socle. TOUJOURS là, même quand rien ne manque : une porte qui
              n'apparaît qu'en cas de problème est une porte qu'on ne trouve pas quand on la
              cherche. Elles quittent `/profil` en Story 7.2 — c'est ici qu'on les atteint. ──── */}
-      <section className={s.section} aria-labelledby="socle-portes">
+      {mode === "tout" && <section className={s.section} aria-labelledby="socle-portes">
         <h2 id="socle-portes" className={`t-titre-sm ${s.titreSection}`}>
           {copie.titrePortes}
         </h2>
@@ -185,7 +186,7 @@ export default function FicheSocle({ fiche, copie }: ProprietesFicheSocle) {
             </li>
           ))}
         </ul>
-      </section>
+      </section>}
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import TourAnam from "./TourAnam";
 import TourUtilisatrice from "./TourUtilisatrice";
 import BlocRessources from "./BlocRessources";
@@ -187,8 +187,14 @@ export default function Fil({
 
   return (
     <div className={s.fil} ref={conteneur}>
-      {tours.map((t) =>
-        t.role === "anam" ? (
+      {tours.map((t) => (
+        <Fragment key={t.id}>
+          {t.separateurAvant && (
+            <div className={s.separateurJour} role="separator" aria-label="Aujourd’hui">
+              <span className="t-meta">Aujourd’hui</span>
+            </div>
+          )}
+          {t.role === "anam" ? (
           <TourAnam
             key={t.id}
             texte={t.texte}
@@ -242,10 +248,11 @@ export default function Fil({
           // Ses mots ne sont pas repris ici : son propre tour est juste au-dessus dans le fil. Ils le
           // sont dans « Mes lectures », où il n'y a plus de fil autour (FR-021).
           <Restitution key={t.id} texte={t.texte} />
-        ) : (
-          <TourUtilisatrice key={t.id} texte={t.texte} />
-        ),
-      )}
+          ) : (
+            <TourUtilisatrice key={t.id} texte={t.texte} />
+          )}
+        </Fragment>
+      ))}
       {/* Story 6.9 (QA T13) — EN DERNIER, après tous les tours : c'est là que la réponse va naître. */}
       {prepare && <AnamPrepare />}
       {/* Région d'annonce a11y — hors flux visuel, remplie UNE fois à la fin (message complet). */}

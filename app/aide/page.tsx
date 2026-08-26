@@ -80,7 +80,8 @@ export default function PageAide() {
         */}
         <div className={s.enTete}>
           <Link className={s.retour} href="/">
-            <span className="t-bouton">Retour</span>
+            <span className="t-bouton">Retour à Anima</span>
+            <span className={`t-meta ${s.commandeDetail}`}>Fermer l&rsquo;aide</span>
           </Link>
           <SortieRapide />
         </div>
@@ -88,6 +89,7 @@ export default function PageAide() {
         <h1 className="t-titre">Aide</h1>
 
         <section className={s.section} aria-label="Ressources">
+          <h2 className="t-titre-sm">Parler à quelqu&rsquo;un maintenant</h2>
           <p className="t-corps">
             Si tu es en danger ou en détresse, tu n&rsquo;as pas à passer par Anam. Ces lignes
             sont tenues par des personnes, joignables directement.
@@ -135,7 +137,7 @@ export default function PageAide() {
 
             `/reperes` continue d'exister et de porter la même copie : une seule source
             (`lib/domain/copie-reperes.ts`), deux surfaces. */}
-        <section className={s.section} id="reperes" aria-label="Comment ça marche">
+        <section className={`${s.section} ${s.panneau}`} id="reperes" aria-label="Comment ça marche">
           <h2 className="t-titre-sm">{reperes.TITRE_HALTE}</h2>
           <p className="t-corps">{reperes.OUVERTURE}</p>
 
@@ -166,7 +168,7 @@ export default function PageAide() {
           <p className="t-corps">{reperes.PAR_OU_COMMENCER}</p>
         </section>
 
-        <section className={s.section} id="transparence" aria-label="Transparence">
+        <section className={`${s.section} ${s.panneau}`} id="transparence" aria-label="Transparence">
           <h2 className="t-titre-sm">Anam est une IA</h2>
           <p className="t-anam">
             Tu parles à une <strong>intelligence artificielle</strong>. Pas à un être humain,

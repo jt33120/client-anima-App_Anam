@@ -1,5 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { estLeJourParis } from "@/lib/domain/ouverture-seance";
 
 /**
  * depot-fil.ts — LE FIL RETROUVÉ AU RECHARGEMENT (QA tour 1, T3).
@@ -52,6 +53,21 @@ export interface TourFil {
    * vingt-quatre heures, c'est-à-dire pour quiconque revient.
    */
   readonly creeLe: string;
+  /** Vrai sur le premier tour du jour courant, jamais sur les suivants. */
+  readonly separateurAvant?: boolean;
+}
+
+/**
+ * Identité commune au tour optimiste et à sa relecture. `cle_tour` est le jeton logique déjà
+ * choisi par le client puis validé par l'API ; le préfixe rôle distingue les deux côtés du même
+ * échange. Les anciennes lignes sans clé gardent leur UUID de table en repli.
+ */
+export function identiteTourFil(
+  role: "utilisatrice" | "anam",
+  cleTour: unknown,
+  idBase: string,
+): string {
+  return typeof cleTour === "string" && cleTour.length > 0 ? `${role}:${cleTour}` : idBase;
 }
 
 /** Vingt échanges. Voir l'en-tête pour le choix du nombre. */
@@ -85,7 +101,25 @@ export function tourDepuisLigne(l: Record<string, unknown> | null | undefined): 
   if (typeof l?.id !== "string" || typeof l?.contenu !== "string") return null;
   if (l.role !== "utilisatrice" && l.role !== "anam") return null;
   if (typeof l.cree_le !== "string" || l.cree_le.length === 0) return null;
-  return { id: l.id, role: l.role, texte: l.contenu, creeLe: l.cree_le };
+  return {
+    id: identiteTourFil(l.role, l.cle_tour, l.id),
+    role: l.role,
+    texte: l.contenu,
+    creeLe: l.cree_le,
+  };
+}
+
+/** Place exactement un repère, sur le premier tour du jour courant dans l'ordre de lecture. */
+export function marquerPremierTourDuJour(
+  tours: readonly TourFil[],
+  maintenant: Date,
+): readonly TourFil[] {
+  let aujourdHuiPlace = false;
+  return tours.map((tour) => {
+    const premierDuJour = !aujourdHuiPlace && estLeJourParis(tour.creeLe, maintenant);
+    if (premierDuJour) aujourdHuiPlace = true;
+    return premierDuJour ? { ...tour, separateurAvant: true } : tour;
+  });
 }
 
 export async function lireFilRecent(
@@ -95,7 +129,7 @@ export async function lireFilRecent(
   const depuis = new Date(maintenant.getTime() - FIL_FENETRE_HEURES * 3_600_000).toISOString();
   const { data, error } = await supabase
     .from("entree_journal")
-    .select("id, role, contenu, cree_le")
+    .select("id, role, contenu, cree_le, cle_tour")
     .gte("cree_le", depuis)
     .order("cree_le", { ascending: false })
     .limit(FIL_ENTREES_MAX);
@@ -111,7 +145,8 @@ export async function lireFilRecent(
     const t = tourDepuisLigne(l);
     if (t) tours.push(t);
   }
-  return tours.reverse();
+  const chronologiques = tours.reverse();
+  return marquerPremierTourDuJour(chronologiques, maintenant);
 }
 
 /**
@@ -140,7 +175,7 @@ export async function lireFilDepuis(
 ): Promise<readonly TourFil[]> {
   let requete = supabase
     .from("entree_journal")
-    .select("id, role, contenu, cree_le")
+    .select("id, role, contenu, cree_le, cle_tour")
     .order("cree_le", { ascending: true })
     .limit(plafond);
   if (depuisIso) requete = requete.gt("cree_le", depuisIso);

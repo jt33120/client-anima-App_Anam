@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { execSync } from "node:child_process";
 import { sansCommentaires } from "./_absence";
@@ -320,6 +320,9 @@ describe("La route Checkout refuse un compte non éligible (revue du 2026-08-13)
     const source = execSync("git ls-files app lib render", { encoding: "utf-8" })
       .split("\n")
       .filter((f) => /\.(ts|tsx)$/.test(f))
+      // `git ls-files` énumère encore une suppression du worktree avant commit. Une garde qui
+      // balaie les sources vivantes ne doit ni ressusciter le fichier ni échouer avant de lire.
+      .filter((f) => existsSync(resolve(process.cwd(), f)))
       .map((f) => readFileSync(resolve(process.cwd(), f), "utf-8"))
       .join("\n");
     expect(sansCommentaires(source)).not.toMatch(/NEXT_PUBLIC_SITE_URL/);

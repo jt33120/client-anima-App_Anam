@@ -41,6 +41,7 @@ export type IdHalte =
   | "lectures"
   | "memoire"
   | "mes-donnees"
+  | "psychologie"
   | "reglages"
   | "reperes"
   | "socle"
@@ -105,6 +106,11 @@ const MENTION_DUE: Readonly<Record<IdHalte, { readonly mention: boolean; readonl
     "mes-donnees": {
       mention: false,
       motif: "un export de SES données et un effacement ; le contenu affiché est le sien",
+    },
+    psychologie: {
+      mention: true,
+      motif:
+        "le type retenu peut venir d’une hypothèse formulée par Anam ; les modules futurs restent explicitement séparés de cette origine",
     },
     abonnement: { mention: false, motif: "un état de contrat ; aucun texte produit" },
     "heure-naissance": { mention: false, motif: "un formulaire ; aucun texte produit" },

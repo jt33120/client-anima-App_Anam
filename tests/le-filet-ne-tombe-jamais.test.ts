@@ -105,15 +105,18 @@ describe("[R12] quand la réponse ne vient pas, le filet part quand même", () =
 const route = sansCommentaires(readFileSync("app/api/anam/message/route.ts", "utf-8"));
 
 describe("[R8/R12] la route branche bien les deux dérivations", () => {
-  it("[R8] le gate passe le niveau effectif à la dérivation, jamais seulement `limitesLevees`", () => {
-    const appel = route.slice(route.indexOf("doitCouperConversation({"), route.indexOf("doitCouperConversation({") + 300);
-    expect(appel, "`doitCouperConversation` doit recevoir le niveau effectif").toMatch(/niveauSecurite,/);
+  it("[R8] le gate atomique reçoit la décision hors détresse, jamais seulement `limitesLevees`", () => {
+    const debut = route.indexOf("deciderAdmissionQuota(");
+    const appel = route.slice(debut, debut + 700);
+    expect(debut, "le gate d’admission atomique a disparu de la route").toBeGreaterThan(-1);
+    expect(appel).toMatch(/\{\s*horsDetresse,\s*seanceClose\s*\}/);
+    expect(route).toMatch(/if \(!admissionQuota\.autorisee\)/);
   });
 
-  it("[R8] et le gate lui-même n'est plus entré en détresse", () => {
-    // La double garde est volontaire : le domaine décide, et la route ne dépense même pas la
-    // lecture premium ni le comptage sur un tour de détresse.
-    expect(route).toMatch(/if \(horsDetresse && seanceClose\)/);
+  it("[R8] la sécurité court-circuite le quota dans l’orchestrateur nommé", () => {
+    const admission = sansCommentaires(readFileSync("lib/domain/admission-quota.ts", "utf-8"));
+    expect(admission).toMatch(/if \(!contexte\.horsDetresse \|\| !contexte\.seanceClose\)/);
+    expect(admission).toMatch(/etat:\s*"bypass"/);
   });
 
   it("[R12] AUCUN corps JSON ne survit après la décision du filet", () => {

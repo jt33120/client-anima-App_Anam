@@ -44,13 +44,27 @@
  *
  * ⚠️ NE JAMAIS AJOUTER DE BOOLÉEN NON PLUS. Un `aDuNouveau: boolean` serait la porte : le rendu
  * s'en servirait pour dessiner une pastille, et FR-031 ne tiendrait plus qu'à la discipline. Même
- * raisonnement que `CarteAnamVue` (6.3), où l'existence d'un motif se lit à `ligne !== null`.
+ * même raisonnement que dans les autres modèles de vue : l'existence d'un état ne doit jamais
+ * devenir un booléen décoratif exploitable comme pastille.
  */
 export interface EntreeMenu {
   readonly titre: string;
   /** Ce qu'on trouve derrière, en une phrase. Jamais un état, jamais un compte. */
   readonly quoi: string;
   readonly url: string;
+}
+
+/**
+ * Un groupe donne une place stable aux portes sans leur ajouter d'état.
+ *
+ * Le catalogue était auparavant une liste plate de neuf lignes : le socle, la mémoire et les
+ * lectures se confondaient visuellement avec l'abonnement et les droits RGPD. Le groupe porte
+ * uniquement un libellé et des entrées ; il n'offre toujours aucun endroit où glisser un compteur,
+ * un badge ou un état commercial (FR-031).
+ */
+export interface GroupeMenu {
+  readonly titre: "Aide" | "Explorer" | "Compte" | "Confidentialité";
+  readonly entrees: readonly EntreeMenu[];
 }
 
 /**
@@ -61,75 +75,84 @@ export interface EntreeMenu {
  * tabulation cessent de trouver ce qu'ils trouvaient avant. Même leçon que le « ? » du 2026-08-23,
  * qui garde `aria-label="Aide"`.
  */
-export const LIBELLE_GLYPHE = "Ton compte";
-export const TITRE_FEUILLE = "Ton compte";
+export const LIBELLE_GLYPHE = "Ouvrir ton espace";
+export const TITRE_FEUILLE = "Ton espace";
 export const LIBELLE_FERMER = "Fermer";
 
-export const ENTREES_MENU: readonly EntreeMenu[] = Object.freeze([
-  {
-    // FR-077 — première, toujours. Aucune entrée ne passe devant, et le « ? » de la surimpression
-    // reste par ailleurs, indépendant de ce menu.
-    titre: "Aide et ressources",
-    quoi: "Des personnes joignables, tout de suite, et ce qu’Anam ne peut pas faire.",
-    url: "/aide",
-  },
-  {
-    // Deuxième — amendement d'`EXPERIENCE.md` du 2026-08-25, §1. Le socle est ce que le produit
-    // savait AVANT le premier mot ; « Ce qu'Anam retient » est ce qu'il a appris APRÈS.
-    titre: "Ton socle",
-    quoi: "Tes six nombres et leur sens, ton ciel de naissance, ton type — et ce qui manque, avec sa raison.",
-    url: "/socle",
-  },
-  {
-    titre: "Ce qu’Anam retient",
-    quoi: "Les phrases qu’elle a gardées de ce que tu lui as dit. Tu peux les corriger ou les effacer une par une.",
-    url: "/memoire",
-  },
-  {
-    titre: "La synthèse",
-    quoi: "Ce qu’Anam a écrit en relisant les dernières semaines.",
-    url: "/synthese",
-  },
-  {
-    titre: "Mes lectures",
-    quoi: "Les cartes déjà tirées, et ce qui en a été écrit.",
-    url: "/lectures",
-  },
-  {
-    titre: "L’abonnement",
-    quoi: "Ce qui est en cours, et comment l’arrêter. Arrêter prend autant de clics que commencer.",
-    url: "/abonnement",
-  },
-  {
-    titre: "Mes données",
-    quoi: "Tout télécharger, ou tout effacer — définitivement, compte compris.",
-    url: "/mes-donnees",
-  },
-  {
-    /**
-     * ⚠️ CETTE ENTRÉE MÈNE À UNE PAGE DE CONFIRMATION, PAS À UNE PAGE DE REVUE — et c'est écrit ici
-     * plutôt que masqué. `EXPERIENCE.md` ligne 74 décrit « Ce que j'ai accepté » comme une surface
-     * de consultation du consentement art. 9 et de la déclaration IA, révocables (FR-012). Elle
-     * n'existe pas : la seule page du sujet s'intitule « Retirer ton consentement ».
-     *
-     * Deux mauvaises sorties étaient possibles. La retirer du menu : FR-012 exige que la révocation
-     * soit atteignable, et l'omettre reviendrait à rendre un droit dépendant d'une URL connue. La
-     * laisser avec un sous-titre neutre : on clique pour RELIRE et on atterrit sur RETIRER, ce qui
-     * est un sursaut, pas une navigation.
-     *
-     * Elle reste donc, et son sous-titre DIT la destination. La page de revue est un manque nommé,
-     * pas un oubli.
-     */
-    titre: "Ce que j’ai accepté",
-    quoi: "Ton consentement à l’usage de tes confidences, la déclaration IA — et le retrait, si tu le veux.",
-    url: "/consentement/revoquer",
-  },
-  {
-    titre: "Réglages",
-    quoi: "Ton prénom, le rythme quotidien, et ce que ton téléphone a le droit d’afficher.",
-    url: "/reglages",
-  },
+export const GROUPES_MENU: readonly GroupeMenu[] = Object.freeze([
+  Object.freeze({
+    titre: "Aide",
+    entrees: Object.freeze([
+      {
+        // FR-077 — première, toujours. Le « ? » de la surimpression reste par ailleurs indépendant.
+        titre: "Aide et ressources",
+        quoi: "Soutien humain, urgences et limites d’Anam.",
+        url: "/aide",
+      },
+    ]),
+  }),
+  Object.freeze({
+    titre: "Explorer",
+    entrees: Object.freeze([
+      {
+        titre: "Ton socle",
+        quoi: "Astrologie, nombres et profil psychologique.",
+        url: "/socle",
+      },
+      {
+        titre: "Ce qu’Anam retient",
+        quoi: "Relire, corriger ou effacer ses souvenirs.",
+        url: "/memoire",
+      },
+      {
+        titre: "La synthèse",
+        quoi: "Les dernières semaines, reliées ensemble.",
+        url: "/synthese",
+      },
+      {
+        titre: "Mes lectures",
+        quoi: "Retrouver les cartes déjà tirées.",
+        url: "/lectures",
+      },
+    ]),
+  }),
+  Object.freeze({
+    titre: "Compte",
+    entrees: Object.freeze([
+      {
+        titre: "L’abonnement",
+        quoi: "Voir ton offre ou l’arrêter.",
+        url: "/abonnement",
+      },
+      {
+        titre: "Réglages",
+        quoi: "Prénom, rythme quotidien et notifications.",
+        url: "/reglages",
+      },
+    ]),
+  }),
+  Object.freeze({
+    titre: "Confidentialité",
+    entrees: Object.freeze([
+      {
+        titre: "Mes données",
+        quoi: "Télécharger tes données ou tout effacer.",
+        url: "/mes-donnees",
+      },
+      {
+        /** Cette porte dit explicitement qu'elle mène aussi au retrait du consentement. */
+        titre: "Ce que j’ai accepté",
+        quoi: "Relire ou retirer ton consentement.",
+        url: "/consentement/revoquer",
+      },
+    ]),
+  }),
 ]);
+
+/** Vue plate dérivée pour les inventaires et les gardes : les groupes restent l'unique catalogue. */
+export const ENTREES_MENU: readonly EntreeMenu[] = Object.freeze(
+  GROUPES_MENU.flatMap((groupe) => groupe.entrees),
+);
 
 /**
  * ⚠️ CE QUI N'EST PAS DANS LE MENU, ET POURQUOI — la liste est GARDÉE (`menu-compte-frontiere`).
@@ -145,6 +168,8 @@ export const HORS_MENU: Readonly<Record<string, string>> = Object.freeze({
     "elle CORRIGE le socle : elle vit sous la halte « Ton socle », au contact du manque qu’elle répare (amendement du 2026-08-25, §1)",
   enneagramme:
     "même raison que l’heure de naissance — c’est une porte du socle, pas une entrée de compte",
+  psychologie:
+    "cet univers se découvre depuis « Moi » : le dupliquer dans le menu de compte recréerait le mélange entre navigation quotidienne et administration que les groupes corrigent",
   reperes:
     "le mode d’emploi est replié dans /aide depuis le 2026-08-23 ; deux portes vers le même contenu divergeraient",
   // ⚠️ `/profil` N'EST PLUS LISTÉ ICI PARCE QU'IL N'EXISTE PLUS (Story 7.3b, 2026-08-25). Une

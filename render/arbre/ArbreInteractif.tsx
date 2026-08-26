@@ -25,7 +25,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   reconcilierProjection,
-  intensiteBornee,
   doitDireOuNaissentLesBranches,
   ZOOM_MIN,
   ZOOM_MAX,
@@ -33,7 +32,8 @@ import {
   type Camera,
   type ProjectionScene,
 } from "@/lib/scene";
-import { placerBranches, CANEVAS } from "./geometrie";
+import { construireGeometrieLunaire, CANEVAS } from "./geometrie";
+import ArbreLunaire from "./ArbreLunaire";
 import EtatVideArbre from "./EtatVideArbre";
 import {
   ARIA_CANEVAS,
@@ -48,7 +48,6 @@ import {
 } from "./copie-arbre";
 import FicheBranche, { type ResultatGeste } from "./FicheBranche";
 import FicheTronc from "./FicheTronc";
-import { CheminTronc } from "./Tronc";
 import VueListe from "./VueListe";
 import s from "./arbre.module.css";
 
@@ -57,6 +56,8 @@ const CLE_VUE = "anima:arbre:vueListe";
 /** Au-delà de ce déplacement, le geste est un GLISSER : le relâchement n'ouvre plus la fiche. */
 const GLISSER_MIN_PX = 8;
 const PAS_CLAVIER_PX = 40;
+/** Cible DOM du tronc lunaire, posée sur sa matière au-dessus du sol. */
+const CENTRE_TRONC = { x: 704, y: 1240 } as const;
 
 export interface ProprietesArbreInteractif {
   projection: ProjectionScene;
@@ -123,7 +124,8 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     });
   };
 
-  const placees = useMemo(() => placerBranches(affichees), [affichees]);
+  const geometrie = useMemo(() => construireGeometrieLunaire(affichees), [affichees]);
+  const placees = geometrie.branches;
   const selectionnee = affichees.find((b) => b.id === p.brancheSelectionnee) ?? null;
 
   // Ce qui décide de la PRÉSENCE du canevas dans le DOM. Déclaré ICI, avant l'effet de mesure, parce que
@@ -131,7 +133,9 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   // un ReferenceError (zone morte temporelle).
   const indisponible = p.projection.indisponible === true;
   const vide = !indisponible && affichees.length === 0;
-  const canevasVisible = !indisponible && !vueListe && !vide;
+  // L'étape 0 ne remplace plus le monde par un dessin alternatif : le même Canvas lunaire reste
+  // présent et laisse voir le ciel. Une ancienne préférence « liste » ne peut pas cacher ce premier état.
+  const canevasVisible = !indisponible && (!vueListe || vide);
   /**
    * Story 3.3 (AC6) — la DÉCISION vient du modèle (`lib/scene`), jamais d'un test local sur l'entitlement.
    * Le rendu ne sait pas ce qu'est un abonnement et n'a pas à l'apprendre (AD-7) : il appelle une fonction
@@ -144,16 +148,18 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
    */
   const direOuNaissentLesBranches = doitDireOuNaissentLesBranches({ ...p.projection, branches: affichees });
 
-  // ── Le CARRÉ effectif du canevas : SVG et accroches partagent EXACTEMENT ce repère (fin du décalage) ──
+  // ── Le PORTRAIT effectif du handoff : Canvas et accroches partagent EXACTEMENT ce repère ──
   const canevasRef = useRef<HTMLDivElement>(null);
-  const [boite, setBoite] = useState({ cote: 0, gauche: 0, haut: 0, largeur: 0, hauteur: 0 });
+  const [boite, setBoite] = useState({ gauche: 0, haut: 0, largeur: 0, hauteur: 0 });
   useLayoutEffect(() => {
     const el = canevasRef.current;
     if (!el) return;
     const mesurer = () => {
       const { width, height } = el.getBoundingClientRect();
-      const cote = Math.min(width, height);
-      setBoite({ cote, gauche: (width - cote) / 2, haut: (height - cote) / 2, largeur: width, hauteur: height });
+      const echelle = Math.min(width / CANEVAS.largeur, height / CANEVAS.hauteur);
+      const largeur = Number.isFinite(echelle) ? CANEVAS.largeur * echelle : 0;
+      const hauteur = Number.isFinite(echelle) ? CANEVAS.hauteur * echelle : 0;
+      setBoite({ gauche: (width - largeur) / 2, haut: (height - hauteur) / 2, largeur, hauteur });
     };
     mesurer();
     const ro = new ResizeObserver(mesurer);
@@ -161,14 +167,17 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     return () => ro.disconnect();
     // RE-REVUE (HAUTE) : la dépendance était `[vueListe]` SEUL. Le canevas n'existe pas quand l'arbre est
     // vide ou indisponible ; il APPARAÎT plus tard (elle nomme sa première branche, ou la lecture reprend)
-    // sans que `vueListe` ne bouge → l'effet ne rejouait jamais, `boite.cote` restait 0, `.monde` était
+    // sans que `vueListe` ne bouge → l'effet ne rejouait jamais, la boîte restait à 0, `.monde` était
     // posé en 0×0 et l'ARBRE ÉTAIT INVISIBLE dans le scénario NOMINAL de la story. On dépend donc de ce qui
     // conditionne réellement sa présence. Gardé par tests/rendu/arbre-mesure.test.tsx (montage réel).
   }, [canevasVisible]);
 
   const { onCadrer } = p;
   const zoomer = useCallback(
-    (facteur: number) => onCadrer({ pan: p.camera.pan, zoom: p.camera.zoom * facteur }),
+    (facteur: number) => {
+      const zoom = p.camera.zoom * facteur;
+      if (Number.isFinite(zoom)) onCadrer({ pan: p.camera.pan, zoom });
+    },
     [onCadrer, p.camera.pan, p.camera.zoom],
   );
 
@@ -180,6 +189,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     const el = canevasRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      if (e.target instanceof Element && e.target.closest("[data-couche-vide]")) return;
       e.preventDefault();
       zoomer(e.deltaY < 0 ? 1.12 : 1 / 1.12);
     };
@@ -201,7 +211,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
    */
   const horsCanevas = (cible: EventTarget | null) => {
     if (!(cible instanceof Element)) return false;
-    if (cible.closest("[data-couche-fiche]")) return true;
+    if (cible.closest("[data-couche-fiche], [data-couche-vide]")) return true;
     const el = cible as HTMLElement;
     return el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable === true;
   };
@@ -221,7 +231,8 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
       depart.current = { x: e.clientX, y: e.clientY, pan: p.camera.pan };
     } else if (pointeurs.current.size === 2) {
       const [a, b] = [...pointeurs.current.values()];
-      pincement.current = { dist: Math.hypot(a.x - b.x, a.y - b.y), zoom: p.camera.zoom };
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      pincement.current = Number.isFinite(dist) && dist > 0 ? { dist, zoom: p.camera.zoom } : null;
       depart.current = null;
     }
   };
@@ -232,8 +243,11 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     if (pointeurs.current.size === 2 && pincement.current) {
       const [a, b] = [...pointeurs.current.values()];
       const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      if (!Number.isFinite(dist) || pincement.current.dist <= 0) return;
+      const zoom = pincement.current.zoom * (dist / pincement.current.dist);
+      if (!Number.isFinite(zoom)) return;
       aGlisse.current = true;
-      p.onCadrer({ pan: p.camera.pan, zoom: pincement.current.zoom * (dist / pincement.current.dist) });
+      p.onCadrer({ pan: p.camera.pan, zoom });
     } else if (depart.current) {
       const dx = e.clientX - depart.current.x;
       const dy = e.clientY - depart.current.y;
@@ -256,37 +270,20 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   };
 
   /**
-   * Taille À L'ÉCRAN de la zone cliquable d'une accroche, en px.
-   *
-   * RE-REVUE (HAUTE) — elle valait 44 px CONSTANTS (contre-échelle 1/zoom) alors que l'écartement entre
-   * accroches décroît quand l'arbre se densifie : à partir d'une dizaine de branches, une cible recouvrait
-   * le point visible de sa voisine et c'est la fiche de LA VOISINE qui s'ouvrait. Une cible qui ouvre la
-   * mauvaise branche est pire qu'une cible petite. On la borne donc à la moitié de l'écartement réel — et
-   * ZOOMER la fait regrandir jusqu'à 44 px, puisque l'écartement à l'écran croît avec le zoom.
-   * Le plancher d'adressabilité au sens de UX-DR-42 reste tenu par la VUE LISTE (équivalent non spatial,
-   * AC8), qui liste chaque branche en toutes lettres — c'est l'exception « autre moyen » de WCAG 2.5.8.
+   * Taille À L'ÉCRAN de la zone cliquable d'une accroche, en px. Les cibles denses peuvent se recouvrir,
+   * mais ne descendent jamais sous le plancher WCAG : zoomer sépare leurs ancres, tandis que le clavier et
+   * la vue liste fournissent un accès non spatial sans ambiguïté. Rétrécir la cible n'est plus un arbitrage.
    */
-  const tailleAccrochePx = (ecartVoisin: number) => {
-    const CIBLE_MAX = 44;
-    if (!Number.isFinite(ecartVoisin) || !boite.cote) return CIBLE_MAX; // seule branche, ou pas encore mesuré
-    // `ecartVoisin` est en unités de canevas (1000) ; à l'écran, un point d'accroche voit `cote/1000 * zoom` px.
-    const ecartPx = ecartVoisin * (boite.cote / CANEVAS.largeur) * p.camera.zoom;
-    // AUCUN PLANCHER, volontairement. Un plancher garantirait le recouvrement dès que l'écartement passe
-    // en dessous — c'est-à-dire qu'il ferait ouvrir LA MAUVAISE BRANCHE, ce qui est pire qu'une cible
-    // petite : l'utilisatrice croirait lire une prise de conscience qui n'est pas celle qu'elle a visée.
-    // La règle 0,9 × écartement garantit la non-superposition pour TOUTE paire (chaque cible vaut au plus
-    // 0,9 fois sa distance au plus proche voisin, donc la somme des demi-tailles reste sous la distance).
-    return Math.min(CIBLE_MAX, ecartPx * 0.9);
-  };
+  const tailleAccrochePx = () => 44;
 
-  /** Ramène l'accroche au centre du conteneur (origine de transform = centre du carré). */
+  /** Ramène l'accroche au centre du portrait (origine de transform = centre du monde). */
   const cadrerBranche = (accroche: { x: number; y: number }) => {
-    const { cote } = boite;
-    if (!cote) return;
+    const { largeur, hauteur } = boite;
+    if (!largeur || !hauteur) return;
     const zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, 1.8));
-    const px = (accroche.x / CANEVAS.largeur) * cote;
-    const py = (accroche.y / CANEVAS.hauteur) * cote;
-    p.onCadrer({ zoom, pan: { x: -zoom * (px - cote / 2), y: -zoom * (py - cote / 2) } });
+    const px = (accroche.x / CANEVAS.largeur) * largeur;
+    const py = (accroche.y / CANEVAS.hauteur) * hauteur;
+    p.onCadrer({ zoom, pan: { x: -zoom * (px - largeur / 2), y: -zoom * (py - hauteur / 2) } });
   };
 
   // Déplacement au CLAVIER (le pan doigt/molette n'est pas atteignable au clavier — plancher UX-DR-42).
@@ -396,7 +393,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
           <p className={s.videTitre}>{INDISPONIBLE_TITRE}</p>
           <p className={s.videCorps}>{INDISPONIBLE_CORPS}</p>
         </div>
-      ) : vueListe ? (
+      ) : vueListe && !vide ? (
         <VueListe
           branches={affichees}
           onOuvrir={ouvrir}
@@ -404,12 +401,6 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
           onRenommer={p.onRenommer}
           onAnnoncer={setAnnonce}
           planOuvert={p.projection.planOuvert === true}
-          direOuNaissentLesBranches={direOuNaissentLesBranches}
-          onOuvrirTronc={troncIncomplet ? () => setFicheTronc(true) : undefined}
-        />
-      ) : vide ? (
-        // AC2 [DUR] — LE MÊME composant que la vue liste (voir `EtatVideArbre`).
-        <EtatVideArbre
           direOuNaissentLesBranches={direOuNaissentLesBranches}
           onOuvrirTronc={troncIncomplet ? () => setFicheTronc(true) : undefined}
         />
@@ -437,87 +428,40 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             style={{
               left: boite.gauche,
               top: boite.haut,
-              width: boite.cote,
-              height: boite.cote,
+              width: boite.largeur,
+              height: boite.hauteur,
               transform: `translate(${p.camera.pan.x}px, ${p.camera.pan.y}px) scale(${p.camera.zoom})`,
             }}
           >
-            <svg viewBox={`0 0 ${CANEVAS.largeur} ${CANEVAS.hauteur}`} className={s.svg} role="img" aria-label={ARIA_CANEVAS}>
-              {/* Tronc + racines — matière argentée, présent d'emblée (FR-088).
-                  Story 5.3 (AC3) : sans son heure, la MATIÈRE est « en réserve » — le contour reste
-                  ENTIER (jamais un pointillé, jamais un fantôme), seule la densité change. Un tronc
-                  en pointillés dirait « cassé » ; celui-ci dit « pas encore rempli ». */}
-              <CheminTronc enReserve={Boolean(troncIncomplet)} />
-              {placees.map((pl) => {
-                const intensite = intensiteBornee(pl.branche.intensite);
-                return (
-                  <g key={pl.branche.id}>
-                    {/*
-                      Le bois — épaisseur CONTINUE, portée par l'intensité (2 px nu → 3,2 px pleinement
-                      feuillu, DESIGN L599-L600).
-
-                      ⚠️ REVUE — l'épaisseur dépendait de l'ENUM : le premier retour la faisait sauter de
-                      2 à 3,2 px d'un coup, en même temps que cinq feuilles apparaissaient ex nihilo.
-                      FR-028 exige l'inverse mot pour mot : « progressive, jamais binaire ; la matière
-                      s'installe PAR DEGRÉS — le trait s'épaissit, les feuilles se déplient AU FIL DES
-                      RETOURS ». Le champ `intensite` existait précisément pour ça et le rendu l'ignorait
-                      pour l'épaisseur : la seule chose qui se lisait à l'écran était un basculement.
-                    */}
-                    <line
-                      x1={pl.fourche.x}
-                      y1={pl.fourche.y}
-                      x2={pl.x}
-                      y2={pl.y}
-                      className={s.branche}
-                      strokeWidth={2 + intensite * 1.2}
-                    />
-                    {/*
-                      Feuillage — densité CONTINUE elle aussi. Le premier retour (intensité 0,2) déplie
-                      DEUX feuilles, pas cinq ; le feuillage plein en compte douze. Bornée : une valeur
-                      folle ne peut pas geler le rendu.
-                    */}
-                    {pl.branche.etat !== "naissance" &&
-                      Array.from({ length: Math.max(1, Math.round(intensite * 12)) }).map((_, k) => (
-                        <circle
-                          key={k}
-                          cx={pl.x + Math.cos(k * 2.4) * (10 + k * 3)}
-                          cy={pl.y + Math.sin(k * 2.4) * (10 + k * 3)}
-                          r={7}
-                          className={s.feuille}
-                          opacity={0.5 + intensite * 0.5}
-                        />
-                      ))}
-                    {/* Rayonnement — pleine lumière nacre, STATIQUE, aucun objet-fruit suspendu. */}
-                    {pl.branche.etat === "rayonnement" && <circle cx={pl.x} cy={pl.y} r={44} className={s.rayonnement} />}
-                    <circle cx={pl.accroche.x} cy={pl.accroche.y} r={9} className={s.accrocheDot} />
-                  </g>
-                );
-              })}
-            </svg>
+            <ArbreLunaire
+              geometrie={geometrie}
+              troncEnReserve={Boolean(troncIncomplet)}
+              ariaLabel={ARIA_CANEVAS}
+            />
 
             {/* Story 5.3 — la cible du TRONC, dans la même couche et le même repère que les accroches.
                 Elle n'existe que s'il manque quelque chose : un tronc complet n'a AUCUNE affordance,
                 rien à fermer, rien à découvrir (AC4). */}
-            {troncIncomplet && (
+            {troncIncomplet && !vide && (
               <button
                 type="button"
                 ref={declencheurTronc}
                 className={`${s.accroche} ${s.cibleTronc}`}
                 style={{
-                  left: `${(500 / CANEVAS.largeur) * 100}%`,
-                  top: `${(760 / CANEVAS.hauteur) * 100}%`,
+                  left: `${(CENTRE_TRONC.x / CANEVAS.largeur) * 100}%`,
+                  top: `${(CENTRE_TRONC.y / CANEVAS.hauteur) * 100}%`,
                   transform: `translate(-50%, -50%) scale(${1 / p.camera.zoom})`,
                 }}
                 aria-label={ARIA_TRONC_A_COMPLETER}
-                onClick={() => {
-                  if (aGlisse.current) return; // un glisser n'ouvre pas la fiche
+                onClick={(e) => {
+                  if (aGlisse.current && e.detail !== 0) return; // un glisser n'ouvre pas la fiche ; le clavier, si
                   setFicheTronc(true);
                 }}
               />
             )}
 
-            {/* Accroches CLIQUABLES — dans le MÊME repère carré que le SVG (alignement exact), taille CSS
-                constante ≥44px quel que soit le zoom (contre-échelle 1/zoom). */}
+            {/* Accroches CLIQUABLES — dans le MÊME repère portrait que le Canvas. Elles gardent 44 px
+                même lorsqu'elles se recouvrent ; zoom, clavier et vue liste désambiguïsent la densité. */}
             {placees.map((pl) => (
               <button
                 key={pl.branche.id}
@@ -527,18 +471,27 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
                 style={{
                   left: `${(pl.accroche.x / CANEVAS.largeur) * 100}%`,
                   top: `${(pl.accroche.y / CANEVAS.hauteur) * 100}%`,
-                  width: tailleAccrochePx(pl.ecartVoisin),
-                  height: tailleAccrochePx(pl.ecartVoisin),
+                  width: tailleAccrochePx(),
+                  height: tailleAccrochePx(),
                   transform: `translate(-50%, -50%) scale(${1 / p.camera.zoom})`,
                 }}
                 aria-label={`Branche : ${pl.branche.nom?.trim() || "sans nom"}`}
-                onClick={() => {
-                  if (aGlisse.current) return; // un glisser n'ouvre pas la fiche
+                onClick={(e) => {
+                  if (aGlisse.current && e.detail !== 0) return; // un glisser n'ouvre pas la fiche ; le clavier, si
                   ouvrir(pl.branche.id);
                 }}
               />
             ))}
           </div>
+
+          {vide && (
+            <div className={s.videSuperposition} data-couche-vide="">
+              <EtatVideArbre
+                direOuNaissentLesBranches={direOuNaissentLesBranches}
+                onOuvrirTronc={troncIncomplet ? () => setFicheTronc(true) : undefined}
+              />
+            </div>
+          )}
 
         </div>
       )}

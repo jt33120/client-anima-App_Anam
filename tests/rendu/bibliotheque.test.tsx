@@ -1,251 +1,104 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import Bibliotheque from "@/render/accueil/Bibliotheque";
-import type { BibliothequeVue, CarteVue } from "@/render/accueil/types";
+import type { BibliothequeVue, CarteVue, UniversVue } from "@/render/accueil/types";
 
-/**
- * bibliotheque.test.tsx — LA BIBLIOTHÈQUE MONTÉE POUR DE VRAI (Story 5.6, T7).
- *
- * `bibliotheque.test.ts` prouve que le MODÈLE ordonne bien et qu'aucun type ne peut porter une
- * mesure. Ce fichier prouve la chose complémentaire, qui n'est pas la même : **ce qui atteint
- * réellement l'écran** — l'ordre du DOM, ce que dit une carte vide, et les chemins par lesquels un
- * compte pourrait fuir sans jamais s'afficher (`aria-label`, texte alternatif, ordre implicite).
- *
- * C'est la raison d'être du projet `rendu` (revue 4.6) : une garde de source reste verte alors que
- * l'écran, lui, ment.
- */
-
-const carte = (cle: string, o: Partial<CarteVue> = {}): CarteVue => ({
+const carte = (cle: string, titre: string, texte: string): CarteVue => ({
   cle,
-  titre: `Titre ${cle}`,
+  titre,
   faits: [],
-  texte: { statut: "non_ecrit" },
+  texte: { statut: "ecrit", texte },
   etat: null,
-  ...o,
 });
 
-/** La carte d'Anam NEUTRE — l'état de très loin le plus fréquent (Story 6.3). */
-const ANAM_NEUTRE = {
-  titre: "Anam",
-  presence: "Elle se manifeste quand elle a quelque chose de précis à dire.",
-  ligne: null,
-} as const;
+const univers = (avecActionEnneagramme = true): readonly UniversVue[] => [
+  {
+    cle: "astrologie",
+    titre: "Astrologie",
+    accroche: "Ton ciel de naissance.",
+    url: "/socle?univers=astrologie",
+    action: null,
+  },
+  {
+    cle: "numerologie",
+    titre: "Numérologie",
+    accroche: "Tes nombres de naissance.",
+    url: "/socle?univers=numerologie",
+    action: null,
+  },
+  {
+    cle: "psychologie",
+    titre: "Psychologie",
+    accroche: "Tes repères psychologiques.",
+    url: "/psychologie",
+    action: avecActionEnneagramme
+      ? { libelle: "Passer mon test d’ennéagramme", url: "/enneagramme" }
+      : null,
+  },
+];
 
-/** Une petite bibliothèque, pour éprouver un rendu de carte isolé. */
-const biblio = (cartes: readonly CarteVue[]): BibliothequeVue => ({
+const VUE: BibliothequeVue = {
   jour: { a: 2026, m: 8, j: 14 },
-  enAvant: null,
-  anam: ANAM_NEUTRE,
-  cartes,
-});
-
-/**
- * ⚠️ LE CHIFFRE « 165 créneaux, 0 écrit » A ÉTÉ RETIRÉ DE CE COMMENTAIRE le 2026-08-25 : il était
- * faux, et la même phrase a coûté une demi-journée dans `lib/corpus/README.md`. L'état réel est
- * calculé par `tests/corpus-etat.test.ts`, et nulle part ailleurs.
- *
- * Ce jeu d'essai porte encore « theme » et « nombres », partis du catalogue avec la Story 7.7 : ce
- * n'est pas un oubli. Ce fichier éprouve le RENDU d'une carte, qui doit continuer de savoir
- * dessiner n'importe quelle carte qu'on lui donne — y compris celles d'un autre écran.
- */
-const REELLE: BibliothequeVue = {
-  jour: { a: 2026, m: 8, j: 14 },
-  enAvant: "theme",
-  anam: ANAM_NEUTRE,
+  enAvant: "horoscope",
   cartes: [
-    carte("theme", {
-      titre: "Ton thème",
-      faits: [
-        { intitule: "Soleil", valeur: "Balance" },
-        { intitule: "Lune", valeur: "Cancer" },
-      ],
-    }),
-    carte("mantra", { titre: "Le mantra du jour" }),
-    carte("horoscope", { titre: "Ton ciel du jour" }),
-    carte("nombres", { titre: "Tes nombres", faits: [{ intitule: "Chemin de vie", valeur: "7" }] }),
-    carte("enneagramme", { titre: "Ton ennéagramme", faits: [{ intitule: "Type", valeur: "4" }] }),
+    carte("mantra", "Le mantra du jour", "Remarque ce qui tient."),
+    carte("horoscope", "Ton ciel du jour", "La Lune ralentit le rythme."),
+    carte("enneagramme", "Ton ennéagramme", "Ce texte ne doit pas vivre sur Moi."),
   ],
+  univers: univers(),
 };
 
-describe("[5.6/AC1] l’ordre du DOM est EXACTEMENT celui reçu — le rendu ne trie rien", () => {
-  it("les titres paraissent dans l’ordre des cartes", () => {
-    render(<Bibliotheque bibliotheque={REELLE} />);
-    const titres = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
-    // « Anam » ferme la liste et n'entre PAS dans la rotation du jour (Story 6.3, D8) : elle est
-    // rendue hors de la grille, donc toujours en dernier, quelle que soit la carte mise en avant.
-    expect(titres).toEqual([
-      "Ton thème",
-      "Le mantra du jour",
-      "Ton ciel du jour",
-      "Tes nombres",
-      "Ton ennéagramme",
-      "Anam",
-    ]);
+describe("[Moi] le quotidien et les univers ont chacun leur place", () => {
+  it("affiche le ciel et le mantra sous Aujourd’hui, mais aucune carte Anam ni profil stable", () => {
+    render(<Bibliotheque bibliotheque={VUE} />);
+
+    const quotidien = screen.getByRole("region", { name: "Aujourd’hui" });
+    expect(within(quotidien).getByText("14 août")).toBeTruthy();
+    expect(within(quotidien).getByRole("article", { name: "Ton ciel du jour" })).toBeTruthy();
+    expect(within(quotidien).getByRole("article", { name: "Le mantra du jour" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Anam" })).toBeNull();
+    expect(screen.queryByRole("article", { name: "Ton ennéagramme" })).toBeNull();
+    expect(screen.queryByText(/elle se manifeste/i)).toBeNull();
   });
 
-  it("[LE TEST QUI COMPTE] inverser l’ordre reçu inverse l’ordre affiché", () => {
-    // Sans cette assertion, un tri caché dans le composant passerait inaperçu : les deux ordres
-    // coïncideraient par hasard sur le jeu ci-dessus. C'est le pouvoir que `lib/domain` retire au
-    // rendu exprès (FR-033 : « jamais algorithmique »).
-    const inverse = { ...REELLE, cartes: [...REELLE.cartes].reverse() };
-    render(<Bibliotheque bibliotheque={inverse} />);
-    const titres = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
-    expect(titres[0]).toBe("Ton ennéagramme");
-  });
-});
+  it("rend trois portes stables avec des destinations explicites", () => {
+    render(<Bibliotheque bibliotheque={VUE} />);
 
-describe("[5.6/AC1] la carte du jour est ANNONCÉE, pas seulement plus grande", () => {
-  it("la mise en avant est dite en toutes lettres", () => {
-    render(<Bibliotheque bibliotheque={REELLE} />);
-    // Une différence purement visuelle n'existe pas pour qui n'y a pas accès.
-    expect(screen.getByText(/mise en avant aujourd’hui/i)).toBeTruthy();
-  });
-
-  it("UNE SEULE carte est mise en avant", () => {
-    render(<Bibliotheque bibliotheque={REELLE} />);
-    expect(screen.getAllByText(/mise en avant aujourd’hui/i)).toHaveLength(1);
-  });
-
-  it("aucune mise en avant quand aucune carte n’a rien à montrer", () => {
-    render(<Bibliotheque bibliotheque={{ ...REELLE, enAvant: null }} />);
-    expect(screen.queryByText(/mise en avant aujourd’hui/i)).toBeNull();
+    expect(screen.getByRole("heading", { name: "Tes univers" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Astrologie/i }).getAttribute("href")).toBe(
+      "/socle?univers=astrologie",
+    );
+    expect(screen.getByRole("link", { name: /Numérologie/i }).getAttribute("href")).toBe(
+      "/socle?univers=numerologie",
+    );
+    expect(screen.getByRole("link", { name: /Psychologie/i }).getAttribute("href")).toBe("/psychologie");
+    expect(screen.queryByRole("link", { name: /Human Design/i })).toBeNull();
   });
 });
 
-describe("[5.6/AC5] l’absence est DITE — jamais un vide, jamais un « bientôt »", () => {
-  it("une carte sans fait ni texte le dit honnêtement", () => {
-    render(<Bibliotheque bibliotheque={REELLE} />);
-    const mantra = screen.getByRole("article", { name: "Le mantra du jour" });
-    expect(within(mantra).getByText(/n’a pas encore écrit/i)).toBeTruthy();
+describe("[Ennéagramme] l’action absente auparavant est impossible à manquer", () => {
+  it("mène directement au questionnaire quand le test n’est pas passé", () => {
+    render(<Bibliotheque bibliotheque={VUE} />);
+    expect(
+      screen.getByRole("link", { name: "Passer mon test d’ennéagramme" }).getAttribute("href"),
+    ).toBe("/enneagramme");
   });
 
-  it("une carte qui a des faits mais pas de texte le dit AUSSI, et garde ses faits", () => {
-    render(<Bibliotheque bibliotheque={REELLE} />);
-    const theme = screen.getByRole("article", { name: "Ton thème" });
-    expect(within(theme).getByText("Balance")).toBeTruthy();
-    expect(within(theme).getByText(/n’a pas encore écrit/i)).toBeTruthy();
-  });
-
-  it("[FR-057] aucun « bientôt », aucun compte à rebours, aucune excuse", () => {
-    const { container } = render(<Bibliotheque bibliotheque={REELLE} />);
-    const texte = container.textContent ?? "";
-    for (const interdit of ["bientôt", "prochainement", "à venir", "désolé", "excuse", "patience"]) {
-      expect(texte.toLowerCase(), `« ${interdit} » teaser ce qu’on n’a pas`).not.toContain(interdit);
-    }
-  });
-
-  it("le texte d’Anima paraît tel quel quand il est écrit", () => {
-    const ecrite: BibliothequeVue = {
-      ...REELLE,
-      cartes: [carte("mantra", { titre: "Le mantra du jour", texte: { statut: "ecrit", texte: "Remarque ce qui tient." } })],
-      enAvant: "mantra",
-    };
-    render(<Bibliotheque bibliotheque={ecrite} />);
-    expect(screen.getByText("Remarque ce qui tient.")).toBeTruthy();
-    expect(screen.queryByText(/n’a pas encore écrit/i)).toBeNull();
+  it("retire seulement le CTA quand un résultat existe, pas l’univers Psychologie", () => {
+    render(<Bibliotheque bibliotheque={{ ...VUE, univers: univers(false) }} />);
+    expect(screen.queryByRole("link", { name: "Passer mon test d’ennéagramme" })).toBeNull();
+    expect(screen.getByRole("link", { name: /Psychologie/i }).getAttribute("href")).toBe("/psychologie");
   });
 });
 
-describe("[5.6/AC2 DUR · FR-031] aucun compte n’atteint l’écran, par AUCUN chemin", () => {
-  /**
-   * ⚠️ LE CHEMIN DE FUITE OUBLIÉ, celui que la 4.10 a trouvé après coup : un compte n'a pas besoin
-   * d'être VISIBLE pour exister. Il peut vivre dans un `aria-label`, un `title`, un `alt`. Ces
-   * assertions lisent donc les attributs, pas seulement le texte.
-   *
-   * Et elles ne peuvent pas refuser « tout chiffre » : « 7 » (chemin de vie) et « 4 » (type) sont
-   * des faits du socle, pas des mesures. Ce qu'on refuse, c'est un compte D'OBJETS.
-   */
-  it("aucun attribut d’accessibilité ne porte un compte", () => {
-    const { container } = render(<Bibliotheque bibliotheque={REELLE} />);
-    for (const el of Array.from(container.querySelectorAll("*"))) {
-      for (const attr of ["aria-label", "title", "alt", "aria-description"]) {
-        const v = el.getAttribute(attr);
-        if (!v) continue;
-        expect(v, `« ${v} » ressemble à un compte dans ${attr}`).not.toMatch(
-          /\b\d+\s*(carte|nouveau|nouvelle|restant|sur\s+\d)/i,
-        );
-      }
-    }
-  });
-
-  it("aucun libellé de type « 3 cartes », « 2 nouvelles », « 1/5 »", () => {
-    const { container } = render(<Bibliotheque bibliotheque={REELLE} />);
-    const texte = container.textContent ?? "";
+describe("[FR-031] Moi ne fabrique ni compteur ni verrou", () => {
+  it("ne rend aucun compte d’objets ni vocabulaire premium", () => {
+    const { container } = render(<Bibliotheque bibliotheque={VUE} />);
+    const texte = (container.textContent ?? "").toLowerCase();
     expect(texte).not.toMatch(/\b\d+\s*(cartes?|nouvelles?|restantes?)\b/i);
     expect(texte).not.toMatch(/\b\d+\s*\/\s*\d+\b/);
-  });
-
-  it("aucun mot de verrou n’apparaît nulle part", () => {
-    const { container } = render(<Bibliotheque bibliotheque={REELLE} />);
-    const texte = (container.textContent ?? "").toLowerCase();
     for (const mot of ["verrouill", "débloqu", "cadenas", "premium", "réservé aux"]) {
-      expect(texte, `« ${mot} » sur la bibliothèque`).not.toContain(mot);
+      expect(texte).not.toContain(mot);
     }
-  });
-
-  it("[CONTRÔLE POSITIF] les faits du socle, eux, sont bien affichés", () => {
-    // Sans ce contrôle, un composant qui n'afficherait RIEN passerait toutes les assertions
-    // ci-dessus — le vert tautologique exact que ce dépôt traque.
-    render(<Bibliotheque bibliotheque={REELLE} />);
-    expect(screen.getByText("7")).toBeTruthy();
-    expect(screen.getByText("4")).toBeTruthy();
-    expect(screen.getByText("Balance")).toBeTruthy();
-  });
-});
-
-describe("[5.6/D4] la date est portée — sans elle, deux jours identiques se lisent comme une panne", () => {
-  it("le jour civil est affiché", () => {
-    render(<Bibliotheque bibliotheque={REELLE} />);
-    // `lune_relative` ne change que tous les ~2,5 jours : le même texte d'horoscope sort deux à
-    // trois jours de suite. C'est le ciel, pas un blocage — la date le dit.
-    expect(screen.getByText("14 août")).toBeTruthy();
-  });
-});
-
-describe("[7.8 · FR-054/FR-086] la voix du PRODUIT n'emprunte jamais celle d'Anima", () => {
-  /**
-   * ⚠️ CETTE GARDE EXISTE PARCE QU'UN MUTANT A SURVÉCU (2026-08-25). Peindre `carte.etat` en
-   * `t-anam` passait TOUS les tests : le champ existait bien, séparé du corpus, avec sa phrase
-   * juste — et l'écran attribuait quand même à une personne réelle des mots qui ne sont pas d'elle.
-   *
-   * La séparation des deux registres ne vaut que si elle se VOIT. Un champ distinct rendu dans le
-   * même style est une distinction qui n'existe que dans le code.
-   */
-  it("[LE CŒUR] l'état du produit n'est JAMAIS peint en `t-anam`", () => {
-    const { container } = render(
-      <Bibliotheque bibliotheque={biblio([carte("enneagramme", { etat: "Le test n’a pas encore été passé." })])} />,
-    );
-    const porteur = [...container.querySelectorAll("p")].find((p) =>
-      (p.textContent ?? "").includes("Le test n’a pas encore été passé."),
-    );
-    expect(porteur, "l'état du produit n'atteint pas l'écran").toBeDefined();
-    expect(
-      porteur!.className,
-      "l'état du produit est peint dans la voix d'Anima — il lui attribue des mots qui ne sont pas d'elle",
-    ).not.toContain("t-anam");
-  });
-
-  it("[LE TÉMOIN] le texte d'Anima, LUI, est bien peint en `t-anam`", () => {
-    // Sans ce témoin, le refus ci-dessus serait vrai sur un rendu qui n'emploie plus `t-anam` du
-    // tout — et la garde passerait au vert en ayant fait disparaître la voix d'Anima de l'écran.
-    const { container } = render(
-      <Bibliotheque
-        bibliotheque={biblio([carte("mantra", { texte: { statut: "ecrit", texte: "Les mots d’Anima." } })])}
-      />,
-    );
-    const porteur = [...container.querySelectorAll("p")].find((p) =>
-      (p.textContent ?? "").includes("Les mots d’Anima."),
-    );
-    expect(porteur, "le texte d'Anima n'atteint pas l'écran").toBeDefined();
-    expect(porteur!.className, "la voix d'Anima a disparu du rendu").toContain("t-anam");
-  });
-
-  it("l'état PRÉCÈDE le silence du corpus — c'est lui qui doit se lire", () => {
-    const { container } = render(
-      <Bibliotheque bibliotheque={biblio([carte("enneagramme", { etat: "Le test attend." })])} />,
-    );
-    const texte = container.textContent ?? "";
-    expect(texte).toContain("Le test attend.");
-    expect(texte, "l'ancienne phrase, fausse, est revenue").not.toContain("Anima n’a pas encore écrit cette carte");
   });
 });

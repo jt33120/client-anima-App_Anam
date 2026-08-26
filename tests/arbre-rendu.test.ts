@@ -92,16 +92,20 @@ describe("[FR-031 DUR] aucune mesure NULLE PART dans le rendu de l'arbre", () =>
 
 describe("accessibilité du canevas & de l'accroche", () => {
   const arbre = lire("render/arbre/ArbreInteractif.tsx");
+  const lunaire = lire("render/arbre/ArbreLunaire.tsx");
   const css = lire("render/arbre/arbre.module.css");
 
   it("le canevas porte role=\"img\" et un aria-label (UX-DR-37)", () => {
-    expect(arbre).toMatch(/role="img"/);
-    expect(arbre).toMatch(/aria-label=\{ARIA_CANEVAS\}|aria-label="/);
+    expect(lunaire).toMatch(/role="img"/);
+    expect(lunaire).toMatch(/aria-label=\{ariaLabel\}/);
+    expect(arbre).toMatch(/ariaLabel=\{ARIA_CANEVAS\}/);
   });
 
-  it("le point d'accroche a une zone tactile ≥ 44px (var --cible-tactile)", () => {
-    // La classe .accroche dimensionne le hit-target avec la cible tactile (44px), indépendant du dessin.
+  it("le point d'accroche reste à 44px ; zoom, clavier et liste résolvent la densité", () => {
     expect(css).toMatch(/\.accroche\s*\{[^}]*--cible-tactile/);
+    expect(arbre).toMatch(/const tailleAccrochePx = \(\) => 44/);
+    expect(arbre).toMatch(/scale\(\$\{1 \/ p\.camera\.zoom\}\)/);
+    expect(arbre).toMatch(/<VueListe/);
   });
 
   it("des boutons de zoom +/− existent (clavier), doublés du pincement/molette", () => {
@@ -167,14 +171,15 @@ describe("[AC3 DUR] les accroches et le dessin partagent le MÊME repère (fin d
   const arbre = lire("render/arbre/ArbreInteractif.tsx");
   const css = lire("render/arbre/arbre.module.css");
 
-  it("le carré effectif est MESURÉ (ResizeObserver) — sans quoi le viewBox letterboxé décale les boutons", () => {
+  it("le portrait effectif est MESURÉ (ResizeObserver) — sans quoi le canevas décale les boutons", () => {
     expect(arbre).toMatch(/ResizeObserver/);
-    expect(arbre, "le côté du carré pilote la boîte du monde").toMatch(/cote/);
+    expect(arbre, "les deux dimensions du portrait pilotent la boîte du monde").toMatch(/largeur[\s\S]{0,80}hauteur/);
   });
 
-  it("le SVG et les accroches vivent dans le MÊME conteneur `.monde` dimensionné en pixels", () => {
-    expect(arbre).toMatch(/width:\s*boite\.cote/);
-    expect(arbre).toMatch(/height:\s*boite\.cote/);
+  it("le Canvas et les accroches vivent dans le MÊME conteneur `.monde` dimensionné en pixels", () => {
+    expect(arbre).toMatch(/width:\s*boite\.largeur/);
+    expect(arbre).toMatch(/height:\s*boite\.hauteur/);
+    expect(arbre).toMatch(/<ArbreLunaire/);
   });
 
   it("le zoom part du CENTRE (au coin, l'arbre fuyait hors cadre en quelques clics)", () => {
@@ -196,7 +201,9 @@ describe("[AC9 / plancher] clavier & gestes", () => {
 
   it("un GLISSER n'ouvre pas la fiche (seuil de déplacement)", () => {
     expect(arbre).toMatch(/GLISSER_MIN_PX/);
-    expect(arbre).toMatch(/if\s*\(\s*aGlisse\.current\s*\)\s*return/);
+    expect(arbre).toMatch(
+      /if\s*\(\s*aGlisse\.current\s*&&\s*e\.detail\s*!==\s*0\s*\)\s*return/,
+    );
   });
 });
 
@@ -282,10 +289,11 @@ describe("[AC4] le message source est repérable AUTREMENT que par la teinte", (
 describe("[AC10] aucune animation de croissance, aucune célébration", () => {
   const css = lire("render/arbre/arbre.module.css");
   const arbre = lire("render/arbre/ArbreInteractif.tsx");
+  const moteur = lire("render/arbre/MoteurArbreLunaire.ts");
 
-  it("le rayonnement est STATIQUE (aucune animation/transition sur sa classe)", () => {
-    const bloc = css.match(/\.rayonnement\s*\{[^}]*\}/)?.[0] ?? "";
-    expect(bloc).not.toMatch(/animation|transition/);
+  it("le rayonnement Canvas est STATIQUE (aucune boucle ou minuterie de croissance)", () => {
+    expect(moteur).not.toMatch(/requestAnimationFrame|setInterval|setTimeout/);
+    expect(css.match(/\.canvasLunaire\s*\{[^}]*\}/)?.[0] ?? "").not.toMatch(/animation|transition/);
   });
 
   it("aucune particule / confetti / étincelle / son dans le rendu de l'arbre", () => {
@@ -297,11 +305,13 @@ describe("[AC10] aucune animation de croissance, aucune célébration", () => {
 
 describe("charte de l'arbre & reduced-motion", () => {
   const css = lire("render/arbre/arbre.module.css");
+  const moteur = lire("render/arbre/MoteurArbreLunaire.ts");
 
   it("le rayonnement est la LUEUR nacre (pas un objet-fruit), aucun brun ni or", () => {
-    expect(css).toMatch(/\.rayonnement\s*\{[^}]*--lueur/);
+    expect(moteur).toContain('lueur: "#CDE4F8"');
+    expect(moteur).toMatch(/globalCompositeOperation\s*=\s*"lighter"/);
     // aucun brun/or codé en dur (charte : arbre de nuit argenté)
-    expect(css).not.toMatch(/#5c4526|#2b1f12|#0c0906|#ffb14d|gold|goldenrod/i);
+    expect(`${css}\n${moteur}`).not.toMatch(/#5c4526|#2b1f12|#0c0906|#ffb14d|gold|goldenrod/i);
   });
 
   it("le surlignage de l'extrait est neutralisé sous prefers-reduced-motion (fade immédiat)", () => {

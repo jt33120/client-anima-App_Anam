@@ -26,7 +26,12 @@ export interface RessourceVue {
  * (ils sont posés, optimistes, jamais retirés — AC1) ; la voix d'Anam porte un état de flux ; le
  * bloc `ressources` (détresse niveaux 2-3, Story 2.6) porte les ressources + la date « Vérifié le … ».
  */
-export type Tour =
+export interface RepereJour {
+  /** Le serveur a placé la frontière du jour ; le rendu ne calcule aucune date. */
+  readonly separateurAvant?: boolean;
+}
+
+export type Tour = (
   | { readonly id: string; readonly role: "utilisatrice"; readonly texte: string }
   | { readonly id: string; readonly role: "anam"; readonly texte: string; readonly etat: EtatAnam }
   | {
@@ -141,7 +146,8 @@ export type Tour =
       readonly role: "lecture";
       readonly lectureId: string;
       readonly texte: string;
-    };
+    }
+) & RepereJour;
 
 /** Le petit cycle local d'une proposition de branche dans le fil (Story 4.5). */
 export type EtatProposition = "propose" | "nomme" | "refuse" | "nee";
@@ -166,17 +172,7 @@ export type OuvertureData =
   /** Story 6.4 (AC1) — le geste de pause. Une phrase, rien d'autre — et surtout AUCUN nombre, alors
    *  que c'est la seule ouverture qui naît d'un compte : les deux compteurs meurent côté serveur,
    *  et le rendu ne peut donc pas afficher « 7 séances cette semaine » (FR-031). */
-  | { readonly type: "pause"; readonly phrase: string }
-  /**
-   * Retour du 2026-08-23 — C'EST ANAM QUI PARLE LA PREMIÈRE.
-   *
-   * ⚠️ LA DERNIÈRE DE L'UNION, ET C'EST UN ORDRE DE PRIORITÉ. Les cinq ouvertures ci-dessus
-   * naissent d'un ÉVÉNEMENT (une branche à proposer, un socle qui vient de se compléter, une
-   * pause à suggérer) : elles ont quelque chose à dire, et elles passent avant. Celle-ci est ce
-   * qu'Anam dit quand il n'y a rien de particulier — c'est-à-dire presque toujours, et le tout
-   * premier jour. Elle ne s'ajoute pas aux autres : elle prend la place laissée vide.
-   */
-  | { readonly type: "premiere-parole"; readonly phrase: string };
+  | { readonly type: "pause"; readonly phrase: string };
 
 /**
  * UN TOUR RETROUVÉ AU RECHARGEMENT (QA tour 1, T3).
@@ -185,11 +181,41 @@ export type OuvertureData =
  * couches serveur (AD-7/AD-10, vérifié par `tests/arc-architecture.test.ts`). Même patron que
  * `BibliothequeVue` et que `OuvertureData`.
  *
- * TROIS CHAMPS, ET PAS UN DE PLUS. Ni date, ni compteur, ni « non lu » : le fil se lit, il ne se
- * mesure pas (FR-031). L'ordre de la liste EST l'ordre de lecture — le rendu ne trie rien.
+ * Aucun horodatage brut ne traverse. Le booléen `separateurAvant` est une décision serveur déjà
+ * prise : il permet de dessiner « Aujourd'hui » sans donner au rendu une horloge ni une date.
  */
 export interface TourHistorique {
   readonly id: string;
   readonly role: "utilisatrice" | "anam";
   readonly texte: string;
+  readonly separateurAvant?: boolean;
 }
+
+/** Métadonnée interactive rattachée à LA ligne persistée qui porte sa phrase. */
+export interface OuvertureLieeAuTour {
+  readonly tourId: string;
+  readonly donnees: OuvertureData;
+}
+
+/**
+ * Résultat de l'action d'ouverture. Copie volontaire du contrat serveur : `render/` ne dépend
+ * jamais de `app/` ni de `lib/data` (AD-7), tandis que TypeScript vérifie leur compatibilité au
+ * point où la fonction descend de la Server Component vers la scène.
+ */
+export type ResultatOuvertureDuJour =
+  | {
+      readonly statut: "ouverte" | "deja-commencee";
+      readonly jourParis: string;
+      /** Délai relatif calculé par l'horloge serveur jusqu'au prochain jour Europe/Paris. */
+      readonly rearmementMs: number;
+      /** Fil relu APRÈS la réclamation : la ligne quotidienne y figure déjà et fait foi. */
+      readonly tours: readonly TourHistorique[];
+      /** Éventuelle forme interactive de cette même ligne — jamais une seconde parole. */
+      readonly ouverture: OuvertureLieeAuTour | null;
+    }
+  | { readonly statut: "en-cours"; readonly reessayerApresMs: number }
+  | { readonly statut: "indisponible" };
+
+export type ResultatOuvertureCourante =
+  | { readonly statut: "disponible"; readonly ouverture: OuvertureData | null }
+  | { readonly statut: "indisponible" };

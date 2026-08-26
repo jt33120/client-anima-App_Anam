@@ -85,6 +85,21 @@ export const INVENTAIRE_EXPORT: readonly EntreeInventaire[] = [
   { table: "invitation_integration", verdict: "inclus", titre: "Les invitations à intégrer", motif: "les moments où une branche a été rapprochée d’une autre" },
   { table: "notification_envoyee", verdict: "inclus", titre: "Les notifications reçues", motif: "motif et horodatage, jamais le contenu" },
   { table: "usage_ia", verdict: "inclus", titre: "Ton usage du modèle", motif: "métrage : modèle, tier, jetons" },
+  {
+    table: "reservation_quota_ia",
+    verdict: "inclus",
+    titre: "Tes admissions au quota IA",
+    motif: "les tours admis dans le plafond mensuel et leur date ; la clé technique de rejeu est retirée",
+    retraits: ["cle_idempotence"],
+  },
+  {
+    table: "ouverture_jour_anam",
+    verdict: "inclus",
+    titre: "Tes ouvertures quotidiennes avec Anam",
+    motif:
+      "le jour et la manière dont chaque conversation quotidienne a commencé ; le jeton technique du bail est retiré",
+    retraits: ["jeton_preparation"],
+  },
 
   // ── L'argent et les réglages ────────────────────────────────────────────────────────────────
   { table: "abonnement", verdict: "inclus", titre: "Ton abonnement", motif: "état, échéance, identifiants Stripe" },
