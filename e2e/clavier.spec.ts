@@ -37,6 +37,7 @@ type Arret = {
 async function traverser(page: Page, plafond = 40): Promise<Arret[]> {
   const arrets: Arret[] = [];
   const vus = new Set<string>();
+  let portails = 0;
 
   for (let i = 0; i < plafond; i++) {
     await page.keyboard.press("Tab");
@@ -71,12 +72,33 @@ async function traverser(page: Page, plafond = 40): Promise<Arret[]> {
     // Mesuré en CI le 2026-08-25 : `/reglages → aucun arrêt`, sur une page qui rend une quinzaine
     // d'éléments focusables. Une garde qui accuse le produit d'un défaut du harnais fait perdre le
     // temps qu'elle prétend faire gagner.
-    if (a === "portail") continue; // ce n'est pas le produit : on saute, on ne s'arrête pas
+    if (a === "portail") {
+      portails += 1;
+      continue; // ce n'est pas le produit : on saute, on ne s'arrête pas
+    }
     if (!a) break; // le focus est sorti du document : la traversée a bouclé
     const cle = `${a.balise}|${a.nom}`;
     if (vus.has(cle)) break; // on a bouclé
     vus.add(cle);
     arrets.push(a);
+  }
+
+  // ⚠️ « AUCUN ARRÊT » N'EST PAS UN DIAGNOSTIC, ET IL A COÛTÉ DEUX PASSAGES DE CI (2026-08-26).
+  //
+  // Le test disait « /reglages → inatteignable au clavier » sur une page qui rend une quinzaine
+  // d'éléments focusables. La cause n'était pas la page : la surcouche de développement de Next
+  // occupait le focus du début à la fin — ce qui arrive dès qu'elle affiche une erreur ou un
+  // avertissement. Une traversée vide accusait alors le produit d'un défaut d'accessibilité, et il
+  // fallait deviner.
+  //
+  // Elle le DIT maintenant. Un harnais qui rend un résultat vide sans expliquer pourquoi transforme
+  // chaque échec en enquête.
+  if (arrets.length === 0 && portails > 0) {
+    throw new Error(
+      `la surcouche de développement de Next a gardé le focus sur ${portails} tabulations : la page ` +
+        `affiche probablement une erreur, et ce n'est PAS un défaut d'accessibilité. Ouvre-la en ` +
+        `\`next dev\` pour lire l'erreur.`,
+    );
   }
   return arrets;
 }

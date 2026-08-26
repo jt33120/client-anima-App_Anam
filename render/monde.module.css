@@ -58,8 +58,15 @@
  * voulu ; c'est un coût PAR TRAME, et aucune garde de pixels ou de boîtes ne peut le voir.
  *
  * INTERDITES EN ANIMATION ET EN TRANSITION, sur toute couche de la scène :
- *     filter · backdrop-filter · box-shadow · drop-shadow
+ *     filter · backdrop-filter · box-shadow · drop-shadow · mix-blend-mode · opacity sur un
+ *     conteneur qui en couvre un autre
  * Chacune force le navigateur à REPEINDRE, et à repeindre tout ce qui est derrière.
+ *
+ * ⚠️ `mix-blend-mode` A ÉTÉ AJOUTÉ À CETTE LISTE LE 2026-08-26, ET SON ABSENCE A COÛTÉ UNE HEURE.
+ * J'ai soupçonné puis disculpé le `drop-shadow` de l'arbre pendant que le vrai suspect — un grain
+ * plein écran en `soft-light` par-dessus quatre-vingts étoiles animées — n'était sur aucune liste.
+ * Une liste d'interdits incomplète ne se contente pas de laisser passer : elle ORIENTE la recherche
+ * vers ce qu'elle contient.
  *
  * AUTORISÉES : `opacity` et `transform`, et elles seules — ce sont les deux que le compositeur sait
  * traiter sans repasser par la peinture.
@@ -70,9 +77,10 @@
  * bouge devant lui, et coûte tout dès que la page défile.
  *
  * ⚠️ INVENTAIRE DES PROPRIÉTÉS NON COMPOSITÉES DÉJÀ PRÉSENTES, avec leur verdict :
- *   • `.arbreMonde { filter: drop-shadow(...) }` — RETIRÉ le 2026-08-26, comme expérience mesurée
- *     (voir la règle elle-même). Et il n'était pas « statique » comme je l'avais écrit : `top` et
- *     `opacity` se transitionnent sur cette même couche.
+ *   • `.arbreMonde { filter: drop-shadow(...) }` — ACQUITTÉ PAR LA MESURE le 2026-08-26 : retiré,
+ *     la scène gagne 1 im/s sur 5. Il reste, et la règle porte le détail. (Il n'était pas
+ *     « statique » comme je l'avais d'abord écrit : `top` et `opacity` s'y transitionnent — c'est
+ *     ce qui en faisait un suspect crédible, et la mesure a tranché quand même.)
  *
  *     ⚠️ J'AI ÉCRIT ICI « laissée, et mesurée par le cas au repos qui est vert ». C'ÉTAIT FAUX
  *     (corrigé le 2026-08-26) : le cas au repos est dans la ligne de base des échecs, il n'a jamais
@@ -189,7 +197,24 @@
   z-index: 5;
   pointer-events: none;
   opacity: 0.05;
-  mix-blend-mode: soft-light;
+  /* ⚠️ `mix-blend-mode: soft-light` A ÉTÉ RETIRÉ ICI LE 2026-08-26, COMME SECONDE EXPÉRIENCE MESURÉE.
+   *
+   * Ce grain couvre TOUT L'ÉCRAN, au-dessus de tout (z-index 5). Un mode de fusion oblige le
+   * navigateur à RELIRE ce qu'il y a dessous, à mélanger pixel par pixel, et à recommencer à chaque
+   * trame dès que quelque chose bouge en dessous — or les quatre-vingts étoiles scintillent en
+   * permanence, sur toutes les régions, seuil compris.
+   *
+   * C'est exactement le mode d'échec du `filter: blur(44px)` de la voie lactée, qui avait fait
+   * tomber l'application à 4 im/s le 2026-08-20 : un effet plein écran au-dessus d'un contenu animé.
+   *
+   * ⚠️ ET `mix-blend-mode` NE FIGURAIT PAS DANS MON INVENTAIRE DES PROPRIÉTÉS COÛTEUSES. Je l'avais
+   * écrit hier en nommant `filter`, `backdrop-filter`, `box-shadow` et `drop-shadow` — et j'ai passé
+   * une heure à soupçonner la mauvaise couche parce que la vraie n'était pas sur ma liste. Une liste
+   * d'interdits incomplète oriente la recherche vers ce qu'elle contient.
+   *
+   * Le grain reste VISIBLE : `opacity: 0.05` continue de le poser. Ce qui change, c'est la façon
+   * dont il se compose. Si la mesure ne bouge pas non plus, il revient tel quel et le suspect
+   * suivant est le scintillement des étoiles. Une variable à la fois. */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -205,26 +230,26 @@
      ferait SAUTER l'arbre au changement de région, pendant qu'il est encore visible. */
   transform: translate(-50%, -50%);
   pointer-events: none;
-  /* ⚠️ `filter: drop-shadow(0 8px 40px …)` A ÉTÉ RETIRÉ ICI LE 2026-08-26, COMME EXPÉRIENCE MESURÉE.
+  /* ⚠️ CE FILTRE A ÉTÉ RETIRÉ, MESURÉ, ET REMIS — ET C'EST LA MESURE QUI L'A ACQUITTÉ (2026-08-26).
    *
-   * Ce que la CI dit, chiffres en main (WebKit, iPhone 14) : la scène tourne à 5 IMAGES PAR SECONDE
-   * au seuil et 9 sur « Moi », contre 62 pour un document du même produit. Ce n'est ni le tour
-   * guidé ni le défilement — c'est la scène AU REPOS, dès le rideau d'entrée. Sur bureau, 32
-   * contre 61.
+   * La scène tourne à 5 im/s au seuil sur WebKit mobile, contre 62 pour un document du même
+   * produit. Ce flou de 40 px sur le plus grand élément de la scène était le suspect le plus
+   * lourd — même famille que le `blur(44px)` de la voie lactée, qui avait fait tomber
+   * l'application à 4 im/s le 2026-08-20.
    *
-   * Ce filtre est le suspect le plus lourd de cette couche, et pour deux raisons cumulées :
-   *   • il porte un flou de 40 px sur le plus grand élément de la scène — même famille que le
-   *     `blur(44px)` de la voie lactée, qui avait fait tomber l'application à 4 im/s le 2026-08-20 ;
-   *   • et cette couche N'EST PAS statique : `top` et `opacity` se transitionnent juste en dessous.
-   *     Un filtre sur une couche animée se re-rasterise à chaque trame.
+   * Retiré, la CI a mesuré : 6 im/s au lieu de 5 sur mobile, 30 au lieu de 32 sur bureau. Du bruit.
+   * IL N'Y EST POUR RIEN, et il revient donc tel quel — le halo qu'il peint est un choix de charte,
+   * et rien ne justifie de le sacrifier à une hypothèse réfutée.
    *
-   * ⚠️ C'EST UNE EXPÉRIENCE, PAS UNE CERTITUDE. Le halo qu'il peignait est très discret
-   * (alpha 0,12) ; s'il manque à l'œil ET que la mesure ne bouge pas, il revient — mais sous une
-   * forme compositée (un `radial-gradient` derrière le canevas), jamais sous un filtre. Si la
-   * mesure bouge, on saura enfin où partait le budget de trame.
+   * ⚠️ CE QUE CETTE EXPÉRIENCE APPREND VRAIMENT : le budget de trame part ailleurs, et la couche la
+   * plus évidente n'était pas la coupable. Le suspect suivant est la seule autre chose peinte sur
+   * TOUTES les régions, seuil compris — les quatre-vingts étoiles, chacune portant une
+   * `animation … infinite`. Quatre-vingts couches animées expliquent aussi l'écart de dix entre
+   * mobile et bureau, que ce filtre n'expliquait pas.
    *
-   * La réponse est dans `e2e/fluidite.spec.ts` au prochain passage de CI. C'est elle qui décide.
-   */
+   * On ne retire rien de plus sans mesurer : une variable à la fois, c'est ce qui rend le chiffre
+   * lisible. */
+  filter: drop-shadow(0 8px 40px rgba(143, 193, 239, 0.12));
   /* Le retrait derrière l'accueil se FOND, il ne coupe pas — même durée que le fondu de région,
      pour que le passage accueil ↔ arbre reste UN mouvement et non deux. Voir .arbreEnRetrait.
      `top` suit la même durée et la même courbe : l'arbre REDESCEND en s'effaçant, en un seul
