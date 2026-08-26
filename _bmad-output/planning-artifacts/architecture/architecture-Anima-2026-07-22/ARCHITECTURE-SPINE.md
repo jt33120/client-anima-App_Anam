@@ -41,7 +41,7 @@ companions:
 ### AD-2 — IA médiée par le serveur `[ADOPTED]`
 - **Binds:** NFR-019, NFR-022, NFR-002 ; toute capacité conversant avec l'IA (§1, §2, §5, §8).
 - **Prevents:** clé exposée au client, appel navigateur→fournisseur en direct, usage non maîtrisé, chemin de données art.9 hors contrôle.
-- **Rule:** le navigateur ne parle JAMAIS à un fournisseur IA. Tout appel passe par `app/api/**`. **Une seule** clé serveur, propriété de l'app (secret Vercel), jamais côté client, jamais une clé par utilisatrice. L'usage est métré par utilisatrice dans `usage_ia` (notre base), pas via des clés séparées.
+- **Rule:** le navigateur ne parle JAMAIS à un fournisseur IA. Tout appel passe par `app/api/**`. **Une seule** clé serveur, propriété de l'app (secret Vercel), jamais côté client, jamais une clé par utilisatrice. L'usage est métré par utilisatrice dans `usage_ia` (notre base), pas via des clés séparées. **Réexaminé et CONFIRMÉ le 2026-08-25 — voir « Note datée — AD-2 réexaminé » en fin de document : quatre motifs fournisseur relevés, la rupture de FR-043 qu'une clé par personne entraînerait, et les deux gardes de CI qui tiennent ce refus.**
 
 ### AD-3 — Abstraction de fournisseur IA `[ADOPTED]`
 - **Binds:** NFR-012, NFR-019 ; §1 séance, §5 détresse, §8 synthèse.
@@ -276,3 +276,81 @@ flowchart LR
 - **Fournisseur STT** — sous-traitant art.9 (AD-4) ou STT local, derrière `SttPort` ; **porte pré-lancement** avant art.9 réel.
 - **Portes de conformité pré-lancement** — **AIPD (NFR-005)** et **procédure de notification de violation art.33-34 (NFR-022)**, en sus du DPA/ZDR Mistral et de la validation clinique+juridique de la détresse.
 - **Durcissement accès admin (NFR-022)** — rendre « accès admin interdit par défaut » techniquement vrai : **break-glass audité** OU **chiffrement applicatif du contenu art.9 par utilisatrice** (clés hors de portée de l'admin base). **Tranché avant art.9 réel** — non fermé par un invariant en v1.
+
+---
+
+## Note datée — AD-2 réexaminé le 2026-08-25 : pourquoi jamais une clé par utilisatrice `[CONFIRMÉ]`
+
+> ⚠️ **Cette note est APPENDUE À LA FIN, et ce n'est pas une question de mise en page.** Une
+> vingtaine de citations `SPINE:<ligne>` vivent dans `epics.md`, dans les artefacts
+> d'implémentation et dans `deferred-work.md` — `:44`, `:54`, `:123`, `:153`, `:266-277`. Insérer
+> ces lignes sous AD-2 les aurait toutes décalées **en silence** : chaque référence aurait continué
+> de pointer quelque part, simplement plus vers ce qu'elle nommait. Une citation qui se trompe sans
+> rougir est pire qu'une citation cassée. La règle d'AD-2 (ligne 44) porte donc un renvoi ici, écrit
+> **sans ajouter de ligne**.
+
+**La demande.** « Une clé API Mistral par utilisatrice, pour savoir ce que chacune me coûte »
+(Julian, 2026-08-25). **Refusée.** AD-2 la refusait déjà mot pour mot il y a un an — « **jamais une
+clé par utilisatrice**. L'usage est métré par utilisatrice dans `usage_ia` (notre base), **pas via
+des clés séparées** ». Ce qui suit ne rouvre pas la décision : il l'**instruit**, pour qu'elle ne se
+rouvre pas une troisième fois.
+
+### Ce que le fournisseur permet réellement — relevé du 2026-08-25
+
+Une décision fournisseur sans date de relevé est un défaut : chacun de ces quatre points porte la
+sienne, et devra être revérifié avant d'être réutilisé comme argument.
+
+1. **Aucun suivi de coût par clé.** La granularité de l'API *Usage Metrics* est
+   user / agent / workspace / organisation — et « user » y désigne un **siège humain** de
+   l'organisation, pas une cliente du produit. Une clé par utilisatrice ne rendrait donc **même pas**
+   le chiffre demandé.
+2. **Les plafonds s'appliquent au *workspace*, pas à la clé** — et un plafond atteint **suspend
+   l'accès API jusqu'au mois suivant**.
+3. **500 workspaces actifs maximum par organisation.** Un workspace par utilisatrice bute sur un mur
+   dur à cinq cents comptes.
+4. **L'Admin API est en Preview, réservée au plan Enterprise**, quand le produit est sur **Scale**
+   (`lib/ai/adapters/mistral.ts:24`). Provisionner des clés par programme n'est pas à notre portée.
+
+### La conséquence produit, qui est plus grave que la conséquence technique
+
+Le point 2 n'est pas un désagrément d'exploitation : c'est une rupture de FR-043.
+
+Un plafond de workspace fait passer **la décision de couper chez le fournisseur** — hors de portée
+du serveur, sans contexte, et potentiellement **au milieu d'une conversation en détresse**. Or
+FR-043 (`prd.md:135`) dit qu'« aucune limite d'usage ne peut interrompre une conversation en
+détresse, y compris et surtout sur un compte ayant épuisé son quota », et tout le code le protège
+avec soin : `lib/domain/allocation-residuelle.ts:47-48` place les deux court-circuits
+(`niveauSecurite > 0`, `limitesLevees`) **en tête** de `doitCouperConversation`, précisément pour que
+la coupure ne puisse jamais atteindre quelqu'un qui va mal.
+
+Déléguer la coupure à un plafond de facturation détruirait cette garantie sans qu'aucune ligne du
+dépôt ne change — donc sans qu'aucun test ne rougisse. C'est le motif décisif du refus.
+
+### Ce qui reste admissible
+
+Le **pool de clés pour le DÉBIT** (`Deferred`, « Pool de clés IA ») : N clés partagées par le
+serveur, choisies pour répartir la charge, **jamais adossées à une identité**, **jamais stockées en
+base**, toutes couvertes par le même DPA art. 28 + ZDR. C'est un geste d'échelle, pas de mesure — il
+ne dit rien du coût de personne, et c'est justement ce qui le rend acceptable.
+
+### Les passerelles à « clés virtuelles » — et l'éliminatoire de chacune
+
+- **OpenRouter** — **interdit par écrit** sur le chemin art. 9 (AD-4 : « aucun direct-US,
+  OpenRouter/tout intermédiaire US interdits »). Éliminé sans examen.
+- **Portkey** (Palo Alto Networks depuis mai 2026) et **Helicone** (Mintlify, mode maintenance
+  depuis mars 2026) — chacun exigerait une entrée de **sous-traitant art. 28 + ZDR** dans
+  `lib/domain/sous-traitants.ts`, donc un contrat, une AIPD reprise, et un intermédiaire de plus sur
+  le chemin le plus sensible du produit.
+- **LiteLLM auto-hébergé** — le seul candidat défendable : pas d'intermédiaire, pas de contrat neuf.
+  Mais il coûte **un Postgres et un service à opérer** pour reproduire une table de neuf colonnes
+  **déjà écrite, déjà métrée par personne et par sous-appel, déjà testée** (`usage_ia`, Story 2.1) —
+  et que personne n'a encore jamais lue. Le manque n'a jamais été l'infrastructure : c'est un prix,
+  deux appels non métrés et une lecture. Voir Epic 10, Stories 10.3, 10.5 et 10.6.
+
+### Ce qui garde cette décision
+
+Le refus ne vit pas seulement dans ce document : `tests/frontiere-serveur.test.ts` échoue si une clé
+de fournisseur devient lisible depuis la base (aucune colonne, aucun `select` portant `cle_api`,
+`api_key` ou `token_fournisseur` hors de `lib/ai/adapters/`), et si l'attestation de conformité au
+démarrage (`assertConformiteArt9`) devient paramétrable par requête, par session ou par ligne de
+base. Ces deux gardes sont la forme exécutable de cette note — un document ne se défend pas seul.
