@@ -108,6 +108,21 @@ async function releverIci(page: Page, nom: string): Promise<string> {
 }
 
 test("[SONDE] quelle couche mange les trames — à supprimer une fois lue", async ({ page }) => {
+  /**
+   * ⚠️ LE DÉLAI PAR DÉFAUT (45 s) NE SUFFIT PAS, ET JE L'AI COMPTÉ TROP TARD.
+   *
+   * Cette sonde prend HUIT mesures de 1,5 s, chacune encadrée de deux pauses d'une demi-seconde
+   * pour laisser les couches se rallumer, plus l'ouverture d'un compte, le tour guidé et deux
+   * retombées de fondu : environ quarante-trois secondes sur une machine qui va bien. Sur un
+   * runner, devant une scène qui tourne à cinq images par seconde, elle les dépasse.
+   *
+   * Et une sonde qui dépasse son délai ne rend PAS une mesure partielle : elle rend un
+   * dépassement, c'est-à-dire rien. Le passage entier serait perdu — et un passage de la CI au
+   * navigateur coûte une vingtaine de minutes, qui est précisément la raison pour laquelle cette
+   * sonde éteint quatre couches d'un coup au lieu d'en essayer une par poussée.
+   */
+  test.setTimeout(240_000);
+
   await ouvrirUnCompteNeuf(page);
 
   await page.goto("/aide");
