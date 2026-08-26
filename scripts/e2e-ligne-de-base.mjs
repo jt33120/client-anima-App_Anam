@@ -104,9 +104,9 @@ function compterEchecs(json) {
           .replace(/\u001b\[[0-9;]*m/g, "")
           .split("\n")
           .filter((l) => l.trim().length > 0)
-          .slice(0, 3)
+          .slice(0, 7)
           .join(" | ")
-          .slice(0, 300);
+          .slice(0, 420);
         titres.get(cle).push({ titre: [nom, spec.title].filter(Boolean).join(" › "), message });
         total += 1;
       }

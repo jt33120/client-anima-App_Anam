@@ -75,13 +75,44 @@ class MoteurArbre {
     if (this.built) return;
     this.built = true;
     const c = this.canvas;
-    const dpr = this.dpr = Math.min(2, window.devicePixelRatio || 1);
-    c.width = this.W * dpr; c.height = this.H * dpr;
+    /* ══ EXPÉRIENCE 3 (2026-08-26) — UNE SEULE VARIABLE : LE NOMBRE DE PIXELS DU TAMPON ══════════
+     *
+     * ⚠️ ON ALLOUAIT 2816 × 1720 PIXELS POUR EN AFFICHER 842. `--arbre-l: min(72vw, 26rem)`
+     * (`monde.module.css`) : sur un iPhone 14, l'arbre occupe 280,8 px CSS, soit 842 px appareil.
+     * Le tampon, lui, valait `1408 × min(2, dpr)` = 2816 px de large — 4,84 Mpx, ~19,4 Mo — et il
+     * en existe DEUX (celui-ci et `this.wood`), soit ~39 Mo de texture.
+     *
+     * Le compositeur doit donc minorer 3,34× une texture de 19,4 Mo à chaque trame où cette couche
+     * est composée. Sur bureau le même tampon ne pèse que 4,84 Mo : c'est la SEULE couche de la
+     * scène dont le poids ABSOLU varie de 4× entre les plateformes — toutes les autres suivent le
+     * viewport, soit 2,3×. C'est ce qui en fait le candidat pour l'écart mobile/bureau que ni le
+     * `drop-shadow` (réfuté) ni le `mix-blend-mode` (confirmé, mais bureau seulement) n'expliquaient.
+     *
+     * ⚠️ CE QUE LA MESURE DEVRA DIRE, ET QUI N'EST PAS « ÇA MONTE ». La couche est composée sur
+     * DEUX régions — le seuil et Anam — et éteinte sur les deux autres (`.arbreEnRetrait` et
+     * `.arbreEnRetraitArbre` posent `--imagerie-opacite: 0`). Le mécanisme prédit donc que le SEUIL
+     * ET ANAM montent, et que « Moi » et « Mon arbre » ne bougent pas. Si tout monte uniformément,
+     * ce n'est pas le prélèvement par trame mais la PRESSION mémoire — un autre mécanisme, qui vaut
+     * la même correction. Si rien ne bouge, on remet ces trois lignes telles quelles.
+     *
+     * Le dessin ne change pas : même géométrie, même rapport W/H, rien n'est agrandi, rien n'est
+     * retiré (UX-DR-38). `W` et `H` restent intacts — `tests/scene-sans-bords.test.ts` les relit
+     * pour vérifier que `--arbre-h` se déduit bien du rapport du canevas. */
+    const dprAppareil = Math.min(3, window.devicePixelRatio || 1);
+    /* La plus grande largeur CSS que `min(72vw, 26rem)` puisse donner sur CET appareil, quelle que
+       soit l'orientation : `build()` ne tourne qu'une fois et n'écoute pas la rotation, donc on
+       prend le côté le plus long. En portrait il reste ainsi ~1,5× de sur-échantillonnage. */
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const largeurCssMax = Math.min(0.72 * Math.max(window.innerWidth, window.innerHeight), 26 * rem);
+    const dpr = (this.dpr = Math.min(2, (largeurCssMax * dprAppareil) / this.W));
+    c.width = Math.round(this.W * dpr); c.height = Math.round(this.H * dpr);
     const ctx = c.getContext("2d");
     if (!ctx) return;
     this.ctx = ctx; this.ctx.scale(dpr, dpr);
     this.wood = document.createElement("canvas");
-    this.wood.width = this.W * dpr; this.wood.height = this.H * dpr;
+    /* Le second tampon suit EXACTEMENT le premier : passer par `c.width` plutôt que de recalculer
+       `this.W * dpr` évite qu'un arrondi les désaccorde d'un pixel. */
+    this.wood.width = c.width; this.wood.height = c.height;
     const wctx = this.wood.getContext("2d");
     if (!wctx) return;
     this.wctx = wctx; this.wctx.scale(dpr, dpr);
