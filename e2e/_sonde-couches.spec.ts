@@ -150,7 +150,7 @@ async function avecLeRemede(page: Page, r: Remede): Promise<number | null> {
  *
  *     SONDE=1 npx playwright test e2e/_sonde-couches.spec.ts --project=mobile
  */
-// test.skip(!process.env.SONDE, "instrument sur demande — voir l'en-tête, SONDE=1 pour l'exécuter");  // ⚠️ TEMPORAIREMENT FORCÉ POUR UNE MESURE, 2026-08-26 07h35 — à revenir en opt-in juste après lecture.
+test.skip(!process.env.SONDE, "instrument sur demande — voir l'en-tête, SONDE=1 pour l'exécuter");
 
 test("[SONDE 2] quel remède rend les étoiles gratuites — à supprimer une fois lue", async ({ page }) => {
   // Cinq remèdes, chacun encadré de deux pauses et d'une mesure de 1,5 s, plus l'ouverture d'un
