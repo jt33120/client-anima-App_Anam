@@ -20,5 +20,14 @@
     "lectures d'onboarding en parallèle (Story 8.3)": "mobile › conversation-attente : 1 échec → 0. Le signe d'Anam paraissait en 1087 ms.",
     "noms de régions triés des deux côtés (Story 7.9)": "mobile › glissement : 1 échec → 0. Le test comparait une liste triée à une liste qui ne l'était pas.",
     "_regle": "Ces trois lignes ont été RETIRÉES de la tolérance : tout nouvel échec y sera désormais signalé comme une régression. C'est le seul sens dans lequel ce fichier bouge."
+  },
+  "_mesure_des_couches_2026-08-26": {
+    "_quoi": "Une sonde temporaire (e2e/_sonde-couches.spec.ts) a éteint chaque couche de la scène à son tour, dans le même passage, chacune avec son témoin. Référence = une halte statique du même produit.",
+    "mobile (référence 62 im/s)": "seuil : tel quel 5 | sans étoiles 62 | sans arbre 8 | sans grain 10. « Moi » : tel quel 16 | sans étoiles 62 | sans arbre 7 | sans grain 29.",
+    "bureau (référence 61 im/s)": "seuil : tel quel 48 | sans étoiles 60 | sans arbre 60 | sans grain 46. « Moi » : tel quel 57 | sans étoiles 61 | sans arbre 60 | sans grain 58.",
+    "_verdict": "LE CHAMP D'ÉTOILES EST LA CAUSE, À LUI SEUL. Le retirer rend TOUTE la vitesse de référence sur les deux appareils — 5 → 62 au seuil sur mobile. Quatre-vingts <span> portant chacun une animation `opacity` infinie coûtent 57 des 62 images par seconde.",
+    "_pourquoi_les_autres_colonnes_ne_disent_rien": "« sans arbre » et « sans grain » font parfois BAISSER la mesure : éteindre un élément force une reconstruction de l'arbre de couches que la demi-seconde d'attente ne laisse pas retomber. Seuls les deux écarts francs et reproductibles — les colonnes « sans étoiles » — sont conclusifs.",
+    "_ce_que_ça_réexplique": "Le `mix-blend-mode` du grain coûtait cher PARCE QU'il devait relire un écran que les étoiles repeignaient déjà. Le `drop-shadow` de l'arbre a été innocenté parce qu'il n'y était pour rien. Et la réduction du tampon du canevas a donné le contraire de la prédiction écrite : ce n'est pas l'arbre qui coûte, c'est la SURFACE que les étoiles obligent à repeindre — un tampon plus petit rend cette surface moins chère à refaire, y compris là où l'arbre est invisible.",
+    "_reste_à_trancher": "Le remède. Si le défaut est la non-promotion en couches de composition, `will-change: opacity` suffit — aucune étoile perdue, aucun changement visuel. Si quatre-vingts couches promues dépassent le budget du compositeur, il faudra réduire leur nombre. Mesuré par la sonde 2, pas décidé au raisonnement."
   }
 }
