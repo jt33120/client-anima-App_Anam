@@ -31,10 +31,30 @@ type Arret = {
 };
 
 /**
+ * Attend que LE PRODUIT soit à l'écran avant de commencer à tabuler.
+ *
+ * ⚠️ SANS CETTE ATTENTE, LA TRAVERSÉE PEUT MESURER UN ÉCRAN QUI N'EXISTE PAS ENCORE. `next dev`
+ * compile ses routes À LA DEMANDE : la toute première navigation vers un chemin peut rendre une
+ * coquille pendant que la surcouche de développement occupe le focus. La traversée relève alors
+ * ZÉRO arrêt et le test accuse la page d'être inatteignable au clavier — sur une page qui va très
+ * bien deux secondes plus tard.
+ *
+ * C'est exactement ce que la CI a rendu le 2026-08-26 : « les écrans du compte » a rougi sur la
+ * PREMIÈRE page de sa boucle, pendant que deux autres tests du même fichier traversaient les mêmes
+ * chemins sans broncher — parce qu'ils passaient après, sur des routes déjà compilées.
+ *
+ * ⚠️ ET ELLE N'ADOUCIT RIEN. Elle n'attend pas « un peu » : elle attend que `<main>` soit VISIBLE,
+ * c'est-à-dire que le rendu du produit ait eu lieu. Si `<main>` n'arrive jamais, l'attente échoue —
+ * et ça, c'en serait un vrai défaut.
+ */
+const attendreLeProduit = (page: Page) =>
+  page.locator("main").first().waitFor({ state: "visible", timeout: 20_000 });
+
+/**
  * Traverse l'écran à la touche Tab et relève, à CHAQUE arrêt, ce que le navigateur peint vraiment.
  * S'arrête quand le focus revient au point de départ (le cycle est bouclé) ou au plafond.
  */
-async function traverser(page: Page, plafond = 40): Promise<Arret[]> {
+async function traverser(page: Page, plafond = 40, ou = ""): Promise<Arret[]> {
   const arrets: Arret[] = [];
   const vus = new Set<string>();
   let portails = 0;
@@ -94,10 +114,26 @@ async function traverser(page: Page, plafond = 40): Promise<Arret[]> {
   // Elle le DIT maintenant. Un harnais qui rend un résultat vide sans expliquer pourquoi transforme
   // chaque échec en enquête.
   if (arrets.length === 0 && portails > 0) {
+    // ⚠️ ET IL DIT MAINTENANT LAQUELLE, ET CE QU'ELLE AFFICHE (2026-08-26, second tour).
+    //
+    // La première version de ce diagnostic disait « la page affiche probablement une erreur » sans
+    // nommer la page ni l'erreur — sur une boucle de CINQ chemins. Elle a rougi en CI, et il restait
+    // à deviner lequel des cinq, puis à reproduire pour lire le message. Un diagnostic qui demande
+    // une enquête n'a fait que déplacer l'enquête.
+    //
+    // La surcouche de Next porte son texte dans un `shadowRoot` : on va le chercher. C'est la seule
+    // façon qu'un passage de CI — vingt minutes — rende la CAUSE et pas seulement le symptôme.
+    const texte = await page
+      .evaluate(() => {
+        const portail = document.querySelector("nextjs-portal");
+        const racine = (portail as unknown as { shadowRoot?: ShadowRoot } | null)?.shadowRoot;
+        return (racine?.textContent ?? portail?.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 400);
+      })
+      .catch(() => "");
     throw new Error(
-      `la surcouche de développement de Next a gardé le focus sur ${portails} tabulations : la page ` +
-        `affiche probablement une erreur, et ce n'est PAS un défaut d'accessibilité. Ouvre-la en ` +
-        `\`next dev\` pour lire l'erreur.`,
+      `${ou || "cet écran"} : la surcouche de développement de Next a gardé le focus sur ${portails} ` +
+        `tabulation(s) et la traversée n'a trouvé AUCUN élément du produit. Ce n'est PAS un défaut ` +
+        `d'accessibilité.\n  Ce que la surcouche affiche : ${texte || "(texte illisible — ouvre la page en `next dev`)"}`,
     );
   }
   return arrets;
@@ -155,7 +191,8 @@ test.describe("La tabulation, avec de vraies frappes", () => {
     const fautifs: string[] = [];
     for (const chemin of ["/memoire", "/reglages", "/mes-donnees", "/abonnement", "/aide"]) {
       await page.goto(chemin);
-      const arrets = await traverser(page);
+      await attendreLeProduit(page);
+      const arrets = await traverser(page, 40, chemin);
 
       // ⚠️ UN PIÈGE À FOCUS SE RECONNAÎT À CECI : la traversée atteint le plafond sans jamais
       // boucler, parce qu'on retombe indéfiniment sur les mêmes éléments sous d'autres noms. Un
@@ -178,7 +215,8 @@ test.describe("La tabulation, avec de vraies frappes", () => {
     const fautifs: string[] = [];
     for (const chemin of ["/memoire", "/reglages", "/mes-donnees", "/abonnement"]) {
       await page.goto(chemin);
-      const arrets = await traverser(page);
+      await attendreLeProduit(page);
+      const arrets = await traverser(page, 40, chemin);
       const dernier = arrets[arrets.length - 1];
       if (!/aide/i.test(dernier?.nom ?? "")) {
         fautifs.push(`${chemin} → dernier arrêt : ${dernier?.balise}[${dernier?.nom}]`);
