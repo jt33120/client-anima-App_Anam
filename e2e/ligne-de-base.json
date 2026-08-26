@@ -8,14 +8,17 @@
   },
   "echecs_tolerés": {
     "mobile › e2e/barre-basse.spec.ts": 2,
-    "mobile › e2e/conversation-attente.spec.ts": 1,
     "mobile › e2e/fluidite.spec.ts": 2,
-    "mobile › e2e/glissement.spec.ts": 1,
     "mobile › e2e/guide.spec.ts": 1,
     "mobile › e2e/reperes.spec.ts": 3,
     "mobile › e2e/seuil.spec.ts": 1,
-    "bureau › e2e/fluidite.spec.ts": 2,
     "bureau › e2e/guide.spec.ts": 1,
     "bureau › e2e/reperes.spec.ts": 3
+  },
+  "_gains_du_2026-08-26": {
+    "mix-blend-mode retiré du grain plein écran": "bureau › fluidite : 2 échecs → 0. mobile : seuil 5→5, Moi 6→11, tour 5→7, en défilant 5→7 et 6→9. Le mode de fusion obligeait le navigateur à relire et mélanger tout l'écran à chaque trame, sous quatre-vingts étoiles qui scintillent.",
+    "lectures d'onboarding en parallèle (Story 8.3)": "mobile › conversation-attente : 1 échec → 0. Le signe d'Anam paraissait en 1087 ms.",
+    "noms de régions triés des deux côtés (Story 7.9)": "mobile › glissement : 1 échec → 0. Le test comparait une liste triée à une liste qui ne l'était pas.",
+    "_regle": "Ces trois lignes ont été RETIRÉES de la tolérance : tout nouvel échec y sera désormais signalé comme une régression. C'est le seul sens dans lequel ce fichier bouge."
   }
 }
