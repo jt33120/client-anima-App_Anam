@@ -1,44 +1,43 @@
 import { test, expect, type Page } from "@playwright/test";
-import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { ouvrirUnCompteNeuf } from "./_entrer";
 
 /**
- * _sonde-couches.spec.ts — SONDE TEMPORAIRE : QUELLE COUCHE COÛTE LES TRAMES ? (2026-08-26)
+ * _sonde-couches.spec.ts — SONDE TEMPORAIRE, SECOND TOUR : COMMENT RENDRE LES ÉTOILES GRATUITES ?
  *
- * ⚠️ CE FICHIER EST UN INSTRUMENT, PAS UNE GARDE. Il est destiné à être SUPPRIMÉ dès que son
- * verdict est lu. Il échoue volontairement, parce que c'est la seule façon dont le comparateur de
- * la CI imprime ses nombres : un test vert ne dit rien dans le rapport JSON.
+ * ⚠️ CE FICHIER EST UN INSTRUMENT, PAS UNE GARDE. Il échoue volontairement — c'est le seul canal par
+ * lequel ses nombres arrivent jusqu'au rapport de la CI — et il se supprime dès son verdict lu.
  *
- * ══ POURQUOI ══════════════════════════════════════════════════════════════════════════════════
+ * ══ CE QUE LE PREMIER TOUR A ÉTABLI (2026-08-26, mesuré, plus supposé) ════════════════════════
  *
- * `fluidite.spec.ts` mesure un coût par région, et le mesure bien. Mais il ne dit pas D'OÙ vient
- * le coût, et les trois expériences menées le 2026-08-26 ont montré que je ne sais pas le deviner :
- *   • le `drop-shadow` de l'arbre — soupçonné, mesuré, INNOCENTÉ (5 → 6 im/s) ;
- *   • le `mix-blend-mode` du grain — CONFIRMÉ, et il ne figurait même pas dans mon inventaire ;
- *   • le tampon du canevas — réduit de 2816 à 416 px : la prédiction écrite disait « le seuil et
- *     Anam montent » et la mesure a dit exactement l'inverse (ce sont Moi et Mon arbre, où la
- *     couche est à `opacity: 0`, qui sont passés de 11 à 16).
+ * Référence = une halte statique du même produit.  mobile 62 im/s · bureau 61 im/s.
  *
- * Trois hypothèses, une seule juste, et à chaque fois une poussée entière pour l'apprendre. Docker
- * étant éteint sur cette machine, la CI est le seul instrument : autant lui faire éteindre chaque
- * couche À SON TOUR dans le même passage, plutôt qu'une hypothèse par poussée.
+ *                    tel quel   sans étoiles   sans arbre   sans grain
+ *   mobile  seuil        5           62             8           10
+ *   mobile  « Moi »     16           62             7           29
+ *   bureau  seuil       48           60            60           46
+ *   bureau  « Moi »     57           61            60           58
  *
- * ══ CE QU'IL RESTE À EXPLIQUER ════════════════════════════════════════════════════════════════
+ * **Retirer le champ d'étoiles rend TOUTE la vitesse de référence, sur les deux appareils.** Les
+ * quatre-vingts `<span>` coûtent à eux seuls 57 des 62 images par seconde du mobile. Ce n'est plus
+ * un suspect : c'est la cause, et les deux autres colonnes ne sont que du bruit de reconstruction
+ * de l'arbre de couches (éteindre un élément coûte plus, pendant la mesure, que l'élément lui-même).
  *
- * Sur mobile, une région où l'arbre est INVISIBLE (`opacity: 0`) plafonne à 16 im/s. Rien n'y est
- * peint de la scène, et pourtant il manque les trois quarts des trames. Quelque chose tourne en
- * permanence, sur toutes les régions. Le seul candidat visible en CSS est le champ d'étoiles :
- * QUATRE-VINGTS `<span>`, chacun portant sa propre animation `opacity` infinie — donc, très
- * probablement, quatre-vingts couches de composition à recomposer à chaque trame.
+ * ══ CE QUE CE SECOND TOUR DOIT TRANCHER ═══════════════════════════════════════════════════════
  *
- * ⚠️ MAIS C'EST UNE HYPOTHÈSE, ET LES DEUX PREMIÈRES ÉTAIENT FAUSSES. D'où cette sonde.
+ * L'explication la plus économe de ce profil : quatre-vingts éléments qui animent `opacity` sans
+ * être PROMUS en couches de composition. Le navigateur les REPEINT alors à chaque trame, et
+ * repeindre une étoile oblige à repeindre ce qu'il y a dessous — d'où le fait que retirer l'arbre
+ * rende presque autant que retirer les étoiles au premier tour sur bureau : ce n'est pas l'arbre
+ * qui coûte, c'est la SURFACE que les étoiles obligent à refaire.
  *
- * ══ CE QUI REND LA MESURE CONCLUSIVE ══════════════════════════════════════════════════════════
+ * Si c'est vrai, alors `will-change: opacity` — une déclaration, aucun changement visuel, aucune
+ * étoile perdue — suffit. Si c'est faux, ou si quatre-vingts couches promues dépassent le budget du
+ * compositeur, il faudra en réduire le nombre, et l'image changera un peu.
  *
- * Chaque suppression est un SEUL changement par rapport au relevé de référence, et chacune porte
- * son TÉMOIN : on vérifie que l'élément existait AVANT et qu'il est réellement devenu invisible
- * APRÈS. Sans ce témoin, « éteindre la couche n'a rien changé » est indiscernable de « le sélecteur
- * ne visait rien » — c'est exactement la panne du parcours au clavier trouvée hier, où une boucle
- * qui ne s'arrêtait nulle part concluait qu'une page était inatteignable.
+ * ⚠️ ON NE CHOISIT PAS ENTRE CES DEUX MONDES EN RAISONNANT. Trois hypothèses ont déjà été réfutées
+ * par la mesure en vingt-quatre heures — dont une dont la prédiction écrite disait exactement
+ * l'inverse de ce que la mesure a dit. Cette sonde essaie donc les cinq remèdes DANS LE MÊME
+ * PASSAGE, chacun avec son témoin, et laisse les nombres trancher.
  */
 
 /** Images par seconde sur 1,5 s de `requestAnimationFrame`. Même instrument que `fluidite.spec.ts`. */
@@ -57,70 +56,88 @@ const imagesParSeconde = (page: Page) =>
       }),
   );
 
-/**
- * Éteint une couche, MESURE, puis rallume — et renvoie `null` si le témoin n'a pas tenu.
- *
- * `display: none` plutôt que `opacity: 0` : une couche à opacité nulle est toujours composée, et
- * c'est précisément ce qu'on cherche à chiffrer. On veut la retirer de l'arbre de rendu.
- */
-async function sansLaCouche(page: Page, selecteur: string): Promise<number | null> {
-  const present = await page.evaluate((s) => document.querySelectorAll(s).length, selecteur);
-  if (present === 0) return null; // le sélecteur ne visait rien : la mesure ne prouverait rien.
+/** Ce que chaque remède injecte, et la preuve qu'il a réellement pris. */
+type Remede = {
+  readonly nom: string;
+  readonly css: string;
+  /** Rend `true` si la page montre bien l'effet attendu. Sans ça, « aucun gain » serait ambigu. */
+  readonly temoin: () => boolean;
+};
 
-  await page.evaluate((s) => {
+const REMEDES: readonly Remede[] = [
+  {
+    nom: "will-change",
+    css: `[class*="etoile"]:not([class*="etoiles"]) { will-change: opacity; }`,
+    temoin: () => {
+      const e = document.querySelector('[class*="etoile"]:not([class*="etoiles"])');
+      return !!e && getComputedStyle(e).willChange.includes("opacity");
+    },
+  },
+  {
+    nom: "translateZ",
+    css: `[class*="etoile"]:not([class*="etoiles"]) { transform: translateZ(0); will-change: transform, opacity; }`,
+    temoin: () => {
+      const e = document.querySelector('[class*="etoile"]:not([class*="etoiles"])');
+      return !!e && getComputedStyle(e).transform !== "none";
+    },
+  },
+  {
+    nom: "40 étoiles",
+    css: `[class*="etoiles"] > *:nth-child(n+41) { display: none; }`,
+    temoin: () =>
+      [...document.querySelectorAll('[class*="etoiles"] > *')].filter(
+        (n) => getComputedStyle(n).display !== "none",
+      ).length === 40,
+  },
+  {
+    nom: "16 étoiles",
+    css: `[class*="etoiles"] > *:nth-child(n+17) { display: none; }`,
+    temoin: () =>
+      [...document.querySelectorAll('[class*="etoiles"] > *')].filter(
+        (n) => getComputedStyle(n).display !== "none",
+      ).length === 16,
+  },
+  {
+    // Le TÉMOIN HAUT de la mesure : on sait déjà qu'il rend 62. S'il ne le rend pas ce coup-ci,
+    // c'est la machine qui a changé, pas le remède — et aucun des quatre autres nombres ne veut
+    // rien dire. Un point de calage coûte deux secondes et sauve une lecture entière.
+    nom: "aucune animation",
+    css: `[class*="etoile"]:not([class*="etoiles"]) { animation: none !important; }`,
+    temoin: () => {
+      const e = document.querySelector('[class*="etoile"]:not([class*="etoiles"])');
+      return !!e && getComputedStyle(e).animationName === "none";
+    },
+  },
+];
+
+/** Applique un remède, mesure, retire — et rend `null` si son témoin n'a pas tenu. */
+async function avecLeRemede(page: Page, r: Remede): Promise<number | null> {
+  await page.evaluate((css) => {
     const style = document.createElement("style");
-    style.id = "sonde-extinction";
-    style.textContent = `${s} { display: none !important; }`;
+    style.id = "sonde-remede";
+    style.textContent = css;
     document.head.appendChild(style);
-  }, selecteur);
+  }, r.css);
 
-  const eteint = await page.evaluate(
-    (s) => [...document.querySelectorAll(s)].every((n) => getComputedStyle(n).display === "none"),
-    selecteur,
-  );
-  if (!eteint) {
-    await page.evaluate(() => document.getElementById("sonde-extinction")?.remove());
-    return null; // la règle n'a pas pris : idem.
+  // Le témoin est sérialisé et évalué DANS la page : Playwright accepte une expression texte, ce
+  // qui évite de reconstruire une fonction côté navigateur.
+  const aPris = (await page.evaluate(`(${r.temoin.toString()})()`)) as boolean;
+
+  if (!aPris) {
+    await page.evaluate(() => document.getElementById("sonde-remede")?.remove());
+    return null;
   }
 
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(600);
   const im = await imagesParSeconde(page);
-  await page.evaluate(() => document.getElementById("sonde-extinction")?.remove());
-  await page.waitForTimeout(500);
+  await page.evaluate(() => document.getElementById("sonde-remede")?.remove());
+  await page.waitForTimeout(600);
   return im;
 }
 
-const ETOILES = '[class*="etoiles"]';
-const ARBRE = '[class*="arbreMonde"]';
-const GRAIN = '[class*="grain"]';
-
-/** Les quatre relevés d'un même endroit : tel quel, puis chaque couche éteinte à son tour. */
-async function releverIci(page: Page, nom: string): Promise<string> {
-  const tel = await imagesParSeconde(page);
-  const sansEtoiles = await sansLaCouche(page, ETOILES);
-  const sansArbre = await sansLaCouche(page, ARBRE);
-  const sansGrain = await sansLaCouche(page, GRAIN);
-  const dire = (v: number | null) => (v === null ? "témoin ROMPU" : `${v}`);
-  return (
-    `${nom} : tel quel ${tel} | sans étoiles ${dire(sansEtoiles)} | ` +
-    `sans arbre ${dire(sansArbre)} | sans grain ${dire(sansGrain)}`
-  );
-}
-
-test("[SONDE] quelle couche mange les trames — à supprimer une fois lue", async ({ page }) => {
-  /**
-   * ⚠️ LE DÉLAI PAR DÉFAUT (45 s) NE SUFFIT PAS, ET JE L'AI COMPTÉ TROP TARD.
-   *
-   * Cette sonde prend HUIT mesures de 1,5 s, chacune encadrée de deux pauses d'une demi-seconde
-   * pour laisser les couches se rallumer, plus l'ouverture d'un compte, le tour guidé et deux
-   * retombées de fondu : environ quarante-trois secondes sur une machine qui va bien. Sur un
-   * runner, devant une scène qui tourne à cinq images par seconde, elle les dépasse.
-   *
-   * Et une sonde qui dépasse son délai ne rend PAS une mesure partielle : elle rend un
-   * dépassement, c'est-à-dire rien. Le passage entier serait perdu — et un passage de la CI au
-   * navigateur coûte une vingtaine de minutes, qui est précisément la raison pour laquelle cette
-   * sonde éteint quatre couches d'un coup au lieu d'en essayer une par poussée.
-   */
+test("[SONDE 2] quel remède rend les étoiles gratuites — à supprimer une fois lue", async ({ page }) => {
+  // Cinq remèdes, chacun encadré de deux pauses et d'une mesure de 1,5 s, plus l'ouverture d'un
+  // compte : très au-delà des 45 s par défaut. La leçon du premier tour, qui les a dépassées.
   test.setTimeout(240_000);
 
   await ouvrirUnCompteNeuf(page);
@@ -129,20 +146,30 @@ test("[SONDE] quelle couche mange les trames — à supprimer une fois lue", asy
   await page.waitForTimeout(900);
   const reference = await imagesParSeconde(page);
 
+  // ⚠️ ON MESURE AU SEUIL, ET C'EST LE PIRE ENDROIT — DONC LE BON. C'est là que le mobile rend
+  // 5 im/s : un remède qui n'y fait rien ne sert à rien ailleurs.
   await page.goto("/");
   await page.waitForTimeout(1400);
-  const auSeuil = await releverIci(page, "seuil");
 
-  await page.getByRole("button", { name: /entrer dans le monde/i }).click();
-  await passerLeTour(page);
-  await page.waitForTimeout(1200);
-  const aMoi = await releverIci(page, "Moi");
+  // Témoin d'entrée : les étoiles sont bien là et bien animées. Sans lui, cinq remèdes sans effet
+  // seraient indiscernables d'une page qui n'a jamais eu d'étoiles.
+  const combien = await page.evaluate(
+    () => document.querySelectorAll('[class*="etoiles"] > *').length,
+  );
+  expect(combien, "aucune étoile à l'écran : les cinq mesures qui suivent ne prouveraient rien").toBeGreaterThan(60);
 
-  // ⚠️ ÉCHEC DÉLIBÉRÉ : c'est le seul canal par lequel ces nombres arrivent jusqu'au rapport.
-  // Les nombres sont dans le MESSAGE, pas seulement dans la valeur comparée : le comparateur de la
-  // CI imprime le message en premier, et c'est la partie qui survit à sa troncature.
+  const telQuel = await imagesParSeconde(page);
+
+  const releves: string[] = [];
+  for (const r of REMEDES) {
+    const im = await avecLeRemede(page, r);
+    releves.push(`${r.nom} ${im === null ? "TÉMOIN ROMPU" : im}`);
+  }
+
+  // ⚠️ ÉCHEC DÉLIBÉRÉ : seul canal vers le rapport.
   expect(
     [],
-    `SONDE DES COUCHES — référence /aide ${reference} im/s\n  ${auSeuil}\n  ${aMoi}`,
-  ).toEqual(["ceci échoue exprès : lire les trois lignes ci-dessus, puis supprimer ce fichier"]);
+    `SONDE 2 — référence /aide ${reference} im/s · ${combien} étoiles · seuil tel quel ${telQuel} im/s\n` +
+      `  ${releves.join(" | ")}`,
+  ).toEqual(["ceci échoue exprès : lire les deux lignes ci-dessus, puis supprimer ce fichier"]);
 });
