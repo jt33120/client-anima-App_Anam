@@ -19,7 +19,7 @@ production en dessous de Pro). « Phase de test » décrit notre intention, pas 
 > peut la TROUVER. La différence compte : le produit n'est pas publiable, et être trouvé aujourd'hui,
 > ce serait être trouvé par quelqu'un qui cherche de l'aide.
 
-Dernière revue : **2026-08-18** (A1 re-mesurée et aggravée, A2 requalifiée et fermée côté code, §8 périmée corrigée).
+Dernière revue : **2026-08-26** (§9 ouverte — la facture Scale). Revue précédente : **2026-08-18** (A1 re-mesurée et aggravée, A2 requalifiée et fermée côté code, §8 périmée corrigée).
 
 
 ---
@@ -613,3 +613,54 @@ Deux décisions à ne pas redécouvrir quand ce moteur sera écrit :
   avec le compte (cascade FK).
 - **`notification_envoyee` est purgée à 30 jours**, déjà, à chaque tick du job de synthèse — empilée,
   la table était un calendrier d'assiduité dont l'absence parle autant que la présence.
+
+---
+
+## 9. La facture Scale — sans elle, aucun chiffre de coût n'est vrai · 🟠
+
+**Ouverte le 2026-08-26**, en instruisant la Story 10.3 (« Donner un prix aux tokens »). Elle
+n'empêche pas de publier ; elle empêche de **chiffrer**. Tant qu'elle est ouverte, toute phrase de la
+forme « cette utilisatrice m'a coûté X » est une supposition présentée comme un fait.
+
+### Ce qui a été relevé, et ce qui manque
+
+Relevé le **2026-08-26** sur la page tarifaire publique de Mistral (`mistral.ai/pricing/api`) :
+
+| Modèle affiché | Id affiché | Entrée / 1 M jetons | Sortie / 1 M jetons |
+| --- | --- | --- | --- |
+| Mistral Small 4 | `mistral-small-latest` | **0,15 $** | **0,60 $** |
+| Mistral Large 3 | `mistral-large-latest` | **0,50 $** | **1,50 $** |
+
+Ces deux lignes **ne suffisent pas** à écrire `lib/domain/tarifs-modele.ts`, et c'est le constat qui
+ouvre cette porte. Il leur manque deux choses que seule ta facture peut dire :
+
+1. **La devise.** La page publique cote en **dollars**. La convention monétaire du dépôt est
+   l'**entier de centimes EUR** (patron `lib/stripe/config.ts`). Convertir demanderait un taux de
+   change — qui est lui-même un fait daté et mouvant, donc une seconde source d'erreur greffée sur
+   la première. Si la facture Scale est libellée en euros, le problème disparaît entièrement. **La
+   facture tranche ; la page publique ne peut pas.**
+2. **La correspondance avec les ids DATÉS.** `usage_ia.modele` grave `mistral-small-2603` et
+   `mistral-large-2512` (`lib/ai/politique-tier.ts:19-22`) — jamais `-latest`, et c'est délibéré sur
+   un chemin art. 9. La page publique, elle, ne cote **que** les alias `-latest`, aujourd'hui
+   « Mistral Small 4 » et « Mistral Large 3 ». Rien ne dit que les builds épinglés par le produit
+   sont ceux qui portent ces prix. Poser l'égalité sans preuve, c'est écrire un chiffre faux dans le
+   module dont la raison d'être est de ne pas en écrire.
+
+### Pourquoi je n'ai pas rempli la table quand même
+
+Le critère de la Story 10.3 est explicite : le tarif doit venir de « la **facture réelle** du plan
+Scale, **jamais un billet de blog** », et « un chiffre faux est pire qu'aucun chiffre ». Remplir la
+table avec les prix publics convertis à un taux inventé aurait produit un module vert, testé, et
+faux — exactement la forme d'erreur la plus coûteuse, parce qu'elle a l'air d'une mesure.
+
+### Ce que tu as à faire
+
+Ouvrir une facture Mistral du plan Scale et relever, pour **chacun des deux ids datés réellement
+appelés** : le prix d'entrée et le prix de sortie par million de jetons, **et la devise**. Trois
+nombres et un mot. La Story 10.3 se code ensuite d'un bloc, avec sa date de relevé et sa source.
+
+### Ce que ça débloque
+
+Toute la lecture de coût de l'Epic 10 : le module de tarifs (10.3), le script d'ops (10.6) et le
+seuil qui alerte (10.7). Les Stories 10.1, 10.2, 10.4 et 10.5 n'en dépendent pas — 10.1 est déjà
+livrée.
