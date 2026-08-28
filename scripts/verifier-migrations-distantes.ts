@@ -123,7 +123,11 @@ function executableSupabase(racine: string): string {
   return existsSync(local) ? local : "supabase";
 }
 
-function referenceProjet(env: NodeJS.ProcessEnv): string | null {
+/** L'environnement, vu comme une simple table — pour que les prédicats ci-dessous soient testables
+ * avec un environnement fabriqué. `NodeJS.ProcessEnv` y reste assignable (même index). */
+export type Environnement = Record<string, string | undefined>;
+
+function referenceProjet(env: Environnement): string | null {
   const explicite = env.SUPABASE_PROJECT_REF?.trim();
   if (explicite) return explicite;
   try {
@@ -136,10 +140,34 @@ function referenceProjet(env: NodeJS.ProcessEnv): string | null {
   }
 }
 
+/**
+ * Les accès d'ops sont-ils là ? — la question qu'il fallait poser AVANT de bloquer une promotion.
+ *
+ * ⚠️ CE PRÉDICAT SÉPARE DEUX FAITS QUE LE SCRIPT CONFONDAIT, ET LA CONFUSION A COÛTÉ QUATRE
+ * DÉPLOIEMENTS. « Le schéma distant a dérivé » est un fait sur la BASE : il doit arrêter une
+ * promotion. « Je n'ai pas de quoi lire le schéma distant » est un fait sur l'ENVIRONNEMENT : il
+ * ne dit rien de la base, et l'ériger en verdict revient à refuser tout déploiement là où les
+ * secrets d'ops n'ont pas leur place.
+ *
+ * Vercel est exactement ce lieu. Depuis `0a06649`, `prebuild` lance `--promotion`, qui exige
+ * `SUPABASE_ACCESS_TOKEN` et `SUPABASE_DB_PASSWORD` ; l'environnement de build ne les a jamais
+ * eus. Les quatre promotions suivantes sont en ERROR et la production est restée figée sur
+ * `60d88da` pendant deux jours — sans que rien ne le dise, puisque les prévisualisations, elles,
+ * passaient : `VERCEL_ENV=preview` ne déclenche pas la lecture distante.
+ *
+ * Une porte qui refuse TOUT LE MONDE ne protège personne : elle apprend seulement à passer par la
+ * fenêtre. Celle-ci ne se relâche que sur l'absence d'accès, et elle le DIT en clair.
+ */
+export function liaisonPossible(racine: string, env: Environnement): boolean {
+  if (existsSync(resolve(racine, "supabase", ".temp", "project-ref"))) return true;
+  return Boolean(referenceProjet(env) && env.SUPABASE_ACCESS_TOKEN && env.SUPABASE_DB_PASSWORD);
+}
+
 function assurerLien(executable: string, racine: string, env: NodeJS.ProcessEnv): void {
   if (existsSync(resolve(racine, "supabase", ".temp", "project-ref"))) return;
   const reference = referenceProjet(env);
-  if (!reference || !env.SUPABASE_ACCESS_TOKEN || !env.SUPABASE_DB_PASSWORD) {
+  // `liaisonPossible` est l'autorité ; `reference` reste testée pour que le type se resserre.
+  if (!liaisonPossible(racine, env) || !reference) {
     throw new Error(
       "liaison_supabase_absente:SUPABASE_PROJECT_REF_SUPABASE_ACCESS_TOKEN_SUPABASE_DB_PASSWORD",
     );
@@ -276,6 +304,23 @@ export function main(
     mode === "--linked" || (mode === "--promotion" && env.VERCEL_ENV === "production");
   if (!["--local", "--linked", "--promotion"].includes(mode)) {
     throw new Error(`mode_inconnu:${mode}`);
+  }
+  // ⚠️ SEULE `--promotion` SE DÉGRADE, ET SEULEMENT SUR L'ABSENCE D'ACCÈS. `--linked` est une
+  // demande EXPLICITE de lire le distant, lancée à la main par quelqu'un qui veut ce verdict : la
+  // dégrader rendrait `npm run schema:check:linked` silencieusement inutile le jour où un secret
+  // manque, c'est-à-dire le jour où l'on en a le plus besoin.
+  //
+  // Ce qui reste BLOQUANT ici, et qui n'a jamais dépendu d'un accès distant : `verifierLocalement`
+  // a déjà tourné plus haut. Un doublon, un trou dans la numérotation ou un nom de migration
+  // ambigu arrête toujours le build, sur Vercel comme ailleurs.
+  if (verifierDistant && mode === "--promotion" && !liaisonPossible(racine, envOps)) {
+    console.warn(
+      "Schéma distant NON VÉRIFIÉ : aucun accès Supabase dans cet environnement " +
+        "(SUPABASE_PROJECT_REF, SUPABASE_ACCESS_TOKEN, SUPABASE_DB_PASSWORD). " +
+        "La promotion continue ; lance `npm run schema:check:linked` là où les accès existent.",
+    );
+    console.log(`Migrations locales cohérentes : ${versions[0]}–${versions.at(-1)}.`);
+    return;
   }
   if (verifierDistant) {
     verifierDistance(racine, noms, versions, envOps);

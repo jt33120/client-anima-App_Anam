@@ -87,11 +87,22 @@ export default async function PageEntrer({
             {/* L'invitation ne vaut que tant qu'on attend une ADRESSE. Une fois le code parti,
                 le formulaire dit lui-même où il en est ; garder « laisse-moi ton adresse » au-dessus
                 de « c'est parti vers toi@… » ferait se contredire l'écran. */}
+            {/* ⚠️ L'INVITATION SUIT LE DRAPEAU, PARCE QUE LE BOUTON LE SUIT DÉJÀ. Le `<div>` juste
+                en dessous ne rend `BoutonConnexionPasskey` que si `passkeysActives()` ; cette
+                phrase, elle, ne le consultait pas. Avec `ANIMA_PASSKEYS` vide — ce que
+                `.env.example` livre par défaut — l'écran disait donc « Choisis la clé d'accès de
+                ton appareil » au-dessus d'un formulaire d'e-mail SEUL : on demandait un geste
+                qu'aucun élément de la page ne permettait.
+
+                Le repli n'est pas une phrase neuve : c'est mot pour mot celle d'avant les
+                passkeys. Un drapeau éteint doit rendre l'écran d'avant, pas un écran dégradé. */}
             {!attente && (
               <p className="t-anam">
                 {recuperation === "1"
                   ? "Je vais vérifier ton adresse avant de retirer les anciennes clés d’accès."
-                  : "Choisis la clé d’accès de ton appareil, ou reçois un lien et un code par e-mail."}
+                  : passkeysActives()
+                    ? "Choisis la clé d’accès de ton appareil, ou reçois un lien et un code par e-mail."
+                    : "Laisse-moi ton adresse. Je t’enverrai un lien — pas de mot de passe à retenir, rien à perdre."}
               </p>
             )}
             <div className={s.portes}>
