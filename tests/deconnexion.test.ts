@@ -43,6 +43,13 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
+// `seDeconnecter` efface aussi le verrou privé (`effacerDeverrouillage`, lib/auth/verrou-prive.ts) —
+// un appel `next/headers` direct, hors client Supabase, que ce test ne mockait pas encore.
+const cookieDelete = vi.fn();
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ delete: cookieDelete }),
+}));
+
 const { seDeconnecter } = await import("@/app/reglages/actions");
 const copie = await import("@/lib/domain/copie-reglages");
 
@@ -63,6 +70,7 @@ describe("[QA T22] `seDeconnecter` — la session se referme VRAIMENT", () => {
   beforeEach(() => {
     signOut.mockClear();
     getUser.mockClear();
+    cookieDelete.mockClear();
   });
 
   it("ferme la session AVANT de naviguer", async () => {
@@ -71,6 +79,11 @@ describe("[QA T22] `seDeconnecter` — la session se referme VRAIMENT", () => {
     const cible = await deconnecter();
     expect(signOut, "la session doit être fermée, pas seulement quittée").toHaveBeenCalledTimes(1);
     expect(cible).toBe("/entrer?deconnexion=1");
+  });
+
+  it("efface aussi le verrou privé — sinon le prochain à ouvrir cet appareil le trouve déverrouillé", async () => {
+    await deconnecter();
+    expect(cookieDelete).toHaveBeenCalledWith("anam_deverrouillage");
   });
 
   it("ne demande RIEN avant — ni consentement, ni état de détresse", async () => {
