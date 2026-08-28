@@ -544,7 +544,7 @@ describe("[QA T3] au montage, le fil déjà écrit est LÀ", () => {
   it("un incident garde l'envoi bloqué et offre un retry explicite, sans boucle automatique", async () => {
     const reclamer = vi
       .fn<() => Promise<ResultatOuvertureDuJour>>()
-      .mockResolvedValueOnce({ statut: "indisponible" })
+      .mockResolvedValueOnce({ statut: "incident-temporaire" })
       .mockResolvedValueOnce(
         ouverturePersistante({
           id: "reprise-db",
@@ -563,6 +563,41 @@ describe("[QA T3] au montage, le fil déjà écrit est LÀ", () => {
     fireEvent.click(retry);
     await waitFor(() => expect(reclamer).toHaveBeenCalledTimes(2));
     expect(await screen.findAllByText("L’ouverture a repris.")).not.toHaveLength(0);
+  });
+
+  it("borne un bail occupé à trois appels espacés puis attend un nouveau geste", async () => {
+    vi.useFakeTimers();
+    const reclamer = vi.fn<() => Promise<ResultatOuvertureDuJour>>(async () => ({
+      statut: "en-cours",
+      reessayerApresMs: 5_000,
+    }));
+    render(<Conversation regionActive onReclamerOuvertureQuotidienne={reclamer} />);
+
+    await act(async () => Promise.resolve());
+    expect(reclamer).toHaveBeenCalledTimes(1);
+    await act(async () => vi.advanceTimersByTimeAsync(5_000));
+    expect(reclamer).toHaveBeenCalledTimes(2);
+    await act(async () => vi.advanceTimersByTimeAsync(10_000));
+    expect(reclamer).toHaveBeenCalledTimes(3);
+    expect(screen.getByText(/L’ouverture du jour prend plus de temps/)).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Ton message à Anam"), {
+      target: { value: "Je peux continuer." },
+    });
+    expect((screen.getByRole("button", { name: "Envoyer" }) as HTMLButtonElement).disabled).toBe(true);
+
+    await act(async () => vi.advanceTimersByTimeAsync(60_000));
+    expect(reclamer).toHaveBeenCalledTimes(3);
+  });
+
+  it("propose la reconnexion quand la session n'est plus valide", async () => {
+    const reclamer = vi.fn<() => Promise<ResultatOuvertureDuJour>>(async () => ({
+      statut: "session-expiree",
+    }));
+    render(<Conversation regionActive onReclamerOuvertureQuotidienne={reclamer} />);
+
+    expect(await screen.findByText("Ta session a expiré.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Me reconnecter" }).getAttribute("href")).toBe("/entrer");
+    expect(screen.queryByText(/Anam n’a pas pu ouvrir/)).toBeNull();
   });
 
   it("sortir puis revenir pendant une réclamation en vol ne lance pas un second appel", async () => {

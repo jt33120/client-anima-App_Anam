@@ -49,3 +49,12 @@ re-read whole files.
 After big code changes, refresh the graph with `graft build` (deterministic,
 no API key, $0).
 <!-- graft:end -->
+
+## Cloud sessions (claude.ai/code, mobile)
+
+A cloud session clones this repo fresh — it never has `.env.local` (gitignored) or the real
+Supabase project. Before running tests, lint, or `next dev` from a cloud session, mirror the
+`quality` job in `.github/workflows/ci.yml`: `supabase start` (CLI pinned to 2.67.1, never
+`latest` — newer versions break `service_role` grants) then `eval "$(supabase status -o env)"`
+to get working local keys. This needs zero real secrets — don't ask for or hardcode production
+credentials to make dev/tests pass.

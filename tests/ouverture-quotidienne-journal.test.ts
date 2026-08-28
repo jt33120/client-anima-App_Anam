@@ -9,6 +9,7 @@ vi.mock("@/lib/data/supabase/admin", () => ({
 }));
 
 const {
+  ErreurDepotOuvertureQuotidienne,
   commencerOuvertureQuotidienne,
   finaliserOuvertureQuotidienne,
 } = await import("@/lib/data/depot-ouverture-quotidienne");
@@ -175,6 +176,26 @@ describe("[ouverture quotidienne] le dépôt parse toute la source de vérité p
       }),
     ).rejects.not.toThrow(/secret/);
   });
+
+  it("distingue une RPC absente d'un incident temporaire sans reprendre le message distant", async () => {
+    maybeSingle.mockResolvedValueOnce({
+      data: null,
+      error: { code: "PGRST202", message: "fonction absente avec donnée sensible" },
+    });
+    await expect(commencerOuvertureQuotidienne("u", "2026-08-26")).rejects.toMatchObject({
+      name: "ErreurDepotOuvertureQuotidienne",
+      causeOuverture: "schema-incompatible",
+    });
+
+    maybeSingle.mockResolvedValueOnce({
+      data: null,
+      error: { code: "08006", message: "connexion rompue avec donnée sensible" },
+    });
+    const incident = commencerOuvertureQuotidienne("u", "2026-08-26").catch((erreur) => erreur);
+    await expect(incident).resolves.toBeInstanceOf(ErreurDepotOuvertureQuotidienne);
+    await expect(incident).resolves.toMatchObject({ causeOuverture: "incident-temporaire" });
+    await expect(incident).resolves.not.toMatchObject({ message: expect.stringMatching(/sensible/) });
+  });
 });
 
 describe("[SQL statique — aucune instance PostgreSQL n'est exercée] outbox quotidienne", () => {
@@ -329,6 +350,16 @@ describe("[SQL statique — aucune instance PostgreSQL n'est exercée] outbox qu
     );
     expect(sql).toMatch(
       /revoke all on function public\.compte_autorise_ouverture_anam\(uuid\)[\s\S]*from public, anon, authenticated, service_role;/,
+    );
+  });
+
+  it("conserve l'ancienne signature comme pont expand/app pendant le déploiement", () => {
+    const compatibilite = corps("consigner_ouverture_quotidienne_anam");
+    expect(compatibilite).toMatch(/commencer_ouverture_quotidienne_anam\(cible, p_jour\)/);
+    expect(compatibilite).toMatch(/finaliser_ouverture_quotidienne_anam\(/);
+    expect(compatibilite).toMatch(/jsonb_build_object\('public', null, 'interne', null\)/);
+    expect(sql).toMatch(
+      /grant execute on function public\.consigner_ouverture_quotidienne_anam\(uuid, date, text\)\s+to service_role;/,
     );
   });
 });

@@ -1,10 +1,18 @@
 import type { Corps } from "@/lib/astro/port";
 import { CORPS_CLASSIQUES } from "@/lib/astro/port";
-import { NOMBRES, type NomNombre, type Numerologie } from "@/lib/astro/numerologie";
+import {
+  NOMBRES,
+  tracerNumerologie,
+  type EntreesNumerologie,
+  type NomNombre,
+  type Numerologie,
+  type TraceNombreNumerologique,
+  type TraceReductionNumerologique,
+} from "@/lib/astro/numerologie";
 import { placer, type ThemeNatal } from "@/lib/astro/theme-natal";
 import { texteDe } from "@/lib/corpus/numerologie";
 import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
-import { NON_ECRIT, type TexteCorpus } from "@/lib/corpus/port";
+import type { TexteCorpus } from "@/lib/corpus/port";
 import type { TypeEnneagramme } from "./enneagramme";
 import { MESSAGE_TYPE_SANS_TEXTE, MESSAGE_TYPE_ABSENT, URL_PASSER_LE_TEST } from "./enneagramme-items";
 import { CORPS_LIBELLE, NOMBRE_LIBELLE, SIGNE_LIBELLE, enSigne } from "./cartes-socle";
@@ -17,6 +25,8 @@ import {
   URL_CORRIGER_LE_NOM,
   URL_AJOUTER_SON_HEURE,
   PORTES_DU_SOCLE,
+  LECTURE_NUMEROLOGIE_NON_ECRITE,
+  LECTURE_NUMEROLOGIE_PARTIELLE,
 } from "./copie-socle";
 
 /**
@@ -74,12 +84,25 @@ export interface Reparation {
   readonly url: string;
 }
 
-/** Un nombre, avec SON texte. Les six en ont un — c'est le cœur de FR-055. */
+/** Un nombre et la preuve arithmétique qui permet de le vérifier. */
 export interface NombreFiche {
   readonly cle: NomNombre;
   readonly intitule: string;
   readonly valeur: string;
-  readonly texte: TexteCorpus;
+  readonly calcul: readonly string[];
+}
+
+/** Un fait d'entrée ou de méthode : intitulé et valeur, sans interprétation. */
+export interface FaitFiche {
+  readonly intitule: string;
+  readonly valeur: string;
+}
+
+/** Une lecture écrite : séparée du nombre et de son calcul. */
+export interface LectureSymboliqueFiche {
+  readonly cle: NomNombre;
+  readonly intitule: string;
+  readonly texte: string;
 }
 
 /** Un nombre qu'on ne peut pas calculer, avec sa raison DITE et ce qui la répare. */
@@ -96,12 +119,18 @@ export interface PositionFiche {
   readonly intitule: string;
   readonly valeur: string;
   readonly maison: string | null;
+  /** Valeur textuelle exacte, absente quand l'heure n'autorise pas cette précision. */
+  readonly longitude: string | null;
+  /** Nombre décimal sérialisé pour le seul placement SVG, jamais affiché comme une interprétation. */
+  readonly projection: string | null;
 }
 
 /** Un angle ou une cuspide — même forme, deux rôles, jamais mélangés dans la même liste. */
 export interface AngleFiche {
   readonly intitule: string;
   readonly valeur: string;
+  readonly longitude: string | null;
+  readonly projection: string | null;
 }
 
 /** Ce qui manque au ciel, dit et non creusé. */
@@ -114,12 +143,23 @@ export interface ManqueFiche {
 export interface SectionNombres {
   /** `null` = la lecture a échoué ou la naissance manque ; la phrase EST dans `indisponible`. */
   readonly indisponible: string | null;
+  readonly entrees: readonly FaitFiche[];
+  readonly conventions: readonly string[];
   readonly nombres: readonly NombreFiche[];
   readonly manquants: readonly NombreManquantFiche[];
+  readonly lecturesSymboliques: readonly LectureSymboliqueFiche[];
+  /** Une seule note pour tout le corpus, jamais une répétition sous chaque nombre. */
+  readonly noteLectureSymbolique: string | null;
 }
 
 export interface SectionCiel {
   readonly indisponible: string | null;
+  readonly projection: {
+    readonly titre: string;
+    readonly description: string;
+    readonly repere: string;
+    readonly source: string;
+  } | null;
   readonly positions: readonly PositionFiche[];
   readonly angles: readonly AngleFiche[];
   readonly cuspides: readonly AngleFiche[];
@@ -149,10 +189,19 @@ export interface PorteFiche {
   readonly url: string;
 }
 
+export interface ApercuUniversFiche {
+  readonly cle: "astrologie" | "numerologie" | "psychologie";
+  readonly titre: string;
+  readonly accroche: string;
+  readonly url: string;
+  readonly faits: readonly FaitFiche[];
+}
+
 export interface FicheSocle {
   readonly nombres: SectionNombres;
   readonly ciel: SectionCiel;
   readonly type: SectionType;
+  readonly apercus: readonly ApercuUniversFiche[];
   /**
    * ⚠️ TOUJOURS PRÉSENTES, MÊME QUAND RIEN NE MANQUE. Une porte qui n'apparaît qu'en cas de
    * problème est une porte qu'on ne trouve pas quand on la cherche — et elles quittent `/profil`
@@ -162,22 +211,99 @@ export interface FicheSocle {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
-// Les nombres — les SIX, avec leurs SIX textes (FR-055)
+// Les nombres — résultat, preuve du calcul, puis lecture symbolique séparée
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-export function sectionNombres(numerologie: Numerologie | null, indisponible: string | null): SectionNombres {
-  if (numerologie === null) {
-    return Object.freeze({ indisponible, nombres: [], manquants: [] });
+function cheminReduction(trace: TraceReductionNumerologique): string {
+  return trace.etapes.join(" → ");
+}
+
+function dernier(trace: TraceReductionNumerologique): number {
+  return trace.etapes.at(-1)!;
+}
+
+function sommeTrace(termes: readonly number[], trace: TraceReductionNumerologique): string {
+  const reduction = cheminReduction(trace);
+  return `${termes.join(" + ")} = ${reduction}`;
+}
+
+function calculLisible(cle: NomNombre, trace: TraceNombreNumerologique | null): readonly string[] {
+  if (!trace) return Object.freeze([]);
+  if (trace.origine === "date_separee") {
+    return Object.freeze([
+      `Jour : ${cheminReduction(trace.jour)}`,
+      `Mois : ${cheminReduction(trace.mois)}`,
+      `Année : ${cheminReduction(trace.annee)}`,
+      `Total : ${sommeTrace([dernier(trace.jour), dernier(trace.mois), dernier(trace.annee)], trace.total)}`,
+    ]);
   }
+  if (trace.origine === "jour_naissance") {
+    return Object.freeze([`Jour du mois : ${cheminReduction(trace.total)}`]);
+  }
+  if (trace.origine === "annee_personnelle") {
+    return Object.freeze([
+      `Jour : ${cheminReduction(trace.jour)}`,
+      `Mois : ${cheminReduction(trace.mois)}`,
+      `Année de référence : ${cheminReduction(trace.anneeDeReference)}`,
+      `Total : ${sommeTrace(
+        [dernier(trace.jour), dernier(trace.mois), dernier(trace.anneeDeReference)],
+        trace.total,
+      )}`,
+    ]);
+  }
+  const selection =
+    cle === "intime" ? "Voyelles comptées" : cle === "personnalite" ? "Consonnes comptées" : "Lettres comptées";
+  return Object.freeze([
+    `${selection} : ${trace.lettres}`,
+    `Valeurs : ${sommeTrace(trace.valeurs, trace.total)}`,
+  ]);
+}
+
+function dateLisible(iso: string): string {
+  const correspondance = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
+  return correspondance
+    ? `${correspondance[3]}/${correspondance[2]}/${correspondance[1]}`
+    : iso;
+}
+
+export function sectionNombres(
+  numerologie: Numerologie | null,
+  indisponible: string | null,
+  entrees?: EntreesNumerologie | null,
+  lecteurTexte: typeof texteDe = texteDe,
+): SectionNombres {
+  if (numerologie === null) {
+    return Object.freeze({
+      indisponible,
+      entrees: [],
+      conventions: [],
+      nombres: [],
+      manquants: [],
+      lecturesSymboliques: [],
+      noteLectureSymbolique: null,
+    });
+  }
+  const trace = entrees ? tracerNumerologie(entrees, numerologie.anneeDeReference) : null;
   const nombres: NombreFiche[] = [];
   const manquants: NombreManquantFiche[] = [];
+  const lecturesSymboliques: LectureSymboliqueFiche[] = [];
+  let auMoinsUnTexteAbsent = false;
   for (const cle of NOMBRES) {
     const lecture = numerologie.nombres[cle];
     const intitule = NOMBRE_LIBELLE[cle];
     if (lecture.statut === "calcule") {
-      // ⚠️ `texteDe` rend `null` quand la clé sort du corpus (une valeur hors des possibles). On
-      // retombe alors sur NON_ECRIT — jamais sur une chaîne vide, qui se lirait « rien à dire ».
-      nombres.push({ cle, intitule, valeur: String(lecture.valeur), texte: texteDe(cle, lecture) ?? NON_ECRIT });
+      nombres.push({
+        cle,
+        intitule,
+        valeur: String(lecture.valeur),
+        calcul: calculLisible(cle, trace?.nombres[cle] ?? null),
+      });
+      const texte = lecteurTexte(cle, lecture);
+      if (texte?.statut === "ecrit") {
+        lecturesSymboliques.push({ cle, intitule, texte: texte.texte });
+      } else {
+        auMoinsUnTexteAbsent = true;
+      }
       continue;
     }
     manquants.push({
@@ -189,7 +315,36 @@ export function sectionNombres(numerologie: Numerologie | null, indisponible: st
       reparation: { libelle: URL_CORRIGER_LE_NOM.libelle, url: URL_CORRIGER_LE_NOM.url },
     });
   }
-  return Object.freeze({ indisponible: null, nombres: Object.freeze(nombres), manquants: Object.freeze(manquants) });
+
+  const faitsEntree: readonly FaitFiche[] = entrees
+    ? Object.freeze([
+        { intitule: "Date de naissance", valeur: dateLisible(entrees.date) },
+        { intitule: "Nom de naissance", valeur: entrees.nomComplet?.trim() || "Non renseigné" },
+        { intitule: "Année de référence", valeur: String(numerologie.anneeDeReference) },
+      ])
+    : Object.freeze([{ intitule: "Année de référence", valeur: String(numerologie.anneeDeReference) }]);
+  const conventions = Object.freeze([
+    "Table pythagoricienne : A vaut 1, B vaut 2… I vaut 9, puis le cycle recommence.",
+    "Le chemin de vie réduit séparément le jour, le mois et l’année avant de les additionner.",
+    "Les nombres maîtres 11, 22 et 33 sont conservés, sauf pour l’année personnelle.",
+    "La lettre Y est comptée comme une voyelle.",
+    "L’année personnelle change au 1er janvier.",
+  ]);
+  const noteLectureSymbolique = auMoinsUnTexteAbsent
+    ? lecturesSymboliques.length === 0
+      ? LECTURE_NUMEROLOGIE_NON_ECRITE
+      : LECTURE_NUMEROLOGIE_PARTIELLE
+    : null;
+
+  return Object.freeze({
+    indisponible: null,
+    entrees: faitsEntree,
+    conventions,
+    nombres: Object.freeze(nombres),
+    manquants: Object.freeze(manquants),
+    lecturesSymboliques: Object.freeze(lecturesSymboliques),
+    noteLectureSymbolique,
+  });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
@@ -226,9 +381,29 @@ const ORDINAL_MAISON = [
   "douzième",
 ] as const;
 
+function longitudeNormalisee(longitude: number): number {
+  return ((longitude % 360) + 360) % 360;
+}
+
+function longitudeLisible(longitude: number): string {
+  return `${longitudeNormalisee(longitude).toFixed(2).replace(".", ",")}°`;
+}
+
+function longitudeProjetee(longitude: number): string {
+  return longitudeNormalisee(longitude).toFixed(6);
+}
+
 export function sectionCiel(theme: ThemeNatal | null, indisponible: string | null): SectionCiel {
   if (theme === null) {
-    return Object.freeze({ indisponible, positions: [], angles: [], cuspides: [], manques: [], sansHeure: null });
+    return Object.freeze({
+      indisponible,
+      projection: null,
+      positions: [],
+      angles: [],
+      cuspides: [],
+      manques: [],
+      sansHeure: null,
+    });
   }
   const avecDegre = theme.precision === "heure_connue";
 
@@ -243,6 +418,8 @@ export function sectionCiel(theme: ThemeNatal | null, indisponible: string | nul
       intitule,
       valeur: enSigne(position.signe, position.degre, avecDegre),
       maison: position.maison ? `${ORDINAL_MAISON[position.maison]} maison` : null,
+      longitude: avecDegre ? longitudeLisible(position.longitude) : null,
+      projection: avecDegre ? longitudeProjetee(position.longitude) : null,
     });
   }
 
@@ -250,17 +427,29 @@ export function sectionCiel(theme: ThemeNatal | null, indisponible: string | nul
   const cuspides: AngleFiche[] = [];
   if (theme.angles.statut === "calcule") {
     const asc = placer(theme.angles.ascendant);
-    angles.push({ intitule: "Ascendant", valeur: enSigne(asc.signe, asc.degre, avecDegre) });
+    angles.push({
+      intitule: "Ascendant",
+      valeur: enSigne(asc.signe, asc.degre, avecDegre),
+      longitude: avecDegre ? longitudeLisible(theme.angles.ascendant) : null,
+      projection: avecDegre ? longitudeProjetee(theme.angles.ascendant) : null,
+    });
     // ⚠️ LE MILIEU DU CIEL EST CALCULÉ DEPUIS LA 5.1 ET N'A JAMAIS ÉTÉ AFFICHÉ NULLE PART. C'est
     // ici, et un test de rendu échoue s'il disparaît.
     const mc = placer(theme.angles.milieuDuCiel);
-    angles.push({ intitule: "Milieu du ciel", valeur: enSigne(mc.signe, mc.degre, avecDegre) });
+    angles.push({
+      intitule: "Milieu du ciel",
+      valeur: enSigne(mc.signe, mc.degre, avecDegre),
+      longitude: avecDegre ? longitudeLisible(theme.angles.milieuDuCiel) : null,
+      projection: avecDegre ? longitudeProjetee(theme.angles.milieuDuCiel) : null,
+    });
     // Les douze cuspides, en SIGNES ENTIERS — le seul système que le produit livre. Le degré n'a
     // aucun sens ici : dans ce système, une maison commence au 0° de son signe, par construction.
     theme.angles.maisons.forEach((longitude, i) => {
       cuspides.push({
         intitule: `${ORDINAL_MAISON[i + 1]} maison`,
         valeur: SIGNE_LIBELLE[placer(longitude).signe],
+        longitude: avecDegre ? longitudeLisible(longitude) : null,
+        projection: avecDegre ? longitudeProjetee(longitude) : null,
       });
     });
   }
@@ -274,6 +463,15 @@ export function sectionCiel(theme: ThemeNatal | null, indisponible: string | nul
 
   return Object.freeze({
     indisponible: null,
+    projection: avecDegre && positions.length > 0
+      ? Object.freeze({
+          titre: "Carte exacte de ton ciel de naissance",
+          description:
+            "Projection circulaire des longitudes écliptiques calculées. La liste qui suit donne les mêmes positions en texte.",
+          repere: "0° est placé en haut ; les longitudes progressent dans le sens horaire.",
+          source: theme.adaptateur,
+        })
+      : null,
     positions: Object.freeze(positions),
     angles: Object.freeze(angles),
     cuspides: Object.freeze(cuspides),
@@ -343,16 +541,87 @@ export function sectionType(type: TypeEnneagramme | null): SectionType {
   });
 }
 
+function apercusDuSocle(
+  nombres: SectionNombres,
+  ciel: SectionCiel,
+  type: SectionType,
+): readonly ApercuUniversFiche[] {
+  const nombre = (cle: NomNombre) => nombres.nombres.find((entree) => entree.cle === cle);
+  const position = (cle: Corps) => ciel.positions.find((entree) => entree.cle === cle);
+  const ascendant = ciel.angles.find((entree) => entree.intitule === "Ascendant");
+
+  const faitsNombres: FaitFiche[] = [];
+  for (const cle of ["chemin_de_vie", "annee_personnelle"] as const) {
+    const entree = nombre(cle);
+    if (entree) faitsNombres.push({ intitule: entree.intitule, valeur: entree.valeur });
+  }
+  if (faitsNombres.length === 0 && nombres.indisponible) {
+    faitsNombres.push({ intitule: "État", valeur: nombres.indisponible });
+  }
+
+  const faitsCiel: FaitFiche[] = [];
+  for (const cle of ["soleil", "lune"] as const) {
+    const entree = position(cle);
+    if (entree) faitsCiel.push({ intitule: entree.intitule, valeur: entree.valeur });
+  }
+  if (ascendant) faitsCiel.push({ intitule: ascendant.intitule, valeur: ascendant.valeur });
+  if (faitsCiel.length === 0 && ciel.indisponible) {
+    faitsCiel.push({ intitule: "État", valeur: ciel.indisponible });
+  }
+
+  return Object.freeze([
+    Object.freeze({
+      cle: "numerologie",
+      titre: "Numérologie",
+      accroche: nombres.indisponible
+        ? "Le détail distingue l’incident d’une donnée absente."
+        : "Tes repères essentiels, avec chaque calcul vérifiable.",
+      url: "/socle?univers=numerologie",
+      faits: Object.freeze(faitsNombres),
+    }),
+    Object.freeze({
+      cle: "astrologie",
+      titre: "Astrologie",
+      accroche: ciel.indisponible
+        ? "Le détail distingue l’incident d’une donnée absente."
+        : ciel.projection
+          ? "Ton ciel calculé, sa carte exacte et sa version textuelle."
+          : "Les positions certaines, sans inventer la précision qui manque.",
+      url: "/socle?univers=astrologie",
+      faits: Object.freeze(faitsCiel),
+    }),
+    Object.freeze({
+      cle: "psychologie",
+      titre: "Psychologie",
+      accroche: type.valeur
+        ? "Le repère psychologique que tu as choisi de garder."
+        : "Ton espace psychologique et le chemin vers le test.",
+      url: "/psychologie",
+      faits: Object.freeze([
+        {
+          intitule: type.intitule,
+          valeur: type.valeur ?? "Aucun type retenu pour le moment.",
+        },
+      ]),
+    }),
+  ]);
+}
+
 export function ficheSocle(
   numerologie: Numerologie | null,
   theme: ThemeNatal | null,
   type: TypeEnneagramme | null,
   indisponibles: { readonly nombres: string | null; readonly ciel: string | null },
+  entreesNumerologie?: EntreesNumerologie | null,
 ): FicheSocle {
+  const nombres = sectionNombres(numerologie, indisponibles.nombres, entreesNumerologie);
+  const ciel = sectionCiel(theme, indisponibles.ciel);
+  const sectionDuType = sectionType(type);
   return Object.freeze({
-    nombres: sectionNombres(numerologie, indisponibles.nombres),
-    ciel: sectionCiel(theme, indisponibles.ciel),
-    type: sectionType(type),
+    nombres,
+    ciel,
+    type: sectionDuType,
+    apercus: apercusDuSocle(nombres, ciel, sectionDuType),
     portes: PORTES_DU_SOCLE,
   });
 }

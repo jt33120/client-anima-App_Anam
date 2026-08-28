@@ -321,6 +321,20 @@ describe("[5.5] la tentative : forme bornée et horodatage autoritaire", () => {
     expect(error, error?.message).toBeNull();
   });
 
+  it("[13.8] `null` entre comme inconnue tandis que les niveaux historiques restent valides", async () => {
+    const reponses = { e1a: null, e1b: 0, e2a: 1, e2b: 2, e3a: 3 };
+    const { data, error } = await u.client
+      .from("enneagramme_tentative")
+      .upsert(
+        { utilisatrice_id: u.id, reponses },
+        { onConflict: "utilisatrice_id" },
+      )
+      .select("reponses")
+      .single<{ reponses: typeof reponses }>();
+    expect(error, error?.message).toBeNull();
+    expect(data?.reponses).toEqual(reponses);
+  });
+
   it("une valeur hors échelle est refusée", async () => {
     const { error } = await u.client
       .from("enneagramme_tentative")

@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import {
+  noterSessionReverrouillee,
+  retourDoitResterCouvert,
+  sessionReverrouillee,
+} from "@/lib/auth/verrou-local";
 import styles from "./couvercle.module.css";
 
 /**
@@ -30,15 +35,48 @@ import styles from "./couvercle.module.css";
  * l'image que le système garde d'elle après qu'elle a rangé son téléphone — et c'est déjà la plus
  * durable des trois.
  */
-export function CouvercleConfidentialite() {
+export function CouvercleConfidentialite({
+  verrouAutomatique = false,
+}: {
+  readonly verrouAutomatique?: boolean;
+}) {
   useEffect(() => {
     const racine = document.documentElement;
+    let reverrouilleeCettePage = false;
     const poser = () => racine.setAttribute("data-couvercle", "pose");
     const retirer = () => racine.removeAttribute("data-couvercle");
 
+    const reverrouiller = () => {
+      poser();
+      if (!verrouAutomatique) return;
+      reverrouilleeCettePage = true;
+      noterSessionReverrouillee();
+      // `sendBeacon` survit à la mise en arrière-plan et ne garde jamais la page ouverte. Le corps
+      // ne porte rien : la route efface seulement le cookie HttpOnly de déverrouillage.
+      if (typeof navigator.sendBeacon === "function") {
+        navigator.sendBeacon("/api/verrou");
+      } else {
+        void fetch("/api/verrou", { method: "POST", keepalive: true }).catch(() => undefined);
+      }
+    };
+
+    const revenir = () => {
+      const doitRedemander =
+        verrouAutomatique &&
+        (reverrouilleeCettePage || sessionReverrouillee()) &&
+        retourDoitResterCouvert(window.location.pathname);
+      if (!doitRedemander) {
+        retirer();
+        return;
+      }
+      poser();
+      const destination = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      window.location.replace(`/verrou?vers=${encodeURIComponent(destination)}`);
+    };
+
     const surVisibilite = () => {
-      if (document.visibilityState === "hidden") poser();
-      else retirer();
+      if (document.visibilityState === "hidden") reverrouiller();
+      else revenir();
     };
 
     document.addEventListener("visibilitychange", surVisibilite);
@@ -49,15 +87,21 @@ export function CouvercleConfidentialite() {
     window.addEventListener("pagehide", poser);
     // Le retour, lui, est fiable des deux côtés — mais on l'écoute quand même explicitement, sans quoi
     // un `pagehide` sans `visibilitychange` correspondant laisserait le couvercle posé au retour.
-    window.addEventListener("pageshow", retirer);
+    window.addEventListener("pageshow", revenir);
+    // iOS ne livre pas toujours `visibilitychange` lors d'un balayage vers l'accueil. `blur` couvre
+    // cette seconde voie sans confondre `pagehide` avec une navigation interne normale.
+    window.addEventListener("blur", reverrouiller);
+    window.addEventListener("focus", revenir);
 
     return () => {
       document.removeEventListener("visibilitychange", surVisibilite);
       window.removeEventListener("pagehide", poser);
-      window.removeEventListener("pageshow", retirer);
+      window.removeEventListener("pageshow", revenir);
+      window.removeEventListener("blur", reverrouiller);
+      window.removeEventListener("focus", revenir);
       retirer();
     };
-  }, []);
+  }, [verrouAutomatique]);
 
   return (
     // `aria-hidden` : pour une lectrice d'écran, ce couvercle n'existe pas — il ne dit rien qu'elle

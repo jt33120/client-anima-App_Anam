@@ -10,6 +10,10 @@ import {
   INTRODUCTION,
   TITRE_NOMBRES,
   TITRE_CIEL,
+  TITRE_APERCU,
+  TITRE_ENTREES_NUMEROLOGIE,
+  TITRE_METHODE_NUMEROLOGIE,
+  TITRE_LECTURE_NUMEROLOGIE,
   TITRE_ANGLES,
   TITRE_MAISONS,
   TITRE_TYPE,
@@ -124,6 +128,7 @@ export default async function Page({
     theme?.statut === "calcule" ? theme.theme : null,
     enneagramme?.statut === "calcule" ? enneagramme.type : null,
     { nombres: raisonNombres, ciel: raisonCiel },
+    numerologie?.statut === "calcule" ? numerologie.entrees : null,
   );
 
   return (
@@ -141,9 +146,13 @@ export default async function Page({
             mode === "astrologie"
               ? "Ton ciel de naissance, calculé à partir de ta date, de ton heure et de ton lieu. Rien ici n’est généré par un modèle."
               : mode === "numerologie"
-                ? "Tes nombres, calculés à partir de ta naissance et de ton nom. Ils restent les mêmes d’un jour à l’autre."
+                ? "Tes nombres, calculés à partir de ta naissance et de ton nom. L’année personnelle suit l’année civile indiquée."
                 : INTRODUCTION,
           titreNombres: TITRE_NOMBRES,
+          titreApercu: TITRE_APERCU,
+          titreEntreesNumerologie: TITRE_ENTREES_NUMEROLOGIE,
+          titreMethodeNumerologie: TITRE_METHODE_NUMEROLOGIE,
+          titreLectureNumerologie: TITRE_LECTURE_NUMEROLOGIE,
           titreCiel: TITRE_CIEL,
           titreAngles: TITRE_ANGLES,
           titreMaisons: TITRE_MAISONS,

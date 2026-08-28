@@ -23,9 +23,8 @@
  * alphabétique.
  *
  * La 5.3 a écrit la doctrine pour l'heure de naissance manquante : « je préfère ne pas te
- * l'inventer ». C'est le même geste. À égalité, il n'y a **pas de type retenu** : le résultat est
- * `indecis`, il NOMME les types à égalité, et il renvoie vers l'autre chemin — celui où Anam
- * propose. C'est aussi ce que la story promet dans son titre : « avoir le choix du chemin ».
+ * l'inventer ». C'est le même geste. À égalité, ou quand une réponse inconnue pourrait changer le
+ * sommet, il n'y a **pas de type retenu** : le résultat est `indetermine`, sans menu de numéros.
  *
  * Cette règle-là EST totale et déterministe (tout jeu de scores tombe dans exactement un cas), donc
  * elle satisfait l'AC1 sans inventer une réponse.
@@ -48,21 +47,28 @@ export function estTypeEnneagramme(v: unknown): v is TypeEnneagramme {
 }
 
 /**
- * L'échelle de réponse — QUATRE degrés, SANS milieu, et c'est une décision.
+ * L'échelle de fréquence — QUATRE degrés ordonnés, plus une inconnue explicite.
  *
- * Un point central (« ni l'un ni l'autre ») est la case qu'on coche quand on ne veut pas répondre :
- * sur dix-huit énoncés, il produit des scores plats, donc des ex æquo partout, donc un test qui ne
- * conclut jamais. Quatre degrés obligent à un penchant, même léger, sans forcer un engagement.
+ * Les quatre degrés décrivent une fréquence observable. « Je ne sais pas » vit hors de cette
+ * échelle sous la forme `null` : elle permet de ne pas répondre sans fabriquer un milieu ni verser
+ * artificiellement zéro point.
  *
  * Les valeurs sont des ENTIERS ORDONNÉS parce qu'on les additionne. Elles ne s'affichent jamais :
- * l'écran ne montre que des libellés (« pas du tout » … « tout à fait »), jamais 0, 1, 2, 3.
+ * l'écran ne montre que des libellés de fréquence, jamais 0, 1, 2, 3.
  */
 export type NiveauReponse = 0 | 1 | 2 | 3;
+
+/** `null` est une réponse explicite (« Je ne sais pas »), jamais un zéro déguisé. */
+export type ValeurReponse = NiveauReponse | null;
 
 export const NIVEAUX: readonly NiveauReponse[] = Object.freeze([0, 1, 2, 3] as const);
 
 export function estNiveauReponse(v: unknown): v is NiveauReponse {
   return v === 0 || v === 1 || v === 2 || v === 3;
+}
+
+export function estValeurReponse(v: unknown): v is ValeurReponse {
+  return v === null || estNiveauReponse(v);
 }
 
 /**
@@ -77,7 +83,7 @@ export function estNiveauReponse(v: unknown): v is NiveauReponse {
  */
 export interface ReponseItem {
   readonly itemId: string;
-  readonly niveau: NiveauReponse;
+  readonly niveau: ValeurReponse;
 }
 
 /** Ce qu'un item apporte au calcul : son identité, et le type qu'il pèse. */
@@ -100,13 +106,14 @@ export type Scores = Readonly<Record<TypeEnneagramme, number>>;
  */
 export function scorer(reponses: readonly ReponseItem[], bareme: readonly ItemBareme[]): Scores {
   const typeParItem = new Map(bareme.map((i) => [i.id, i.type]));
-  const derniere = new Map<string, NiveauReponse>();
+  const derniere = new Map<string, ValeurReponse>();
   for (const r of reponses) {
     if (!typeParItem.has(r.itemId)) continue;
     derniere.set(r.itemId, r.niveau);
   }
   const totaux = Object.fromEntries(TYPES.map((t) => [t, 0])) as Record<TypeEnneagramme, number>;
   for (const [itemId, niveau] of derniere) {
+    if (niveau === null) continue;
     totaux[typeParItem.get(itemId) as TypeEnneagramme] += niveau;
   }
   return Object.freeze(totaux);
@@ -118,7 +125,7 @@ export function scorer(reponses: readonly ReponseItem[], bareme: readonly ItemBa
  */
 export type ResultatTest =
   | { readonly statut: "retenu"; readonly type: TypeEnneagramme }
-  | { readonly statut: "indecis"; readonly exaequo: readonly TypeEnneagramme[] }
+  | { readonly statut: "indetermine"; readonly raison: "egalite" | "reponses_inconnues" }
   | { readonly statut: "incomplet"; readonly manquants: readonly string[] };
 
 /**
@@ -137,12 +144,28 @@ export function conclure(reponses: readonly ReponseItem[], bareme: readonly Item
   if (manquants.length > 0) return { statut: "incomplet", manquants };
 
   const scores = scorer(reponses, bareme);
-  // ⚠️ Le maximum se calcule sur les VALEURS, jamais par un tri. `Array.sort` est stable depuis
-  // ES2019 : « le premier de la liste » et « le plus haut score » coïncident tant que les données
-  // sont ordonnées, ce qui rend un test de départage vert pour la mauvaise raison. C'est la zone de
-  // coïncidence qui a produit trois des cinq survivants de la campagne de la 5.4.
-  const meilleur = Math.max(...TYPES.map((t) => scores[t]));
-  const exaequo = TYPES.filter((t) => scores[t] === meilleur);
-  if (exaequo.length > 1) return { statut: "indecis", exaequo: Object.freeze(exaequo) };
-  return { statut: "retenu", type: exaequo[0] };
+  const typeParItem = new Map(bareme.map((i) => [i.id, i.type]));
+  const derniere = new Map<string, ValeurReponse>();
+  for (const reponse of reponses) {
+    if (typeParItem.has(reponse.itemId)) derniere.set(reponse.itemId, reponse.niveau);
+  }
+
+  // Une inconnue ouvre un intervalle : le minimum est le score observé, le maximum ajoute trois
+  // points par item inconnu. Un type n'est retenu que si son MINIMUM dépasse le MAXIMUM de tous les
+  // autres. Ainsi `null` n'est ni scoré à zéro, ni remplacé par une réponse moyenne.
+  const inconnues = Object.fromEntries(TYPES.map((t) => [t, 0])) as Record<TypeEnneagramme, number>;
+  for (const [itemId, niveau] of derniere) {
+    if (niveau === null) inconnues[typeParItem.get(itemId) as TypeEnneagramme] += 1;
+  }
+  const maximum = (type: TypeEnneagramme) => scores[type] + inconnues[type] * 3;
+  const certain = TYPES.find((type) =>
+    TYPES.every((autre) => autre === type || scores[type] > maximum(autre)),
+  );
+  if (certain !== undefined) return { statut: "retenu", type: certain };
+
+  const aUneInconnue = TYPES.some((type) => inconnues[type] > 0);
+  return {
+    statut: "indetermine",
+    raison: aUneInconnue ? "reponses_inconnues" : "egalite",
+  };
 }

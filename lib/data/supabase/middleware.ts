@@ -1,6 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { OPTIONS_COOKIE_SESSION } from "./cookies-session";
+import {
+  COOKIE_DEVERROUILLAGE,
+  destinationInterne,
+  passkeyRequise,
+  passkeysActives,
+  routeExempteeDuVerrou,
+  sessionDeverrouillee,
+} from "@/lib/auth/verrou-prive";
+
+function recopierCookies(source: NextResponse, cible: NextResponse): NextResponse {
+  for (const cookie of source.cookies.getAll()) cible.cookies.set(cookie);
+  return cible;
+}
 
 /**
  * Rafraîchit silencieusement la session à chaque requête (Story 1.3, AC4).
@@ -37,6 +50,7 @@ export async function updateSession(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      auth: { experimental: { passkey: true } },
       // Mêmes attributs que `server.ts` — un seul objet partagé, sinon le durcissement d'un chemin
       // laisse l'autre poser l'ancien cookie (voir `cookies-session.ts`).
       cookieOptions: OPTIONS_COOKIE_SESSION,
@@ -55,7 +69,52 @@ export async function updateSession(
     },
   );
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  return response;
+  const { pathname, search } = request.nextUrl;
+  if (
+    !passkeysActives() ||
+    !user ||
+    !passkeyRequise(user) ||
+    routeExempteeDuVerrou(pathname)
+  ) {
+    return response;
+  }
+
+  const { data: jeton, error } = await supabase.auth.getClaims();
+  const deverrouillee =
+    !error &&
+    sessionDeverrouillee(
+      jeton?.claims,
+      request.cookies.get(COOKIE_DEVERROUILLAGE)?.value,
+    );
+  if (deverrouillee) return response;
+
+  if (pathname === "/api" || pathname.startsWith("/api/")) {
+    return recopierCookies(
+      response,
+      NextResponse.json(
+        { code: "verrouille", message: "Déverrouille Anam pour continuer." },
+        {
+          status: 423,
+          headers: {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+          },
+        },
+      ),
+    );
+  }
+
+  const destination = destinationInterne(`${pathname}${search}`);
+  const verrou = request.nextUrl.clone();
+  verrou.pathname = "/verrou";
+  verrou.search = "";
+  verrou.searchParams.set("vers", destination);
+  // 303 est intentionnel : une Server Action verrouillée ne doit jamais rejouer son POST vers
+  // `/verrou`. Le navigateur ouvre la porte par un GET propre, sans corps sensible à retransmettre.
+  return recopierCookies(response, NextResponse.redirect(verrou, 303));
+
 }

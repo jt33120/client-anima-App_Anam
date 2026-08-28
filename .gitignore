@@ -33,9 +33,8 @@ next-env.d.ts
 /supabase/.temp
 /supabase/.branches
 
-# Overrides locaux non partagés (convention Claude Code) — .claude/settings.json,
-# .claude/skills/ et .claude/helpers/ doivent rester suivis : une session cloud
-# démarre d'un checkout git frais et n'a que ce qui est commité.
+# outillage BMAD/graft — settings.json, helpers/ et skills/ sont committés pour que les sessions
+# cloud (claude.ai/code) les aient aussi. Seul le fichier de préférences personnelles reste local.
 .claude/settings.local.json
 
 # Vercel CLI (identifiants de projet — dépôt public)

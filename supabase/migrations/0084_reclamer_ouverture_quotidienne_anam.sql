@@ -692,3 +692,50 @@ comment on function public.commencer_ouverture_quotidienne_anam(uuid, date) is
   'Attribue sous verrou un bail court après relecture du journal, ou restitue la ligne et son événement public. Service-role only.';
 comment on function public.finaliser_ouverture_quotidienne_anam(uuid, date, uuid, text, jsonb) is
   'Outbox atomique : valide la préparation, réserve pause/invitation via leurs RPC de référence, insère une parole et persiste sa métadonnée publique. Service-role only.';
+
+-- Pont expand/app : les anciennes instances 0082 peuvent rester servies pendant que le nouveau
+-- code commence à utiliser l'outbox. La signature historique délègue aux deux nouvelles phases et
+-- conserve sa sémantique (`true` seulement quand CET appel grave la ligne). Elle sera retirée dans
+-- une migration contract ultérieure, après disparition vérifiée des anciens déploiements.
+create function public.consigner_ouverture_quotidienne_anam(
+  cible uuid,
+  p_jour date,
+  p_contenu text
+) returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  droit record;
+  ligne record;
+begin
+  if p_contenu is null or btrim(p_contenu) = '' then
+    return false;
+  end if;
+
+  select * into droit
+    from public.commencer_ouverture_quotidienne_anam(cible, p_jour);
+  if droit.statut is distinct from 'a_preparer' or droit.jeton is null then
+    return false;
+  end if;
+
+  select * into ligne
+    from public.finaliser_ouverture_quotidienne_anam(
+      cible,
+      p_jour,
+      droit.jeton,
+      p_contenu,
+      jsonb_build_object('public', null, 'interne', null)
+    );
+  return ligne.entree_id is not null;
+end;
+$$;
+
+revoke all on function public.consigner_ouverture_quotidienne_anam(uuid, date, text)
+  from public, anon, authenticated;
+grant execute on function public.consigner_ouverture_quotidienne_anam(uuid, date, text)
+  to service_role;
+
+comment on function public.consigner_ouverture_quotidienne_anam(uuid, date, text) is
+  'Pont de compatibilité 0082 vers l''outbox 0084, service-role only. À retirer après extinction des anciens déploiements.';

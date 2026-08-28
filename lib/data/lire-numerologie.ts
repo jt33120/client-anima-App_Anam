@@ -1,6 +1,10 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { calculerNumerologie, type Numerologie } from "@/lib/astro/numerologie";
+import {
+  calculerNumerologie,
+  type EntreesNumerologie,
+  type Numerologie,
+} from "@/lib/astro/numerologie";
 
 /**
  * lire-numerologie.ts — LA NUMÉROLOGIE DE L'UTILISATRICE COURANTE (Story 5.2, T5).
@@ -56,7 +60,12 @@ export type RaisonNumerologieIndisponible =
   | "lecture_impossible";
 
 export type ResultatNumerologie =
-  | { readonly statut: "calcule"; readonly numerologie: Numerologie }
+  | {
+      readonly statut: "calcule";
+      readonly numerologie: Numerologie;
+      /** Entrées renvoyées au serveur de rendu pour expliquer le calcul, jamais journalisées. */
+      readonly entrees: EntreesNumerologie;
+    }
   | { readonly statut: "indisponible"; readonly raison: RaisonNumerologieIndisponible };
 
 interface LigneIdentite {
@@ -102,11 +111,13 @@ export async function lireNumerologie(
   // `prenom` n'est PAS lu : c'est une donnée d'adresse (comment Anam la nomme), jamais une entrée de
   // calcul. Le concaténer au nom complet — qui contient déjà les prénoms — compterait le prénom deux
   // fois et rendrait le nombre d'expression faux, sans que rien ne le signale.
+  const entrees: EntreesNumerologie = {
+    date: data.date_naissance,
+    nomComplet: data.nom_complet,
+  };
   return {
     statut: "calcule",
-    numerologie: calculerNumerologie(
-      { date: data.date_naissance, nomComplet: data.nom_complet },
-      anneeCouranteParis(maintenant),
-    ),
+    entrees,
+    numerologie: calculerNumerologie(entrees, anneeCouranteParis(maintenant)),
   };
 }

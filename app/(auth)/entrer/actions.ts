@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/data/supabase/admin";
 import { appliquerBarriereMinorite } from "@/lib/safety/appliquer-barriere";
 import { origineDuSite } from "@/lib/courriel/origine";
+import { destinationInterne } from "@/lib/auth/verrou-prive";
 import { ESSAIS_MAX, lireAttente, poserAttente } from "./attente";
 
 /**
@@ -96,14 +97,17 @@ export async function envoyerLien(
   formData: FormData,
 ): Promise<EtatEntree> {
   const email = String(formData.get("email") ?? "").trim();
+  const destination = destinationInterne(formData.get("destination"));
   if (!email || !email.includes("@")) {
     return { ok: false, message: "Entre une adresse e-mail valide." };
   }
 
   const supabase = await createSupabaseServerClient();
+  const retour = new URL("/auth/confirm", await origineDuLien());
+  retour.searchParams.set("next", destination);
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${await origineDuLien()}/auth/confirm` },
+    options: { emailRedirectTo: retour.toString() },
   });
 
   if (error) {
@@ -112,7 +116,7 @@ export async function envoyerLien(
   }
   // Le courriel porte DEUX portes : le lien (PKCE, ce navigateur-ci) et le code (n'importe quel
   // appareil pour le LIRE, ce navigateur-ci pour le TAPER). On note l'adresse visée.
-  await poserAttente({ adresse: email, essais: 0 });
+  await poserAttente({ adresse: email, essais: 0, destination });
   return { ok: true, adresse: email };
 }
 
@@ -168,7 +172,7 @@ export async function verifierCode(_prev: EtatCode, formData: FormData): Promise
 
   await poserAttente(null);
   // LA MÊME machine d'état que le lien magique — jamais une seconde (leçon 1.4).
-  redirect(await destinationApresAuth(supabase, "/"));
+  redirect(await destinationApresAuth(supabase, attente.destination));
 }
 
 /**
@@ -181,9 +185,10 @@ export async function verifierCode(_prev: EtatCode, formData: FormData): Promise
  *
  * Aucune condition, aucun message d'erreur possible : on efface, on revient au formulaire.
  */
-export async function recommencer(): Promise<void> {
+export async function recommencer(formData: FormData): Promise<void> {
   await poserAttente(null);
-  redirect("/entrer");
+  const destination = destinationInterne(formData.get("destination"));
+  redirect(destination === "/" ? "/entrer" : `/entrer?vers=${encodeURIComponent(destination)}`);
 }
 
 /**

@@ -15,6 +15,11 @@ export async function createSupabaseServerClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      // L'API passkey de Supabase est encore expérimentale et refuse tout appel sans opt-in SDK.
+      // L'activer ici n'ouvre aucun flux à elle seule : `ANIMA_PASSKEYS=oui` garde les routes et
+      // les actions. Cela permet en revanche de garder les cookies de session HttpOnly — aucune
+      // cérémonie ne passe par le client Supabase du navigateur.
+      auth: { experimental: { passkey: true } },
       // Le cookie porte l'access_token ET le refresh_token : il ne doit être ni lisible par le
       // JavaScript de page, ni transmis en clair (voir `cookies-session.ts`).
       cookieOptions: OPTIONS_COOKIE_SESSION,

@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
+import {
+  ErreurLectureOnboarding,
+  etapeOnboardingPour,
+} from "@/app/(auth)/etat-onboarding";
 
 /**
  * etat-onboarding.test.ts — [8.3] LA GARDE PARTAGÉE PAR TOUTES LES PAGES PROTÉGÉES.
@@ -76,7 +79,10 @@ describe("[8.3/AC2 DUR] chacune des deux pannes lève, et aucun rejet n'échappe
       utilisatrice: { error: { message: "réseau coupé" } },
       consentement: { data: CONSENTIE },
     });
-    await expect(etapeOnboardingPour(c, UID)).rejects.toThrow(/état d’onboarding impossible/);
+    await expect(etapeOnboardingPour(c, UID)).rejects.toMatchObject({
+      name: "ErreurLectureOnboarding",
+      sourceLecture: "utilisatrice",
+    });
   });
 
   it("[LE CŒUR] une panne sur `consentement` lève aussi — c'est la moitié qu'on perdait", async () => {
@@ -86,7 +92,10 @@ describe("[8.3/AC2 DUR] chacune des deux pannes lève, et aucun rejet n'échappe
       utilisatrice: { data: ADULTE },
       consentement: { error: { message: "réseau coupé" } },
     });
-    await expect(etapeOnboardingPour(c, UID)).rejects.toThrow(/consentement impossible/);
+    await expect(etapeOnboardingPour(c, UID)).rejects.toMatchObject({
+      name: "ErreurLectureOnboarding",
+      sourceLecture: "consentement",
+    });
   });
 
   it("les DEUX en panne : la première nommée l'emporte, et rien ne fuit", async () => {
@@ -97,10 +106,25 @@ describe("[8.3/AC2 DUR] chacune des deux pannes lève, et aucun rejet n'échappe
       utilisatrice: { error: { message: "A" } },
       consentement: { error: { message: "B" } },
     });
-    await expect(etapeOnboardingPour(c, UID)).rejects.toThrow(/état d’onboarding impossible/);
+    await expect(etapeOnboardingPour(c, UID)).rejects.toBeInstanceOf(ErreurLectureOnboarding);
     await new Promise((r) => setTimeout(r, 20));
     process.off("unhandledRejection", capter);
     expect(rejets, "un rejet non capté échappe — le parallélisme fuit").toEqual([]);
+  });
+
+  it("ne livre jamais le message Supabase à la frontière d'affichage", async () => {
+    const c = client({
+      utilisatrice: { error: { message: "token interne et détail SQL à ne pas afficher" } },
+      consentement: { data: CONSENTIE },
+    });
+    const erreur = etapeOnboardingPour(c, UID).catch((cause) => cause);
+    await expect(erreur).resolves.toMatchObject({
+      message: "etat_onboarding_indisponible",
+      sourceLecture: "utilisatrice",
+    });
+    await expect(erreur).resolves.not.toMatchObject({
+      message: expect.stringMatching(/token interne|SQL/i),
+    });
   });
 });
 

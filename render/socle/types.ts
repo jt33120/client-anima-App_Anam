@@ -34,7 +34,18 @@ export interface NombreVue {
   readonly cle: string;
   readonly intitule: string;
   readonly valeur: string;
-  readonly texte: TexteVue;
+  readonly calcul: readonly string[];
+}
+
+export interface FaitVue {
+  readonly intitule: string;
+  readonly valeur: string;
+}
+
+export interface LectureSymboliqueVue {
+  readonly cle: string;
+  readonly intitule: string;
+  readonly texte: string;
 }
 
 export interface NombreManquantVue {
@@ -50,11 +61,15 @@ export interface PositionVue {
   readonly valeur: string;
   /** `null` = les angles ne sont pas calculables ; la maison n'existe alors pas, elle n'est pas vide. */
   readonly maison: string | null;
+  readonly longitude: string | null;
+  readonly projection: string | null;
 }
 
 export interface AngleVue {
   readonly intitule: string;
   readonly valeur: string;
+  readonly longitude: string | null;
+  readonly projection: string | null;
 }
 
 export interface ManqueVue {
@@ -65,12 +80,22 @@ export interface ManqueVue {
 
 export interface SectionNombresVue {
   readonly indisponible: string | null;
+  readonly entrees: readonly FaitVue[];
+  readonly conventions: readonly string[];
   readonly nombres: readonly NombreVue[];
   readonly manquants: readonly NombreManquantVue[];
+  readonly lecturesSymboliques: readonly LectureSymboliqueVue[];
+  readonly noteLectureSymbolique: string | null;
 }
 
 export interface SectionCielVue {
   readonly indisponible: string | null;
+  readonly projection: {
+    readonly titre: string;
+    readonly description: string;
+    readonly repere: string;
+    readonly source: string;
+  } | null;
   readonly positions: readonly PositionVue[];
   readonly angles: readonly AngleVue[];
   readonly cuspides: readonly AngleVue[];
@@ -97,9 +122,18 @@ export interface PorteVue {
   readonly url: string;
 }
 
+export interface ApercuUniversVue {
+  readonly cle: "astrologie" | "numerologie" | "psychologie";
+  readonly titre: string;
+  readonly accroche: string;
+  readonly url: string;
+  readonly faits: readonly FaitVue[];
+}
+
 export interface FicheSocleVue {
   readonly nombres: SectionNombresVue;
   readonly ciel: SectionCielVue;
   readonly type: SectionTypeVue;
+  readonly apercus: readonly ApercuUniversVue[];
   readonly portes: readonly PorteVue[];
 }

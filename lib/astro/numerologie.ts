@@ -231,6 +231,41 @@ export interface Numerologie {
   readonly nombres: Readonly<Record<NomNombre, LectureNombre>>;
 }
 
+/** Une réduction arithmétique, du nombre reçu jusqu'à la valeur retenue. */
+export interface TraceReductionNumerologique {
+  readonly etapes: readonly number[];
+}
+
+export type TraceNombreNumerologique =
+  | {
+      readonly origine: "date_separee";
+      readonly jour: TraceReductionNumerologique;
+      readonly mois: TraceReductionNumerologique;
+      readonly annee: TraceReductionNumerologique;
+      readonly total: TraceReductionNumerologique;
+    }
+  | {
+      readonly origine: "jour_naissance";
+      readonly total: TraceReductionNumerologique;
+    }
+  | {
+      readonly origine: "annee_personnelle";
+      readonly jour: TraceReductionNumerologique;
+      readonly mois: TraceReductionNumerologique;
+      readonly anneeDeReference: TraceReductionNumerologique;
+      readonly total: TraceReductionNumerologique;
+    }
+  | {
+      readonly origine: "lettres";
+      readonly lettres: string;
+      readonly valeurs: readonly number[];
+      readonly total: TraceReductionNumerologique;
+    };
+
+export interface TraceNumerologie {
+  readonly nombres: Readonly<Record<NomNombre, TraceNombreNumerologique | null>>;
+}
+
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 // Les calculs
 // ══════════════════════════════════════════════════════════════════════════════════════════════
@@ -318,6 +353,92 @@ export function personnalite(nomComplet: string): number {
   const consonnes = [...lettresDe(nomComplet)].filter((l) => !VOYELLES.includes(l)).join("");
   if (consonnes.length === 0) throw new Error("numerologie : aucune consonne");
   return reduire(sommeLettres(consonnes));
+}
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// La trace — mêmes règles, mais sous une forme vérifiable par l'utilisatrice
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+function tracerReduction(valeur: number, conserverMaitres: boolean): TraceReductionNumerologique {
+  if (!Number.isInteger(valeur) || valeur < 1) {
+    throw new Error(`numerologie : trace impossible sur ${valeur}`);
+  }
+  const etapes = [valeur];
+  let courante = valeur;
+  while (courante > 9 && !(conserverMaitres && estMaitre(courante))) {
+    courante = sommeDesChiffres(courante);
+    etapes.push(courante);
+  }
+  return Object.freeze({ etapes: Object.freeze(etapes) });
+}
+
+function tracerLettres(lettres: string): TraceNombreNumerologique {
+  const valeurs = Object.freeze([...lettres].map(valeurLettre));
+  return Object.freeze({
+    origine: "lettres",
+    lettres,
+    valeurs,
+    total: tracerReduction(sommeLettres(lettres), true),
+  });
+}
+
+/**
+ * Rend la preuve arithmétique des six calculs, sans ajouter de sens ni de texte libre au résultat
+ * `Numerologie`. La trace est calculée à la demande pour l'écran de transparence et n'est jamais
+ * persistée : elle reste un produit mécanique des mêmes entrées et conventions.
+ */
+export function tracerNumerologie(
+  entrees: EntreesNumerologie,
+  anneeDeReference: number,
+): TraceNumerologie {
+  if (!Number.isInteger(anneeDeReference) || anneeDeReference < 1) {
+    throw new Error("numerologie : année de référence invalide");
+  }
+
+  const date = eclaterDate(entrees.date);
+  const jour = tracerReduction(date.jour, true);
+  const mois = tracerReduction(date.mois, true);
+  const annee = tracerReduction(date.annee, true);
+  const anneeReference = tracerReduction(anneeDeReference, false);
+
+  const nombres: Record<NomNombre, TraceNombreNumerologique | null> = {
+    chemin_de_vie: Object.freeze({
+      origine: "date_separee",
+      jour,
+      mois,
+      annee,
+      total: tracerReduction(
+        jour.etapes.at(-1)! + mois.etapes.at(-1)! + annee.etapes.at(-1)!,
+        true,
+      ),
+    }),
+    jour_de_naissance: Object.freeze({ origine: "jour_naissance", total: jour }),
+    annee_personnelle: Object.freeze({
+      origine: "annee_personnelle",
+      jour,
+      mois,
+      anneeDeReference: anneeReference,
+      total: tracerReduction(
+        jour.etapes.at(-1)! + mois.etapes.at(-1)! + anneeReference.etapes.at(-1)!,
+        false,
+      ),
+    }),
+    expression: null,
+    intime: null,
+    personnalite: null,
+  };
+
+  const brut = entrees.nomComplet?.trim() ?? "";
+  const lettres = lettresDe(brut);
+  if (brut.length > 0 && lettres.length > 0) {
+    const voyelles = [...lettres].filter((lettre) => VOYELLES.includes(lettre)).join("");
+    const consonnes = [...lettres].filter((lettre) => !VOYELLES.includes(lettre)).join("");
+    nombres.expression = tracerLettres(lettres);
+    if (voyelles.length > 0) nombres.intime = tracerLettres(voyelles);
+    if (consonnes.length > 0) nombres.personnalite = tracerLettres(consonnes);
+  }
+
+  return Object.freeze({ nombres: Object.freeze(nombres) });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════

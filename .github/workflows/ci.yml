@@ -17,16 +17,21 @@ jobs:
 
       - run: npm ci
 
+      - name: Cohérence des migrations locales
+        run: npm run schema:check
+
       - name: Lint (garde de direction des dépendances AD-1/AD-10)
         run: npm run lint
 
       # Supabase local pour prouver la RLS deny-by-default (AD-12).
-      # Version ÉPINGLÉE sur celle du dev local : `latest` (v2.110+) mappe le nouveau secret key
-      # `sb_secret_` à un rôle sans les grants attendus → « permission denied for table » (42501)
-      # sur les fixtures service_role. 2.67.1 est la version de référence du projet.
+      # Version ÉPINGLÉE : `latest` (v2.110+) mappe le nouveau secret key `sb_secret_` à un rôle
+      # sans les grants attendus → « permission denied for table » (42501) sur les fixtures
+      # service_role. 2.92.0 est le plancher qui comprend `[auth.passkey]`/`[auth.webauthn]`
+      # (supabase/config.toml, ajoutés le 2026-08-28) tout en restant sous la régression 2.110+ —
+      # 2.67.1 (l'ancien pin) ne connaît pas ces clés : « 'auth' has invalid keys: passkey, webauthn ».
       - uses: supabase/setup-cli@v1
         with:
-          version: 2.67.1
+          version: 2.92.0
       - run: supabase start
 
       - name: Exporter les clés Supabase locales
@@ -85,10 +90,11 @@ jobs:
 
       - run: npm ci
 
-      # Même version ÉPINGLÉE que `quality` : la 2.110+ casse les grants service_role (voir plus haut).
+      # Même version ÉPINGLÉE que `quality` (voir plus haut : 2.110+ casse service_role, < 2.92.0
+      # ne comprend pas `[auth.passkey]`/`[auth.webauthn]`).
       - uses: supabase/setup-cli@v1
         with:
-          version: 2.67.1
+          version: 2.92.0
       - run: supabase start
 
       # WebKit pour le projet « mobile » (iPhone 14) et Chromium pour « bureau ». Le téléphone

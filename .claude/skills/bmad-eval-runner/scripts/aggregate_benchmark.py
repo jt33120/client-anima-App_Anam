@@ -21,14 +21,14 @@ Input shapes accepted for a single config:
 
 Usage:
   Summarize one config across its runs:
-    uv run aggregate_benchmark.py --runs CONFIG_A.json
-    uv run aggregate_benchmark.py --runs RUN_DIR/        (reads timing.json files)
+    python3 aggregate_benchmark.py --runs CONFIG_A.json
+    python3 aggregate_benchmark.py --runs RUN_DIR/        (reads timing.json files)
 
   Compare two configs (each summarized, then delta = B - A):
-    uv run aggregate_benchmark.py --baseline A.json --variant B.json
+    python3 aggregate_benchmark.py --baseline A.json --variant B.json
 
   Self-test on a known fixture (no external input needed):
-    uv run aggregate_benchmark.py --self-test
+    python3 aggregate_benchmark.py --self-test
 
 Output is one JSON object on stdout.
 """

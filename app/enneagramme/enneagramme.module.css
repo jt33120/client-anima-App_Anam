@@ -22,12 +22,87 @@
   margin: 0 auto;
 }
 
+.bloc,
+.introduction {
+  width: 100%;
+  max-width: 28rem;
+}
+
 .bloc {
   display: flex;
   flex-direction: column;
   gap: var(--esp-4);
+}
+
+.introduction {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+}
+
+.introduction p,
+.repere p {
+  margin: 0;
+}
+
+.reperes {
   width: 100%;
-  max-width: 28rem;
+  border-top: 1px solid var(--bordure);
+  padding-top: var(--esp-3);
+}
+
+.reperes > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--cible-tactile);
+  color: var(--texte);
+  cursor: pointer;
+}
+
+.listeReperes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  list-style: none;
+  margin: var(--esp-3) 0 0;
+  padding: 0;
+}
+
+.repere {
+  padding: var(--esp-4);
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+}
+
+.repere summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--cible-tactile);
+  cursor: pointer;
+}
+
+.repere p {
+  margin-top: var(--esp-3);
+}
+
+.nomRepere {
+  color: var(--texte-doux);
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 /* L'énoncé en cours. `min-height` pour que la page ne SAUTE PAS entre un énoncé court et un long :
@@ -39,7 +114,7 @@
   text-align: left;
 }
 
-/* Les quatre réponses. Empilées, pleine largeur, TOUTES DE MÊME POIDS : une échelle dont un degré
+/* Les cinq réponses. Empilées, pleine largeur, TOUTES DE MÊME POIDS : une échelle dont un degré
    se remarque plus que les autres n'est plus une échelle. */
 .reponses {
   display: flex;
@@ -51,6 +126,9 @@
 }
 
 .reponse {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
   width: 100%;
   min-height: var(--cible-tactile);
   padding: var(--esp-3) var(--esp-4);
@@ -62,7 +140,12 @@
   border: 1px solid var(--bordure-forte);
   border-radius: var(--rayon);
   cursor: pointer;
-  transition: opacity var(--duree-standard) var(--courbe);
+  transition:
+    opacity var(--duree-standard) var(--courbe),
+    background-color var(--duree-standard) var(--courbe);
+}
+.reponse:hover:not(:disabled) {
+  background: var(--accent-doux);
 }
 .reponse:disabled {
   opacity: 0.6;
@@ -70,9 +153,48 @@
 }
 .reponse:focus-visible,
 .bouton:focus-visible,
-.discret:focus-visible {
+.discret:focus-visible,
+.reperes > summary:focus-visible,
+.repere summary:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
+}
+
+.glyphesFrequence,
+.glypheInconnu {
+  flex: 0 0 calc(var(--cible-tactile) + var(--cible-tactile) + var(--cible-tactile));
+  min-height: var(--cible-tactile);
+}
+
+.glyphesFrequence {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  color: var(--lueur);
+}
+
+.glypheFrequence {
+  display: grid;
+  place-items: center;
+  width: var(--esp-5);
+  height: var(--esp-5);
+}
+
+.glypheFrequence svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.glypheInconnu {
+  display: grid;
+  place-items: center;
+  color: var(--texte-doux);
 }
 
 /* Le résultat : un TYPE, jamais un nombre de points ni un classement (FR-031). */

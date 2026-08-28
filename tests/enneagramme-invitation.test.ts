@@ -82,11 +82,9 @@ describe("[7.8] REFUS TENU — la porte ne passe pas par le type de carte", () =
 });
 
 describe("[7.8/AC6] l'écran s'annonce avant de démarrer", () => {
-  it("[LE CŒUR] l'annonce est montée, et SEULEMENT au premier passage", () => {
-    // Quelqu'un qui reprend une passe en cours n'a pas besoin qu'on lui réexplique ce qu'elle
-    // fait : la relance serait du bavardage à chaque retour.
+  it("[LE CŒUR] l’introduction pédagogique est fournie au questionnaire avant son démarrage", () => {
     const page = lire("app/enneagramme/page.tsx");
-    expect(page).toMatch(/\{cleTentative === "nouvelle" && <p[^>]*>\{ANNONCE_DU_TEST\}<\/p>\}/);
+    expect(page).toContain("introduction={<IntroductionEnneagramme />}");
   });
 
   it("[NFR-017] elle DIT ce que le code tient depuis la 5.5 : on peut s'arrêter et reprendre", () => {

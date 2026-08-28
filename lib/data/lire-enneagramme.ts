@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
 import type { TexteCorpus } from "@/lib/corpus/port";
 import {
-  estNiveauReponse,
+  estValeurReponse,
   estTypeEnneagramme,
   type ReponseItem,
   type TypeEnneagramme,
@@ -146,15 +146,15 @@ interface LigneTentative {
 /**
  * Les réponses relues en `ReponseItem[]`.
  *
- * Une entrée dont le niveau n'est pas 0..3 est ÉCARTÉE plutôt que corrigée : la ramener à 0 serait
- * répondre « pas du tout » à sa place, et `conclure` doit pouvoir dire « incomplet » en nommant
- * l'item. La contrainte `reponses_enneagramme_valides` (0049) rend le cas quasi impossible — le
- * « quasi » est le réimport `service_role`.
+ * Une entrée qui n'est ni un niveau 0..3 ni l'inconnue explicite `null` est ÉCARTÉE plutôt que
+ * corrigée : la ramener à 0 serait répondre « jamais » à sa place, et `conclure` doit pouvoir dire
+ * « incomplet » en nommant l'item. La contrainte `reponses_enneagramme_valides` (0049 puis 0087)
+ * rend le cas quasi impossible — le « quasi » est le réimport `service_role`.
  */
 export function reponsesDepuisJson(brut: unknown): readonly ReponseItem[] {
   if (typeof brut !== "object" || brut === null || Array.isArray(brut)) return [];
   return Object.entries(brut as Record<string, unknown>)
-    .filter(([, niveau]) => estNiveauReponse(niveau))
+    .filter(([, niveau]) => estValeurReponse(niveau))
     .map(([itemId, niveau]) => ({ itemId, niveau: niveau as ReponseItem["niveau"] }));
 }
 

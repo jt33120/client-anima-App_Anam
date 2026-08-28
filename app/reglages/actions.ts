@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { heureValide } from "@/lib/domain/socle-quotidien";
 import * as copieNom from "@/lib/domain/copie-reglages";
 import type { EtatNom } from "@/render/reglages/FormulaireNom";
+import { effacerDeverrouillage } from "@/lib/auth/verrou-prive";
 
 /**
  * actions.ts — L'ABONNEMENT À LA POUSSÉE ET L'HEURE CHOISIE (Story 6.2, T6).
@@ -166,6 +167,7 @@ export async function reglerCourriels(refuse: boolean): Promise<EtatReglages> {
 export async function seDeconnecter(): Promise<void> {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
+  await effacerDeverrouillage();
   redirect("/entrer?deconnexion=1");
 }
 

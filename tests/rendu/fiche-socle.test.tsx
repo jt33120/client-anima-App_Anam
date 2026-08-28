@@ -5,7 +5,11 @@ import type { FicheSocleVue } from "@/render/socle/types";
 import { ficheSocle } from "@/lib/domain/fiche-socle";
 import {
   INTRODUCTION,
+  TITRE_APERCU,
   TITRE_NOMBRES,
+  TITRE_ENTREES_NUMEROLOGIE,
+  TITRE_METHODE_NUMEROLOGIE,
+  TITRE_LECTURE_NUMEROLOGIE,
   TITRE_CIEL,
   TITRE_ANGLES,
   TITRE_MAISONS,
@@ -13,6 +17,7 @@ import {
   TITRE_MANQUES,
   TITRE_PORTES,
   SENS_DU_CIEL_NON_ECRIT,
+  LECTURE_NUMEROLOGIE_NON_ECRITE,
 } from "@/lib/domain/copie-socle";
 import { MESSAGE_TYPE_SANS_TEXTE, MESSAGE_TYPE_ABSENT } from "@/lib/domain/enneagramme-items";
 import { calculerNumerologie } from "@/lib/astro/numerologie";
@@ -41,7 +46,11 @@ const SANS_HEURE: EntreesNaissance = { ...AVEC_HEURE, heure: null };
 
 const COPIE = {
   introduction: INTRODUCTION,
+  titreApercu: TITRE_APERCU,
   titreNombres: TITRE_NOMBRES,
+  titreEntreesNumerologie: TITRE_ENTREES_NUMEROLOGIE,
+  titreMethodeNumerologie: TITRE_METHODE_NUMEROLOGIE,
+  titreLectureNumerologie: TITRE_LECTURE_NUMEROLOGIE,
   titreCiel: TITRE_CIEL,
   titreAngles: TITRE_ANGLES,
   titreMaisons: TITRE_MAISONS,
@@ -57,6 +66,7 @@ const complete = ficheSocle(
   calculerThemeNatal(AVEC_HEURE, ephemeride),
   4,
   { nombres: null, ciel: null },
+  { date: "1990-06-15", nomComplet: "Marie Claire Dubois" },
 ) as unknown as FicheSocleVue;
 
 const sansHeureNiNom = ficheSocle(
@@ -64,15 +74,26 @@ const sansHeureNiNom = ficheSocle(
   calculerThemeNatal(SANS_HEURE, ephemeride),
   null,
   { nombres: null, ciel: null },
+  { date: "1990-06-15", nomComplet: null },
 ) as unknown as FicheSocleVue;
 
-const dessiner = (fiche: FicheSocleVue) => render(<FicheSocle fiche={fiche} copie={COPIE} />);
+const corpusNumerologieVide: FicheSocleVue = {
+  ...complete,
+  nombres: {
+    ...complete.nombres,
+    lecturesSymboliques: [],
+    noteLectureSymbolique: LECTURE_NUMEROLOGIE_NON_ECRITE,
+  },
+};
+
+const dessiner = (fiche: FicheSocleVue, mode: "tout" | "astrologie" | "numerologie" = "tout") =>
+  render(<FicheSocle fiche={fiche} copie={COPIE} mode={mode} />);
 
 afterEach(cleanup);
 
 describe("[7.5/AC4] le milieu du ciel arrive à l'écran", () => {
   it("[LE CŒUR] l'ascendant ET le milieu du ciel sont dans le DOM", () => {
-    const { container } = dessiner(complete);
+    const { container } = dessiner(complete, "astrologie");
     const texte = container.textContent ?? "";
     expect(texte).toContain("Ascendant");
     expect(texte, "le milieu du ciel est calculé depuis la 5.1 et n'avait jamais été affiché").toContain(
@@ -81,7 +102,7 @@ describe("[7.5/AC4] le milieu du ciel arrive à l'écran", () => {
   });
 
   it("les douze cuspides sont rendues, et nommées", () => {
-    const { container } = dessiner(complete);
+    const { container } = dessiner(complete, "astrologie");
     const texte = container.textContent ?? "";
     for (const nom of ["première maison", "sixième maison", "douzième maison"]) {
       expect(texte, `cuspide manquante : ${nom}`).toContain(nom);
@@ -89,36 +110,54 @@ describe("[7.5/AC4] le milieu du ciel arrive à l'écran", () => {
   });
 });
 
-describe("[7.5/AC1] les six nombres, avec leurs six textes", () => {
-  it("[LE CŒUR] six entrées de nombre, et chacune porte un texte non vide", () => {
-    const { container } = dessiner(complete);
+describe("[7.5 · 13.9] les six nombres, avec leurs six preuves de calcul", () => {
+  it("[LE CŒUR] six entrées de nombre, et chacune ouvre son calcul", () => {
+    const { container } = dessiner(complete, "numerologie");
     const entrees = container.querySelectorAll("li[class*='entree']");
     expect(entrees.length, "six nombres calculés doivent donner six entrées à l'écran").toBe(6);
     for (const e of entrees) {
-      const anam = e.querySelector("p[class*='texte']");
-      expect(anam, "un nombre sans son texte est FR-055 non tenu").not.toBeNull();
-      expect((anam!.textContent ?? "").length).toBeGreaterThan(20);
+      const calcul = e.querySelector("details[class*='calcul']");
+      expect(calcul, "un résultat sans preuve arithmétique n'est pas vérifiable").not.toBeNull();
+      expect(calcul?.textContent ?? "").toContain("Voir le calcul");
     }
   });
 
   it("les six intitulés sont là, pas seulement le chemin de vie", () => {
-    const texte = dessiner(complete).container.textContent ?? "";
+    const texte = dessiner(complete, "numerologie").container.textContent ?? "";
     for (const nom of ["Chemin de vie", "Expression", "Intime", "Personnalité", "Jour de naissance", "Année personnelle"]) {
       expect(texte, `intitulé manquant : ${nom}`).toContain(nom);
     }
+  });
+
+  it("sépare la méthode de la lecture symbolique et ne répète qu'une note de corpus", () => {
+    const { container } = dessiner(corpusNumerologieVide, "numerologie");
+    expect(container.textContent ?? "").toContain(TITRE_METHODE_NUMEROLOGIE);
+    expect(container.textContent ?? "").toContain(TITRE_LECTURE_NUMEROLOGIE);
+    expect(container.querySelectorAll("p").length).toBeGreaterThan(0);
+    expect((container.textContent ?? "").split(LECTURE_NUMEROLOGIE_NON_ECRITE).length - 1).toBe(1);
+  });
+
+  it("garde les lectures écrites derrière un seul dévoilement optionnel", () => {
+    const { container } = dessiner(complete, "numerologie");
+    const lecture = [...container.querySelectorAll("details")].find((detail) =>
+      (detail.querySelector("summary")?.textContent ?? "").includes(TITRE_LECTURE_NUMEROLOGIE),
+    );
+    expect(lecture).toBeDefined();
+    expect(lecture?.open).toBe(false);
+    expect(lecture?.querySelectorAll("article")).toHaveLength(6);
   });
 });
 
 describe("[7.5/AC3] le ciel entier, plus jamais cinq corps", () => {
   it("[LE CŒUR] Jupiter, Saturne, Uranus, Neptune et Pluton paraissent", () => {
-    const texte = dessiner(complete).container.textContent ?? "";
+    const texte = dessiner(complete, "astrologie").container.textContent ?? "";
     for (const corps of ["Jupiter", "Saturne", "Uranus", "Neptune", "Pluton"]) {
       expect(texte, `${corps} manque — la carte en montrait cinq, la halte les montre tous`).toContain(corps);
     }
   });
 
   it("les maisons accompagnent les positions quand les angles existent", () => {
-    const { container } = dessiner(complete);
+    const { container } = dessiner(complete, "astrologie");
     const positions = container.querySelectorAll("li[class*='position']");
     expect(positions.length).toBeGreaterThan(10);
     const avecMaison = [...positions].filter((p) => (p.textContent ?? "").includes("maison"));
@@ -126,9 +165,30 @@ describe("[7.5/AC3] le ciel entier, plus jamais cinq corps", () => {
   });
 });
 
+describe("[13.7] la carte natale exacte et son équivalent textuel", () => {
+  it("nomme le SVG et projette chaque longitude servie par le domaine", () => {
+    const { container } = dessiner(complete, "astrologie");
+    const svg = container.querySelector("svg[role='img']");
+    expect(svg).not.toBeNull();
+    expect(svg?.querySelector("title")?.textContent).toContain("Carte exacte");
+    expect(svg?.querySelector("desc")?.textContent).toContain("mêmes positions en texte");
+    for (const position of complete.ciel.positions) {
+      if (!position.projection) continue;
+      expect(svg?.querySelector(`g[transform='rotate(${position.projection} 160 160)']`), position.cle).not.toBeNull();
+      expect(container.textContent ?? "", position.cle).toContain(`Longitude : ${position.longitude}`);
+    }
+  });
+
+  it("ne dessine aucune carte précise quand l'heure manque", () => {
+    const { container } = dessiner(sansHeureNiNom, "astrologie");
+    expect(container.querySelector("svg[role='img']")).toBeNull();
+    expect(container.textContent ?? "").toContain("Il me manque ton heure de naissance");
+  });
+});
+
 describe("[7.5/AC2] une absence se DIT — jamais un tiret, jamais une ligne vide", () => {
   it("[LE CŒUR] sans nom, les nombres manquants portent leur phrase ET leur lien", () => {
-    const { container } = dessiner(sansHeureNiNom);
+    const { container } = dessiner(sansHeureNiNom, "numerologie");
     const manques = container.querySelectorAll("div[class*='manque']");
     expect(manques.length, "aucune absence dite : le défaut est le silence, pas l'absence").toBeGreaterThan(0);
     const liens = container.querySelectorAll("a[href='/reglages']");
@@ -141,7 +201,7 @@ describe("[7.5/AC2] une absence se DIT — jamais un tiret, jamais une ligne vid
     // phrase est de la ponctuation ; ce que FR-050 refuse, c'est un tiret À LA PLACE d'une valeur.
     // Une garde qui confond les deux devient impossible à satisfaire, et la pression est alors de
     // l'assouplir jusqu'à ce qu'elle ne garde plus rien. On regarde donc les ÉLÉMENTS, pas la chaîne.
-    const { container } = dessiner(sansHeureNiNom);
+    const { container } = dessiner(sansHeureNiNom, "numerologie");
     expect((container.textContent ?? "").toLowerCase()).not.toContain("non disponible");
     const creux = [...container.querySelectorAll("span, p, li")].filter((e) =>
       /^[\s—–\-.·]*$/.test(e.textContent ?? ""),
@@ -150,7 +210,7 @@ describe("[7.5/AC2] une absence se DIT — jamais un tiret, jamais une ligne vid
   });
 
   it("sans heure, l'aveu de la 5.3 est affiché avec son lien vers /heure-naissance", () => {
-    const { container } = dessiner(sansHeureNiNom);
+    const { container } = dessiner(sansHeureNiNom, "astrologie");
     expect(container.textContent ?? "").toContain("Il me manque ton heure de naissance");
     expect(container.querySelectorAll("a[href='/heure-naissance']").length).toBeGreaterThan(0);
   });
@@ -158,7 +218,7 @@ describe("[7.5/AC2] une absence se DIT — jamais un tiret, jamais une ligne vid
 
 describe("[7.5/AC5] le sens du ciel n'est pas écrit, et la page le DIT", () => {
   it("[LE CŒUR] l'aveu paraît dès qu'une position est affichée", () => {
-    const texte = dessiner(complete).container.textContent ?? "";
+    const texte = dessiner(complete, "astrologie").container.textContent ?? "";
     expect(texte, "un tableau d'éphémérides muet est exactement ce que la 5.6 a refusé").toContain(
       SENS_DU_CIEL_NON_ECRIT,
     );
@@ -166,26 +226,19 @@ describe("[7.5/AC5] le sens du ciel n'est pas écrit, et la page le DIT", () => 
 
   it("mais PAS quand il n'y a aucune position à qualifier", () => {
     const vide = ficheSocle(null, null, null, { nombres: "panne", ciel: "panne" }) as unknown as FicheSocleVue;
-    expect(dessiner(vide).container.textContent ?? "").not.toContain(SENS_DU_CIEL_NON_ECRIT);
+    expect(dessiner(vide, "astrologie").container.textContent ?? "").not.toContain(SENS_DU_CIEL_NON_ECRIT);
   });
 });
 
-describe("[7.5 · 7.8] le type — Anima cesse d'être accusée d'un vide qui n'est pas le sien", () => {
-  it("[LE CŒUR] sans type, c'est le TEST qui est nommé, et le lien y mène", () => {
+describe("[13.6] le type reste un repère résumé dans la porte Psychologie", () => {
+  it("[LE CŒUR] sans type, l'aperçu dit l'absence sans accuser le corpus", () => {
     const { container } = dessiner(sansHeureNiNom);
     const texte = container.textContent ?? "";
-    expect(texte).toContain(MESSAGE_TYPE_ABSENT);
+    expect(texte).toContain("Aucun type retenu pour le moment.");
     expect(texte, "l'ancien message accusait Anima d'un texte qu'elle a pourtant écrit").not.toContain(
       "Anima n’a pas encore écrit cette carte",
     );
-    // ⚠️ ON VISE LE LIEN DE L'ABSENCE, PAS TOUS LES LIENS DE LA PAGE. La section « Ce que tu peux
-    // changer » porte elle aussi une porte vers `/enneagramme` : compter la page entière ferait
-    // passer ce test au vert le jour où l'invitation disparaîtrait, la porte suffisant au compte.
-    const bloc = [...container.querySelectorAll("div[class*='manque']")].find((d) =>
-      (d.textContent ?? "").includes(MESSAGE_TYPE_ABSENT),
-    );
-    expect(bloc, "l'invitation au test n'est pas dans un bloc d'absence").toBeDefined();
-    expect(bloc!.querySelectorAll("a[href='/enneagramme']").length).toBe(1);
+    expect(container.querySelectorAll("a[href='/psychologie']").length).toBe(1);
   });
 
   it("avec un type, son texte de corpus paraît et l'invitation disparaît", () => {
@@ -241,11 +294,19 @@ describe("[7.5 · 7.2] les deux portes du socle", () => {
   });
 });
 
-describe("[7.5] la structure du document", () => {
-  it("quatre sections, chacune avec un titre accessible", () => {
+describe("[13.6] la structure résumée du document", () => {
+  it("rend les trois univers comme des portes entières vers leur détail", () => {
+    const { container } = dessiner(complete);
+    expect(container.querySelectorAll("a[href='/socle?univers=numerologie']")).toHaveLength(1);
+    expect(container.querySelectorAll("a[href='/socle?univers=astrologie']")).toHaveLength(1);
+    expect(container.querySelectorAll("a[href='/psychologie']")).toHaveLength(1);
+    expect(container.querySelectorAll("a[class*='porteApercu'] svg[aria-hidden='true']")).toHaveLength(3);
+  });
+
+  it("un aperçu et les portes de correction, chacun avec un titre accessible", () => {
     const { container } = dessiner(complete);
     const sections = container.querySelectorAll("section[aria-labelledby]");
-    expect(sections.length, "nombres, ciel, type, portes").toBe(4);
+    expect(sections.length, "aperçu puis portes de correction").toBe(2);
     for (const sec of sections) {
       const id = sec.getAttribute("aria-labelledby")!;
       const titre = container.querySelector(`#${id}`);

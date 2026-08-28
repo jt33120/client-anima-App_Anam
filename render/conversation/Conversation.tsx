@@ -47,6 +47,19 @@ const MESSAGE_ECHEC = "Je n’ai pas pu répondre. Ton message est gardé.";
  * On énonce un fait : quelque chose est en cours. C'est exactement ce que le signe visuel dit.
  */
 const ANNONCE_ATTENTE = "Anam prépare sa réponse.";
+const MAX_APPELS_OUVERTURE_AUTOMATIQUES = 3;
+
+function delaiVerificationBail(reessayerApresMs: number, numeroAppel: number): number {
+  const baseSure = Math.min(Math.max(reessayerApresMs, 250), 5_000);
+  return Math.min(baseSure * 2 ** Math.max(0, numeroAppel - 1), 10_000);
+}
+
+type CauseEchecOuverture =
+  | "session-expiree"
+  | "acces-incomplet"
+  | "schema-incompatible"
+  | "incident-temporaire"
+  | "attente-expiree";
 
 /**
  * La CLÉ STABLE d'une ouverture — ce qui permet de distinguer « une nouvelle chose à dire » de « la même
@@ -340,8 +353,11 @@ export default function Conversation({
   const [regionObservee, setRegionObservee] = useState(regionActive);
   const derniereEntreeTentativee = useRef(0);
   const tentativeCourante = useRef(0);
+  const appelsOuvertureAutomatiques = useRef(0);
   const [jourTraite, setJourTraite] = useState(false);
   const [etatOuverture, setEtatOuverture] = useState<"repos" | "en-cours" | "echec">("repos");
+  const [causeEchecOuverture, setCauseEchecOuverture] = useState<CauseEchecOuverture | null>(null);
+  const [destinationAcces, setDestinationAcces] = useState<string | null>(null);
   const attenteRegistre = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rearmementJour = useRef<ReturnType<typeof setTimeout> | null>(null);
   const regionActiveRef = useRef(regionActive);
@@ -362,7 +378,10 @@ export default function Conversation({
   // serveur un délai relatif jusqu'à minuit Paris, ce qui reste juste même si son horloge est fausse.
   if (regionObservee !== regionActive) {
     setRegionObservee(regionActive);
-    if (regionActive) setEntreeRegion((precedente) => precedente + 1);
+    if (regionActive) {
+      appelsOuvertureAutomatiques.current = 0;
+      setEntreeRegion((precedente) => precedente + 1);
+    }
   }
 
   const actionOuverture = onReclamerOuvertureQuotidienne;
@@ -393,28 +412,52 @@ export default function Conversation({
     const numeroEntree = entreeRegion;
     const idTentative = tentativeCourante.current + 1;
     tentativeCourante.current = idTentative;
+    appelsOuvertureAutomatiques.current += 1;
     derniereEntreeTentativee.current = numeroEntree;
     setEtatOuverture("en-cours");
+    setCauseEchecOuverture(null);
+    setDestinationAcces(null);
     setAnnonce(ANNONCE_ATTENTE);
 
     void actionOuverture()
       .then((resultat) => {
         if (tentativeCourante.current !== idTentative) return;
-        if (resultat.statut === "indisponible") {
+        if (
+          resultat.statut === "session-expiree" ||
+          resultat.statut === "acces-incomplet" ||
+          resultat.statut === "schema-incompatible" ||
+          resultat.statut === "incident-temporaire"
+        ) {
           setAnnonce("");
+          setCauseEchecOuverture(resultat.statut);
+          setDestinationAcces(
+            resultat.statut === "acces-incomplet" ? resultat.destination : null,
+          );
           setEtatOuverture("echec");
           return;
         }
         if (resultat.statut === "en-cours") {
+          if (appelsOuvertureAutomatiques.current >= MAX_APPELS_OUVERTURE_AUTOMATIQUES) {
+            setAnnonce("");
+            setCauseEchecOuverture("attente-expiree");
+            setEtatOuverture("echec");
+            return;
+          }
           attenteRegistre.current = setTimeout(() => {
             if (tentativeCourante.current !== idTentative) return;
             setEtatOuverture("repos");
             setEntreeRegion((precedente) => precedente + 1);
-          }, resultat.reessayerApresMs);
+          }, delaiVerificationBail(
+            resultat.reessayerApresMs,
+            appelsOuvertureAutomatiques.current,
+          ));
           return;
         }
 
         setJourTraite(true);
+        appelsOuvertureAutomatiques.current = 0;
+        setCauseEchecOuverture(null);
+        setDestinationAcces(null);
         if (rearmementJour.current) clearTimeout(rearmementJour.current);
         rearmementJour.current = setTimeout(() => {
           // Les clés ne valent que pour le jour traité. Une invitation légitimement resservie le
@@ -462,6 +505,7 @@ export default function Conversation({
       .catch(() => {
         if (tentativeCourante.current !== idTentative) return;
         setAnnonce("");
+        setCauseEchecOuverture("incident-temporaire");
         setEtatOuverture("echec");
       });
   }, [
@@ -474,7 +518,11 @@ export default function Conversation({
   ]);
 
   const relancerOuverture = useCallback(() => {
+    if (attenteRegistre.current) clearTimeout(attenteRegistre.current);
+    appelsOuvertureAutomatiques.current = 0;
     setJourTraite(false);
+    setCauseEchecOuverture(null);
+    setDestinationAcces(null);
     setEtatOuverture("repos");
     setEntreeRegion((precedente) => precedente + 1);
   }, []);
@@ -482,7 +530,20 @@ export default function Conversation({
     regionActive &&
     !!actionOuverture &&
     !jourTraite &&
-    (ouvertureQuotidienneDue || etatOuverture === "en-cours" || etatOuverture === "echec");
+    (ouvertureQuotidienneDue ||
+      etatOuverture === "en-cours" ||
+      etatOuverture === "echec");
+
+  const messageEchecOuverture =
+    causeEchecOuverture === "session-expiree"
+      ? "Ta session a expiré."
+      : causeEchecOuverture === "acces-incomplet"
+        ? "Ton accès doit être terminé avant d’ouvrir le fil."
+        : causeEchecOuverture === "schema-incompatible"
+          ? "Une mise à jour du service doit se terminer avant d’ouvrir le fil."
+          : causeEchecOuverture === "attente-expiree"
+            ? "L’ouverture du jour prend plus de temps. Tu peux réessayer quand tu es prête."
+            : "Le fil n’a pas pu être ouvert.";
 
   /**
    * Réévaluation explicite après un geste. C'est le vrai chemin réactif de la 4.10 : la Server
@@ -828,12 +889,30 @@ export default function Conversation({
         nommage={nommage}
         quotaEpuise={quotaEpuise}
       />
-      {etatOuverture === "echec" && ouvertureBloquante ? (
+      {etatOuverture === "echec" && causeEchecOuverture ? (
         <div className={s.repriseOuverture} role="status">
-          <p className="t-meta">Anam n’a pas pu ouvrir la session.</p>
-          <button type="button" className={s.reessayerOuverture} onClick={relancerOuverture}>
-            <span className="t-bouton">Réessayer</span>
-          </button>
+          <p className="t-meta">{messageEchecOuverture}</p>
+          {causeEchecOuverture === "session-expiree" ? (
+            <a className={`${s.reessayerOuverture} t-bouton`} href="/entrer">
+              Me reconnecter
+            </a>
+          ) : causeEchecOuverture === "acces-incomplet" && destinationAcces ? (
+            <a className={`${s.reessayerOuverture} t-bouton`} href={destinationAcces}>
+              Continuer
+            </a>
+          ) : causeEchecOuverture === "schema-incompatible" ? (
+            <button
+              type="button"
+              className={s.reessayerOuverture}
+              onClick={() => window.location.reload()}
+            >
+              <span className="t-bouton">Recharger la page</span>
+            </button>
+          ) : (
+            <button type="button" className={s.reessayerOuverture} onClick={relancerOuverture}>
+              <span className="t-bouton">Réessayer</span>
+            </button>
+          )}
         </div>
       ) : null}
       <Composeur

@@ -5,6 +5,7 @@ import {
   CLES_ENNEAGRAMME,
   CORPUS_ENNEAGRAMME,
   cleEnneagramme,
+  reperesPourIntroduction,
   texteDuType,
   texteDuTypeRetenu,
 } from "@/lib/corpus/enneagramme";
@@ -60,6 +61,16 @@ describe("[5.5/AC1] la forme du corpus", () => {
   });
 });
 
+describe("[13.8] les neuf repères dépliables restent une projection du corpus", () => {
+  it("expose les neuf textes existants sans résumé produit", () => {
+    const reperes = reperesPourIntroduction();
+    expect(reperes).toHaveLength(9);
+    for (const repere of reperes) {
+      expect(texteDuTypeRetenu(repere.type)).toEqual({ statut: "ecrit", texte: repere.texte });
+    }
+  });
+});
+
 describe("[5.5/AC1] la clé JETTE hors domaine — une clé fabriquée n'est pas une absence de texte", () => {
   it("accepte 1..9", () => {
     for (const t of TYPES) expect(cleEnneagramme(t)).toBe(`enneagramme:${t}`);
@@ -87,8 +98,8 @@ describe("[5.5/AC1] la jonction distingue TROIS états, jamais deux", () => {
   it("[LE CŒUR] un ex æquo rend `null` — il n'y a rien à écrire, pas un texte en attente", () => {
     // Confondre les deux ferait promettre « ce texte n'est pas encore écrit » à quelqu'un dont le
     // test n'a désigné personne.
-    const indecis: ResultatTest = { statut: "indecis", exaequo: [3, 8] };
-    expect(texteDuType(indecis)).toBeNull();
+    const indetermine: ResultatTest = { statut: "indetermine", raison: "egalite" };
+    expect(texteDuType(indetermine)).toBeNull();
   });
 
   it("un test incomplet rend `null` lui aussi", () => {

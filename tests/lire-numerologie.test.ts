@@ -95,6 +95,7 @@ describe("[T5] le comportement du chemin de lecture", () => {
     });
     expect(r.numerologie.nombres.expression.statut).toBe("calcule");
     expect(r.numerologie.anneeDeReference).toBe(2026);
+    expect(r.entrees).toEqual({ date: "1970-11-28", nomComplet: "Marie Dupont" });
     // La mesure, pas l'intention : AUCUNE écriture n'a eu lieu.
     expect(ecritures).toEqual({ insert: 0, update: 0, upsert: 0, delete: 0, rpc: 0 });
   });

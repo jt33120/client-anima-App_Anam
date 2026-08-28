@@ -82,7 +82,7 @@ export interface DepotEnneagramme {
  * produit exactement ça, et c'est déjà la règle de `scorer` (`lib/domain/enneagramme.ts`). Les deux
  * doivent coïncider, sans quoi ce qui est marqué à l'écran et ce qui est scoré divergeraient.
  */
-export function reponsesEnJson(reponses: readonly ReponseItem[]): Record<string, number> {
+export function reponsesEnJson(reponses: readonly ReponseItem[]): Record<string, number | null> {
   return Object.fromEntries(reponses.map((r) => [r.itemId, r.niveau]));
 }
 
