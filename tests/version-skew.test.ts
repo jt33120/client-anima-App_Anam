@@ -15,6 +15,18 @@ describe("[14.6] changement de déploiement et frontières françaises", () => {
     expect(deploymentIdPour({})).toBeUndefined();
   });
 
+  it("tronque à 32 caractères — Vercel refuse au-delà, et un SHA git en fait 40", () => {
+    // Régression : la production a été cassée de 0a06649 à ce correctif. Vercel rejetait le
+    // déploiement AVANT le build (« The deploymentId … must be 32 characters or less »), parce
+    // que VERCEL_GIT_COMMIT_SHA est un SHA complet de 40 caractères.
+    const shaComplet = "6c00130f23de7107dcda80c2575a76419c6fc0b2";
+    expect(shaComplet).toHaveLength(40);
+
+    const identifiant = deploymentIdPour({ VERCEL_GIT_COMMIT_SHA: shaComplet });
+    expect(identifiant).toHaveLength(32);
+    expect(shaComplet.startsWith(identifiant!)).toBe(true);
+  });
+
   it("refuse les caractères incompatibles avec le protocole de déploiement Next", () => {
     expect(() => deploymentIdPour({ NEXT_DEPLOYMENT_ID: "avec.point" })).toThrow(
       /deployment_id_invalide:NEXT_DEPLOYMENT_ID/,
