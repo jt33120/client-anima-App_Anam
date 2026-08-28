@@ -1,6 +1,49 @@
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/data/supabase/admin";
 
+export type CauseErreurOuvertureQuotidienne =
+  | "schema-incompatible"
+  | "incident-temporaire";
+
+/**
+ * Erreur fermée du dépôt : le code Supabase sert à classer l'incident, jamais à composer une copie.
+ * Le message distant peut contenir SQL, identifiants ou données et ne franchit donc pas ce module.
+ */
+export class ErreurDepotOuvertureQuotidienne extends Error {
+  readonly name = "ErreurDepotOuvertureQuotidienne";
+
+  constructor(
+    readonly causeOuverture: CauseErreurOuvertureQuotidienne,
+    operation: string,
+  ) {
+    super(`ouverture_quotidienne:${operation}:${causeOuverture}`);
+  }
+}
+
+const CODES_SCHEMA_INCOMPATIBLE = new Set([
+  "PGRST202", // fonction absente du cache PostgREST
+  "PGRST204", // colonne absente du cache PostgREST
+  "PGRST205", // table absente du cache PostgREST
+  "42883", // fonction PostgreSQL absente
+  "42P01", // relation PostgreSQL absente
+  "42703", // colonne PostgreSQL absente
+]);
+
+function erreurRpc(operation: string, code: unknown): ErreurDepotOuvertureQuotidienne {
+  const cause =
+    typeof code === "string" && CODES_SCHEMA_INCOMPATIBLE.has(code)
+      ? "schema-incompatible"
+      : "incident-temporaire";
+  return new ErreurDepotOuvertureQuotidienne(cause, operation);
+}
+
+function erreurReponse(operation: string): ErreurDepotOuvertureQuotidienne {
+  return new ErreurDepotOuvertureQuotidienne(
+    "incident-temporaire",
+    `${operation}_reponse_invalide`,
+  );
+}
+
 export type DroitOuvertureQuotidienne =
   | { readonly statut: "a-preparer"; readonly jeton: string }
   | { readonly statut: "en-cours" }
@@ -68,7 +111,7 @@ function lignePersistanteDepuis(
     !Number.isFinite(Date.parse(ligne.entree_creee_le)) ||
     !evenementPublicValide(ligne.evenement_public)
   ) {
-    throw new Error("ouverture_quotidienne: ligne_invalide");
+    throw erreurReponse("ligne");
   }
   return {
     id: ligne.entree_id,
@@ -103,8 +146,8 @@ export async function commencerOuvertureQuotidienne(
       p_jour: jourParis,
     })
     .maybeSingle<LigneDroitOuverture>();
-  if (error) throw new Error(`ouverture_quotidienne_commencer: ${error.code ?? "echec"}`);
-  if (!data) throw new Error("ouverture_quotidienne_commencer: reponse_invalide");
+  if (error) throw erreurRpc("commencer", error.code);
+  if (!data) throw erreurReponse("commencer");
 
   if (data.statut === "en_cours" && data.jeton === null && reponseSansLigne(data)) {
     return { statut: "en-cours" };
@@ -113,7 +156,7 @@ export async function commencerOuvertureQuotidienne(
     try {
       return { statut: "deja-commencee", ligne: lignePersistanteDepuis(data) };
     } catch {
-      throw new Error("ouverture_quotidienne_commencer: reponse_invalide");
+      throw erreurReponse("commencer");
     }
   }
   if (
@@ -124,7 +167,7 @@ export async function commencerOuvertureQuotidienne(
   ) {
     return { statut: "a-preparer", jeton: data.jeton };
   }
-  throw new Error("ouverture_quotidienne_commencer: reponse_invalide");
+  throw erreurReponse("commencer");
 }
 
 /**
@@ -149,15 +192,15 @@ export async function finaliserOuvertureQuotidienne(
       p_preparation: preparation,
     })
     .maybeSingle<LigneOuvertureQuotidienne>();
-  if (error) throw new Error(`ouverture_quotidienne_finaliser: ${error.code ?? "echec"}`);
+  if (error) throw erreurRpc("finaliser", error.code);
   if (!data) {
-    throw new Error("ouverture_quotidienne_finaliser: reponse_invalide");
+    throw erreurReponse("finaliser");
   }
   try {
     const ligne = lignePersistanteDepuis(data);
     if (!ligne) throw new Error("ligne_absente");
     return ligne;
   } catch {
-    throw new Error("ouverture_quotidienne_finaliser: reponse_invalide");
+    throw erreurReponse("finaliser");
   }
 }

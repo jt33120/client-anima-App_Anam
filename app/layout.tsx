@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { policeAnam, policeUi } from "./styles/polices";
 import { CouvercleConfidentialite } from "@/render/confidentialite/CouvercleConfidentialite";
+import { passkeysActives } from "@/lib/auth/verrou-prive";
 
 // NFR-015 — identité discrète : « Anam » sur TOUTES les routes. Le `template` littéral
 // (sans %s) absorbe tout title enfant en « Anam » ; les pages l'explicitent aussi
@@ -57,7 +58,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Story 6.2 (AC5) — la vignette du sélecteur de tâches ne montre jamais l'intérieur d'une
             séance. Monté ici, donc sur TOUTES les routes : une halte oubliée serait une halte
             découverte, et c'est justement une conversation qu'on ne veut pas voir photographiée. */}
-        <CouvercleConfidentialite />
+        <CouvercleConfidentialite verrouAutomatique={passkeysActives()} />
       </body>
     </html>
   );

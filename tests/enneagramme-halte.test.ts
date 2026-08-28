@@ -113,7 +113,7 @@ vi.mock("@/lib/data/lire-enneagramme", () => ({
   lireTentativeEnneagramme: () => lireTentative(),
 }));
 
-const { conclureTest, departagerExAequo } = await import("@/app/enneagramme/actions");
+const { conclureTest } = await import("@/app/enneagramme/actions");
 
 /** Dix-huit réponses qui donnent un vainqueur net : le type de `ITEMS[0]` seul à 3. */
 function reponsesAvecVainqueur(): Record<string, number> {
@@ -141,13 +141,18 @@ describe("[5.5/AC1] `conclureTest` — le barème vit côté serveur", () => {
     expect(terminerTentative).toHaveBeenCalledWith({ type: ITEMS[0].type });
   });
 
-  it("[LE CŒUR] ce qui vient du client est FILTRÉ : identifiants inconnus et niveaux hors 0..3", async () => {
+  it("[LE CŒUR] le client est filtré, mais `null` reste une réponse inconnue explicite", async () => {
     // Le client peut poster n'importe quoi. Un niveau `99` sur un item réel fausserait le score sans
     // que rien ne le dise ; un identifiant inventé passerait dans le JSONB et ferait échouer la
     // contrainte de forme de 0049 — donc une écriture refusée, donc un test bloqué à l'écran.
     lireTentative.mockResolvedValue({ statut: "calcule", tentative: { tentativeId: "t", reponses: [] } });
-    await conclureTest({ [ITEMS[0].id]: 99, "e0z": 2, [ITEMS[1].id]: 1, pasUnObjet: null });
-    expect(enregistrerReponses).toHaveBeenCalledWith({ reponses: [{ itemId: ITEMS[1].id, niveau: 1 }] });
+    await conclureTest({ [ITEMS[0].id]: 99, "e0z": 2, [ITEMS[1].id]: 1, [ITEMS[2].id]: null });
+    expect(enregistrerReponses).toHaveBeenCalledWith({
+      reponses: [
+        { itemId: ITEMS[1].id, niveau: 1 },
+        { itemId: ITEMS[2].id, niveau: null },
+      ],
+    });
   });
 
   it("un test INCOMPLET ne retient rien", async () => {
@@ -171,8 +176,21 @@ describe("[5.5/AC1] `conclureTest` — le barème vit côté serveur", () => {
       },
     });
     const r = await conclureTest(toutes);
-    expect(r.statut).toBe("indecis");
+    expect(r.statut).toBe("indetermine");
     expect(terminerTentative, "aucun type ne s'écrit sur une égalité").not.toHaveBeenCalled();
+  });
+
+  it("une inconnue qui empêche une conclusion ne persiste aucun type", async () => {
+    const toutes = Object.fromEntries(ITEMS.map((i) => [i.id, i.id === ITEMS[0].id ? null : 0]));
+    lireTentative.mockResolvedValue({
+      statut: "calcule",
+      tentative: {
+        tentativeId: "t",
+        reponses: Object.entries(toutes).map(([itemId, niveau]) => ({ itemId, niveau })),
+      },
+    });
+    expect(await conclureTest(toutes)).toEqual({ statut: "indetermine" });
+    expect(terminerTentative).not.toHaveBeenCalled();
   });
 
   it("une panne de relecture se DIT, elle ne prétend pas avoir conclu", async () => {
@@ -182,46 +200,9 @@ describe("[5.5/AC1] `conclureTest` — le barème vit côté serveur", () => {
   });
 });
 
-describe("[5.5/AC1] `departagerExAequo` — elle tranche, mais pas n'importe quoi", () => {
-  const toutes = Object.fromEntries(ITEMS.map((i) => [i.id, 2]));
-  beforeEach(() => {
-    lireTentative.mockResolvedValue({
-      statut: "calcule",
-      tentative: {
-        tentativeId: "t",
-        reponses: Object.entries(toutes).map(([itemId, niveau]) => ({ itemId, niveau })),
-      },
-    });
-  });
-
-  it("[CONTRÔLE POSITIF] un type À ÉGALITÉ est accepté", async () => {
-    // Tous les items à 2 : les neuf types sont à égalité, donc n'importe lequel est légitime.
-    expect(await departagerExAequo(5)).toEqual({ statut: "retenu" });
-    expect(terminerTentative).toHaveBeenCalledWith({ type: 5 });
-  });
-
-  it("hors domaine → refus, et rien n'est écrit", async () => {
-    for (const mauvais of [0, 10, "4", null, 4.5]) {
-      expect((await departagerExAequo(mauvais)).statut, String(mauvais)).toBe("erreur");
-    }
-    expect(terminerTentative).not.toHaveBeenCalled();
-  });
-
-  it("[LE CŒUR] un type qui n'est PAS à égalité est refusé", async () => {
-    // Sans cette garde, l'écran deviendrait un menu où l'on se choisit un type sans passer par le
-    // test. C'est une garde de PRODUIT, pas de sécurité — la base, elle, accepte n'importe quel type
-    // de sa part, et l'en-tête de 0049 dit pourquoi.
-    const gagnant = ITEMS[0].type;
-    const net = Object.fromEntries(ITEMS.map((i) => [i.id, i.type === gagnant ? 3 : 0]));
-    lireTentative.mockResolvedValue({
-      statut: "calcule",
-      tentative: {
-        tentativeId: "t",
-        reponses: Object.entries(net).map(([itemId, niveau]) => ({ itemId, niveau })),
-      },
-    });
-    const autre = gagnant === 1 ? 2 : 1;
-    expect((await departagerExAequo(autre)).statut).toBe("erreur");
-    expect(terminerTentative).not.toHaveBeenCalled();
+describe("[13.8] aucun départage par numéro ne subsiste", () => {
+  it("la Server Action de sélection d’un type a disparu", async () => {
+    const actions = await import("@/app/enneagramme/actions");
+    expect("departagerExAequo" in actions).toBe(false);
   });
 });

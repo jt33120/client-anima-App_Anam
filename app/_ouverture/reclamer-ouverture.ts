@@ -1,9 +1,14 @@
 "use server";
 
-import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
+import type { User } from "@supabase/supabase-js";
+import {
+  ErreurLectureOnboarding,
+  etapeOnboardingPour,
+} from "@/app/(auth)/etat-onboarding";
 import { creerDepotBranche } from "@/lib/data/depot-branche";
 import { lireFilRecent } from "@/lib/data/depot-fil";
 import {
+  ErreurDepotOuvertureQuotidienne,
   commencerOuvertureQuotidienne,
   finaliserOuvertureQuotidienne,
 } from "@/lib/data/depot-ouverture-quotidienne";
@@ -37,6 +42,22 @@ interface OuvertureLiee {
   readonly donnees: Ouverture;
 }
 
+type DestinationAccesIncomplet =
+  | "/barriere"
+  | "/entrer?refus=age"
+  | "/naissance"
+  | "/consentement"
+  | "/consentement/revoque";
+
+type EchecOuvertureDuJour =
+  | { readonly statut: "session-expiree" }
+  | {
+      readonly statut: "acces-incomplet";
+      readonly destination: DestinationAccesIncomplet;
+    }
+  | { readonly statut: "schema-incompatible" }
+  | { readonly statut: "incident-temporaire" };
+
 type ResultatOuvertureDuJour =
   | {
       readonly statut: "ouverte" | "deja-commencee";
@@ -46,26 +67,52 @@ type ResultatOuvertureDuJour =
       readonly ouverture: OuvertureLiee | null;
     }
   | { readonly statut: "en-cours"; readonly reessayerApresMs: number }
-  | { readonly statut: "indisponible" };
+  | EchecOuvertureDuJour;
 
 type ResultatOuvertureCourante =
   | { readonly statut: "disponible"; readonly ouverture: Ouverture | null }
   | { readonly statut: "indisponible" };
 
-async function sessionAutorisee() {
+type SessionOuverture =
+  | {
+      readonly statut: "autorisee";
+      readonly supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>;
+      readonly user: User;
+      readonly jourParis: string;
+      readonly maintenant: Date;
+    }
+  | Extract<EchecOuvertureDuJour, { statut: "session-expiree" | "acces-incomplet" }>
+  | { readonly statut: "incident-temporaire" };
+
+function destinationAccesIncomplet(
+  etape: Exclude<Awaited<ReturnType<typeof etapeOnboardingPour>>, "suite">,
+): DestinationAccesIncomplet {
+  if (etape === "barre") return "/barriere";
+  if (etape === "mineur") return "/entrer?refus=age";
+  if (etape === "naissance") return "/naissance";
+  if (etape === "consentement") return "/consentement";
+  return "/consentement/revoque";
+}
+
+async function sessionAutorisee(): Promise<SessionOuverture> {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!user) return { statut: "session-expiree" };
 
   // Une Server Action est un endpoint : elle ne peut se reposer sur la garde de `app/page.tsx`.
   // L'état complet est réaffirmé AVANT prénom, branches ou journal (données art. 9).
-  if ((await etapeOnboardingPour(supabase, user.id)) !== "suite") return null;
+  const etape = await etapeOnboardingPour(supabase, user.id);
+  if (etape !== "suite") {
+    return { statut: "acces-incomplet", destination: destinationAccesIncomplet(etape) };
+  }
 
   const maintenant = new Date();
   const jourParis = cleJourParis(maintenant);
-  return jourParis ? { supabase, user, jourParis, maintenant } : null;
+  return jourParis
+    ? { statut: "autorisee", supabase, user, jourParis, maintenant }
+    : { statut: "incident-temporaire" };
 }
 
 function toursPourRendu(
@@ -98,7 +145,7 @@ function lierEvenementPersiste(
 }
 
 async function matiereOuverture(
-  contexte: NonNullable<Awaited<ReturnType<typeof sessionAutorisee>>>,
+  contexte: Extract<SessionOuverture, { statut: "autorisee" }>,
 ): Promise<MatiereOuverture> {
   const { supabase, user } = contexte;
   const [prenom, branches, presenceJournal] = await Promise.all([
@@ -128,12 +175,13 @@ async function matiereOuverture(
 export async function reclamerOuvertureDuJour(): Promise<ResultatOuvertureDuJour> {
   try {
     const contexte = await sessionAutorisee();
-    if (!contexte) return { statut: "indisponible" };
+    if (contexte.statut !== "autorisee") return contexte;
     const { supabase, user, jourParis, maintenant } = contexte;
 
     const droit = await commencerOuvertureQuotidienne(user.id, jourParis);
     if (droit.statut === "en-cours") {
-      return { statut: "en-cours", reessayerApresMs: 300 };
+      // Deux reprises automatiques à 5 s puis 10 s couvrent le bail SQL de 15 s sans le marteler.
+      return { statut: "en-cours", reessayerApresMs: 5_000 };
     }
     if (droit.statut === "deja-commencee") {
       const fil = await lireFilRecent(supabase, maintenant);
@@ -179,10 +227,14 @@ export async function reclamerOuvertureDuJour(): Promise<ResultatOuvertureDuJour
       ouverture: lierEvenementPersiste(jourParis, ligne),
     };
   } catch (e) {
+    const statut =
+      e instanceof ErreurDepotOuvertureQuotidienne
+        ? e.causeOuverture
+        : "incident-temporaire";
     console.error("[ouverture] réclamation impossible — aucun tour éphémère n’est inventé", {
-      nom: e instanceof Error ? e.name : "inconnu",
+      cause: e instanceof ErreurLectureOnboarding ? e.code : statut,
     });
-    return { statut: "indisponible" };
+    return { statut };
   }
 }
 
@@ -194,7 +246,7 @@ export async function reclamerOuvertureDuJour(): Promise<ResultatOuvertureDuJour
 export async function chargerOuvertureCourante(): Promise<ResultatOuvertureCourante> {
   try {
     const contexte = await sessionAutorisee();
-    if (!contexte) return { statut: "indisponible" };
+    if (contexte.statut !== "autorisee") return { statut: "indisponible" };
     const ouverture = await chargerOuverture(
       contexte.supabase,
       contexte.user.id,

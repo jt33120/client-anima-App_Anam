@@ -22,6 +22,31 @@
   width: 100%;
   max-width: 22rem;
 }
+
+.portes {
+  display: grid;
+  gap: var(--esp-4);
+  width: 100%;
+  max-width: 22rem;
+}
+
+.separateur {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  margin: 0;
+  color: var(--texte-doux);
+  font-family: var(--pile-ui);
+  font-size: 0.8125rem;
+}
+
+.separateur::before,
+.separateur::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--bordure);
+}
 .etiquette {
   display: flex;
   flex-direction: column;

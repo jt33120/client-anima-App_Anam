@@ -33,8 +33,9 @@ next-env.d.ts
 /supabase/.temp
 /supabase/.branches
 
-# outillage BMAD régénérable (npx bmad-method install)
-.claude/
+# outillage BMAD/graft — settings.json, helpers/ et skills/ sont committés pour que les sessions
+# cloud (claude.ai/code) les aient aussi. Seul le fichier de préférences personnelles reste local.
+.claude/settings.local.json
 
 # Vercel CLI (identifiants de projet — dépôt public)
 .vercel

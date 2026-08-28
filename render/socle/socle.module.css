@@ -1,166 +1,510 @@
-/* La halte « Ton socle » (Story 7.5).
-
-   Même sobriété que `/memoire` et `/reglages`, et pour une raison précise : c'est un écran de
-   CONSULTATION, pas une région du monde. On y montre à quelqu'un ce qui a été calculé sur lui —
-   l'habiller de l'imagerie de séance ferait passer un registre d'intimité sur une page dont l'objet
-   est la transparence.
-
-   ⚠️ AUCUN `font-size` ICI. L'échelle vit dans `app/styles/globals.css` et s'applique par les
-   classes globales (`t-titre-sm`, `t-corps`, `t-meta`, `t-anam`). Trois haltes ont déjà titré à
-   1,75 rem quand tout le reste titrait à 1,5 (QA du 2026-08-19, M5) : ce fichier ne peut pas
-   refaire cette faute, il n'a pas d'endroit où l'écrire. */
-
 .halte {
-  max-width: 38rem;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--esp-6);
+  width: 100%;
+  max-width: calc(var(--contenu-max) + var(--esp-9));
+  margin: 0 auto;
+  padding: var(--esp-6) var(--marge-mobile) var(--esp-8);
+  box-sizing: border-box;
 }
 
-.titreHalte {
-  font-family: var(--pile-anam);
-  font-weight: 400;
-  color: var(--texte);
+.titreHalte,
+.enteteSection h2,
+.blocInformation h3,
+.lectureSymbolique h3,
+.equivalentTextuel h3,
+.sousSection h3 {
   margin: 0;
+  color: var(--texte);
 }
 
 .introduction {
+  max-width: var(--mesure);
   margin: 0;
   color: var(--texte-doux);
-  line-height: 1.6;
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.titreSection {
-  font-family: var(--pile-anam);
-  font-weight: 400;
-  color: var(--texte);
-  margin: 0;
-}
-
+.apercu,
+.section,
+.enteteSection,
+.blocInformation,
+.equivalentTextuel,
 .sousSection {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
 }
 
-.titreSousSection {
-  margin: 0;
-  color: var(--texte-doux);
-  letter-spacing: 0.06em;
-  text-transform: none;
-  font-weight: 400;
+.apercu,
+.section {
+  gap: var(--esp-5);
 }
 
-.liste {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.enteteSection,
+.blocInformation,
+.equivalentTextuel,
+.sousSection {
+  gap: var(--esp-3);
 }
 
-/* Un nombre : son étiquette, sa valeur, son texte. Trois étages, jamais une ligne de tableau —
-   c'est ce qui distingue une fiche qu'on lit d'un relevé qu'on parcourt. */
-.entree {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--texte-doux) 25%, transparent);
-}
-
-/* Une porte du socle. Classe DISTINCTE de `.entree`, et ce n'est pas cosmétique : une garde compte
-   les entrées de nombre (« six sur six », FR-055) et une classe partagée lui ferait compter deux
-   choses différentes sous le même nom — elle mesurerait la mise en page, pas la promesse. */
-.porte {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--texte-doux) 25%, transparent);
-}
-
-/* Une position : tout sur une ligne, parce qu'il y en a douze et qu'on les compare du regard.
-   `flex-wrap` : sur 390 px, « Nœud lunaire moyen » + « Sagittaire, 12° » + « neuvième maison »
-   ne tiennent pas — et une valeur tronquée serait un fait faux. */
-.position {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25rem 0.6rem;
-}
-
-.etiquette {
-  color: var(--texte-doux);
-  margin: 0;
-}
-
-.valeur {
-  color: var(--texte);
-  margin: 0;
-}
-
-.maison {
-  color: var(--texte-doux);
-  margin: 0;
-}
-
-.texte {
-  margin: 0;
-  color: var(--texte);
-  line-height: 1.7;
-}
-
-/* Le silence du corpus. Il se lit comme une note, jamais comme une erreur : ce n'est pas une panne,
-   c'est un texte qu'une personne n'a pas encore écrit. */
-.nonEcrit {
-  margin: 0;
-  color: var(--texte-doux);
-  font-style: italic;
-  line-height: 1.6;
-}
-
-/* Un manque : dit, encadré doucement, et suivi de ce qui le répare quand quelque chose le répare. */
-.manque {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.9rem 1rem;
-  border-radius: 0.5rem;
+.section {
+  padding: var(--esp-5);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
   background: var(--surface);
 }
 
-.raison {
+.sectionCiel {
+  background:
+    radial-gradient(circle at 50% 12%, color-mix(in srgb, var(--lueur) 10%, transparent), transparent 35%),
+    var(--surface);
+}
+
+.surtitre,
+.etiquette,
+.accrocheApercu,
+.longitude,
+.maison,
+.legendeCiel,
+.noteCorpus,
+.panne {
   margin: 0;
+  color: var(--texte-doux);
+}
+
+.grilleApercus,
+.grilleNombres,
+.listePositions,
+.listePortes,
+.listeMethode,
+.calcul ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grilleApercus,
+.grilleNombres {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
+}
+
+.itemApercu {
+  min-width: 0;
+}
+
+.porteApercu {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--esp-4);
+  min-height: calc(var(--cible-tactile) * 3);
+  padding: var(--esp-5);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
+  background:
+    radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--lueur) 10%, transparent), transparent 40%),
+    var(--surface);
   color: var(--texte);
+  text-decoration: none;
+  transition:
+    border-color var(--duree-courte) var(--courbe),
+    background var(--duree-courte) var(--courbe),
+    transform var(--duree-courte) var(--courbe);
+}
+
+.porteApercu:hover {
+  border-color: var(--bordure-forte);
+  background-color: var(--surface-elevee);
+  transform: translateY(-2px);
+}
+
+.porteApercu:focus-visible,
+.reparation:focus-visible,
+.devoilement > summary:focus-visible,
+.calcul > summary:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
+.glypheApercu {
+  display: grid;
+  place-items: center;
+  width: calc(var(--cible-tactile) + var(--esp-2));
+  height: calc(var(--cible-tactile) + var(--esp-2));
+  color: var(--lueur);
+}
+
+.glypheApercu svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contenuApercu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  min-width: 0;
+}
+
+.titreApercu {
+  color: var(--texte);
+}
+
+.actionApercu {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--cible-tactile);
+  color: var(--accent);
+}
+
+.faits {
+  display: grid;
+  gap: var(--esp-2);
+  margin: var(--esp-2) 0 0;
+}
+
+.fait {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--esp-3);
+}
+
+.fait dt,
+.fait dd {
+  margin: 0;
+}
+
+.fait dt {
+  color: var(--texte-doux);
+}
+
+.fait dd {
+  color: var(--texte);
+  text-align: right;
+}
+
+.blocInformation,
+.equivalentTextuel,
+.sousSection,
+.manque {
+  padding: var(--esp-4);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
+  background: color-mix(in srgb, var(--surface-elevee) 58%, transparent);
+}
+
+.lectureSymbolique {
+  border-color: var(--bordure-forte);
+}
+
+.lectureVide,
+.contenuLecture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+}
+
+.lectureVide {
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon-md);
+  background: color-mix(in srgb, var(--surface-elevee) 58%, transparent);
+}
+
+.lectureVide h3 {
+  margin: 0;
+}
+
+.devoilement,
+.calcul {
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
+  background: color-mix(in srgb, var(--surface-elevee) 45%, transparent);
+}
+
+.devoilement > summary,
+.calcul > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  min-height: var(--cible-tactile);
+  padding: 0 var(--esp-4);
+  color: var(--texte);
+  cursor: pointer;
+}
+
+.devoilement > summary::after,
+.calcul > summary::after {
+  content: "+";
+  color: var(--accent);
+}
+
+.devoilement[open] > summary::after,
+.calcul[open] > summary::after {
+  content: "−";
+}
+
+.listeMethode,
+.calcul ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: 0 var(--esp-4) var(--esp-4);
+  color: var(--texte-doux);
+}
+
+.listeMethode li,
+.calcul li {
   line-height: 1.6;
 }
 
-/* La cible tactile fait 44 px de haut comme partout ailleurs (UX-DR-42) : un lien de réparation
-   qu'on rate au doigt est un lien qui n'existe pas. */
+.entree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  min-width: 0;
+  padding: var(--esp-4);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
+  background:
+    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 36%),
+    var(--surface-elevee);
+}
+
+.nombreFort,
+.valeur,
+.texte,
+.raison {
+  margin: 0;
+  color: var(--texte);
+}
+
+.nombreFort {
+  line-height: 1;
+}
+
+.calcul {
+  margin-top: auto;
+}
+
+.manque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.lectureEcrite {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding-top: var(--esp-3);
+  border-top: 1px solid var(--bordure);
+}
+
+.noteCorpus,
+.panne {
+  line-height: 1.6;
+}
+
 .reparation {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
   align-self: flex-start;
+  min-height: var(--cible-tactile);
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 0.25em;
 }
 
-/* Une panne se dit comme une panne — jamais comme un vide (leçon 4.6 puis 4.9). */
-.panne {
-  margin: 0;
-  color: var(--texte-doux);
-  line-height: 1.6;
+.figureCiel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-3);
+  width: 100%;
+  max-width: var(--mesure);
+  margin: 0 auto;
+}
+
+.carteCiel {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon-full);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--lueur) 13%, transparent), transparent 28%),
+    radial-gradient(circle at 50% 50%, var(--surface-elevee), var(--fond) 72%);
+}
+
+.svgCiel {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.haloCiel {
+  fill: none;
+  stroke: color-mix(in srgb, var(--lueur) 18%, transparent);
+  stroke-width: 12;
+}
+
+.anneauFort,
+.anneau,
+.anneauInterieur,
+.repereAngulaire,
+.cuspideCiel,
+.angleCiel {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.anneauFort {
+  stroke: var(--bordure-forte);
+  stroke-width: 1.5;
+}
+
+.anneau,
+.anneauInterieur {
+  stroke: var(--bordure);
+  stroke-width: 1;
+}
+
+.repereAngulaire {
+  stroke: var(--bordure-forte);
+  stroke-width: 1;
+}
+
+.cuspideCiel {
+  stroke: color-mix(in srgb, var(--accent) 58%, var(--bordure));
+  stroke-width: 1;
+}
+
+.angleCiel {
+  stroke: var(--lueur);
+  stroke-width: 1.5;
+  opacity: 0.7;
+}
+
+.pointCiel {
+  fill: var(--accent);
+  stroke: var(--fond);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.coeurCiel {
+  fill: var(--lueur);
+  stroke: var(--fond);
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.graduationCiel {
+  fill: var(--texte-doux);
+}
+
+.legendeCiel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  text-align: center;
+}
+
+.listePositions,
+.listePortes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+.position {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--esp-1) var(--esp-3);
+  padding-bottom: var(--esp-3);
+  border-bottom: 1px solid var(--bordure);
+}
+
+.position:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.position .valeur,
+.position .maison,
+.position .longitude {
+  text-align: right;
+}
+
+.position .longitude {
+  grid-column: 1 / -1;
+}
+
+.porte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  padding-bottom: var(--esp-3);
+  border-bottom: 1px solid var(--bordure);
+}
+
+.porte:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .halte {
+    padding-right: var(--marge-desktop);
+    padding-left: var(--marge-desktop);
+  }
+
+  .grilleApercus,
+  .grilleNombres {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .itemApercu:nth-child(3):last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .porteApercu {
+    transition: none;
+  }
+
+  .porteApercu:hover {
+    transform: none;
+  }
+}
+
+:global(:root[data-a11y="contraste"]) .porteApercu,
+:global(:root[data-a11y="contraste"]) .sectionCiel,
+:global(:root[data-a11y="contraste"]) .entree,
+:global(:root[data-a11y="contraste"]) .carteCiel {
+  background: var(--surface);
+}
+
+@media (prefers-contrast: more) {
+  :global(:root:not([data-a11y="nuit"])) .porteApercu,
+  :global(:root:not([data-a11y="nuit"])) .sectionCiel,
+  :global(:root:not([data-a11y="nuit"])) .entree,
+  :global(:root:not([data-a11y="nuit"])) .carteCiel {
+    background: var(--surface);
+  }
 }

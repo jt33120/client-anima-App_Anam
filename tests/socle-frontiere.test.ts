@@ -48,20 +48,28 @@ function champs(corps: string): string[] {
 }
 
 const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
+  { ou: "domaine · FaitFiche", corps: corpsInterface(DOMAINE, "FaitFiche") },
   { ou: "domaine · NombreFiche", corps: corpsInterface(DOMAINE, "NombreFiche") },
+  { ou: "domaine · LectureSymboliqueFiche", corps: corpsInterface(DOMAINE, "LectureSymboliqueFiche") },
   { ou: "domaine · NombreManquantFiche", corps: corpsInterface(DOMAINE, "NombreManquantFiche") },
   { ou: "domaine · PositionFiche", corps: corpsInterface(DOMAINE, "PositionFiche") },
+  { ou: "domaine · AngleFiche", corps: corpsInterface(DOMAINE, "AngleFiche") },
   { ou: "domaine · SectionNombres", corps: corpsInterface(DOMAINE, "SectionNombres") },
   { ou: "domaine · SectionCiel", corps: corpsInterface(DOMAINE, "SectionCiel") },
   { ou: "domaine · SectionType", corps: corpsInterface(DOMAINE, "SectionType") },
   { ou: "domaine · FicheSocle", corps: corpsInterface(DOMAINE, "FicheSocle") },
+  { ou: "domaine · ApercuUniversFiche", corps: corpsInterface(DOMAINE, "ApercuUniversFiche") },
+  { ou: "rendu · FaitVue", corps: corpsInterface(RENDU, "FaitVue") },
   { ou: "rendu · NombreVue", corps: corpsInterface(RENDU, "NombreVue") },
+  { ou: "rendu · LectureSymboliqueVue", corps: corpsInterface(RENDU, "LectureSymboliqueVue") },
   { ou: "rendu · NombreManquantVue", corps: corpsInterface(RENDU, "NombreManquantVue") },
   { ou: "rendu · PositionVue", corps: corpsInterface(RENDU, "PositionVue") },
+  { ou: "rendu · AngleVue", corps: corpsInterface(RENDU, "AngleVue") },
   { ou: "rendu · SectionNombresVue", corps: corpsInterface(RENDU, "SectionNombresVue") },
   { ou: "rendu · SectionCielVue", corps: corpsInterface(RENDU, "SectionCielVue") },
   { ou: "rendu · SectionTypeVue", corps: corpsInterface(RENDU, "SectionTypeVue") },
   { ou: "rendu · FicheSocleVue", corps: corpsInterface(RENDU, "FicheSocleVue") },
+  { ou: "rendu · ApercuUniversVue", corps: corpsInterface(RENDU, "ApercuUniversVue") },
 ];
 
 /**
@@ -90,13 +98,17 @@ const MESURES = [
 ];
 
 const APPARIEMENTS: ReadonlyArray<[string, string]> = [
+  ["FaitFiche", "FaitVue"],
   ["NombreFiche", "NombreVue"],
+  ["LectureSymboliqueFiche", "LectureSymboliqueVue"],
   ["NombreManquantFiche", "NombreManquantVue"],
   ["PositionFiche", "PositionVue"],
+  ["AngleFiche", "AngleVue"],
   ["SectionNombres", "SectionNombresVue"],
   ["SectionCiel", "SectionCielVue"],
   ["SectionType", "SectionTypeVue"],
   ["FicheSocle", "FicheSocleVue"],
+  ["ApercuUniversFiche", "ApercuUniversVue"],
 ];
 
 describe("[7.5/AC8 DUR] aucune des deux déclarations ne peut porter une mesure", () => {
@@ -163,8 +175,10 @@ describe("[7.5/AC8 DUR] aucune des deux déclarations ne peut porter une mesure"
     const src = lire("render/socle/FicheSocle.tsx").replace(/\/\*[\s\S]*?\*\//g, "");
     expect(src).not.toMatch(/texte\s*\?\?/);
     expect(src).not.toMatch(/\.texte\s*\|\|/);
-    // Et le silence affiché vient d'en haut (`copie.typeSansTexte`) ou d'une phrase nommée —
-    // jamais d'une chaîne vide.
-    expect(src).toMatch(/statut === "ecrit"/);
+    // Les lectures arrivées au rendu sont déjà les seules qui ont été écrites ; le composant ne
+    // déduit plus l'état du corpus et reçoit aussi sa note unique depuis le domaine.
+    expect(src).toMatch(/lecturesSymboliques/);
+    expect(src).toMatch(/noteLectureSymbolique/);
+    expect(src).not.toMatch(/Anima n[’']a pas encore écrit/);
   });
 });

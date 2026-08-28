@@ -5,12 +5,14 @@ import {
   NIVEAUX,
   estTypeEnneagramme,
   estNiveauReponse,
+  estValeurReponse,
   scorer,
   conclure,
   itemsManquants,
   type ItemBareme,
   type ReponseItem,
   type TypeEnneagramme,
+  type ValeurReponse,
 } from "@/lib/domain/enneagramme";
 
 /**
@@ -29,8 +31,11 @@ const BAREME: readonly ItemBareme[] = TYPES.flatMap((t) => [
 ]);
 
 /** Répond `niveau` partout, puis applique les exceptions par item. */
-function reponses(niveauParDefaut: 0 | 1 | 2 | 3, exceptions: Record<string, 0 | 1 | 2 | 3> = {}): ReponseItem[] {
-  return BAREME.map((i) => ({ itemId: i.id, niveau: exceptions[i.id] ?? niveauParDefaut }));
+function reponses(niveauParDefaut: ValeurReponse, exceptions: Record<string, ValeurReponse> = {}): ReponseItem[] {
+  return BAREME.map((i) => ({
+    itemId: i.id,
+    niveau: Object.hasOwn(exceptions, i.id) ? exceptions[i.id] : niveauParDefaut,
+  }));
 }
 
 /** Fait gagner `type` sans ambiguïté : tout le monde à 0, lui à 3+3. */
@@ -51,6 +56,11 @@ describe("[5.5/AC1] les unions sont FERMÉES — rien n'entre par la porte des e
     for (const v of [-1, 4, 1.5, "2", null, undefined, true]) {
       expect(estNiveauReponse(v), JSON.stringify(v)).toBe(false);
     }
+  });
+
+  it("la valeur explicite `null` signifie « Je ne sais pas », jamais le niveau zéro", () => {
+    for (const n of [...NIVEAUX, null]) expect(estValeurReponse(n), String(n)).toBe(true);
+    for (const v of [-1, 4, "2", undefined, true]) expect(estValeurReponse(v), String(v)).toBe(false);
   });
 
   it("[CONTRÔLE DU CONTRÔLE] le barème d'épreuve couvre bien les neuf types", () => {
@@ -97,6 +107,11 @@ describe("[5.5/AC1] le score : addition par type, appariement NOMINAL", () => {
     expect(s[5]).toBe(1);
   });
 
+  it("« Je ne sais pas » ne verse aucun point au score", () => {
+    const s = scorer(reponses(0, { i4a: 3, i4b: null }), BAREME);
+    expect(s[4]).toBe(3);
+  });
+
   it("le score rendu est GELÉ — personne ne le mute en aval", () => {
     const s = scorer(reponses(1), BAREME);
     expect(Object.isFrozen(s)).toBe(true);
@@ -112,28 +127,45 @@ describe("[5.5/AC1] le verdict : un type, un refus de trancher, ou un test incom
     }
   });
 
-  it("[LE CŒUR] à égalité, le produit REFUSE de trancher et nomme les ex æquo", () => {
+  it("[LE CŒUR] à égalité, le produit REFUSE de trancher sans demander un type", () => {
     const rep = reponses(0, { i3a: 3, i3b: 3, i8a: 3, i8b: 3 });
-    expect(conclure(rep, BAREME)).toEqual({ statut: "indecis", exaequo: [3, 8] });
+    expect(conclure(rep, BAREME)).toEqual({ statut: "indetermine", raison: "egalite" });
   });
 
   it("[LE TEST QUI COMPTE] l'égalité PARFAITE ne rend pas le type 1", () => {
     // C'est le mutant le plus tentant : « le plus petit numéro gagne ». Il est total, il est
     // déterministe, et il range silencieusement vers le type 1 tous ceux qu'on n'a pas su lire.
     const verdict = conclure(reponses(2), BAREME);
-    expect(verdict.statut).toBe("indecis");
-    expect(verdict.statut === "indecis" && verdict.exaequo).toEqual([...TYPES]);
+    expect(verdict).toEqual({ statut: "indetermine", raison: "egalite" });
   });
 
   it("l'ex æquo se juge sur le SOMMET, pas sur l'ensemble du classement", () => {
     // Deux types à 6, un troisième à 5 : indécis entre les deux premiers, le troisième n'y est pas.
     const rep = reponses(0, { i1a: 3, i1b: 3, i2a: 3, i2b: 3, i9a: 3, i9b: 2 });
-    expect(conclure(rep, BAREME)).toEqual({ statut: "indecis", exaequo: [1, 2] });
+    expect(conclure(rep, BAREME)).toEqual({ statut: "indetermine", raison: "egalite" });
   });
 
   it("UN SEUL POINT d'écart suffit à trancher — le refus n'est pas une facilité", () => {
     const rep = reponses(0, { i6a: 3, i6b: 3, i9a: 3, i9b: 2 });
     expect(conclure(rep, BAREME)).toEqual({ statut: "retenu", type: 6 });
+  });
+
+  it("une inconnue peut rester compatible avec un résultat certain", () => {
+    const rep = reponses(0, { i4a: 3, i4b: 3, i7b: null });
+    expect(conclure(rep, BAREME)).toEqual({ statut: "retenu", type: 4 });
+  });
+
+  it("une inconnue qui pourrait changer le sommet rend le résultat honnêtement indéterminé", () => {
+    const rep = reponses(0, { i4a: 3, i4b: 1, i7a: 2, i7b: null });
+    expect(conclure(rep, BAREME)).toEqual({
+      statut: "indetermine",
+      raison: "reponses_inconnues",
+    });
+  });
+
+  it("répondre « Je ne sais pas » parcourt l'item : il n'est plus manquant", () => {
+    const rep = reponses(0, { i6a: null });
+    expect(itemsManquants(rep, BAREME)).not.toContain("i6a");
   });
 
   it("[LE CŒUR] un test incomplet ne se score PAS, et dit ce qui manque", () => {

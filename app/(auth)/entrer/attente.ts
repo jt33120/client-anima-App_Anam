@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { destinationInterne } from "@/lib/auth/verrou-prive";
 
 /**
  * ══ L'ATTENTE D'UN CODE — ET POURQUOI ELLE NE PEUT PAS VIVRE DANS REACT ════════════════════════
@@ -31,7 +32,11 @@ export const DUREE_ATTENTE_S = 3600;
 /** Ce qu'on tolère avant de renvoyer demander un code neuf. Confort, pas garde — voir `actions.ts`. */
 export const ESSAIS_MAX = 5;
 
-export type Attente = { readonly adresse: string; readonly essais: number };
+export type Attente = {
+  readonly adresse: string;
+  readonly essais: number;
+  readonly destination: string;
+};
 
 export async function lireAttente(): Promise<Attente | null> {
   const brut = (await cookies()).get(COOKIE_ATTENTE)?.value;
@@ -39,7 +44,13 @@ export async function lireAttente(): Promise<Attente | null> {
   try {
     const v = JSON.parse(brut) as Partial<Attente>;
     if (typeof v.adresse !== "string" || !v.adresse.includes("@")) return null;
-    return { adresse: v.adresse, essais: typeof v.essais === "number" ? v.essais : 0 };
+    return {
+      adresse: v.adresse,
+      essais: typeof v.essais === "number" ? v.essais : 0,
+      // Compatibilité avec les cookies déjà posés avant le verrou privé : aucune reconnexion en
+      // attente n'est cassée au déploiement, elle revient simplement à la scène.
+      destination: destinationInterne(v.destination),
+    };
   } catch {
     return null;
   }

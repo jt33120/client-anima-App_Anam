@@ -171,6 +171,16 @@ minimum_password_length = 6
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
 password_requirements = ""
 
+# WebAuthn local. Face ID, Touch ID, l'empreinte ou le PIN restent dans l'authenticator : Anam ne
+# reçoit qu'une preuve signée. Le RP ID est un contrat durable — le changer invalide les passkeys.
+[auth.passkey]
+enabled = true
+
+[auth.webauthn]
+rp_display_name = "Anam"
+rp_id = "localhost"
+rp_origins = ["http://localhost:3000"]
+
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
 email_sent = 2

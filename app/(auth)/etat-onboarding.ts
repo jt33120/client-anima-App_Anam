@@ -5,6 +5,18 @@ import {
   type StatutConsentement,
 } from "./onboarding";
 
+export type SourceLectureOnboarding = "utilisatrice" | "consentement";
+
+/** Une panne de lecture reste distincte d'une ligne absente, sans exposer le détail Supabase. */
+export class ErreurLectureOnboarding extends Error {
+  readonly name = "ErreurLectureOnboarding";
+  readonly code = "etat_onboarding_indisponible";
+
+  constructor(readonly sourceLecture: SourceLectureOnboarding) {
+    super("etat_onboarding_indisponible");
+  }
+}
+
 /**
  * État d'onboarding d'une session — SOURCE UNIQUE de vérité partagée par toutes les
  * gardes (/, /auth/confirm, /naissance, /consentement) ET les Server Actions de consentement.
@@ -57,10 +69,10 @@ export async function etapeOnboardingPour(
   ]);
 
   if (erreurLigne) {
-    throw new Error(`Lecture de l’état d’onboarding impossible : ${erreurLigne.message}`);
+    throw new ErreurLectureOnboarding("utilisatrice");
   }
   if (erreurConsentement) {
-    throw new Error(`Lecture du consentement impossible : ${erreurConsentement.message}`);
+    throw new ErreurLectureOnboarding("consentement");
   }
 
   return etapeOnboarding(ligne, statutConsentement(consentement));

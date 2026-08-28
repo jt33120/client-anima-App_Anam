@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 /**
  * destination-apres-auth.test.ts — LA MACHINE D'ÉTAT PARTAGÉE PAR LES DEUX PORTES
@@ -36,6 +36,10 @@ beforeEach(() => {
   getUser.mockReset().mockResolvedValue({ data: { user: { id: "u1" } } });
   signOut.mockReset().mockResolvedValue(undefined);
   etape.mockReset();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("[entrée] chaque étape a SA destination — aucune ne tombe dans « suite »", () => {
@@ -82,5 +86,44 @@ describe("[entrée] ce que la fonction fait de la SESSION, et pas seulement de l
     getUser.mockResolvedValue({ data: { user: null } });
     expect(await destinationApresAuth(client(), "/quelque-part")).toBe("/quelque-part");
     expect(etape).not.toHaveBeenCalled();
+  });
+});
+
+describe("[entrée] la protection WebAuthn est proposée puis exigée sans casser la récupération", () => {
+  beforeEach(() => {
+    vi.stubEnv("ANIMA_PASSKEYS", "oui");
+    etape.mockResolvedValue("suite");
+  });
+
+  it("propose l'inscription avant les données privées quand le compte n'est pas encore protégé", async () => {
+    getUser.mockResolvedValue({ data: { user: { id: "u1", app_metadata: {} } } });
+    expect(await destinationApresAuth(client(), "/moi")).toBe("/securiser?vers=%2Fmoi");
+  });
+
+  it("envoie un compte protégé au verrou après une reconnexion e-mail", async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: "u1", app_metadata: { anima_passkey_required: true } } },
+    });
+    expect(await destinationApresAuth(client(), "/moi?onglet=socle")).toBe(
+      "/verrou?vers=%2Fmoi%3Fonglet%3Dsocle",
+    );
+  });
+
+  it("la preuve passkey vérifiée va à la destination demandée", async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: "u1", app_metadata: { anima_passkey_required: true } } },
+    });
+    expect(
+      await destinationApresAuth(client(), "/moi", { passkeyVerifiee: true }),
+    ).toBe("/moi");
+  });
+
+  it("la récupération e-mail reste atteignable même quand la passkey est exigée", async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: "u1", app_metadata: { anima_passkey_required: true } } },
+    });
+    expect(await destinationApresAuth(client(), "/securiser/recuperer")).toBe(
+      "/securiser/recuperer",
+    );
   });
 });

@@ -7,8 +7,7 @@ import { lireTentativeEnneagramme } from "@/lib/data/lire-enneagramme";
 import { ITEMS } from "@/lib/domain/enneagramme-items";
 import {
   conclure,
-  estNiveauReponse,
-  estTypeEnneagramme,
+  estValeurReponse,
   type ReponseItem,
   type ResultatTest,
 } from "@/lib/domain/enneagramme";
@@ -42,8 +41,8 @@ export type EtatTest =
   | { readonly statut: "erreur"; readonly message: string }
   /** Le test a tranché : le type est retenu, l'écran se recharge sur le résultat. */
   | { readonly statut: "retenu" }
-  /** Deux lectures à égalité — le produit REFUSE de trancher et lui rend la main (voir plus bas). */
-  | { readonly statut: "indecis"; readonly exaequo: readonly number[] };
+  /** L'évidence disponible ne permet pas de retenir un type sans l'inventer. */
+  | { readonly statut: "indetermine" };
 
 const ERREUR_GENERIQUE = "Je n’ai pas pu enregistrer. Réessaie.";
 
@@ -56,12 +55,12 @@ async function session() {
   return user ? { supabase, utilisatriceId: user.id } : null;
 }
 
-/** Filtre ce qui vient du client : identifiant connu, niveau dans 0..3. Le reste est ignoré. */
+/** Filtre le client : identifiant connu, niveau 0..3 ou inconnue explicite `null`. */
 function reponsesValides(brut: unknown): ReponseItem[] {
   if (typeof brut !== "object" || brut === null || Array.isArray(brut)) return [];
   const connus = new Set(ITEMS.map((i) => i.id));
   return Object.entries(brut as Record<string, unknown>)
-    .filter(([id, niveau]) => connus.has(id) && estNiveauReponse(niveau))
+    .filter(([id, niveau]) => connus.has(id) && estValeurReponse(niveau))
     .map(([itemId, niveau]) => ({ itemId, niveau: niveau as ReponseItem["niveau"] }));
 }
 
@@ -93,9 +92,9 @@ export async function enregistrerReponses(reponses: unknown): Promise<{ ok: bool
  * charge utile du dernier envoi marcherait aujourd'hui et deviendrait faux le jour où un envoi
  * partiel arriverait. La base est la source, et l'upsert qui précède la rend complète.
  *
- * ⚠️ À ÉGALITÉ, LE PRODUIT REFUSE DE TRANCHER. `conclure` rend `indecis` avec les types à égalité —
- * départager par « le plus petit numéro » aurait biaisé silencieusement vers le type 1, et personne
- * ne l'aurait jamais vu. L'écran lui rend la main : c'est elle qui sait.
+ * ⚠️ À ÉGALITÉ, LE PRODUIT REFUSE DE TRANCHER. `conclure` rend `indetermine` et aucun type n'est
+ * proposé au clic : demander un numéro à quelqu'un que le test n'a pas su lire déplacerait le
+ * problème au lieu de le résoudre.
  */
 export async function conclureTest(reponses: unknown): Promise<EtatTest> {
   try {
@@ -110,40 +109,13 @@ export async function conclureTest(reponses: unknown): Promise<EtatTest> {
 
     const resultat: ResultatTest = conclure(tentative.tentative.reponses, ITEMS);
     if (resultat.statut === "incomplet") return { statut: "en_cours" };
-    if (resultat.statut === "indecis") return { statut: "indecis", exaequo: [...resultat.exaequo] };
+    if (resultat.statut === "indetermine") return { statut: "indetermine" };
 
     if (!(await depot.terminerTentative({ type: resultat.type }))) {
       // `false` = un autre onglet a conclu avant nous. L'état est BON — on recharge plutôt que
       // d'annoncer un échec (0049 : « l'appelant relit »).
       return { statut: "retenu" };
     }
-    return { statut: "retenu" };
-  } catch {
-    return { statut: "erreur", message: ERREUR_GENERIQUE };
-  }
-}
-
-/**
- * Le départage d'un ex æquo, PAR ELLE.
- *
- * Le type choisi doit être l'un de ceux qui sont à égalité — sinon l'écran deviendrait un menu où
- * l'on se choisit un type sans passer par le test. C'est une garde de PRODUIT, pas de sécurité : la
- * base, elle, accepte n'importe quel type de sa part, et l'en-tête de 0049 dit pourquoi.
- */
-export async function departagerExAequo(type: unknown): Promise<EtatTest> {
-  try {
-    if (!estTypeEnneagramme(type)) return { statut: "erreur", message: ERREUR_GENERIQUE };
-    const s = await session();
-    if (!s) return { statut: "erreur", message: ERREUR_GENERIQUE };
-
-    const tentative = await lireTentativeEnneagramme(s.supabase, s.utilisatriceId);
-    if (tentative.statut !== "calcule") return { statut: "erreur", message: ERREUR_GENERIQUE };
-    const resultat = conclure(tentative.tentative.reponses, ITEMS);
-    if (resultat.statut !== "indecis" || !resultat.exaequo.includes(type)) {
-      return { statut: "erreur", message: ERREUR_GENERIQUE };
-    }
-
-    await creerDepotEnneagramme(s.utilisatriceId, s.supabase).terminerTentative({ type });
     return { statut: "retenu" };
   } catch {
     return { statut: "erreur", message: ERREUR_GENERIQUE };

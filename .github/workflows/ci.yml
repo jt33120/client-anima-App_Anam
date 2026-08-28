@@ -17,6 +17,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Cohérence des migrations locales
+        run: npm run schema:check
+
       - name: Lint (garde de direction des dépendances AD-1/AD-10)
         run: npm run lint
 

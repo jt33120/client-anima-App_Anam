@@ -56,10 +56,14 @@ export const TITRE_HALTE = "Ton socle";
 
 export const INTRODUCTION =
   "Ce qui a été calculé à partir de ta date, de ton heure et de ton nom. Rien ici ne vient d’un " +
-  "modèle : ce sont des nombres et des positions, les mêmes hier et demain.";
+  "modèle : les nombres suivent les conventions affichées et les positions viennent du calcul natal.";
 
 export const TITRE_NOMBRES = "Tes nombres";
 export const TITRE_CIEL = "Ton ciel de naissance";
+export const TITRE_APERCU = "L’essentiel, en un regard";
+export const TITRE_ENTREES_NUMEROLOGIE = "Les données utilisées";
+export const TITRE_METHODE_NUMEROLOGIE = "La méthode de calcul";
+export const TITRE_LECTURE_NUMEROLOGIE = "Lecture symbolique d’Anima";
 export const TITRE_ANGLES = "Tes angles";
 export const TITRE_MAISONS = "Tes maisons";
 export const TITRE_TYPE = "Ton type";
@@ -125,6 +129,12 @@ export const PORTES_DU_SOCLE: readonly { readonly titre: string; readonly quoi: 
 export const SENS_DU_CIEL_NON_ECRIT =
   "Les positions sont exactes ; ce qu’elles racontent n’est pas encore écrit. Anima écrit ces " +
   "textes elle-même, un par un, et je préfère un blanc à des mots qui ne seraient pas les siens.";
+
+export const LECTURE_NUMEROLOGIE_NON_ECRITE =
+  "La lecture symbolique d’Anima n’est pas encore écrite. Les calculs affichés restent factuels et vérifiables.";
+
+export const LECTURE_NUMEROLOGIE_PARTIELLE =
+  "Seules les lectures symboliques déjà écrites par Anima sont affichées ici.";
 
 export const NOMBRES_INDISPONIBLES =
   "Je n’arrive pas à relire tes nombres en ce moment. Ils ne sont pas perdus ; reviens un peu plus tard.";

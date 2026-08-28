@@ -1,19 +1,18 @@
 import type { ItemBareme, NiveauReponse, TypeEnneagramme } from "./enneagramme";
 
 /**
- * enneagramme-items.ts — LES DIX-HUIT ÉNONCÉS DU TEST COURT (Story 5.5, AC1).
+ * enneagramme-items.ts — LES DIX-HUIT QUESTIONS DU TEST COURT (Stories 5.5 et 13.8).
  *
  * ══ POURQUOI CES PHRASES NE SONT PAS DU CORPUS D'ANIMA ═══════════════════════════════════════════
  *
  * FR-054 réserve à Anima les INTERPRÉTATIONS — ce que le produit dit du sens d'un nombre, d'un
- * signe, d'un type. Un énoncé de test n'interprète rien : c'est une phrase que le produit soumet à
- * l'accord de quelqu'un, du même registre que ce qu'il dit de lui-même. Le précédent est écrit :
+ * signe, d'un type. Une question de test n'interprète rien : elle demande la fréquence d'un geste
+ * observable dans une situation précise. Le précédent est écrit :
  * D10 de la 5.3 range `MESSAGE_SANS_HEURE` et `PHRASE_INVITATION` dans `lib/domain/` pour cette
  * raison exacte.
  *
- * Conséquence pratique : ces dix-huit phrases NE consomment PAS le budget d'écriture d'Anima (156
- * créneaux l'attendent déjà). Les neuf interprétations de types, elles, sont du corpus — et naîtront
- * non écrites, comme les trois autres corpus.
+ * Conséquence pratique : ces dix-huit questions NE consomment PAS le budget d'écriture d'Anima.
+ * Les neuf interprétations de types, elles, restent exclusivement dans le corpus.
  *
  * ══ LE REGISTRE, ET CE QU'IL INTERDIT ════════════════════════════════════════════════════════════
  *
@@ -30,15 +29,15 @@ import type { ItemBareme, NiveauReponse, TypeEnneagramme } from "./enneagramme";
  * fermé : un test dédié exige que toute exclusion prouve qu'elle protège d'un vrai match, et la
  * revue 4.9 en a déjà retiré quatre.
  *
- * Donc : des CONSTATS, à la première personne, sans vocabulaire clinique, sans futur, et sans
- * dénégation médicale. La reformulation est toujours possible — « j'envisage ce qui pourrait mal
- * tourner » dit la même chose que la phrase refusée.
+ * Donc : des SITUATIONS concrètes et des comportements observables, sans vocabulaire clinique,
+ * sans futur et sans dénégation médicale. L'échelle demande une fréquence, jamais une adhésion à
+ * un portrait psychologique abstrait.
  *
  * ══ L'ORDRE EST FIXE, ET LES TYPES SONT ENTRELACÉS ═══════════════════════════════════════════════
  *
  * Aucun mélange aléatoire : `Math.random` rendrait le test non reproductible, et l'AC1 exige le
- * déterminisme. Les deux énoncés d'un même type sont donc séparés par les huit autres — servis
- * groupés, ils rendraient le barème lisible à l'œil nu et pousseraient à répondre au personnage
+ * déterminisme. Les deux questions d'un même type sont donc séparées par les huit autres — servies
+ * groupées, elles rendraient le barème lisible à l'œil nu et pousseraient à répondre au personnage
  * plutôt qu'à soi.
  */
 
@@ -49,46 +48,49 @@ export interface ItemTest extends ItemBareme {
 }
 
 /**
- * DIX-HUIT ÉNONCÉS, DEUX PAR TYPE — décision Julian du 2026-08-13.
+ * DIX-HUIT QUESTIONS, DEUX PAR TYPE — décision Julian du 2026-08-13.
  *
  * « Court » est dans le titre de la story, et la charte visuelle interdit tout indicateur de
  * progression (barre, « question 3 sur 12 », points remplis) : un test long désoriente sans recours.
- * À l'autre bout, un seul énoncé par type ne départage rien. Deux est le plus petit jeu qui laisse
- * apparaître un écart.
+ * À l'autre bout, une seule question par type ne départage rien. Deux est le plus petit jeu qui
+ * laisse apparaître un écart.
  */
 export const ITEMS: readonly ItemTest[] = Object.freeze([
-  { id: "e1a", type: 1, texte: "Je repère tout de suite ce qui n’est pas à sa place." },
-  { id: "e2a", type: 2, texte: "Je sais souvent ce dont les autres ont besoin avant qu’ils le disent." },
-  { id: "e3a", type: 3, texte: "J’avance plus vite quand il y a un résultat à montrer." },
-  { id: "e4a", type: 4, texte: "Ce qui est ordinaire me laisse à distance." },
-  { id: "e5a", type: 5, texte: "Je préfère observer un moment avant de participer." },
-  { id: "e6a", type: 6, texte: "J’envisage ce qui pourrait mal tourner, par réflexe." },
-  { id: "e7a", type: 7, texte: "Je garde plusieurs portes ouvertes." },
-  { id: "e8a", type: 8, texte: "Je dis les choses franchement, quitte à bousculer." },
-  { id: "e9a", type: 9, texte: "Je cède facilement pour que le calme revienne." },
-  { id: "e1b", type: 1, texte: "Il y a une bonne façon de faire, et je m’y tiens." },
-  { id: "e2b", type: 2, texte: "J’ai du mal à demander quelque chose pour moi." },
-  { id: "e3b", type: 3, texte: "Je m’adapte à ce qu’on attend de moi, presque sans y penser." },
-  { id: "e4b", type: 4, texte: "Il me manque souvent quelque chose que les autres semblent avoir." },
-  { id: "e5b", type: 5, texte: "Je garde mon énergie, et je choisis où la dépenser." },
-  { id: "e6b", type: 6, texte: "Je fais confiance lentement, et rarement d’un coup." },
-  { id: "e7b", type: 7, texte: "Quand quelque chose pèse, je passe à la suite." },
-  { id: "e8b", type: 8, texte: "Je supporte mal qu’on décide à ma place." },
-  { id: "e9b", type: 9, texte: "Mes propres envies mettent du temps à me parvenir." },
+  { id: "e1a", type: 1, texte: "Un travail collectif vient de se terminer. À quelle fréquence reprends-tu les détails que les autres laisseraient passer ?" },
+  { id: "e2a", type: 2, texte: "Quelqu’un traverse une semaine chargée. À quelle fréquence proposes-tu ton aide avant qu’on te la demande ?" },
+  { id: "e3a", type: 3, texte: "Un objectif précis est fixé. À quelle fréquence organises-tu tes journées autour du résultat à atteindre ?" },
+  { id: "e4a", type: 4, texte: "Tu choisis un vêtement, un objet ou un projet. À quelle fréquence cherches-tu ce qui ne ressemble pas au reste ?" },
+  { id: "e5a", type: 5, texte: "Une discussion porte sur un sujet nouveau. À quelle fréquence écoutes-tu et rassembles-tu des informations avant de participer ?" },
+  { id: "e6a", type: 6, texte: "Une décision importante approche. À quelle fréquence vérifies-tu les risques et prépares-tu une solution de secours ?" },
+  { id: "e7a", type: 7, texte: "Un programme devient lourd ou répétitif. À quelle fréquence proposes-tu une autre activité ou une nouvelle option ?" },
+  { id: "e8a", type: 8, texte: "Une décision te concerne directement. À quelle fréquence dis-tu clairement ce que tu refuses ?" },
+  { id: "e9a", type: 9, texte: "Un désaccord monte dans un groupe. À quelle fréquence cherches-tu d’abord un terrain qui calme l’échange ?" },
+  { id: "e1b", type: 1, texte: "Une règle a été convenue. À quelle fréquence la suis-tu même quand personne ne regarde ?" },
+  { id: "e2b", type: 2, texte: "Un groupe doit faire un choix. À quelle fréquence t’occupes-tu d’abord de ce qui facilitera la vie des autres ?" },
+  { id: "e3b", type: 3, texte: "Tu arrives dans un nouveau groupe. À quelle fréquence adaptes-tu la façon de présenter ce que tu fais ?" },
+  { id: "e4b", type: 4, texte: "Tu racontes une expérience personnelle. À quelle fréquence choisis-tu les détails qui montrent ce qu’elle avait d’unique ?" },
+  { id: "e5b", type: 5, texte: "Plusieurs personnes sollicitent ton attention. À quelle fréquence réserves-tu du temps seul avant de répondre ?" },
+  { id: "e6b", type: 6, texte: "Tu rencontres une nouvelle personne. À quelle fréquence attends-tu des signes réguliers avant de lui faire pleinement confiance ?" },
+  { id: "e7b", type: 7, texte: "Tu prépares un voyage ou un week-end. À quelle fréquence gardes-tu plusieurs possibilités ouvertes jusqu’au dernier moment ?" },
+  { id: "e8b", type: 8, texte: "Quelqu’un est traité injustement devant toi. À quelle fréquence interviens-tu directement ?" },
+  { id: "e9b", type: 9, texte: "Un groupe choisit l’horaire ou le lieu. À quelle fréquence laisses-tu les autres décider même si tu avais une préférence ?" },
 ] as const);
 
 /**
- * Les libellés de l'échelle. Ils descendent du serveur avec les énoncés plutôt que d'être recopiés
+ * Les libellés de l'échelle. Ils descendent du serveur avec les questions plutôt que d'être recopiés
  * dans un module de copie de rendu : `render/` ne peut importer ni `@/lib/domain` ni `@/lib/corpus`,
  * et la 5.3 a écrit la parade dans ses écarts — « recopier les textes aurait fabriqué une divergence
  * en attente ». Aucun chiffre n'est jamais montré (FR-031).
  */
 export const LIBELLES_NIVEAU: Readonly<Record<NiveauReponse, string>> = Object.freeze({
-  0: "Pas du tout",
-  1: "Un peu",
-  2: "Plutôt",
-  3: "Tout à fait",
+  0: "Jamais ou presque",
+  1: "Parfois",
+  2: "Souvent",
+  3: "Presque toujours",
 });
+
+/** Une absence d'avis explicite : elle parcourt la question mais n'ajoute aucun point. */
+export const LIBELLE_INCONNU = "Je ne sais pas";
 
 /** Ce qu'un énoncé montre à l'écran : son identité et sa phrase. */
 export interface ItemAffiche {
@@ -167,9 +169,18 @@ export const MESSAGE_TYPE_ABSENT =
  * finir, et FR-031 refuse les jauges partout ailleurs dans le produit.
  */
 export const ANNONCE_DU_TEST =
-  "Quelques phrases, à situer entre « pas du tout moi » et « tout à fait moi ». C’est court. Tu " +
-  "peux t’arrêter en route et reprendre plus tard : ce que tu as posé reste là, et rien ne se " +
-  "perd si tu fermes l’application.";
+  "C’est court. Pour chaque situation, indique ce qui t’arrive le plus souvent. Tu peux répondre « Je ne sais " +
+  "pas » : cette réponse reste inconnue et ne vaut jamais zéro. Tu peux aussi t’arrêter et reprendre " +
+  "plus tard : ce que tu as posé reste là.";
+
+export const INTRODUCTION_ENNEAGRAMME =
+  "L’ennéagramme est une grille de lecture qui regroupe neuf manières récurrentes de porter son " +
+  "attention, de décider et de réagir. Ici, il se fonde uniquement sur tes réponses à des " +
+  "situations concrètes du quotidien.";
+
+export const LIMITE_ENNEAGRAMME =
+  "Le résultat reste une hypothèse : ce questionnaire exploratoire ne prouve pas qui tu es et peut " +
+  "ne retenir aucun type.";
 
 export const URL_PASSER_LE_TEST: { readonly libelle: string; readonly url: string } = Object.freeze({
   libelle: "Le test d’ennéagramme",

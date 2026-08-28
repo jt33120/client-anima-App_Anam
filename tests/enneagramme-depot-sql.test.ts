@@ -440,11 +440,12 @@ describe("[5.5/AC5] `anon` n'exécute aucune des deux RPC", () => {
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 describe("[5.5/T6] la relecture ne fait pas confiance à ce qu'elle lit", () => {
-  it("un niveau hors 0..3 est ÉCARTÉ, jamais ramené à 0", async () => {
+  it("un niveau hors 0..3 est écarté, tandis que `null` reste une inconnue explicite", async () => {
     // Le ramener à 0 répondrait « pas du tout » à sa place, et `conclure` ne pourrait plus dire
     // « incomplet » en nommant l'item.
     expect(reponsesDepuisJson({ e1a: 2, e1b: 9, e2a: -1, e2b: null })).toEqual([
       { itemId: "e1a", niveau: 2 },
+      { itemId: "e2b", niveau: null },
     ]);
   });
 
@@ -455,7 +456,9 @@ describe("[5.5/T6] la relecture ne fait pas confiance à ce qu'elle lit", () => 
   });
 
   it("aller-retour : ce qui est écrit est ce qui est relu", () => {
-    const reponses = toutesLesReponses(3);
+    const reponses: ReponseItem[] = toutesLesReponses(3).map((reponse) =>
+      reponse.itemId === "e4a" ? { ...reponse, niveau: null } : reponse,
+    );
     expect(reponsesDepuisJson(reponsesEnJson(reponses))).toEqual(reponses);
   });
 });

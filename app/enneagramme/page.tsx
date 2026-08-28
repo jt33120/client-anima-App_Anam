@@ -9,15 +9,17 @@ import {
 import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
 import {
   LIBELLES_NIVEAU,
-  ANNONCE_DU_TEST,
+  LIBELLE_INCONNU,
   MESSAGE_TYPE_SANS_TEXTE,
+  ITEMS,
   itemsPourAffichage,
 } from "@/lib/domain/enneagramme-items";
-import { NIVEAUX } from "@/lib/domain/enneagramme";
+import { conclure, NIVEAUX } from "@/lib/domain/enneagramme";
 import { phraseHypothese } from "@/lib/domain/enneagramme-hypothese";
 import TestCourt from "./test-court";
 import Hypothese from "./hypothese";
 import Resultat from "./resultat";
+import IntroductionEnneagramme from "./introduction";
 import s from "./enneagramme.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
@@ -119,6 +121,11 @@ export default async function Page({
   // efface la tentative, la clé change, l'arbre React est REMONTÉ, et aucune réponse de la passe
   // précédente ne survit à l'écran. Le défaut n° 6 de la revue 4.6, fermé par construction.
   const cleTentative = tentative.statut === "calcule" ? tentative.tentative.tentativeId : "nouvelle";
+  const issueInitiale =
+    tentative.statut === "calcule" &&
+    conclure(tentative.tentative.reponses, ITEMS).statut === "indetermine"
+      ? "indetermine"
+      : "en_cours";
 
   const texteRetenu =
     type.statut === "calcule" ? texteDuTypeRetenu(type.type) : { statut: "non_ecrit" as const };
@@ -126,7 +133,7 @@ export default async function Page({
   return (
     <main className={s.halte}>
       <RetourScene url={urlRetourScene(await searchParams)} />
-      <h1 className="t-titre">Ton type</h1>
+      <h1 className="t-titre">Explorer tes façons d’agir</h1>
 
       {refaire === undefined && hypothese.statut === "calcule" ? (
         <Hypothese
@@ -141,20 +148,18 @@ export default async function Page({
           messageSansTexte={MESSAGE_TYPE_SANS_TEXTE}
         />
       ) : (
-        <>
-          {/* ⚠️ L'ÉCRAN S'ANNONCE AVANT DE DÉMARRER, et seulement au PREMIER passage (Story 7.8).
-              Quelqu'un qui reprend une passe en cours n'a pas besoin qu'on lui réexplique ce
-              qu'elle fait : la relance serait alors du bavardage à chaque retour. */}
-          {cleTentative === "nouvelle" && <p className="t-corps">{ANNONCE_DU_TEST}</p>}
-          <TestCourt
-            key={cleTentative}
-            items={itemsPourAffichage()}
-            // Les libellés descendent du SERVEUR (jamais recopiés dans un module de rendu) :
-            // `render/` ne peut pas importer `lib/domain`, et une copie serait une divergence.
-            libelles={NIVEAUX.map((n) => LIBELLES_NIVEAU[n])}
-            reponsesInitiales={reponsesInitiales}
-          />
-        </>
+        <TestCourt
+          key={cleTentative}
+          items={itemsPourAffichage()}
+          // Les libellés descendent du SERVEUR (jamais recopiés dans un module de rendu) :
+          // `render/` ne peut pas importer `lib/domain`, et une copie serait une divergence.
+          libelles={NIVEAUX.map((n) => LIBELLES_NIVEAU[n])}
+          libelleInconnu={LIBELLE_INCONNU}
+          reponsesInitiales={reponsesInitiales}
+          nouvelle={cleTentative === "nouvelle"}
+          issueInitiale={issueInitiale}
+          introduction={<IntroductionEnneagramme />}
+        />
       )}
 
       {/* Un chemin de retour, jamais un cul-de-sac. */}

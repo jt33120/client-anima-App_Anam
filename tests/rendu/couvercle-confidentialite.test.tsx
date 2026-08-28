@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import { CouvercleConfidentialite } from "@/render/confidentialite/CouvercleConfidentialite";
 
@@ -20,9 +20,36 @@ function visibilite(etat: "visible" | "hidden") {
   Object.defineProperty(document, "visibilityState", { value: etat, configurable: true });
 }
 
+function stockageMemoire(): Storage {
+  const valeurs = new Map<string, string>();
+  return {
+    get length() { return valeurs.size; },
+    clear: () => valeurs.clear(),
+    getItem: (cle) => valeurs.get(cle) ?? null,
+    key: (index) => [...valeurs.keys()][index] ?? null,
+    removeItem: (cle) => { valeurs.delete(cle); },
+    setItem: (cle, valeur) => { valeurs.set(cle, String(valeur)); },
+  };
+}
+
+function installerStockages() {
+  Object.defineProperty(window, "localStorage", {
+    value: stockageMemoire(),
+    configurable: true,
+  });
+  Object.defineProperty(window, "sessionStorage", {
+    value: stockageMemoire(),
+    configurable: true,
+  });
+}
+
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
   visibilite("visible");
+  try { window.localStorage?.clear(); } catch {}
+  try { window.sessionStorage?.clear(); } catch {}
+  window.history.replaceState({}, "", "/");
   document.documentElement.removeAttribute("data-couvercle");
 });
 
@@ -87,6 +114,48 @@ describe("[6.2/AC5] le couvercle se pose quand l'application passe en arrière-p
     const { unmount } = render(<CouvercleConfidentialite />);
     unmount();
     window.dispatchEvent(new Event("pagehide"));
+    expect(document.documentElement.getAttribute("data-couvercle")).toBeNull();
+  });
+
+  it("[VERROU] efface le déverrouillage serveur dès le passage en arrière-plan", () => {
+    installerStockages();
+    const sendBeacon = vi.fn(() => true);
+    vi.stubGlobal("navigator", { ...navigator, sendBeacon });
+
+    render(<CouvercleConfidentialite verrouAutomatique />);
+    visibilite("hidden");
+    document.dispatchEvent(new Event("visibilitychange"));
+
+    expect(sendBeacon).toHaveBeenCalledWith("/api/verrou");
+    expect(window.sessionStorage.getItem("anam_session_reverrouillee")).toBe("oui");
+    expect(document.documentElement.getAttribute("data-couvercle")).toBe("pose");
+  });
+
+  it("[VERROU] pagehide seul couvre mais ne confond pas une navigation interne avec un vol", () => {
+    installerStockages();
+    const sendBeacon = vi.fn(() => true);
+    vi.stubGlobal("navigator", { ...navigator, sendBeacon });
+
+    render(<CouvercleConfidentialite verrouAutomatique />);
+    window.dispatchEvent(new Event("pagehide"));
+
+    expect(sendBeacon).not.toHaveBeenCalled();
+    expect(window.sessionStorage.getItem("anam_session_reverrouillee")).toBeNull();
+    expect(document.documentElement.getAttribute("data-couvercle")).toBe("pose");
+  });
+
+  it("[VERROU] la page de déverrouillage reste utilisable au retour", () => {
+    installerStockages();
+    const sendBeacon = vi.fn(() => true);
+    vi.stubGlobal("navigator", { ...navigator, sendBeacon });
+    window.history.replaceState({}, "", "/verrou");
+
+    render(<CouvercleConfidentialite verrouAutomatique />);
+    visibilite("hidden");
+    document.dispatchEvent(new Event("visibilitychange"));
+    visibilite("visible");
+    document.dispatchEvent(new Event("visibilitychange"));
+
     expect(document.documentElement.getAttribute("data-couvercle")).toBeNull();
   });
 });

@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ITEMS, LIBELLES_NIVEAU } from "@/lib/domain/enneagramme-items";
+import { ITEMS, LIBELLES_NIVEAU, LIBELLE_INCONNU } from "@/lib/domain/enneagramme-items";
 import { NIVEAUX } from "@/lib/domain/enneagramme";
+import { reperesPourIntroduction } from "@/lib/corpus/enneagramme";
 
 /**
  * enneagramme-halte.test.tsx — LA HALTE, RÉELLEMENT MONTÉE (Story 5.5, T8).
@@ -22,7 +23,6 @@ import { NIVEAUX } from "@/lib/domain/enneagramme";
 
 const enregistrerReponses = vi.fn();
 const conclureTest = vi.fn();
-const departagerExAequo = vi.fn();
 const accepterHypothese = vi.fn();
 const refuserHypothese = vi.fn();
 const recommencerTest = vi.fn();
@@ -31,7 +31,6 @@ const effacerType = vi.fn();
 vi.mock("@/app/enneagramme/actions", () => ({
   enregistrerReponses: (r: unknown) => enregistrerReponses(r),
   conclureTest: (r: unknown) => conclureTest(r),
-  departagerExAequo: (t: unknown) => departagerExAequo(t),
   accepterHypothese: (id: string) => accepterHypothese(id),
   refuserHypothese: (id: string) => refuserHypothese(id),
   recommencerTest: () => recommencerTest(),
@@ -43,6 +42,7 @@ const refresh = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 
 const { default: TestCourt } = await import("@/app/enneagramme/test-court");
+const { default: IntroductionEnneagramme } = await import("@/app/enneagramme/introduction");
 const { default: Hypothese } = await import("@/app/enneagramme/hypothese");
 const { default: Resultat } = await import("@/app/enneagramme/resultat");
 
@@ -53,7 +53,6 @@ beforeEach(() => {
   for (const m of [
     enregistrerReponses,
     conclureTest,
-    departagerExAequo,
     accepterHypothese,
     refuserHypothese,
     recommencerTest,
@@ -65,13 +64,44 @@ beforeEach(() => {
   }
   enregistrerReponses.mockResolvedValue({ ok: true });
   conclureTest.mockResolvedValue({ statut: "retenu" });
-  departagerExAequo.mockResolvedValue({ statut: "retenu" });
   accepterHypothese.mockResolvedValue({ statut: "repondu" });
   refuserHypothese.mockResolvedValue({ statut: "repondu" });
 });
 
-const monterTest = (deja: Record<string, number> = {}) =>
-  render(<TestCourt items={AFFICHES} libelles={LIBELLES} reponsesInitiales={deja} />);
+const monterTest = (
+  deja: Record<string, number | null> = {},
+  options: { nouvelle?: boolean; issueInitiale?: "en_cours" | "indetermine" } = {},
+) =>
+  render(
+    <TestCourt
+      items={AFFICHES}
+      libelles={LIBELLES}
+      libelleInconnu={LIBELLE_INCONNU}
+      reponsesInitiales={deja}
+      nouvelle={options.nouvelle ?? false}
+      issueInitiale={options.issueInitiale ?? "en_cours"}
+      introduction={<IntroductionEnneagramme />}
+    />,
+  );
+
+describe("[13.8] comprendre avant de commencer", () => {
+  it("explique simplement la méthode, sa limite, puis déplie les neuf repères du corpus", () => {
+    render(<IntroductionEnneagramme />);
+    expect(screen.getByText(/grille de lecture/i)).toBeTruthy();
+    expect(screen.getByText(/hypothèse/i)).toBeTruthy();
+    expect(screen.getByText(/Voir les neuf repères/i)).toBeTruthy();
+    for (const repere of reperesPourIntroduction()) {
+      expect(screen.getByText(repere.texte)).toBeTruthy();
+    }
+  });
+
+  it("une nouvelle passe attend le geste « Commencer » avant de montrer la première question", async () => {
+    monterTest({}, { nouvelle: true });
+    expect(screen.queryByText(ITEMS[0].texte)).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: /Commencer/i }));
+    expect(screen.getByText(ITEMS[0].texte)).toBeTruthy();
+  });
+});
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 // FR-031 — aucun compteur, aucune jauge, aucun score
@@ -116,12 +146,13 @@ describe("[5.5/AC1 DUR] rien ne compte à l’écran (FR-031)", () => {
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 describe("[5.5/AC1] une question à la fois, reprise là où elle s’était arrêtée", () => {
-  it("un seul énoncé est affiché, avec ses quatre degrés", () => {
+  it("un seul énoncé est affiché, avec quatre fréquences et « Je ne sais pas »", () => {
     monterTest();
     expect(screen.getByText(ITEMS[0].texte)).toBeTruthy();
-    expect(screen.queryByText(ITEMS[1].texte), "les autres énoncés ne sont pas montés").toBeNull();
+    expect(screen.getByRole("group", { name: ITEMS[0].texte })).toBeTruthy();
+    expect(screen.queryByText(ITEMS[1].texte), "les autres questions ne sont pas montées").toBeNull();
     const liste = screen.getByRole("list");
-    expect(within(liste).getAllByRole("button")).toHaveLength(4);
+    expect(within(liste).getAllByRole("button")).toHaveLength(5);
   });
 
   it("[NFR-017] elle reprend au PREMIER énoncé sans réponse", () => {
@@ -148,12 +179,32 @@ describe("[5.5/AC1] une question à la fois, reprise là où elle s’était arr
     expect(document.activeElement?.textContent).toBe(LIBELLES[3]);
   });
 
-  it("les quatre degrés ont EXACTEMENT la même forme", () => {
-    // Une échelle dont un degré se remarque plus que les autres suggère une bonne réponse.
+  it("les quatre fréquences sont illustrées par le glyphe Psychologie établi, jamais un emoji", () => {
+    monterTest();
+    for (const [index, libelle] of LIBELLES.entries()) {
+      const bouton = screen.getByRole("button", { name: libelle });
+      expect(bouton.querySelectorAll("svg"), libelle).toHaveLength(index + 1);
+      for (const glyphe of bouton.querySelectorAll("svg")) {
+        expect(glyphe.getAttribute("aria-hidden")).not.toBeNull();
+      }
+      expect(bouton.textContent).not.toMatch(/[😀-🙏]/u);
+    }
+    expect(screen.getByRole("button", { name: LIBELLE_INCONNU }).querySelector("svg")).toBeNull();
+  });
+
+  it("les cinq réponses ont EXACTEMENT la même forme", () => {
+    // Une réponse dont le dessin porte davantage de poids suggérerait une bonne réponse.
     monterTest();
     const boutons = within(screen.getByRole("list")).getAllByRole("button");
     const classes = new Set(boutons.map((b) => b.className));
-    expect(classes.size, "un seul dessin pour les quatre degrés").toBe(1);
+    expect(classes.size, "un seul dessin de bouton pour les cinq réponses").toBe(1);
+  });
+
+  it("« Je ne sais pas » persiste `null`, avance et ne devient jamais un zéro", async () => {
+    monterTest();
+    await userEvent.click(screen.getByRole("button", { name: LIBELLE_INCONNU }));
+    expect(enregistrerReponses).toHaveBeenCalledWith({ [ITEMS[0].id]: null });
+    expect(screen.getByText(ITEMS[1].texte)).toBeTruthy();
   });
 });
 
@@ -196,33 +247,25 @@ describe("[5.5/AC1] deux clics ne font pas deux envois", () => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
-// L'ex æquo — le produit refuse de trancher
+// Le résultat indéterminé — le produit refuse de fabriquer un type
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-describe("[5.5/AC1] à égalité, c’est elle qui tranche", () => {
-  it("[LE CŒUR] les types à égalité sont NOMMÉS, et le produit ne choisit pas", async () => {
-    // Départager par « le plus petit numéro » aurait biaisé silencieusement vers le type 1 — faux,
-    // parfaitement déterministe, donc invisible à tout test de reproductibilité.
-    conclureTest.mockResolvedValue({ statut: "indecis", exaequo: [3, 8] });
+describe("[13.8] aucun type n’est demandé à quelqu’un que le test n’a pas su lire", () => {
+  it("[LE CŒUR] l’égalité finit sur un résultat honnêtement indéterminé, sans type cliquable", async () => {
+    conclureTest.mockResolvedValue({ statut: "indetermine" });
     const deja = Object.fromEntries(ITEMS.slice(0, ITEMS.length - 1).map((i) => [i.id, 2]));
     monterTest(deja);
     await userEvent.click(screen.getByRole("button", { name: LIBELLES[3] }));
 
-    const bloc = await screen.findByRole("region", { name: /égalité/i });
-    const choix = within(bloc).getAllByRole("button");
-    expect(choix).toHaveLength(2);
-    expect(choix.map((b) => b.textContent)).toEqual(["Le type 3", "Le type 8"]);
-    // Aucun n'est mis en avant : ce serait choisir à sa place en le suggérant.
-    expect(new Set(choix.map((b) => b.className)).size).toBe(1);
+    const bloc = await screen.findByRole("region", { name: /sans type/i });
+    expect(bloc.textContent).toMatch(/aucun type/i);
+    expect(within(bloc).queryByRole("button", { name: /type \d/i })).toBeNull();
   });
 
-  it("son choix part au serveur, qui le vérifie", async () => {
-    conclureTest.mockResolvedValue({ statut: "indecis", exaequo: [3, 8] });
-    const deja = Object.fromEntries(ITEMS.slice(0, ITEMS.length - 1).map((i) => [i.id, 2]));
-    monterTest(deja);
-    await userEvent.click(screen.getByRole("button", { name: LIBELLES[3] }));
-    await userEvent.click(await screen.findByRole("button", { name: "Le type 8" }));
-    expect(departagerExAequo).toHaveBeenCalledWith(8);
+  it("un résultat indéterminé persisté reste visible après remontage", () => {
+    const deja = Object.fromEntries(ITEMS.map((i) => [i.id, 2]));
+    monterTest(deja, { issueInitiale: "indetermine" });
+    expect(screen.getByRole("region", { name: /sans type/i })).toBeTruthy();
   });
 });
 

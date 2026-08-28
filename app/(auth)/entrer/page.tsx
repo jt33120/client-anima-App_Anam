@@ -3,6 +3,8 @@ import { lireAttente } from "./attente";
 import { entreeDemo, entreeDemoSuspendue } from "./actions";
 import { ADIEU } from "@/lib/domain/copie-mes-donnees";
 import { SESSION_FERMEE } from "@/lib/domain/copie-reglages";
+import { destinationInterne, passkeysActives } from "@/lib/auth/verrou-prive";
+import BoutonConnexionPasskey from "../passkeys/BoutonConnexionPasskey";
 import s from "./entrer.module.css";
 
 /**
@@ -28,9 +30,17 @@ export const metadata = { title: "Anam" };
 export default async function PageEntrer({
   searchParams,
 }: {
-  searchParams: Promise<{ refus?: string; efface?: string; deconnexion?: string }>;
+  searchParams: Promise<{
+    refus?: string;
+    efface?: string;
+    deconnexion?: string;
+    erreur?: string;
+    vers?: string;
+    recuperation?: string;
+  }>;
 }) {
-  const { refus, efface, deconnexion } = await searchParams;
+  const { refus, efface, deconnexion, erreur, vers: versBrut, recuperation } = await searchParams;
+  const vers = destinationInterne(versBrut);
 
   /* ⚠️ LA LECTURE QUI MANQUAIT (mesuré le 2026-08-19 sur le téléphone de Julian).
      L'écran « tape ton code » ne vivait que dans la mémoire de React. Basculer sur sa boîte mail
@@ -43,7 +53,9 @@ export default async function PageEntrer({
     <main className={s.page}>
       <div className={s.contenu}>
         <p className="t-surtitre">Anam</p>
-        <h1 className="t-display">Entrer</h1>
+        <h1 className="t-display">
+          {recuperation === "1" ? "Récupérer mon accès" : "Me reconnecter"}
+        </h1>
         {refus === "age" ? (
           <p className="t-anam" role="status">
             Ce lieu est réservé aux 18 ans ou plus. Reviens quand tu y seras — la
@@ -67,16 +79,33 @@ export default async function PageEntrer({
                 {SESSION_FERMEE}
               </p>
             )}
+            {erreur === "lien" && (
+              <p className={s.erreur} role="alert">
+                Ce lien n’a pas pu ouvrir ta session. Demande un nouveau code ci-dessous.
+              </p>
+            )}
             {/* L'invitation ne vaut que tant qu'on attend une ADRESSE. Une fois le code parti,
                 le formulaire dit lui-même où il en est ; garder « laisse-moi ton adresse » au-dessus
                 de « c'est parti vers toi@… » ferait se contredire l'écran. */}
             {!attente && (
               <p className="t-anam">
-                Laisse-moi ton adresse. Je t&rsquo;enverrai un lien — pas de mot de
-                passe à retenir, rien à perdre.
+                {recuperation === "1"
+                  ? "Je vais vérifier ton adresse avant de retirer les anciennes clés d’accès."
+                  : "Choisis la clé d’accès de ton appareil, ou reçois un lien et un code par e-mail."}
               </p>
             )}
-            <FormulaireEntree adresseEnAttente={attente?.adresse} />
+            <div className={s.portes}>
+              {!attente && recuperation !== "1" && passkeysActives() ? (
+                <>
+                  <BoutonConnexionPasskey vers={vers} />
+                  <p className={s.separateur} aria-hidden="true">ou</p>
+                </>
+              ) : null}
+              <FormulaireEntree
+                adresseEnAttente={attente?.adresse}
+                destination={attente?.destination ?? vers}
+              />
+            </div>
             {/* ── QA tour 2 — L'INFORMATION DUE AVANT LA COLLECTE (RGPD art. 13) ──────────────
                 Mesuré : cet écran ne contenait AUCUN `href`. Pas un lien, pas une ligne sur ce
                 qu'on fait des données — et c'est ici qu'on demande une adresse e-mail.

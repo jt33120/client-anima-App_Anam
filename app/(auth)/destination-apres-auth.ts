@@ -1,6 +1,13 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  destinationInterne,
+  passkeyRequise,
+  passkeysActives,
+} from "@/lib/auth/verrou-prive";
 import { etapeOnboardingPour } from "./etat-onboarding";
+
+type OptionsDestination = { readonly passkeyVerifiee?: boolean };
 
 /**
  * OÙ VA QUELQU'UN QUI VIENT D'OUVRIR SA SESSION — un seul endroit, pour deux portes.
@@ -23,6 +30,7 @@ import { etapeOnboardingPour } from "./etat-onboarding";
 export async function destinationApresAuth(
   supabase: SupabaseClient,
   next: string,
+  options: OptionsDestination = {},
 ): Promise<string> {
   const {
     data: { user },
@@ -38,5 +46,21 @@ export async function destinationApresAuth(
   if (etape === "naissance") return "/naissance";
   if (etape === "consentement") return "/consentement";
   if (etape === "revoque") return "/consentement/revoque";
-  return next; // suite
+
+  const suite = destinationInterne(next);
+  if (!passkeysActives()) return suite;
+
+  // Cette destination n'est produite que par le lien de récupération que l'utilisatrice vient de
+  // demander. La détourner vers /verrou créerait précisément l'impasse qu'elle essaie de résoudre.
+  if (suite === "/securiser/recuperer") return suite;
+
+  if (passkeyRequise(user)) {
+    return options.passkeyVerifiee
+      ? suite
+      : `/verrou?vers=${encodeURIComponent(suite)}`;
+  }
+
+  // Première connexion après le déploiement : proposer la protection AVANT les données privées,
+  // tout en laissant une sortie explicite aux navigateurs sans WebAuthn.
+  return `/securiser?vers=${encodeURIComponent(suite)}`;
 }

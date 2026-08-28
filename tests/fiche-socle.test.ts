@@ -6,7 +6,6 @@ import {
   sectionNombres,
   sectionCiel,
   sectionType,
-  type NombreFiche,
 } from "@/lib/domain/fiche-socle";
 import {
   RAISON_NOMBRE,
@@ -15,6 +14,7 @@ import {
   URL_CORRIGER_LE_NOM,
   URL_AJOUTER_SON_HEURE,
   SENS_DU_CIEL_NON_ECRIT,
+  LECTURE_NUMEROLOGIE_NON_ECRITE,
   INTRODUCTION,
 } from "@/lib/domain/copie-socle";
 import { URL_PASSER_LE_TEST, MESSAGE_TYPE_ABSENT } from "@/lib/domain/enneagramme-items";
@@ -55,6 +55,7 @@ const themeSansHeure = calculerThemeNatal(SANS_HEURE, ephemeride);
 
 const NUM_COMPLETE = calculerNumerologie({ date: "1990-06-15", nomComplet: "Marie Claire Dubois" }, 2026);
 const NUM_SANS_NOM = calculerNumerologie({ date: "1990-06-15", nomComplet: null }, 2026);
+const ENTREES_NUM_COMPLETE = { date: "1990-06-15", nomComplet: "Marie Claire Dubois" };
 
 const RIEN = { nombres: null, ciel: null };
 
@@ -62,7 +63,7 @@ const RIEN = { nombres: null, ciel: null };
 // AC1 — les SIX nombres, avec leurs SIX textes
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-describe("[7.5/AC1] la promesse FR-055 : six nombres, six textes", () => {
+describe("[7.5 · 13.9] les six nombres et leur lecture sont deux couches distinctes", () => {
   it("[CONTRÔLE DU CONTRÔLE] le jeu d'essai a bien ses six nombres calculés", () => {
     // Sans ce témoin, « six sur six » serait vrai sur un jeu qui n'en produit que trois — et le
     // test mesurerait le jeu d'essai, pas le module.
@@ -72,12 +73,12 @@ describe("[7.5/AC1] la promesse FR-055 : six nombres, six textes", () => {
     expect(NOMBRES.length).toBe(6);
   });
 
-  it("[LE CŒUR] les six nombres portent CHACUN leur texte — pas seulement le chemin de vie", () => {
-    const section = sectionNombres(NUM_COMPLETE, null);
+  it("[LE CŒUR] les six résultats et les textes réellement écrits restent distincts", () => {
+    const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
     expect(section.nombres.length, "six nombres calculés doivent produire six lignes").toBe(6);
     expect(section.manquants).toHaveLength(0);
-    const ecrits = section.nombres.filter((n: NombreFiche) => n.texte.statut === "ecrit");
-    expect(ecrits.length, "les 69 créneaux de numérologie sont écrits : les six textes doivent sortir").toBe(6);
+    expect(section.lecturesSymboliques).toHaveLength(6);
+    expect(section.noteLectureSymbolique).toBeNull();
   });
 
   it("les six sont dans l'ordre du catalogue, pas dans celui de l'objet", () => {
@@ -85,12 +86,40 @@ describe("[7.5/AC1] la promesse FR-055 : six nombres, six textes", () => {
     expect(section.nombres.map((n) => n.cle)).toEqual([...NOMBRES]);
   });
 
-  it("aucun texte n'est fabriqué : l'union est transportée telle quelle", () => {
-    const section = sectionNombres(NUM_COMPLETE, null);
-    for (const n of section.nombres) {
-      expect(["ecrit", "non_ecrit"]).toContain(n.texte.statut);
-      if (n.texte.statut === "ecrit") expect(n.texte.texte.length).toBeGreaterThan(20);
+  it("chaque résultat porte sa preuve arithmétique, pas une interprétation", () => {
+    const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
+    for (const nombre of section.nombres) expect(nombre.calcul.length, nombre.cle).toBeGreaterThan(0);
+    expect(section.nombres.find((nombre) => nombre.cle === "chemin_de_vie")?.calcul.join(" ")).toContain("Total :");
+  });
+});
+
+describe("[13.9] les entrées et conventions sont traçables", () => {
+  it("montre exactement la date, le nom et l'année utilisés", () => {
+    const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
+    expect(section.entrees).toEqual([
+      { intitule: "Date de naissance", valeur: "15/06/1990" },
+      { intitule: "Nom de naissance", valeur: "Marie Claire Dubois" },
+      { intitule: "Année de référence", valeur: "2026" },
+    ]);
+  });
+
+  it("déclare la table, la réduction séparée, les maîtres, Y et la bascule annuelle", () => {
+    const texte = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE).conventions.join(" ");
+    for (const attendu of ["pythagoricienne", "séparément", "11, 22 et 33", "lettre Y", "1er janvier"]) {
+      expect(texte).toContain(attendu);
     }
+  });
+
+  it("ne répète qu'une seule note quand tout le corpus symbolique est vide", () => {
+    const section = sectionNombres(
+      NUM_COMPLETE,
+      null,
+      ENTREES_NUM_COMPLETE,
+      () => ({ statut: "non_ecrit" }),
+    );
+    expect(section.lecturesSymboliques).toHaveLength(0);
+    const occurrences = JSON.stringify(section).split(LECTURE_NUMEROLOGIE_NON_ECRITE).length - 1;
+    expect(occurrences).toBe(1);
   });
 });
 
@@ -189,6 +218,44 @@ describe("[7.5/AC4] les angles, dont un qui n'avait jamais été affiché", () =
     expect(ciel.angles).toHaveLength(0);
     expect(ciel.cuspides).toHaveLength(0);
     expect(ciel.manques.length, "le silence sur une absence est le défaut, pas l'absence").toBeGreaterThan(0);
+  });
+});
+
+describe("[13.7] la projection natale ne dépasse jamais la précision disponible", () => {
+  it("porte les longitudes exactes comme texte et comme coordonnées SVG quand l'heure est connue", () => {
+    const ciel = sectionCiel(themeComplet, null);
+    expect(ciel.projection).not.toBeNull();
+    expect(ciel.projection?.description).toContain("mêmes positions en texte");
+    for (const position of ciel.positions) {
+      expect(position.longitude).toMatch(/^\d{1,3},\d{2}°$/);
+      expect(position.projection).toMatch(/^\d{1,3}\.\d{6}$/);
+    }
+  });
+
+  it("retire la carte et les degrés exacts quand l'heure n'est pas connue", () => {
+    const ciel = sectionCiel(themeSansHeure, null);
+    expect(ciel.projection).toBeNull();
+    expect(ciel.positions.every((position) => position.longitude === null && position.projection === null)).toBe(true);
+  });
+});
+
+describe("[13.6] le socle est un aperçu, chaque détail reste à un geste", () => {
+  it("construit les trois portes dans la grammaire des univers de Moi", () => {
+    const fiche = ficheSocle(NUM_COMPLETE, themeComplet, 4, RIEN, ENTREES_NUM_COMPLETE);
+    expect(fiche.apercus.map((apercu) => apercu.cle)).toEqual(["numerologie", "astrologie", "psychologie"]);
+    expect(fiche.apercus.map((apercu) => apercu.url)).toEqual([
+      "/socle?univers=numerologie",
+      "/socle?univers=astrologie",
+      "/psychologie",
+    ]);
+    expect(fiche.apercus.every((apercu) => apercu.faits.length > 0)).toBe(true);
+  });
+
+  it("ne promet pas de carte exacte lorsque l'heure n'autorise pas cette précision", () => {
+    const fiche = ficheSocle(NUM_COMPLETE, themeSansHeure, null, RIEN, ENTREES_NUM_COMPLETE);
+    const astrologie = fiche.apercus.find((apercu) => apercu.cle === "astrologie");
+    expect(astrologie?.accroche).toContain("sans inventer la précision");
+    expect(astrologie?.accroche).not.toContain("carte exacte");
   });
 });
 

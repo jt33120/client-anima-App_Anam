@@ -91,3 +91,24 @@ export function texteDuType(resultat: ResultatTest): TexteCorpus | null {
 export function texteDuTypeRetenu(type: TypeEnneagramme): TexteCorpus {
   return lireTexte(CORPUS_ENNEAGRAMME, cleEnneagramme(type));
 }
+
+export interface RepereEnneagramme {
+  readonly type: TypeEnneagramme;
+  readonly texte: string;
+}
+
+/**
+ * Les repères que l'introduction peut déplier.
+ *
+ * Aucun résumé n'est composé ici : un créneau non écrit reste absent de la liste. Cette projection
+ * rend structurelle la frontière FR-054 — l'écran ne peut expliquer un type qu'avec le texte du
+ * corpus Anima déjà présent.
+ */
+export function reperesPourIntroduction(): readonly RepereEnneagramme[] {
+  return Object.freeze(
+    TYPES.flatMap((type) => {
+      const texte = texteDuTypeRetenu(type);
+      return texte.statut === "ecrit" ? [Object.freeze({ type, texte: texte.texte })] : [];
+    }),
+  );
+}

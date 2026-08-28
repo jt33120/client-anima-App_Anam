@@ -146,6 +146,12 @@ export const HORS_HALTE: Readonly<Record<string, string>> = Object.freeze({
   desabonnement: "atteinte depuis un pied de courriel, SANS session — aucune halte n’y est due",
   "(auth)/entrer": "avant toute session — il n’y a encore ni contenu ni interlocuteur",
   "(auth)/naissance": "parcours d’entrée, avant le consentement art. 9",
+  "(auth)/verrou":
+    "porte d’authentification sans contenu personnel — ajouter le pied derrière le verrou exposerait une navigation inutile",
+  "(auth)/securiser":
+    "cérémonie WebAuthn et explication de sécurité, avant l’accès au contenu personnel",
+  "(auth)/securiser/recuperer":
+    "récupération de compte après preuve e-mail — écran d’action sans texte produit par un modèle",
   "(auth)/consentement": "l’écran qui DÉCLARE l’IA — y remettre la mention serait la répéter à elle-même",
   "(auth)/consentement/revoque": "impasse volontaire après révocation",
   "(auth)/consentement/revoquer":

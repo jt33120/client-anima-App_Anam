@@ -64,6 +64,45 @@
   gap: 0.75rem;
 }
 
+.listePasskeys {
+  display: grid;
+  gap: var(--esp-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.passkey {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-4);
+  padding: var(--esp-4);
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
+}
+
+.metaPasskey {
+  margin: var(--esp-1) 0 0;
+  color: var(--texte-doux);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.lienBouton {
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--cible-tactile);
+  padding: 0 var(--esp-5);
+  color: var(--texte);
+  border: 1px solid var(--texte-doux);
+  border-radius: var(--rayon-full);
+  text-decoration: none;
+}
+
 .bouton {
   font: inherit;
   color: var(--texte);
@@ -84,9 +123,17 @@
 }
 
 .bouton:focus-visible,
-.select:focus-visible {
+.select:focus-visible,
+.lienBouton:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
+}
+
+@media (max-width: 30rem) {
+  .passkey {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 .champHeure {

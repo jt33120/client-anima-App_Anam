@@ -146,11 +146,16 @@
 .reessayerOuverture {
   min-height: var(--cible-tactile);
   padding: var(--esp-2) var(--esp-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--texte);
   background: transparent;
   border: 1px solid var(--bordure-forte);
   border-radius: var(--rayon);
   cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .reessayerOuverture:focus-visible {

@@ -19,6 +19,12 @@ import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/p
 import { urlRetourScene } from "@/lib/scene/retour-scene";
 import RetourScene from "@/render/RetourScene";
 import { enregistrerNom } from "./actions";
+import GestionPasskeys from "@/render/reglages/GestionPasskeys";
+import { passkeyRequise, passkeysActives } from "@/lib/auth/verrou-prive";
+import {
+  listerPasskeys,
+  supprimerPasskey,
+} from "@/app/(auth)/passkeys/actions";
 
 // NFR-015 / identité de route — « Anam » partout, jamais un titre qui dit l'intimité de la page.
 export const metadata = { title: "Anam" };
@@ -112,6 +118,7 @@ export default async function PageReglages({
       .maybeSingle<{ prenom: string | null; nom_complet: string | null }>(),
   ]);
   const courrielsArretes = Boolean(courriel?.refuse_le);
+  const clesAcces = passkeysActives() ? await listerPasskeys() : [];
 
   return (
     <main className={s.halte}>
@@ -195,6 +202,14 @@ export default async function PageReglages({
         </form>
         <p className={s.description}>{copie.COURRIELS_QUI_RESTENT}</p>
       </section>
+
+      {passkeysActives() ? (
+        <GestionPasskeys
+          protectionActive={passkeyRequise(user)}
+          clesInitiales={clesAcces}
+          supprimer={supprimerPasskey}
+        />
+      ) : null}
 
       {/* Story 6.6 — le seul chemin cliquable vers « Mes données » tant que le menu de compte
           n'existe pas. `/reglages` est ce qui s'en approche le plus ; la dette du menu reste

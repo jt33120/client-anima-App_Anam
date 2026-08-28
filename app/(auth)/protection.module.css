@@ -1,0 +1,135 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--esp-7) var(--marge-mobile);
+}
+
+.carte {
+  width: min(100%, 34rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-5);
+  padding: clamp(var(--esp-5), 7vw, var(--esp-8));
+  text-align: center;
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
+  border-radius: calc(var(--rayon) * 2);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 18%);
+}
+
+.carte h1,
+.carte p {
+  margin: 0;
+}
+
+.explication {
+  display: grid;
+  gap: var(--esp-3);
+  color: var(--texte-doux);
+  line-height: 1.65;
+}
+
+.fait {
+  color: var(--texte);
+}
+
+.actions {
+  width: min(100%, 25rem);
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.actionIsolee {
+  width: 100%;
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.boutonPrincipal,
+.boutonSecondaire,
+.lienSecondaire {
+  min-height: var(--cible-tactile);
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--esp-5);
+  border-radius: var(--rayon);
+  font: inherit;
+  cursor: pointer;
+}
+
+.boutonPrincipal {
+  border: 0;
+  color: var(--sur-accent);
+  background: var(--accent);
+}
+
+.boutonSecondaire,
+.lienSecondaire {
+  color: var(--texte);
+  background: transparent;
+  border: 1px solid var(--bordure-forte);
+  text-decoration: none;
+}
+
+.lienDiscret {
+  color: var(--texte-doux);
+  min-height: var(--cible-tactile);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-underline-offset: 0.2em;
+}
+
+.boutonPrincipal:disabled,
+.boutonSecondaire:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.boutonPrincipal:focus-visible,
+.boutonSecondaire:focus-visible,
+.lienSecondaire:focus-visible,
+.lienDiscret:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
+.erreur {
+  margin: 0;
+  color: var(--alerte);
+  font-family: var(--pile-ui);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.separateur {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  width: 100%;
+  color: var(--texte-doux);
+  font-size: 0.8125rem;
+}
+
+.separateur::before,
+.separateur::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--bordure);
+}
+
+@media (max-width: 30rem) {
+  .page {
+    align-items: start;
+    padding-top: var(--esp-6);
+  }
+
+  .carte {
+    padding: var(--esp-5);
+  }
+}

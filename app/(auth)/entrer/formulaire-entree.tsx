@@ -16,7 +16,13 @@ const initialCode: EtatCode = {};
  * Le code est la porte qui traverse : il voyage par les yeux. On l'annonce donc SANS le présenter
  * comme un repli honteux — pour beaucoup de gens, ce sera le chemin normal.
  */
-export default function FormulaireEntree({ adresseEnAttente }: { adresseEnAttente?: string }) {
+export default function FormulaireEntree({
+  adresseEnAttente,
+  destination = "/",
+}: {
+  adresseEnAttente?: string;
+  destination?: string;
+}) {
   /* ⚠️ L'ÉTAT INITIAL VIENT DU SERVEUR, ET C'EST TOUT LE CORRECTIF DU 2026-08-19.
      Il valait `{ ok: false }` en dur : l'écran de code ne survivait donc qu'en mémoire de React.
      Sur un téléphone, le geste normal — basculer sur sa boîte mail pour lire le code, revenir —
@@ -40,6 +46,7 @@ export default function FormulaireEntree({ adresseEnAttente }: { adresseEnAttent
             cookie posé à la demande, jamais de ce formulaire. L'écrire ici est ce qui permet à
             quelqu'un de voir, AVANT de taper, que le code demandé ne concerne pas son adresse. */}
         <form action={actionCode} className={s.form} noValidate>
+          <input type="hidden" name="destination" value={destination} />
           <label htmlFor="code" className={s.etiquette}>
             <span className="t-meta">Le code reçu</span>
             {/* `maxLength` à 8 et non 6 : la production a un jour envoyé des codes à HUIT
@@ -67,6 +74,7 @@ export default function FormulaireEntree({ adresseEnAttente }: { adresseEnAttent
             porte, une adresse tapée de travers enfermerait sur un écran réclamant un code qui
             n'arrivera jamais. Formulaire distinct — imbriquer deux <form> est invalide en HTML. */}
         <form action={recommencer}>
+          <input type="hidden" name="destination" value={destination} />
           <button type="submit" className={s.lienSecondaire}>
             <span className="t-meta">Ce n&rsquo;est pas la bonne adresse ? Recommencer</span>
           </button>
@@ -83,6 +91,7 @@ export default function FormulaireEntree({ adresseEnAttente }: { adresseEnAttent
      `required` RESTE : il est annoncé par les lecteurs d'écran, et c'est sa vraie fonction. */
   return (
     <form action={action} className={s.form} noValidate>
+      <input type="hidden" name="destination" value={destination} />
       <label htmlFor="email" className={s.etiquette}>
         {/* Étiquette VISIBLE (jamais un placeholder en guise d'étiquette) */}
         <span className="t-meta">Ton adresse e-mail</span>
@@ -99,7 +108,7 @@ export default function FormulaireEntree({ adresseEnAttente }: { adresseEnAttent
       </label>
       {etat.message ? <p className={s.erreur}>{etat.message}</p> : null}
       <button type="submit" className={s.bouton} disabled={enCours}>
-        <span className="t-bouton">{enCours ? "Envoi…" : "Recevoir mon lien"}</span>
+        <span className="t-bouton">{enCours ? "Envoi…" : "Me reconnecter par e-mail"}</span>
       </button>
     </form>
   );

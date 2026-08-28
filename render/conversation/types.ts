@@ -214,7 +214,18 @@ export type ResultatOuvertureDuJour =
       readonly ouverture: OuvertureLieeAuTour | null;
     }
   | { readonly statut: "en-cours"; readonly reessayerApresMs: number }
-  | { readonly statut: "indisponible" };
+  | { readonly statut: "session-expiree" }
+  | {
+      readonly statut: "acces-incomplet";
+      readonly destination:
+        | "/barriere"
+        | "/entrer?refus=age"
+        | "/naissance"
+        | "/consentement"
+        | "/consentement/revoque";
+    }
+  | { readonly statut: "schema-incompatible" }
+  | { readonly statut: "incident-temporaire" };
 
 export type ResultatOuvertureCourante =
   | { readonly statut: "disponible"; readonly ouverture: OuvertureData | null }
