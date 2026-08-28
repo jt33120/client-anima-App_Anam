@@ -52,3 +52,7 @@ QA_testing/*.zip
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+
+# Caches Python des scripts de skills BMAD — régénérés à chaque exécution.
+__pycache__/
+*.pyc
