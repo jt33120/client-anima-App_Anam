@@ -33,8 +33,10 @@ next-env.d.ts
 /supabase/.temp
 /supabase/.branches
 
-# outillage BMAD régénérable (npx bmad-method install)
-.claude/
+# Overrides locaux non partagés (convention Claude Code) — .claude/settings.json,
+# .claude/skills/ et .claude/helpers/ doivent rester suivis : une session cloud
+# démarre d'un checkout git frais et n'a que ce qui est commité.
+.claude/settings.local.json
 
 # Vercel CLI (identifiants de projet — dépôt public)
 .vercel
