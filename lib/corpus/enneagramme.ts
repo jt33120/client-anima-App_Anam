@@ -18,11 +18,16 @@ import {
  * (27). Même port, même format de clé `"<domaine>:<valeur>"` — décidé une fois en 5.2, où le
  * commentaire réservait déjà nommément la place de celui-ci.
  *
- * ⚠️ CE FICHIER NE CONTIENT AUCUN TEXTE, ET C'EST LA SEULE FORME CONFORME. Les neuf créneaux sont
- * DÉCLARÉS et tous `non_ecrit`. Les remplir nous-mêmes signerait du nom d'une personne réelle un
+ * ⚠️ CE MODULE NE CONTIENT AUCUN TEXTE — MAIS LES NEUF SONT ÉCRITS. Cet en-tête a dit « tous
+ * `non_ecrit` » bien après qu'Anima les a livrés : ils vivent dans `lib/corpus/textes-de-base.ts:108-117`
+ * et `creneau()` les résout par clé. Même piège de lecture que dans `numerologie.ts`, corrigé le
+ * même jour. L'état réel se lit dans `lib/corpus/README.md`, que `tests/corpus-etat.test.ts`
+ * recalcule depuis le code — jamais dans un paragraphe.
+ *
+ * La règle, elle, n'a pas bougé : les remplir NOUS-MÊMES signerait du nom d'une personne réelle un
  * texte qu'elle n'a pas écrit (FR-086) ; les faire générer par un modèle serait la même faute en
- * pire (FR-047/FR-054). L'écran de résultat dit donc honnêtement qu'Anima ne l'a pas encore écrit —
- * exactement comme le socle annonce ce qu'il ne peut pas calculer sans l'heure de naissance.
+ * pire (FR-047/FR-054). Un créneau resté vide s'affiche honnêtement comme non écrit — exactement
+ * comme le socle annonce ce qu'il ne peut pas calculer sans l'heure de naissance.
  *
  * ══ NEUF, ET PAS UN DE PLUS ══════════════════════════════════════════════════════════════════════
  *
