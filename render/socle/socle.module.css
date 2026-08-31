@@ -224,6 +224,17 @@
   margin: 0;
 }
 
+/* La preuve du calcul, en clair sous le nombre (retour du 2026-08-30).
+   Discrète mais JAMAIS repliée : c'est ce qui distingue un résultat vérifiable d'un verdict.
+   `tabular-nums` aligne les chiffres d'une ligne à l'autre de la grille ; `overflow-wrap`
+   protège les chaînes longues d'expression (dix-sept valeurs additionnées) sur mobile. */
+.preuveCalcul {
+  margin: calc(var(--esp-1) * -1) 0 var(--esp-2);
+  color: var(--texte-doux);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
 .devoilement,
 .calcul {
   border: 1px solid var(--bordure);

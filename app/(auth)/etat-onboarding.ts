@@ -52,21 +52,58 @@ export async function etapeOnboardingPour(
   // et ne JAMAIS confondre « lecture impossible » (transitoire) avec « pas de ligne ». Sinon on
   // renvoie une adulte déjà consentante vers /naissance, où l'immutabilité de la date la bloque
   // (le défaut est arrivé, revue 1.5).
-  const [
+  const lireLesDeux = () =>
+    Promise.all([
+      supabase
+        .from("utilisatrice")
+        .select("date_naissance, mineur_detecte, barriere_minorite_le")
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("consentement")
+        .select("art9_accorde, ia_reconnue, cgu_acceptees, revoked_at")
+        .eq("utilisatrice_id", userId)
+        .maybeSingle(),
+    ]);
+
+  // ══ UNE SEULE REPRISE, ET ELLE NE RELÂCHE RIEN (retour du 2026-08-30) ═══════════════════════
+  //
+  // Rapporté par Julian : « This page couldn't load — A server error occurred. Reload to try
+  // again. […] je dois reload pour ensuite afficher la page ». Le texte est ANGLAIS : ce n'est pas
+  // `app/_erreur/ErreurApplication.tsx`, c'est la page 500 intégrée de Next. L'erreur naît donc
+  // au-dessus des boundaries, dans le rendu du document.
+  //
+  // Cette fonction en est la source la plus probable : `app/page.tsx` garde TOUT le reste derrière
+  // un `.catch()` — l'arbre, l'allocation, la mémoire — et ce `throw`-ci est le seul nu. Une
+  // lecture qui échoue UNE fois y rend un 500 franc.
+  //
+  // Le mécanisme observé en production : `proxy.ts` rafraîchit la session à chaque requête ; le
+  // JWT tout juste émis porte un `iat` daté par l'horloge de GoTrue, et Postgres le valide avec la
+  // SIENNE. Si elle est en retard de quelques centaines de millisecondes, l'`iat` est « dans le
+  // futur » et la lecture rend un 401. Au rechargement, le jeton a vieilli : ça passe. C'est
+  // exactement le geste que l'utilisatrice fait à la main — on l'automatise, une fois.
+  //
+  // ⚠️ CE N'EST PAS UN ADOUCISSEMENT DE LA GARDE, ET LA DISTINCTION EST TOUT. La règle du fichier
+  // reste intacte : on ne confond JAMAIS « lecture impossible » avec « pas de ligne ». Si la
+  // seconde lecture échoue aussi, on lève comme avant, avec la même source nommée. Une panne
+  // réelle continue donc de faire du bruit ; seul le clignotement d'une horloge est absorbé.
+  //
+  // ⚠️ ET LA REPRISE NE COURT QUE SUR ERREUR. Le chemin nominal garde ses DEUX départs, ce que
+  // `tests/etat-onboarding.test.ts` vérifie en comptant l'ordre : une reprise systématique en
+  // ferait quatre et ferait rougir la garde du parallélisme, à juste titre.
+  const DELAI_REPRISE_MS = 400;
+  let [
     { data: ligne, error: erreurLigne },
     { data: consentement, error: erreurConsentement },
-  ] = await Promise.all([
-    supabase
-      .from("utilisatrice")
-      .select("date_naissance, mineur_detecte, barriere_minorite_le")
-      .eq("id", userId)
-      .maybeSingle(),
-    supabase
-      .from("consentement")
-      .select("art9_accorde, ia_reconnue, cgu_acceptees, revoked_at")
-      .eq("utilisatrice_id", userId)
-      .maybeSingle(),
-  ]);
+  ] = await lireLesDeux();
+
+  if (erreurLigne || erreurConsentement) {
+    await new Promise((suite) => setTimeout(suite, DELAI_REPRISE_MS));
+    [
+      { data: ligne, error: erreurLigne },
+      { data: consentement, error: erreurConsentement },
+    ] = await lireLesDeux();
+  }
 
   if (erreurLigne) {
     throw new ErreurLectureOnboarding("utilisatrice");

@@ -122,6 +122,44 @@ describe("[7.5 · 13.9] les six nombres, avec leurs six preuves de calcul", () =
     }
   });
 
+  /**
+   * ⚠️ LA PREUVE EST HORS DU PLI, ET C'EST LA MOITIÉ QUI COMPTE (retour du 2026-08-30).
+   *
+   * Le test au-dessus exige qu'un calcul EXISTE. Il était vert quand le calcul vivait entièrement
+   * dans un `<details>` fermé — c'est-à-dire quand la seule chose visible d'un nombre était sa
+   * valeur, juste au-dessus d'une « Lecture symbolique d'Anima » qui, elle, promettait de parler
+   * de soi. « Exister » et « se voir » ne sont pas la même exigence, et le défaut rapporté
+   * (« trop d'interprétation, pas assez de factuel ») vivait exactement dans cet écart.
+   *
+   * On vérifie donc que la ligne qui PROUVE le résultat est rendue HORS du `<details>`.
+   */
+  it("[LE CŒUR] la ligne qui prouve le résultat se lit sans ouvrir quoi que ce soit", () => {
+    const { container } = dessiner(complete, "numerologie");
+    const entrees = container.querySelectorAll("li[class*='entree']");
+    expect(entrees.length).toBe(6);
+    for (const e of entrees) {
+      const replie = e.querySelector("details[class*='calcul']");
+      const horsDuPli = e.querySelector("p[class*='preuveCalcul']");
+      expect(horsDuPli, "la preuve est restée sous le pli — le nombre se lit encore comme un verdict").not.toBeNull();
+      const preuve = horsDuPli?.textContent ?? "";
+      // Une preuve arithmétique porte une flèche de réduction : c'est ce qui la distingue d'une
+      // étiquette. Sans cette assertion, un `<p>` vide ou décoratif rendrait le test vert.
+      expect(preuve, `preuve non arithmétique : « ${preuve} »`).toMatch(/→/);
+      expect(replie, "le pas-à-pas complet doit rester disponible").not.toBeNull();
+      expect(replie?.contains(horsDuPli!), "la preuve est DANS le pli, donc toujours cachée").toBe(false);
+    }
+  });
+
+  it("[ANTI-VACUITÉ] la preuve visible est bien la dernière ligne de la trace, pas un texte inventé", () => {
+    // Sans ce témoin, `<p class="preuveCalcul">→</p>` passerait le test précédent.
+    const { container } = dessiner(complete, "numerologie");
+    const premiere = container.querySelector("li[class*='entree']");
+    const preuve = premiere?.querySelector("p[class*='preuveCalcul']")?.textContent ?? "";
+    const lignes = complete.nombres.nombres[0].calcul;
+    expect(lignes.length, "le doublage de test ne porte aucune trace").toBeGreaterThan(0);
+    expect(preuve).toBe(lignes[lignes.length - 1]);
+  });
+
   it("les six intitulés sont là, pas seulement le chemin de vie", () => {
     const texte = dessiner(complete, "numerologie").container.textContent ?? "";
     for (const nom of ["Chemin de vie", "Expression", "Intime", "Personnalité", "Jour de naissance", "Année personnelle"]) {
