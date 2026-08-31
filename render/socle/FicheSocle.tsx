@@ -174,13 +174,34 @@ function SectionNumerologie({
           <li key={nombre.cle} className={s.entree}>
             <p className={`t-meta ${s.etiquette}`}>{nombre.intitule}</p>
             <p className={`t-display ${s.nombreFort}`}>{nombre.valeur}</p>
+            {/* ⚠️ LA PREUVE REMONTE AU-DESSUS DU PLI (retour du 2026-08-30 : « numérologie plus
+                concret, moins dans l'interprétation, plus factuel »).
+
+                Elle était DÉJÀ calculée et DÉJÀ affichée — mais derrière un `<details>` fermé. Un
+                nombre seul en `t-display`, avec son calcul replié et la lecture symbolique juste
+                en dessous, se lit comme un VERDICT : la seule chose visible sans geste était la
+                valeur, et la seule chose qu'on avait envie d'ouvrir était l'interprétation.
+                Personne ne clique sur « Voir le calcul » pour vérifier un nombre qu'on lui
+                annonce ; on clique sur ce qui promet de parler de soi.
+
+                La dernière ligne de la trace est celle qui PROUVE le résultat — « Total : 6 + 6 + 1
+                = 13 → 4 », ou « Valeurs : … = 83 → 11 ». Elle passe donc en clair, collée au
+                nombre. Le pas-à-pas complet reste sous le pli : ce qui était caché n'est plus la
+                preuve, c'est son détail.
+
+                ⚠️ LE `<details>` RESTE, ET IL DOIT RESTER. `tests/rendu/fiche-socle.test.tsx`
+                exige un `details[class*='calcul']` dont le texte contient « Voir le calcul » : le
+                supprimer au motif que la preuve est désormais visible ferait rougir la garde. */}
             {nombre.calcul.length > 0 && (
-              <details className={s.calcul}>
-                <summary className="t-meta">Voir le calcul</summary>
-                <ul>
-                  {nombre.calcul.map((ligne) => <li key={ligne} className="t-meta">{ligne}</li>)}
-                </ul>
-              </details>
+              <>
+                <p className={`t-meta ${s.preuveCalcul}`}>{nombre.calcul[nombre.calcul.length - 1]}</p>
+                <details className={s.calcul}>
+                  <summary className="t-meta">Voir le calcul</summary>
+                  <ul>
+                    {nombre.calcul.map((ligne) => <li key={ligne} className="t-meta">{ligne}</li>)}
+                  </ul>
+                </details>
+              </>
             )}
           </li>
         ))}

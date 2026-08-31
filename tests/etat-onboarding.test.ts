@@ -175,3 +175,92 @@ describe("[8.3/AC3] les cinq sorties restent couvertes après le changement", ()
     expect(await etapeOnboardingPour(c, UID)).toBe("consentement");
   });
 });
+
+/**
+ * ══ LE 500 QUI OBLIGEAIT À RECHARGER (retour du 2026-08-30) ═════════════════════════════════════
+ *
+ * « This page couldn't load — A server error occurred. Reload to try again. […] je dois reload
+ * pour ensuite afficher la page. » Le texte est ANGLAIS : c'est la page 500 intégrée de Next, donc
+ * une erreur née au-dessus des boundaries maison.
+ *
+ * `app/page.tsx` garde tout le reste derrière un `.catch()` ; ce `throw`-ci était le seul nu. Une
+ * lecture qui échoue UNE fois — un JWT tout juste rafraîchi dont l'`iat` devance l'horloge de
+ * Postgres de quelques centaines de millisecondes — rendait un 500 franc.
+ *
+ * ⚠️ CE QUE CES DEUX TESTS GARDENT ENSEMBLE, ET POURQUOI IL EN FAUT DEUX. Absorber une panne
+ * transitoire et continuer de hurler sur une panne réelle sont deux exigences OPPOSÉES : un
+ * correctif qui avale tout satisfait la première et trahit la seconde — et c'est précisément la
+ * faute que l'en-tête du fichier interdit depuis la revue 1.5 (« ne JAMAIS confondre lecture
+ * impossible avec pas de ligne », sinon une adulte consentante repart vers /naissance, où
+ * l'immutabilité de la date la bloque). Le premier test seul serait vert sur un `catch` qui rend
+ * « pas de ligne ». Le second l'en empêche.
+ */
+describe("[2026-08-30] une lecture qui cligne ne rend plus un 500", () => {
+  /** Un client dont la Nᵉ lecture d'une table échoue, les suivantes passent. */
+  function clientQuiCligne(
+    echecsParTable: Record<string, number>,
+    donnees: Record<string, unknown>,
+  ): { client: SupabaseClient; departs: () => number } {
+    let departs = 0;
+    const restants = { ...echecsParTable };
+    const c = {
+      from(table: string) {
+        departs += 1;
+        const chaine = {
+          select: () => chaine,
+          eq: () => chaine,
+          maybeSingle: async () => {
+            if ((restants[table] ?? 0) > 0) {
+              restants[table] -= 1;
+              return { data: null, error: { message: "JWT issued at future" } };
+            }
+            return { data: donnees[table] ?? null, error: null };
+          },
+        };
+        return chaine;
+      },
+    } as unknown as SupabaseClient;
+    return { client: c, departs: () => departs };
+  }
+
+  it("[LE CŒUR] une panne transitoire est reprise une fois, et la page rend", async () => {
+    const { client: c, departs } = clientQuiCligne(
+      { utilisatrice: 1 },
+      { utilisatrice: ADULTE, consentement: CONSENTIE },
+    );
+    expect(await etapeOnboardingPour(c, UID)).toBe("suite");
+    // Quatre départs : la reprise relit LES DEUX tables, elle ne rattrape pas une moitié.
+    expect(departs(), "la reprise n'a pas eu lieu, ou elle n'a relu qu'une table").toBe(4);
+  });
+
+  it("[LE CŒUR] une panne QUI DURE lève toujours — la reprise n'avale rien", async () => {
+    const { client: c } = clientQuiCligne(
+      { utilisatrice: 99 },
+      { utilisatrice: ADULTE, consentement: CONSENTIE },
+    );
+    await expect(etapeOnboardingPour(c, UID)).rejects.toMatchObject({
+      name: "ErreurLectureOnboarding",
+      sourceLecture: "utilisatrice",
+    });
+  });
+
+  it("le consentement aussi est repris, pas seulement `utilisatrice`", async () => {
+    const { client: c } = clientQuiCligne(
+      { consentement: 1 },
+      { utilisatrice: ADULTE, consentement: CONSENTIE },
+    );
+    expect(await etapeOnboardingPour(c, UID)).toBe("suite");
+  });
+
+  it("[ANTI-VACUITÉ] sans panne, aucune reprise : le chemin nominal garde ses deux départs", async () => {
+    // Sans ce témoin, une reprise SYSTÉMATIQUE ferait passer les trois tests ci-dessus tout en
+    // doublant le coût de chaque page gardée du produit.
+    const { client: c, departs } = clientQuiCligne(
+      {},
+      { utilisatrice: ADULTE, consentement: CONSENTIE },
+    );
+    expect(await etapeOnboardingPour(c, UID)).toBe("suite");
+    expect(departs(), "une reprise court alors que rien n'a échoué").toBe(2);
+  });
+});
+

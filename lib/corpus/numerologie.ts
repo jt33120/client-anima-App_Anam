@@ -14,17 +14,23 @@ import {
 /**
  * numerologie.ts — LES 69 CRÉNEAUX D'INTERPRÉTATION NUMÉROLOGIQUE (Story 5.2, FR-054 / FR-086).
  *
- * ── CE FICHIER EST VOLONTAIREMENT VIDE DE TEXTE ────────────────────────────────────────────────
+ * ── CE FICHIER NE PORTE AUCUN TEXTE — MAIS LES 69 SONT ÉCRITS DEPUIS LE 2026-08-23 ─────────────
  *
- * Les 69 créneaux sont DÉCLARÉS, aucun n'est ÉCRIT. Ce n'est pas un travail inachevé, c'est la seule
- * forme conforme : FR-054 exige que les interprétations viennent du corpus d'Anima, et FR-086
- * rappelle qu'Anima est une personne réelle dont on ne fabrique jamais une parole. Un modèle ne peut
- * pas les écrire (FR-047), nous non plus (ce serait du texte générique repris, exactement ce que
- * FR-054 bannit), et on ne les achète pas.
+ * ⚠️ CET EN-TÊTE A MENTI PENDANT UNE SEMAINE, ET IL A COÛTÉ UNE DEMI-JOURNÉE. Il disait « aucun
+ * n'est ÉCRIT », ce qui était vrai à la Story 5.2 et faux depuis qu'Anima a livré sa prose. Les
+ * textes ne sont pas ici, ils sont dans `lib/corpus/textes-de-base.ts:150-229`, et `creneau()`
+ * (`lib/corpus/port.ts:103-106`) les résout par clé. Un fichier « vide de texte » qui rend des
+ * créneaux `ecrit` : les deux moitiés sont vraies, l'en-tête n'en disait qu'une.
  *
- * Le produit affiche donc des nombres justes et dit honnêtement, créneau par créneau, que le texte
- * n'est pas encore écrit. C'est la discipline de FR-050 — « je préfère ne pas te l'inventer » — et
- * celle de Chiron en 5.1, appliquée à la prose.
+ * Ce qui reste exact, et qui est la vraie règle : ce MODULE ne contient aucune prose. FR-054 exige
+ * que les interprétations viennent du corpus d'Anima, FR-086 rappelle qu'Anima est une personne
+ * réelle dont on ne fabrique jamais une parole. Un modèle ne peut pas les écrire (FR-047), nous non
+ * plus. Un créneau resté vide s'affiche honnêtement comme non écrit — discipline de FR-050, « je
+ * préfère ne pas te l'inventer ».
+ *
+ * L'état réel est CALCULÉ, jamais raconté : `lib/corpus/README.md` porte le tableau, et
+ * `tests/corpus-etat.test.ts` le recalcule depuis le code. C'est lui qui fait foi, pas ce
+ * paragraphe.
  *
  * ── COMMENT ANIMA REMPLIT CE FICHIER ───────────────────────────────────────────────────────────
  *
