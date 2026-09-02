@@ -21,6 +21,15 @@ import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
  *   5. LE FONDU DE RÉGION SUPERPOSAIT DEUX TEXTES pendant un tiers de seconde (deux opacités à
  *      ~0,5 au même instant).
  *
+ * ══ ET DEPUIS LE 2026-09-02, L'IMAGE DE L'ENTRÉE EST L'AVATAR D'ANAM ══════════════════════════════
+ *
+ * Retour du fondateur : « mets plutôt l'avatar d'Anam, qui se remplit d'étoiles ». L'asset a été
+ * refait DÉTOURÉ (`public/scene/seuil/`, alpha à la source), ce qui lève le motif du point 2 ; et
+ * l'arbre se retire du seuil au lieu de s'empiler derrière — deux illustrations empilées, c'était
+ * exactement le point 2. Les gardes de composition mesurent donc désormais la boîte de l'AVATAR
+ * (sa toile `[data-remplissage-etoiles]`, qui a la même boîte que son image), et la garde « une
+ * seule image » compte UNE image — celle-là — et vérifie qu'elle est bien la détourée.
+ *
  * ⚠️ CE FICHIER MESURE DES BOÎTES *ET* DES PIXELS, ET LES DEUX SONT NÉCESSAIRES. Le recouvrement
  * est un défaut de MISE EN PAGE — des rectangles suffisent, et c'est le bon outil. Le rognage de
  * la cime, lui, ne déplace aucune boîte : le canevas a exactement la même taille coupé ou entier.
@@ -36,44 +45,49 @@ async function composition(page: Page) {
     const seuil = document.querySelector('section[aria-label="Seuil"]')!;
     return {
       hauteur: innerHeight,
-      arbre: boite(document.querySelector('[class*="arbreMonde"] canvas')),
+      // La toile du remplissage a EXACTEMENT la boîte de l'image (`render/seuil/avatar-seuil.module.css`) :
+      // c'est elle qu'on mesure, parce qu'elle est là dès le montage, image décodée ou non.
+      avatar: boite(seuil.querySelector("[data-remplissage-etoiles]")),
       textes: [...seuil.querySelectorAll("h1, p, button")].map((e) => ({
         quoi: `${e.tagName.toLowerCase()}[${(e.textContent ?? "").trim().slice(0, 24)}]`,
         ...boite(e)!,
       })),
       images: seuil.querySelectorAll("img").length,
+      toiles: seuil.querySelectorAll("[data-remplissage-etoiles]").length,
+      sources: [...seuil.querySelectorAll("img")].map((i) => (i as HTMLImageElement).currentSrc || (i as HTMLImageElement).src),
       barre: !!document.querySelector("nav[aria-label='Régions']"),
     };
   });
 }
 
 test.describe("Le seuil", () => {
-  test("[UNE COMPOSITION] l'arbre ne touche aucun mot, et la porte est à l'écran", async ({ page }) => {
+  test("[UNE COMPOSITION] l'avatar ne touche aucun mot, et la porte est à l'écran", async ({ page }) => {
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "Anam", exact: true })).toBeVisible();
     await page.waitForTimeout(1500);
 
     const c = await composition(page);
-    expect(c.arbre, "le décor a disparu du seuil : la mesure qui suit ne prouverait rien").not.toBeNull();
+    expect(c.avatar, "l'avatar a disparu du seuil : la mesure qui suit ne prouverait rien").not.toBeNull();
+    expect(c.avatar!.bottom - c.avatar!.top, "témoin : la boîte de l'avatar est plate, rien n'est mesuré").toBeGreaterThan(100);
 
-    // ⚠️ ON MESURE LA BOÎTE DU CANEVAS, PAS L'ENCRE. Elle est plus large que le dessin (le cadrage
-    // laisse de l'air) : la garde est donc plus stricte que l'œil, et c'est voulu — c'est
-    // exactement ce que la réserve `--arbre-h` de `.seuil` promet de tenir.
+    // ⚠️ ON MESURE LA BOÎTE DE LA TOILE, PAS L'ENCRE. C'est la boîte de l'image entière — plus
+    // large que la silhouette peinte : la garde est donc plus stricte que l'œil, et c'est voulu.
+    // L'avatar est le premier enfant de la colonne ; le `row-gap` de `.seuil` est ce qui sépare.
     const collisions = c.textes.filter(
-      (t) => t.top < c.arbre!.bottom && t.bottom > c.arbre!.top && t.left < c.arbre!.right && t.right > c.arbre!.left,
+      (t) => t.top < c.avatar!.bottom && t.bottom > c.avatar!.top && t.left < c.avatar!.right && t.right > c.avatar!.left,
     );
     expect(
       collisions.map((t) => t.quoi),
-      `du texte dans le feuillage :\n${collisions.map((t) => `${t.quoi} ${t.top}–${t.bottom} vs arbre ${c.arbre!.top}–${c.arbre!.bottom}`).join("\n")}`,
+      `du texte sur l'avatar :\n${collisions.map((t) => `${t.quoi} ${t.top}–${t.bottom} vs avatar ${c.avatar!.top}–${c.avatar!.bottom}`).join("\n")}`,
     ).toEqual([]);
 
-    // Le titre vient APRÈS l'arbre, jamais avant : une composition, pas une superposition.
+    // Le titre vient APRÈS l'avatar, jamais avant : une composition, pas une superposition.
     const h1 = c.textes[0];
-    expect(h1.top, "le titre passe au-dessus de l'arbre").toBeGreaterThan(c.arbre!.bottom);
+    expect(h1.top, "le titre passe au-dessus de l'avatar").toBeGreaterThan(c.avatar!.bottom);
 
     await expect(
-      page.getByRole("button", { name: /entrer dans le monde/i }),
+      page.getByRole("button", { name: /commencer/i }),
       "la porte n'est pas à l'écran sans geste",
     ).toBeInViewport();
 
@@ -107,24 +121,31 @@ test.describe("Le seuil", () => {
     ).toBeGreaterThanOrEqual(court.surBas);
   });
 
-  test("[UNE SEULE IMAGE] le seuil ne composite aucun bitmap — son image est l'arbre", async ({ page }) => {
+  test("[UNE SEULE IMAGE, DÉTOURÉE] le seuil composite UN bitmap — l'avatar, avec son alpha — et UNE toile", async ({
+    page,
+  }) => {
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "Anam", exact: true })).toBeVisible();
 
     const c = await composition(page);
-    expect(
-      c.images,
-      "une image est revenue au seuil : si elle n'a pas de canal alpha, elle y sera un rectangle " +
-        "(voir tests/scene-sans-bords.test.ts)",
-    ).toBe(0);
+    // ⚠️ « UNE » ET PAS « AU MOINS UNE ». Le 2026-08-19, il y en avait deux empilées (le décor et
+    // le personnage) : c'est le compte exact qui garde la composition, pas la présence.
+    expect(c.images, "le seuil n'a plus qu'une image, et c'est l'avatar").toBe(1);
+    expect(c.toiles, "une seule couche de dessin : le remplissage est UN canvas").toBe(1);
+    // Et c'est la DÉTOURÉE (`public/scene/seuil/`), jamais la peinture entière sans alpha qui vit
+    // encore à la racine de `public/scene/` — si elle revenait, elle serait un rectangle (voir
+    // tests/scene-sans-bords.test.ts).
+    expect(c.sources[0], "l'image du seuil n'est pas l'asset détouré").toMatch(/\/scene\/seuil\/anam-seuil/);
   });
 
   test("[L'ARBRE EST ENTIER] aucun pixel peint ne touche le bord de son canevas", async ({ page }) => {
     // ⚠️ CETTE GARDE-CI NE PEUT PAS ÊTRE GÉOMÉTRIQUE. Un dessin rogné et un dessin entier occupent
     // exactement le même canevas, aux mêmes coordonnées : aucune boîte ne les distingue. On relit
-    // donc le bitmap. De l'encre sur la première ligne, c'est une arête franche sur la seule image
-    // de l'entrée — et sur une scène qui se dit « sans bords » (AD-7, AC1).
+    // donc le bitmap. De l'encre sur la première ligne, c'est une arête franche sur le décor de la
+    // scène — et sur une scène qui se dit « sans bords » (AD-7, AC1). Depuis le 2026-09-02 l'arbre
+    // n'est plus l'image de l'entrée (il s'y retire, l'avatar la tient) ; il reste monté et peint
+    // dans son tampon, et cette garde le relit tel quel.
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
     // ⚠️ ON ATTEND L'ENCRE, PAS UNE DURÉE. Un `waitForTimeout` fixe suffit sur une machine au
@@ -202,31 +223,31 @@ test.describe("Le seuil", () => {
       "les trois destinations sont offertes sous la porte : le rideau se contourne",
     ).toBe(false);
 
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Régions" }).getByRole("button"),
       "le doublage non-spatial doit reprendre dès qu'il y a quelque chose à doubler (UX-DR-37)",
-    ).toHaveText(["Moi", "Anam", "Mon arbre"]);
+    ).toHaveText(["Aujourd’hui", "Anam", "Mon arbre"]);
   });
 
   test("[UNE FOIS] franchi, le seuil ne se redresse plus devant personne", async ({ page }) => {
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
     // La Server Action pose la date ; on lui laisse le temps de revenir avant de recharger.
     await page.waitForTimeout(1500);
 
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: /^Moi$/, level: 1 }),
+      page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 }),
       "le monde ne s'ouvre pas sur l'accueil : la date n'a pas été posée, ou pas relue",
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /entrer dans le monde/i }),
+      page.getByRole("button", { name: /commencer/i }),
       "la porte se redresse devant quelqu'un qui l'a déjà franchie",
     ).toBeHidden();
   });
@@ -246,14 +267,14 @@ test.describe("Le seuil", () => {
       const w = window as unknown as { __ech: number[][] };
       w.__ech = [];
       const a = document.querySelector('section[aria-label="Seuil"]')!;
-      const b = document.querySelector('section[aria-label="Moi"]')!;
+      const b = document.querySelector('section[aria-label="Aujourd’hui"]')!;
       const tic = () => {
         w.__ech.push([Number(getComputedStyle(a).opacity), Number(getComputedStyle(b).opacity)]);
         if (w.__ech.length < 120) requestAnimationFrame(tic);
       };
       requestAnimationFrame(tic);
     });
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     await page.waitForTimeout(1600);
 

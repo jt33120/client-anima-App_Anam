@@ -23,38 +23,38 @@ test("[H4] le lieu se présente une fois, puis plus jamais", async ({ page }) =>
   await page.goto("/");
 
   // ── 1. On franchit le seuil, et l'accueil présente le lieu.
-  const porte = page.getByRole("button", { name: /entrer dans le monde/i });
+  const porte = page.getByRole("button", { name: /commencer/i });
   await expect(porte, "la porte du seuil n'est pas atteignable").toBeInViewport();
   await porte.click();
   await passerLeTour(page);
 
-  const titre = page.getByRole("heading", { name: "Trois places", level: 2, exact: true });
+  const titre = page.getByRole("heading", { name: "Trois dimensions", level: 2, exact: true });
   await expect(titre, "un compte neuf n'a pas été présenté au lieu").toBeVisible();
   // ⚠️ DEUX PIÈGES DE LOCALISATION, TOUS DEUX PAYÉS ICI.
   //  1. un `<dt>` ne tire pas son nom accessible de son texte : `getByRole("term", { name })` ne
   //     trouve rien, et le croire ferait écrire une garde qui rougit sur du HTML parfaitement juste ;
   //  2. la bibliothèque a ses propres `<dt>` (« Chemin de vie », « Soleil »…) — un `getByRole` non
   //     borné en ramassait dix. On borne au repère nommé de la présentation.
-  const presentation = page.getByRole("region", { name: "Trois places" });
-  await expect(presentation.getByRole("term")).toHaveText(["Anam", "Mon arbre", "Moi"]);
+  const presentation = page.getByRole("region", { name: "Trois dimensions" });
+  await expect(presentation.getByRole("term")).toHaveText(["Anam", "Mon arbre", "Aujourd’hui"]);
   await expect(presentation.getByText(/Le plus simple/), "rien ne dit par quoi commencer").toBeVisible();
 
   // ── 2. La présentation est LUE avant les cartes, et sans avoir à chercher.
   await expect(titre).toBeInViewport();
-  await expect(page.getByRole("heading", { name: "Moi", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
 
   // ── 3. Les trois noms de la présentation sont ceux de la barre : ce qu'on vient de lire est
   //       atteignable tout de suite, et c'est la moitié de « je sais quoi faire ».
   const barre = page.getByRole("navigation", { name: "Régions" });
-  await expect(barre.getByRole("button")).toHaveText(["Moi", "Anam", "Mon arbre"]);
+  await expect(barre.getByRole("button")).toHaveText(["Aujourd’hui", "Anam", "Mon arbre"]);
 
   // ── 4. On revient. Le monde s'ouvre DIRECTEMENT sur l'accueil — le seuil ne se redresse plus
   //       (QA manuelle du 2026-08-19 : il était rendu à chaque chargement) — et l'accueil s'est tu.
   await page.waitForTimeout(1500); // la Server Action pose la date avant qu'on recharge
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Moi", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Trois places", level: 2, exact: true }),
+    page.getByRole("heading", { name: "Trois dimensions", level: 2, exact: true }),
     "la présentation revient à chaque chargement : la date n'a pas été posée, ou pas relue",
   ).toHaveCount(0);
 });

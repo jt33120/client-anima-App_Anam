@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { resolve, join } from "node:path";
+import { HAUTEUR_SEUIL, LARGEUR_SEUIL } from "@/render/seuil/remplissage-etoiles";
 
 /**
  * scene-sans-bords.test.ts — « UNE SCÈNE CONTINUE, SANS BORDS » (AD-7, AC1 · QA T9, puis
@@ -19,7 +20,11 @@ import { resolve, join } from "node:path";
  * sa propre voie lactée — posée sur le ciel étoilé de la scène. Aucun masque ne rend un rectangle
  * opaque continu ; il le dissout au mieux, en dupliquant une nuit par-dessus une autre.
  *
- * Le seuil ne composite donc plus aucune image bitmap : son image est l'ARBRE, qui est procédural.
+ * Le seuil n'a donc plus composité aucune image bitmap : son image a été l'ARBRE, procédural,
+ * jusqu'au 2026-09-02. Ce jour-là, le fondateur a demandé l'avatar d'Anam à la place, et l'asset a
+ * été REFAIT détouré (`public/scene/seuil/`, alpha à la source) : la règle ne change pas, c'est le
+ * fichier qui la satisfait enfin. L'avatar vit dans la région seuil (`render/seuil/`), avec UN jeton
+ * de hauteur et le rapport de l'asset — la réserve au-dessus du nom est l'avatar lui-même.
  * Ce fichier garde la RÈGLE qui en découle, pas la mise en page qui en est sortie.
  *
  * ⚠️ AUCUN TEST DE CE DÉPÔT NE VOIT UN PIXEL. Les projets `node` et `rendu` (jsdom) ne composent
@@ -113,7 +118,7 @@ describe("[QA 2026-08-19] la réserve du seuil se déduit de l'arbre, elle ne la
     ).toEqual([H, W]);
   });
 
-  it("`--arbre-l` est déclaré UNE fois et consommé par l'arbre ET par la réserve du seuil", () => {
+  it("`--arbre-l` est déclaré UNE fois et consommé par l'arbre", () => {
     // Deux valeurs écrites séparément, c'est le titre dans le feuillage le jour où l'une bouge.
     // ⚠️ COMMENTAIRES RETIRÉS AVANT TOUTE MESURE, ET ÇA VIENT DE MORDRE (2026-08-25). Un inventaire
     // des propriétés non compositées a été écrit dans la feuille, et il CITE `.arbreMonde { filter:
@@ -133,20 +138,65 @@ describe("[QA 2026-08-19] la réserve du seuil se déduit de l'arbre, elle ne la
       return css.slice(i, css.indexOf("}", i));
     };
     expect(bloc(".arbreMonde"), "l'arbre doit tirer sa largeur du jeton").toMatch(/width:\s*var\(--arbre-l\)/);
-    expect(bloc(".seuil"), "la réserve du seuil doit tirer sa hauteur du jeton").toMatch(/var\(--arbre-h\)/);
+    // ⚠️ `.seuil` NE LIT PLUS `--arbre-h` — ET C'EST VOULU (2026-09-02). L'arbre se retire du seuil
+    // (`.arbreEnRetraitSeuil`) : une réserve calculée depuis sa hauteur réserverait du vide pour une
+    // image qu'on ne peint plus là. La réserve est désormais l'avatar, en flux — garde ci-dessous.
+    expect(bloc(".seuil"), "la réserve de l'arbre est revenue au seuil : elle réserve du vide").not.toMatch(
+      /var\(--arbre-h\)/,
+    );
+  });
+});
+
+describe("[2026-09-02] la boîte de l'avatar se déduit de l'asset, elle ne le devine pas", () => {
+  const css = readFileSync(resolve(racine, "render/seuil/avatar-seuil.module.css"), "utf-8").replace(
+    /\/\*[\s\S]*?\*\//g,
+    "",
+  );
+
+  it("[LE CŒUR] le rapport déclaré dans le CSS est celui de `LARGEUR_SEUIL / HAUTEUR_SEUIL`", () => {
+    // ⚠️ CE QUI SE JOUE ICI : `demarrerRemplissage` cale l'image en `contain` dans la boîte du canvas
+    // et échantillonne la silhouette DANS ce cadre. Si la boîte n'a pas le rapport de l'asset, le
+    // cadre laisse de l'air et les étoiles convergent vers une silhouette décalée — sans que rien
+    // ne casse. Même forme de défaut que « Anam » à 331 px dans le feuillage.
+    const m = /--avatar-l:\s*calc\(\s*var\(--avatar-h\)\s*\*\s*(\d+)\s*\/\s*(\d+)\s*\)/.exec(css);
+    expect(m, "`--avatar-l` doit se déduire de `--avatar-h` par le rapport de l'asset").not.toBeNull();
+    expect(
+      [Number(m![1]), Number(m![2])],
+      `le CSS dit ${m![1]}/${m![2]}, l'asset fait ${LARGEUR_SEUIL}/${HAUTEUR_SEUIL}`,
+    ).toEqual([LARGEUR_SEUIL, HAUTEUR_SEUIL]);
+    // …et le rapport est CELUI DU FICHIER, pas seulement celui des constantes du module.
+    const { largeur, hauteur } = enTetePng("public/scene/seuil/anam-seuil.png");
+    expect([largeur, hauteur]).toEqual([LARGEUR_SEUIL, HAUTEUR_SEUIL]);
+  });
+
+  it("`--avatar-h` est déclaré UNE fois, et la boîte comme la largeur en descendent", () => {
+    expect((css.match(/--avatar-h:/g) ?? []).length, "un seul point de déclaration").toBe(1);
+    const i = css.indexOf(".avatar {");
+    expect(i, ".avatar a disparu de avatar-seuil.module.css").toBeGreaterThan(-1);
+    const bloc = css.slice(i, css.indexOf("}", i));
+    expect(bloc).toMatch(/height:\s*var\(--avatar-h\)/);
+    expect(bloc).toMatch(/width:\s*var\(--avatar-l\)/);
+    // Aucun `will-change` ici : le dépôt n'en tolère qu'un, mesuré, dans monde.module.css.
+    expect(css, "un `will-change` de plus : voir tests/scene-accessibilite.test.ts").not.toMatch(/will-change/);
   });
 });
 
 describe("[QA T9] les autres personnages sont détourés à la source", () => {
-  it("`presence` et `veille` portent un canal alpha, aux deux formats et en plusieurs densités", () => {
+  it("`presence`, `veille` — et `seuil` depuis le 2026-09-02 — portent un canal alpha, en plusieurs densités", () => {
     // Mesuré le 2026-08-18 : leur pourtour est transparent à 0 % d'opacité, contrairement à
     // `anam-seuil.png`. Le pipeline sait donc faire — c'était un fichier, pas un système. Ils ne
     // sont composités nulle part aujourd'hui ; cette garde tient la porte ouverte pour le jour où.
+    //
+    // ⚠️ `public/scene/seuil/` EST COMPOSITÉ AU SEUIL (l'avatar qui se remplit d'étoiles), et c'est
+    // le seul asset dont `ImageAnam` construit le chemin par gabarit — la garde « aucun fichier de
+    // render/ ne référence une image sans alpha » ne le voit pas. On le relit donc ici, nommément.
     for (const f of [
       "public/scene/presence/anam-presence.png",
       "public/scene/presence/anam-presence@2x.png",
       "public/scene/veille/anam-veille.png",
       "public/scene/veille/anam-veille@2x.png",
+      "public/scene/seuil/anam-seuil.png",
+      "public/scene/seuil/anam-seuil@2x.png",
     ]) {
       const { largeur, hauteur, typeCouleur } = enTetePng(f);
       expect(largeur, `${f} vide ou illisible`).toBeGreaterThan(50);

@@ -50,12 +50,12 @@ test.describe("Le décor de l'arbre", () => {
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
     await laisserRetomber(page);
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     await laisserRetomber(page);
 
     // La région d'accueil est bien celle qui est active — sans quoi la mesure ne dirait rien.
-    await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
 
     expect(
       await opaciteEffectiveArbre(page),
@@ -63,17 +63,37 @@ test.describe("Le décor de l'arbre", () => {
     ).toBe(0);
   });
 
-  test("au seuil, il est PEINT — le retrait est local, la scène n'a pas perdu son arbre", async ({
+  test("au seuil, il CÈDE LA PLACE à l'avatar — retiré, pas supprimé : la scène n'a pas perdu son arbre", async ({
     page,
   }) => {
     // ⚠️ SANS CE TEST, « supprimer l'arbre partout » passerait pour une correction de B4.
+    //
+    // Jusqu'au 2026-09-02, ce test exigeait l'arbre PEINT au seuil (opacité > 0,9) : il en était
+    // l'image. Depuis, l'image de l'entrée est l'avatar d'Anam (`render/seuil/`), et l'arbre se
+    // retire du seuil par le MÊME jeton que derrière Moi et Anam — deux illustrations empilées sur
+    // un tiers d'écran, c'était le défaut mesuré le 2026-08-19. Le témoin change donc de forme :
+    // l'opacité effective vaut 0 ici, ET le canevas est toujours monté et peint dans son tampon.
+    // C'est ce qui distingue « retiré » (le jeton) de « supprimé » (plus de canevas, plus d'encre).
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
     await laisserRetomber(page);
 
     const o = await opaciteEffectiveArbre(page);
     expect(o, "le décor a disparu de la scène entière").not.toBeNull();
-    expect(o!).toBeGreaterThan(0.9);
+    expect(o!, "l'arbre s'empile derrière l'avatar : deux illustrations sur un tiers d'écran").toBe(0);
+
+    const encreDu = () =>
+      page.evaluate(() => {
+        const c = document.querySelector('[class*="arbreMonde"] canvas') as HTMLCanvasElement | null;
+        if (!c) return 0;
+        const d = c.getContext("2d")!.getImageData(0, 0, c.width, c.height).data;
+        let n = 0;
+        for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++;
+        return n;
+      });
+    await expect
+      .poll(encreDu, { timeout: 15_000, message: "le canevas de l'arbre est vide : il a été supprimé, pas retiré" })
+      .toBeGreaterThan(10_000);
   });
 
   test("derrière Anam, l'arbre ne peint RIEN — la conversation garde seulement le ciel", async ({
@@ -82,7 +102,7 @@ test.describe("Le décor de l'arbre", () => {
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
     await laisserRetomber(page);
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     await page.getByRole("button", { name: "Anam", exact: true }).click();
     await laisserRetomber(page);

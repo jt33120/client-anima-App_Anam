@@ -86,9 +86,9 @@ test.describe("La barre de régions", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: "Moi", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
     await page.waitForTimeout(1200);
 
     const region = page.locator('[class*="regionActive"]');
@@ -136,9 +136,9 @@ test.describe("La barre de régions", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: "Moi", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
     await page.waitForTimeout(1200);
 
     const region = page.locator('[class*="regionActive"]');
@@ -179,7 +179,7 @@ test.describe("La barre de régions", () => {
     // la MISE EN PAGE qui était fausse, donc c'est elle qu'on mesure.
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: "Mon arbre" }).click();
     await expect(page.getByRole("heading", { name: "Mon arbre", level: 1 })).toBeVisible();
@@ -218,7 +218,7 @@ test.describe("La barre de régions", () => {
     // téléphone, ou zoom 200 %, deux situations réelles. Là, seule la compressibilité sauve.
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: "Mon arbre" }).click();
     await expect(page.getByRole("heading", { name: "Mon arbre", level: 1 })).toBeVisible();

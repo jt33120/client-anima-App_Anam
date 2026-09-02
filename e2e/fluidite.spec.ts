@@ -58,7 +58,7 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
   await page.waitForTimeout(1400);
   const releves: Record<string, number> = { seuil: await imagesParSeconde(page) };
 
-  await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+  await page.getByRole("button", { name: /commencer/i }).click();
   await passerLeTour(page);
   const barre = page.getByRole("navigation", { name: "Régions" });
   // ⚠️ LA LISTE EST EN DUR ICI, ET C'EST UN PIÈGE CONNU (Story 7.9, AC4). Le 2026-08-25, les
@@ -66,7 +66,7 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
   // rien, la boucle ne mesure RIEN — et une boucle qui ne mesure rien passe au VERT. Le test se
   // serait vidé sans une ligne rouge. On compte donc ce qui a réellement été mesuré, à la fin.
   const mesurees: string[] = [];
-  for (const region of ["Moi", "Anam", "Mon arbre"]) {
+  for (const region of ["Aujourd’hui", "Anam", "Mon arbre"]) {
     await barre.getByRole("button", { name: region, exact: true }).click();
     await page.waitForTimeout(1200);
     releves[region] = await imagesParSeconde(page);
@@ -78,7 +78,7 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
   expect(
     mesurees,
     "la boucle n'a pas parcouru les trois régions : le test se serait vidé au lieu d'échouer",
-  ).toEqual(["Moi", "Anam", "Mon arbre"]);
+  ).toEqual(["Aujourd’hui", "Anam", "Mon arbre"]);
 
   // ⚠️ ON VÉRIFIE LA PRÉSENCE DES CLÉS, PAS LEUR NOMBRE — ET MA PREMIÈRE VERSION S'EST TROMPÉE
   // (2026-08-26). Elle exigeait `toHaveLength(3)` en oubliant que `releves` est PRÉ-REMPLI avec le
@@ -111,7 +111,7 @@ test("[PENDANT LE TOUR AUSSI] l'écran qui apprend le produit ne doit pas saccad
   const reference = await imagesParSeconde(page);
 
   await page.goto("/");
-  await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+  await page.getByRole("button", { name: /commencer/i }).click();
   await page.waitForTimeout(1500);
   await expect(page.getByRole("dialog"), "témoin : le tour n’est pas ouvert").toBeVisible();
 
@@ -174,7 +174,7 @@ test("[PENDANT UN DÉFILEMENT] un fond ne coûte rien au repos et tout quand la 
   expect(reference, "témoin : la référence elle-même ne tient pas — machine trop chargée").toBeGreaterThan(8);
 
   await page.goto("/");
-  await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+  await page.getByRole("button", { name: /commencer/i }).click();
   await passerLeTour(page);
   const barre = page.getByRole("navigation", { name: "Régions" });
 
@@ -182,7 +182,7 @@ test("[PENDANT UN DÉFILEMENT] un fond ne coûte rien au repos et tout quand la 
   const mesurees: string[] = [];
   // Les deux régions que les Stories 11.2 et 7.10 vont repeindre. « Anam » est hors du cas : son
   // fil a son propre défilement, éprouvé par `conversation-attente.spec.ts`.
-  for (const region of ["Moi", "Mon arbre"]) {
+  for (const region of ["Aujourd’hui", "Mon arbre"]) {
     await barre.getByRole("button", { name: region, exact: true }).click();
     await page.waitForTimeout(1000);
     releves[region] = await imagesParSecondePendantDefilement(page);
@@ -192,7 +192,7 @@ test("[PENDANT UN DÉFILEMENT] un fond ne coûte rien au repos et tout quand la 
   expect(
     mesurees,
     "la boucle n'a pas parcouru les deux régions : le test se serait vidé au lieu d'échouer",
-  ).toEqual(["Moi", "Mon arbre"]);
+  ).toEqual(["Aujourd’hui", "Mon arbre"]);
 
   const trop = Object.entries(releves).filter(([, v]) => v < reference * PART_MINIMALE);
   expect(

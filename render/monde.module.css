@@ -8,6 +8,10 @@
  *  - La parallaxe au pointeur du prototype est RETIRÉE (différée, hors modèle — SPINE L272).
  *  - Sous prefers-reduced-motion, le changement de région est INSTANTANÉ (0 ms, AC4) :
  *    la transition de région est explicitement neutralisée (le bug du prototype est corrigé).
+ *  - Le remplissage d'étoiles du seuil (`render/seuil/`) n'est PAS une exception à ces deux
+ *    lignes : c'est une animation FINIE sur un canvas — 4,5 s, puis la boucle s'arrête d'elle-même,
+ *    zéro coût au repos, jamais rejouée. Elle ne boucle pas (la respiration reste le seul mouvement
+ *    en boucle, globals.css) et ne déplace aucun texte ; sous reduced-motion, état final immédiat.
  */
 
 .monde {
@@ -255,9 +259,11 @@
   left: 50%;
   top: 50%;
   width: var(--arbre-l);
-  /* ⚠️ LE CENTRAGE PASSE PAR `top` SEUL, ET LE `-50%` NE BOUGE PLUS JAMAIS. C'est `top` que
-     `.arbreAuSeuil` déplace, et c'est `top` qui se transitionne : garder un `translate` variable
-     ferait SAUTER l'arbre au changement de région, pendant qu'il est encore visible. */
+  /* ⚠️ LE CENTRAGE PASSE PAR `top` SEUL, ET LE `-50%` NE BOUGE PLUS JAMAIS. C'était `top` que
+     `.arbreAuSeuil` déplaçait (jusqu'au 2026-09-02 : l'arbre montait au seuil), et c'est `top` qui
+     se transitionne : garder un `translate` variable ferait SAUTER l'arbre au changement de région,
+     pendant qu'il est encore visible. Plus aucune région ne déplace `top` aujourd'hui ; la règle
+     reste, pour le jour où l'une le fera. */
   transform: translate(-50%, -50%);
   pointer-events: none;
   /* ⚠️ CE FILTRE A ÉTÉ RETIRÉ, MESURÉ, ET REMIS — ET C'EST LA MESURE QUI L'A ACQUITTÉ (2026-08-26).
@@ -289,16 +295,27 @@
     top var(--duree-longue) var(--courbe);
 }
 
-/* ── L'ARBRE MONTE AU SEUIL — il devient la seule image de l'entrée ─────────────────────────────
-   Mesuré à 390 × 664 avant correction : 174 px de vide entre la surimpression et le feuillage
-   (26 % de l'écran), puis le feuillage (250–422) et le personnage (329–624) qui se recouvraient
-   sur 93 px, le titre et la phrase se lisant par-dessus les deux. L'écran n'avait pas un défaut
-   d'image : il n'avait pas de composition.
+/* ── L'ARBRE SE RETIRE DU SEUIL — l'image de l'entrée est l'AVATAR (retour du fondateur,
+   2026-09-02 : « quand on crée un compte, on voit l'arbre : mets plutôt l'avatar d'Anam ») ────────
+   Entre le 2026-08-19 et aujourd'hui, l'arbre MONTAIT au seuil (`.arbreAuSeuil` le calait sous la
+   surimpression, et `.seuil` réservait `--arbre-h` au-dessus de son texte) : il était la seule
+   image de l'entrée, parce que `anam-seuil.png` était alors une peinture entière, sans alpha, qui
+   ne pouvait pas se poser sur le ciel sans rectangle. L'asset détouré (`public/scene/seuil/`,
+   alpha à la source) lève cette raison.
 
-   L'arbre se cale donc sous la surimpression, et `.seuil` réserve exactement sa hauteur au-dessus
-   de son texte. Les deux règles lisent le MÊME jeton : elles ne peuvent pas diverger. */
-.arbreAuSeuil {
-  top: calc(var(--cible-tactile) + var(--esp-6) + var(--arbre-h) / 2);
+   ⚠️ L'AVATAR REMPLACE L'ARBRE, IL NE S'AJOUTE PAS DEVANT. Deux illustrations empilées sur un
+   tiers d'écran est EXACTEMENT le défaut mesuré le 2026-08-19 (feuillage 250–422 et personnage
+   329–624 se recouvrant sur 93 px). Au seuil, l'arbre cède donc la place par le même jeton que
+   derrière Moi et Anam — pas par `opacity`, voir `.arbreEnRetrait`. Il ne change plus de `top` :
+   aucun glissement à l'entrée, l'avatar vit DANS la région seuil, en flux (`render/seuil/`).
+
+   Ce que ça implique, dit ici pour que personne ne le découvre par hasard : les trois régions se
+   retirant déjà l'arbre, le décor `ArbreVivant` n'est plus visible AU REPOS sur aucune région. Il
+   reste monté et peint dans son tampon (gardes e2e : `seuil.spec` « l'arbre est entier »,
+   `scene-imagerie`), prêt pour le jour où une région le montre. Le retirer est une décision de
+   produit, pas un effet de bord de celle-ci. */
+.arbreEnRetraitSeuil {
+  --imagerie-opacite: 0;
 }
 .arbreMonde canvas {
   display: block;
@@ -329,7 +346,8 @@
    `opacity: var(--imagerie-opacite)` : écrire ici `opacity: 0` mettrait deux règles de même
    spécificité en concurrence, et l'ordre des feuilles déciderait. Éteindre le jeton localement
    est la MÊME grammaire que le mode contraste renforcé, qui l'éteint à la racine. */
-/* Moi laisse place à ses cartes ; Anam laisse place à son ciel et à sa propre image. */
+/* Aujourd’hui (la région d'accueil) laisse place à ses cartes ; Anam laisse place à son ciel et à sa
+   propre image. */
 .arbreEnRetrait {
   --imagerie-opacite: 0;
 }
@@ -662,52 +680,32 @@
        un rectangle visible.
    Les trois tombent ensemble, parce qu'ils n'avaient qu'une cause : rien ne tenait la colonne.
 
+   ══ ET DEPUIS LE 2026-09-02, L'IMAGE EST L'AVATAR, EN FLUX ══════════════════════════════════════
+   L'arbre a tenu la place de l'image entre-temps (voir `.arbreEnRetraitSeuil`), calé hors de la
+   région, avec une réserve `padding-top` calculée depuis `--arbre-h` pour que le titre ne remonte
+   pas dans le feuillage. L'avatar, lui, vit DANS la région (`render/seuil/AvatarSeuil.tsx`), premier
+   enfant de la colonne : la « réserve » est l'élément lui-même, et il ne peut plus diverger de ce
+   qu'il réserve. Sa géométrie — un seul jeton, `--avatar-h`, et le rapport de l'asset — vit dans
+   `render/seuil/avatar-seuil.module.css`, avec le calcul du budget vertical à 390 × 664 qui garde
+   la porte à l'écran sans défiler. `tests/scene-sans-bords.test.ts` relit ce rapport.
+
    ⚠️ LE VOILE PART AVEC L'IMAGE, PAS AVANT. UX-DR-39 interdit qu'un texte se pose sur une image
-   SANS voile ; ici il n'y a plus d'image derrière le texte — l'arbre est AU-DESSUS, séparé par la
-   réserve ci-dessous. La règle `.voile-seuil` reste définie dans `globals.css` et gardée par
+   SANS voile ; ici il n'y a toujours pas d'image derrière le texte — l'avatar est AU-DESSUS, dans le
+   flux, séparé par `row-gap`. La règle `.voile-seuil` reste définie dans `globals.css` et gardée par
    `tests/voile.test.ts` : le jour où une image repasse derrière un texte, elle est là. */
 .seuil {
   align-items: center;
-  /* La colonne se centre dans ce qui RESTE une fois l'arbre servi — pas dans l'écran entier, et
-     pas au plancher.
+  /* La colonne — avatar, nom, phrase, porte — se centre dans la région comme UN bloc.
      ⚠️ `safe` N'EST PAS DÉCORATIF ICI. `.region` s'interdit `justify-content` en toutes lettres,
      et pour une raison juste : un centrage rogne le HAUT quand le contenu déborde, et ce qui est
      rogné par un centrage n'est pas atteignable au défilement — le titre disparaîtrait pour de
      bon (zoom 200 %, paysage court). `safe center` retombe sur `start` dès qu'il y a débordement :
      on garde le centrage quand il y a de la place, et le défilement quand il n'y en a plus. */
   justify-content: safe center;
-  /* ⚠️ CETTE RÉSERVE EST CE QUI EMPÊCHE LE TITRE DE REMONTER DANS LE FEUILLAGE, et elle se déduit
-     du même jeton que l'arbre (voir `.monde`). Un nombre écrit à la main ici mentirait le jour où
-     l'arbre change de taille — ce qui est la forme exacte du défaut corrigé. */
-  padding-top: calc(
-    var(--cible-tactile) + var(--esp-6) + var(--arbre-h) + var(--esp-7)
-  );
-}
-/* ── SOUS 600 px DE HAUT, L'ARBRE SE RETIRE DU SEUIL ───────────────────────────────────────────
-   Paysage d'un téléphone, ou zoom 200 % (qui divise la hauteur du viewport de mise en page par
-   deux). Il reste alors ~308 px utiles une fois les deux réserves prises, et la colonne — nom,
-   phrase, porte — en occupe déjà ~202 : il n'y a pas de place pour une image, seulement pour une
-   image écrasée. On préfère la retirer. C'est la MÊME grammaire que le retrait derrière l'accueil
-   (le jeton, pas `opacity`), et la réserve tombe avec elle, sinon elle réserverait du vide. */
-@media (max-height: 600px) {
-  .arbreAuSeuil {
-    --imagerie-opacite: 0;
-  }
-  .seuil {
-    padding-top: calc(var(--cible-tactile) + var(--esp-6));
-  }
-}
-
-/* Sans arbre — socle absent, ou imagerie cédée aux aplats — la réserve n'a plus rien à réserver :
-   elle laisserait un vide à la place d'une image qu'on ne peint pas. */
-.seuilSansArbre,
-:global(:root[data-a11y="contraste"]) .seuil {
-  padding-top: calc(var(--cible-tactile) + var(--esp-6));
-}
-@media (prefers-contrast: more) {
-  :global(:root:not([data-a11y="nuit"])) .seuil {
-    padding-top: calc(var(--cible-tactile) + var(--esp-6));
-  }
+  /* L'air entre l'avatar et le nom. Sous 600 px de haut et en contraste renforcé, l'avatar sort du
+     flux (`display: none`, dans sa propre feuille) : il ne reste qu'un enfant, et `row-gap` ne
+     réserve rien — aucun vide à la place d'une image qu'on ne peint pas. */
+  row-gap: var(--esp-7);
 }
 .seuilTexte {
   position: relative;

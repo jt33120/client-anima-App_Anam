@@ -36,7 +36,7 @@ const coincidence = (page: Page, selecteurCible: string) =>
 async function arriverDansLeMonde(page: Page) {
   await ouvrirUnCompteNeuf(page);
   await page.goto("/");
-  await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+  await page.getByRole("button", { name: /commencer/i }).click();
   await page.waitForTimeout(1600);
 }
 
@@ -143,7 +143,7 @@ test.describe("Le tour guidé", () => {
     expect(
       [...regions].sort(),
       "le tour reste sur un seul écran : il explique au lieu de guider",
-    ).toEqual(["Moi", "Anam", "Mon arbre"].sort());
+    ).toEqual(["Aujourd’hui", "Anam", "Mon arbre"].sort());
     await expect(dialogue(page), "le tour ne se termine jamais").toHaveCount(0);
   });
 

@@ -38,6 +38,7 @@ import EchangeSource from "./conversation/EchangeSource";
 import Bibliotheque from "./accueil/Bibliotheque";
 import PremierPassage, { type PremierPassageVue } from "./premier-passage";
 import Guide, { type EtapeGuideVue } from "./guide/Guide";
+import AvatarSeuil from "./seuil/AvatarSeuil";
 import type { BibliothequeVue } from "./accueil/types";
 import type {
   ResultatOuvertureCourante,
@@ -132,6 +133,25 @@ export interface ProprietesSceneRendue {
    * EN SILENCE, et rien n'aurait rougi : c'est exactement la panne que ce menu existe pour réparer.
    */
   menu: CopieMenu;
+  /**
+   * LA COPIE DU SEUIL (retour du fondateur, 2026-09-02) — le nom, la phrase, la porte, et le nom
+   * accessible de l'avatar, décidés hors du rendu.
+   *
+   * ⚠️ ELLE DESCEND PAR PROPRIÉTÉ PARCE QUE `render/` N'A PAS LE DROIT D'IMPORTER `lib/domain`
+   * (AD-7/AD-10), où elle vit (`copie-seuil.ts`) — même patron que le tour guidé et le menu de
+   * compte. Ces trois textes étaient écrits en dur ici : ils échappaient aux gardes de voix, et la
+   * phrase n'en avait jamais eu une. OBLIGATOIRE, comme le menu : un seuil sans nom ni porte est un
+   * écran vide, et rien d'autre ne rougirait.
+   */
+  copieSeuil: CopieSeuil;
+}
+
+/** La copie du seuil telle que la scène la consomme. La source de vérité est `lib/domain/copie-seuil.ts`. */
+export interface CopieSeuil {
+  readonly titre: string;
+  readonly tagline: string;
+  readonly action: string;
+  readonly altAvatar: string;
 }
 
 /* Étoiles générées côté client APRÈS montage → aucun décalage d'hydratation. */
@@ -232,6 +252,7 @@ export default function SceneDom({
   seuilDejaFranchi = false,
   guide,
   menu,
+  copieSeuil,
 }: ProprietesSceneRendue) {
   const [etat, dispatch] = useReducer(
     reducteurVue,
@@ -593,7 +614,7 @@ export default function SceneDom({
           et le jeton gouverne à nouveau. */}
       {projection.tronc.present && (
         <div
-          className={`${s.arbreMonde} ${region === "seuil" ? s.arbreAuSeuil : ""} ${
+          className={`${s.arbreMonde} ${region === "seuil" ? s.arbreEnRetraitSeuil : ""} ${
             region === "accueil" || region === "anam" ? s.arbreEnRetrait : ""
           } ${region === "arbre" ? s.arbreEnRetraitArbre : ""} imagerie`}
           aria-hidden
@@ -608,36 +629,47 @@ export default function SceneDom({
 
       {/* ─────────── Région : le seuil (le rideau se lève) ─────────── */}
       <section
-        className={`${s.region} ${s.seuil} ${
-          projection.tronc.present ? "" : s.seuilSansArbre
-        } ${seuilActif ? s.regionActive : ""}`}
+        className={`${s.region} ${s.seuil} ${seuilActif ? s.regionActive : ""}`}
         aria-label="Seuil"
         aria-hidden={seuilActif ? undefined : true}
         inert={seuilActif ? undefined : true}
       >
-        {/* ⚠️ IL N'Y A PLUS QU'UNE SEULE IMAGE ICI, ET C'EST LA CORRECTION D'UN DÉFAUT MESURÉ.
-            `anam-seuil.png` était composité SOUS le texte : mesuré à 390 × 664, sa boîte occupait
-            (0, 329)–(226, 624) — c'est-à-dire exactement celle du titre, de la phrase et de la
-            porte, qui se lisaient donc sur son visage, tandis que le décor de l'arbre (250–422)
-            la traversait par le haut. Deux illustrations empilées sur un tiers d'écran.
+        {/* ⚠️ L'IMAGE DU SEUIL EST L'AVATAR D'ANAM, ET CETTE DÉCISION A UNE HISTOIRE — à lire avant
+            de la refaire dans un sens ou dans l'autre.
 
-            Et le fichier n'était pas un personnage détouré : c'est une PEINTURE ENTIÈRE, avec son
-            propre ciel étoilé, sa propre lune et sa propre voie lactée, posée sur le ciel étoilé
-            de la scène. D'où le masque plumeux de la QA T9 — un emplâtre qui dissolvait un
-            rectangle dans une nuit qu'il dupliquait. `presence/` et `veille/` prouvent que le
-            détourage était possible (leur pourtour est transparent) ; ce fichier-ci ne l'a jamais
-            eu.
+            Le 2026-08-19, `anam-seuil.png` a été RETIRÉ d'ici. Composité SOUS le texte, mesuré à
+            390 × 664, sa boîte occupait (0, 329)–(226, 624) — c'est-à-dire exactement celle du
+            titre, de la phrase et de la porte, qui se lisaient donc sur son visage, tandis que le
+            décor de l'arbre (250–422) la traversait par le haut. Deux illustrations empilées sur
+            un tiers d'écran. Et le fichier n'était pas un personnage détouré : c'était une
+            PEINTURE ENTIÈRE, avec son propre ciel étoilé, sa propre lune et sa propre voie lactée,
+            posée sur le ciel étoilé de la scène — d'où le masque plumeux de la QA T9, un emplâtre
+            qui dissolvait un rectangle dans une nuit qu'il dupliquait. L'arbre, procédural et sans
+            second ciel, a tenu la place de l'image entre-temps.
 
-            L'image du seuil est donc l'ARBRE, qui est l'objet du produit, qui est procédural (donc
-            net à toute densité), et qui n'apporte pas un second ciel. Le personnage reste dans
-            `public/scene/` : il n'est pas supprimé, il n'est plus empilé. */}
+            Le 2026-09-02, le fondateur a demandé l'avatar à la place de l'arbre — « un effet wow,
+            plénitude et confiance, une animation lente, un asset d'Anam qui se remplit d'étoiles,
+            une sorte d'écran de chargement beau et long » — et l'asset a été REFAIT pour ça :
+            `public/scene/seuil/anam-seuil{,@2x}.{avif,webp,png}`, Anam détourée en corps entier,
+            alpha À LA SOURCE (type de couleur 6, relu par `tests/scene-sans-bords.test.ts`). Le
+            motif du retrait — un rectangle sur une scène qui se dit sans bords — tombe avec lui.
+            Le vieux fichier reste dans `public/scene/`, sans alpha, et la garde qui documente
+            pourquoi il a quitté le seuil reste avec lui.
+
+            Ce qui ne change pas : UNE seule image. L'arbre se RETIRE du seuil
+            (`.arbreEnRetraitSeuil`) au lieu de s'empiler derrière l'avatar. L'avatar vit ICI, en
+            flux, premier enfant de la colonne : sa boîte EST la réserve au-dessus du nom, et elle
+            ne peut plus diverger de ce qu'elle réserve (voir `render/seuil/`). Le remplissage est
+            une animation FINIE sur un canvas, pas une grammaire de mouvement nouvelle — le
+            pourquoi est en tête de `AvatarSeuil.tsx`. */}
+        <AvatarSeuil actif={seuilActif} alt={copieSeuil.altAvatar} />
         <div className={s.seuilTexte}>
           <h1
             className="t-display"
             tabIndex={-1}
             ref={(el) => void (entetes.current.seuil = el)}
           >
-            Anam
+            {copieSeuil.titre}
           </h1>
           <p className="t-anam fondu-texte">
             {/* ⚠️ AUCUNE SALUTATION D'HEURE ICI (QA visuelle du 2026-08-19, M4). « Bonsoir » a été
@@ -646,26 +678,37 @@ export default function SceneDom({
                 que le lieu ne le regarde pas. La rendre juste demanderait l'heure de
                 L'UTILISATRICE — le serveur est en UTC — et `render/` n'a pas le droit d'importer
                 `lib/domain` (AD-7/AD-10) : ce n'est donc pas un mot à replacer ici, c'est une
-                donnée à faire descendre. En attendant, la phrase ne ment plus. */}
-            Ce lieu ne te jugera pas — et ne te flattera pas non plus.
+                donnée à faire descendre. En attendant, la phrase ne ment plus.
+
+                ⚠️ ET LA PHRASE N'EST PLUS ÉCRITE ICI. Elle vit dans `lib/domain/copie-seuil.ts`,
+                où les gardes de voix la lisent, et descend par `copieSeuil` — comme le nom et la
+                porte. Elle disait ce que le lieu N'EST PAS (il ne juge pas, il ne flatte pas) ; le
+                fondateur veut ce qu'il EST. `tests/rendu/seuil-avatar.test.tsx` refuse qu'un de
+                ces trois textes revienne en dur dans ce fichier. */}
+            {copieSeuil.tagline}
           </p>
 
           {/* ⚠️ LE SEUIL NE PRÉSENTE PAS LE LIEU, ET C'EST UNE MESURE QUI L'A DÉCIDÉ. La première
               version de H4 posait la présentation ICI, entre la phrase et la porte. Sur iPhone 14
               (390 × 664), le seuil dispose de 512 px utiles une fois les réserves de surimpression
               et de barre retirées ; l'identité et la porte en prennent déjà 300. Mesuré : contenu
-              à 894 px pour 664, et « entrer dans le monde » ENTIÈREMENT hors du viewport — ratio 0.
-              Quelqu'un qui arrivait voyait une présentation et aucune porte.
+              à 894 px pour 664, et la porte ENTIÈREMENT hors du viewport — ratio 0. Quelqu'un qui
+              arrivait voyait une présentation et aucune porte.
 
               La contrainte n'était pas un accident de copie : un seuil est fait pour être
               traversé, pas lu. La présentation vit donc dans l'accueil, où elle est lue avec les
-              trois noms visibles dans la barre juste en dessous — et où l'on peut y aller. */}
+              trois noms visibles dans la barre juste en dessous — et où l'on peut y aller.
+
+              ⚠️ ET L'AVATAR OBÉIT À LA MÊME MESURE. Sa hauteur est calculée pour que la porte
+              reste à l'écran sans défiler à 390 × 664 — le calcul, ligne à ligne, est en tête de
+              `render/seuil/avatar-seuil.module.css`. Le nom, la phrase et la porte sont visibles
+              PENDANT le remplissage : le chargement beau et long est l'image, pas un verrou. */}
           <button
             className={s.affordance}
             type="button"
             onClick={() => aller("accueil")}
           >
-            <span className="t-bouton">entrer dans le monde</span>
+            <span className="t-bouton">{copieSeuil.action}</span>
           </button>
         </div>
       </section>
