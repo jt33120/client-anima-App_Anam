@@ -248,6 +248,11 @@ describe("[L'IMAGE] la toile est décorative, dans la section Seuil, au-dessus d
     expect(img, "aucune image d'Anam au seuil").not.toBeNull();
     expect(img!.getAttribute("src")).toMatch(/\/scene\/seuil\/anam-seuil\.png$/);
     expect(img!.getAttribute("srcset")).toMatch(/anam-seuil@2x\.png 2x/);
+    // Le héros de la première peinture ne se charge pas « quand on y arrive » : le remplissage
+    // attend son bitmap, un `lazy` y mettrait une attente vide avant la première trame (revue du
+    // 2026-09-02). Les portraits de la conversation, eux, restent `lazy` (garde d'ImageAnam).
+    expect(img!.getAttribute("loading"), "l'image du seuil doit être chargée en priorité").toBe("eager");
+    expect(img!.getAttribute("fetchpriority")).toBe("high");
     // Le sens est porté par l'enveloppe (`role="img"` + alt), l'`<img>` interne est décorative.
     expect(img!.getAttribute("alt")).toBe("");
     expect(seuil.querySelector('[role="img"]')?.getAttribute("aria-label")).toBe(ALT_AVATAR_SEUIL);

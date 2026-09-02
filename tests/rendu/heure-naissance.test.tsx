@@ -211,6 +211,14 @@ describe("[2026-09-01] Anam arrive avec une bulle", () => {
       /OU_TROUVER_SON_HEURE/,
     );
   });
+
+  it("[LE CŒUR] la bulle « il me manque ton heure » ne se montre qu'à celle dont l'heure manque", () => {
+    // Revue du 2026-09-02 : la bulle était rendue à tout le monde, y compris à celle qui revient
+    // pour sa commune seule avec une heure déjà gravée. Anam ne réclame pas ce qu'elle a.
+    const page = sansCommentaires(lire("app/heure-naissance/page.tsx"));
+    expect(page).toMatch(/const heureManque = \(deja\?\.heure_naissance \?\? null\) === null;/);
+    expect(page).toMatch(/\{heureManque && <BulleAnam \/>\}/);
+  });
 });
 
 describe("[2026-09-01] beaucoup moins de texte", () => {

@@ -100,7 +100,17 @@ export default function AvatarSeuil({ actif, alt }: { actif: boolean; alt: strin
     };
     const lancer = () => {
       if (annule) return;
-      remplissage = demarrerRemplissage(toile, image, { dureeMs: DUREE_REMPLISSAGE_MS });
+      // La couleur du halo est le jeton `--lueur`, lu ICI parce qu'un canvas ne lit pas les
+      // variables CSS : sans ça, le sprite garderait une teinte en dur qui survivrait à la
+      // prochaine palette (c'est arrivé avec Soft Balance, revue du 2026-09-02).
+      const couleur = toile.ownerDocument.defaultView
+        ?.getComputedStyle(toile)
+        .getPropertyValue("--lueur")
+        .trim();
+      remplissage = demarrerRemplissage(toile, image, {
+        dureeMs: DUREE_REMPLISSAGE_MS,
+        couleur: couleur || undefined,
+      });
       // `termine` est résolue à la fin naturelle ET par `arreter()` : `annule` empêche alors de
       // toucher l'état d'un composant démonté ou d'une région devenue inerte.
       void remplissage.termine.then(montrer);
@@ -122,7 +132,7 @@ export default function AvatarSeuil({ actif, alt }: { actif: boolean; alt: strin
 
   return (
     <div ref={enveloppe} className={s.avatar}>
-      <ImageAnam format="seuil" alt={alt} className={`${s.image} ${pret ? s.imagePrete : ""}`} />
+      <ImageAnam chargement="eager" format="seuil" alt={alt} className={`${s.image} ${pret ? s.imagePrete : ""}`} />
       <canvas ref={canvas} className={s.toile} aria-hidden data-remplissage-etoiles />
       {pret && (
         <div className={`${s.lotus} fondu-image`} aria-hidden>

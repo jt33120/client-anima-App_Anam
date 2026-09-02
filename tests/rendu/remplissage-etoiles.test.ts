@@ -16,23 +16,28 @@
  * l'horloge, qui s'ARRÊTE à la fin ; pause quand l'onglet est caché ; `reduce-motion` = état final
  * sans boucle ; sprite tamponné par `drawImage` en « lighter », jamais `arc` + `shadowBlur`.
  */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  DEBUT_FONDU_IMAGE,
-  DIAMETRE_ETOILE,
-  HAUTEUR_SEUIL,
-  LARGEUR_SEUIL,
-  MAX_ETOILES_DEFAUT,
-  PART_VOL,
-  PHYSIQUE_MAX,
-  ALPHA_MINIMAL,
   aleatoireDeterministe,
+  ALPHA_MINIMAL,
   cadreContenu,
+  composantesRgb,
+  creerSprite,
+  DEBUT_FONDU_IMAGE,
   demarrerRemplissage,
+  DIAMETRE_ETOILE,
   easeInOutCubic,
   echantillonnerAlpha,
   echantillonnerSilhouette,
   fonduImageA,
+  HAUTEUR_SEUIL,
+  LARGEUR_SEUIL,
+  LUEUR_DEFAUT,
+  MAX_ETOILES_DEFAUT,
+  PART_VOL,
+  PHYSIQUE_MAX,
   positionsA,
   preparerChamp,
   tailleCanvas,
@@ -216,6 +221,53 @@ afterEach(() => {
 });
 
 // ═════════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("remplissage-etoiles — la couleur du halo vient du jeton, jamais d'une teinte en dur", () => {
+  /* Revue du 2026-09-02 : le sprite portait encore l'ancienne lueur (#CDE4F8) après le passage à
+     Soft Balance. Un canvas ne lit pas `--lueur` tout seul : la couleur est une option, lue par
+     l'appelant, et le module n'a plus qu'une valeur de repli, celle de la palette courante. */
+  function documentFactice() {
+    const arrets: string[] = [];
+    const ctx = {
+      createRadialGradient: () => ({ addColorStop: (_o: number, c: string) => arrets.push(c) }),
+      fillRect: () => undefined,
+      set fillStyle(_v: unknown) {},
+    };
+    const doc = {
+      createElement: () => ({ width: 0, height: 0, getContext: () => ctx }),
+    } as unknown as Document;
+    return { doc, arrets };
+  }
+
+  it("[LE CŒUR] convertit #RRGGBB et #RGB en composantes, et retombe sur la lueur Soft Balance sinon", () => {
+    expect(composantesRgb("#7A90C9")).toBe("122, 144, 201");
+    expect(composantesRgb("  #D3DBF0 ")).toBe("211, 219, 240");
+    expect(composantesRgb("#fff")).toBe("255, 255, 255");
+    expect(composantesRgb("")).toBe(composantesRgb(LUEUR_DEFAUT));
+    expect(composantesRgb("rgb(1, 2, 3)")).toBe(composantesRgb(LUEUR_DEFAUT));
+    expect(LUEUR_DEFAUT, "le repli est la lueur de la palette courante, pas l'ancienne").toBe("#D3DBF0");
+  });
+
+  it("[LE CŒUR] le sprite peint le halo dans la couleur demandée, et l'ancienne lueur n'apparaît plus", () => {
+    const { doc, arrets } = documentFactice();
+    expect(creerSprite(doc, 8, "#7A90C9")).not.toBeNull();
+    expect(arrets).toEqual(["rgba(255, 255, 255, 1)", "rgba(122, 144, 201, 0.85)", "rgba(122, 144, 201, 0)"]);
+    const { doc: doc2, arrets: arrets2 } = documentFactice();
+    creerSprite(doc2, 8);
+    expect(arrets2.join(" ")).toContain("211, 219, 240");
+    expect(arrets2.join(" "), "l'ancienne lueur #CDE4F8 (205, 228, 248) ne doit plus être peinte").not.toContain("205, 228, 248");
+  });
+
+  it("[LE CŒUR] `demarrerRemplissage` transmet `couleur` au sprite", () => {
+    // Le module source doit passer `options.couleur` à `creerSprite` : sinon l'option est morte.
+    const src = readFileSync(resolve(process.cwd(), "render/seuil/remplissage-etoiles.ts"), "utf-8");
+    expect(src).toMatch(/creerSprite\([^)]*options\.couleur\)/);
+    // Et l'appelant du seuil lit bien le jeton sur le canvas.
+    const avatar = readFileSync(resolve(process.cwd(), "render/seuil/AvatarSeuil.tsx"), "utf-8");
+    expect(avatar).toMatch(/getPropertyValue\("--lueur"\)/);
+    expect(avatar).toMatch(/couleur:/);
+  });
+});
 
 describe("remplissage-etoiles — échantillonnage de la silhouette", () => {
   it("[LE CŒUR] ne garde que les pixels dont l'alpha DÉPASSE 128, sur la grille du pas", () => {

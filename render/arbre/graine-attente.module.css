@@ -59,12 +59,13 @@
   0%, 100% { transform: scale(0.975); }
   45% { transform: scale(1.025); }
 }
-/* Le soulèvement : monte de 3, redescend, effleure une demi-unité sous le repos, se pose.
-   Aucune valeur au-delà de ces bornes ; un ressort passerait bien au-delà. */
+/* Le soulèvement : monte de 3, redescend, se pose. La première version « effleurait une
+   demi-unité sous le repos » avant de se poser : c'est un dépassement, donc l'ébauche d'un
+   rebond, et la charte n'en veut aucun (DESIGN.md « aucun rebond », revue du 2026-09-02). La
+   graine ne descend jamais sous son point de repos. */
 @keyframes graineSoulevement {
   0%, 100% { transform: translateY(0px); }
   45% { transform: translateY(-3px); }
-  80% { transform: translateY(0.5px); }
 }
 /* Le halo ne change QUE d'opacité : une lueur, pas une forme (même règle que le halo du lotus). */
 @keyframes graineHalo {

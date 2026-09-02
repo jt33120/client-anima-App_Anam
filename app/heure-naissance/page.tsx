@@ -97,13 +97,18 @@ export default async function Page({
     .eq("id", user.id)
     .maybeSingle<{ heure_naissance: string | null; lieu_naissance: string | null }>();
 
+  const heureManque = (deja?.heure_naissance ?? null) === null;
+
   return (
     <main className={s.halte}>
       <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className="t-titre">Ton heure de naissance</h1>
       {/* Anam arrive avec une bulle (2026-09-01). Le titre reste PREMIER dans l'ordre du document :
           un lecteur d'écran entre par lui ; l'œil, lui, tombe sur elle. */}
-      <BulleAnam />
+      {/* La bulle dit « il me manque ton heure » : elle ne se montre qu'à celle dont l'heure
+          manque vraiment. Une heure déjà gravée (retour par le menu, ou pour la commune seule)
+          rendrait la phrase fausse : Anam ne réclame pas ce qu'elle a (revue du 2026-09-02). */}
+      {heureManque && <BulleAnam />}
       <FormulaireHeure deja={{ heure: deja?.heure_naissance ?? null, lieu: deja?.lieu_naissance ?? null }} />
       {/* Story 6.9 (QA T7) — la porte de secours (FR-077) et, là où elle est due, la mention
           IA (art. 50). Le MODÈLE décide ; ce composant dessine. */}

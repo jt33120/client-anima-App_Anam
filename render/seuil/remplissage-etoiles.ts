@@ -95,6 +95,26 @@ export interface OptionsRemplissage {
   maintenant?: () => number;
   /** Force le mode « moins de mouvement ». Défaut : `matchMedia("(prefers-reduced-motion: reduce)")`. */
   reduceMotion?: boolean;
+  /**
+   * Couleur du halo des étoiles, en `#RRGGBB` : le jeton `--lueur` de la palette, lu par
+   * l'appelant sur le canvas (`getComputedStyle`). Défaut : `LUEUR_DEFAUT`. Un canvas ne lit pas
+   * les variables CSS tout seul, et une teinte recopiée en dur ici a déjà survécu à un changement
+   * de palette (revue du 2026-09-02 : le sprite portait l'ancienne lueur #CDE4F8 après le passage
+   * à Soft Balance).
+   */
+  couleur?: string;
+}
+
+/** La lueur Soft Balance (Sky), valeur de repli quand le jeton n'est pas lisible (jsdom, canvas hors DOM). */
+export const LUEUR_DEFAUT = "#D3DBF0";
+
+/** `#RRGGBB` (ou `#RGB`) → `"r, g, b"` ; une valeur illisible retombe sur `LUEUR_DEFAUT`. */
+export function composantesRgb(hex: string): string {
+  const h = hex.trim().replace(/^#/, "");
+  const n = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  if (!/^[0-9a-fA-F]{6}$/.test(n)) return composantesRgb(LUEUR_DEFAUT);
+  const v = parseInt(n, 16);
+  return `${(v >> 16) & 255}, ${(v >> 8) & 255}, ${v & 255}`;
 }
 
 /** Le champ d'étoiles préparé : tout ce dont la simulation a besoin, sans canvas. */
@@ -340,9 +360,14 @@ export function fonduImageA(avancement: number): number {
 
 /**
  * Le sprite d'étoile : un dégradé radial rendu UNE fois sur un petit canvas, puis tamponné par
- * `drawImage`. Cœur blanc, halo nacré (la `lueur` de la palette lunaire, #CDE4F8), bord transparent.
+ * `drawImage`. Cœur blanc, halo de la couleur `--lueur` de la palette (jamais une teinte en dur :
+ * voir `OptionsRemplissage.couleur`), bord transparent.
  */
-export function creerSprite(doc: Document, diametre: number): HTMLCanvasElement | null {
+export function creerSprite(
+  doc: Document,
+  diametre: number,
+  couleur: string = LUEUR_DEFAUT,
+): HTMLCanvasElement | null {
   const d = Math.max(2, Math.round(diametre));
   const sprite = doc.createElement("canvas");
   sprite.width = d;
@@ -352,8 +377,9 @@ export function creerSprite(doc: Document, diametre: number): HTMLCanvasElement 
   const r = d / 2;
   const degrade = ctx.createRadialGradient(r, r, 0, r, r, r);
   degrade.addColorStop(0, "rgba(255, 255, 255, 1)");
-  degrade.addColorStop(0.35, "rgba(205, 228, 248, 0.85)");
-  degrade.addColorStop(1, "rgba(205, 228, 248, 0)");
+  const rgb = composantesRgb(couleur);
+  degrade.addColorStop(0.35, `rgba(${rgb}, 0.85)`);
+  degrade.addColorStop(1, `rgba(${rgb}, 0)`);
   ctx.fillStyle = degrade;
   ctx.fillRect(0, 0, d, d);
   return sprite;
@@ -531,7 +557,7 @@ export function demarrerRemplissage(
       image,
       cadre,
       champ,
-      sprite: creerSprite(doc, DIAMETRE_ETOILE * taille.echelle),
+      sprite: creerSprite(doc, DIAMETRE_ETOILE * taille.echelle, options.couleur),
       positions: new Float32Array(champ.nombre * 3),
       echelle: taille.echelle,
       largeur: taille.largeur,

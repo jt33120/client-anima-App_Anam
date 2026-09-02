@@ -179,11 +179,12 @@ describe("[LE SOUFFLE] le même que le lotus, et rien qui rebondisse", () => {
     expect(duree).toBeGreaterThanOrEqual(3000);
   });
 
-  it("[LE CŒUR] aucun overshoot : l'échelle reste dans [0,97 ; 1,03], la translation dans [−4 ; 0,5]", () => {
+  it("[LE CŒUR] aucun overshoot : l'échelle reste dans [0,97 ; 1,03], la translation dans [−4 ; 0]", () => {
     // C'est ICI que « rebondir » devient « se soulever ». Un ressort passe au-delà de sa cible avant
-    // de revenir ; une graine qui se dresse monte, redescend, effleure d'une demi-unité, se pose. Les
-    // bornes sont celles du brief : souffle ±2,5 pour cent (le lotus : 0,975 → 1,025), montée de 2 à 3,
-    // micro-retombée d'un demi.
+    // de revenir ; une graine qui se dresse monte, redescend, se pose. La première version
+    // « effleurait une demi-unité sous le repos » : c'était déjà un dépassement, l'ébauche du
+    // rebond que DESIGN.md interdit (revue du 2026-09-02). Les bornes : souffle ±2,5 pour cent (le
+    // lotus : 0,975 → 1,025), montée de 2 à 3, et JAMAIS sous le point de repos.
     const blocs = toutesLesKeyframes();
     const tout = blocs.map((b) => b.corps).join("\n");
 
@@ -201,12 +202,12 @@ describe("[LE SOUFFLE] le même que le lotus, et rien qui rebondisse", () => {
     expect(translations.length, "la graine ne se soulève plus").toBeGreaterThan(0);
     for (const t of translations) {
       expect(t, `translateY(${t}px) : elle saute au lieu de se soulever`).toBeGreaterThanOrEqual(-4);
-      expect(t, `translateY(${t}px) : elle s'enfonce, ce n'est plus une micro-retombée`).toBeLessThanOrEqual(0.5);
+      expect(t, `translateY(${t}px) : elle passe sous son repos, c'est un rebond qui commence`).toBeLessThanOrEqual(0);
     }
-    // [ANTI-VACUITÉ] elle monte (au moins −2) ET elle retombe d'un rien (une valeur > 0) : c'est le
-    // geste du fondateur, pas une graine immobile qui passerait toutes les bornes.
+    // [ANTI-VACUITÉ] elle monte VRAIMENT (au moins −2) et elle REVIENT se poser (une valeur à 0) :
+    // c'est le geste du fondateur, pas une graine immobile qui passerait toutes les bornes.
     expect(Math.min(...translations), "la montée n'est plus perceptible").toBeLessThanOrEqual(-2);
-    expect(Math.max(...translations), "la micro-retombée a disparu").toBeGreaterThan(0);
+    expect(Math.max(...translations), "la graine ne se pose plus").toBe(0);
 
     // Rien d'autre ne bouge : ni de côté, ni en rotation, ni en cisaillement.
     expect(tout).not.toMatch(/translateX|translate\(|rotate|skew|matrix/);
