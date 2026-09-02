@@ -25,7 +25,7 @@ import {
   MAX_ETOILES_DEFAUT,
   PART_VOL,
   PHYSIQUE_MAX,
-  SEUIL_ALPHA,
+  ALPHA_MINIMAL,
   aleatoireDeterministe,
   cadreContenu,
   demarrerRemplissage,
@@ -56,8 +56,8 @@ function rgba(largeur: number, hauteur: number, alphaDe: Alpha): Uint8ClampedArr
  * alpha 128 exactement (exclue), une colonne à 129 (incluse), un corps plein à 255.
  */
 const PETITE: Alpha = (x, y) => {
-  if (x === 3) return SEUIL_ALPHA; // = 128 : PAS silhouette (le seuil est strict)
-  if (x === 27 && y >= 10) return SEUIL_ALPHA + 1; // = 129 : silhouette
+  if (x === 3) return ALPHA_MINIMAL; // = 128 : PAS silhouette (le seuil est strict)
+  if (x === 27 && y >= 10) return ALPHA_MINIMAL + 1; // = 129 : silhouette
   if (x >= 6 && x < 24 && y >= 10 && y < 38) return 255;
   return 0;
 };
@@ -226,7 +226,7 @@ describe("remplissage-etoiles — échantillonnage de la silhouette", () => {
       const y = cibleY(cibles, i);
       expect(x % 3, "x sur la grille").toBe(0);
       expect(y % 3, "y sur la grille").toBe(0);
-      expect(PETITE(x, y), `alpha strictement > 128 en (${x}, ${y})`).toBeGreaterThan(SEUIL_ALPHA);
+      expect(PETITE(x, y), `alpha strictement > 128 en (${x}, ${y})`).toBeGreaterThan(ALPHA_MINIMAL);
       expect(x, "la colonne à alpha 128 exactement est EXCLUE").not.toBe(3);
     }
     // La colonne à 129 est INCLUSE : le seuil est strict dans les deux sens.
@@ -249,7 +249,7 @@ describe("remplissage-etoiles — échantillonnage de la silhouette", () => {
     expect(Math.min(...ys), "des cibles du haut").toBeLessThan(24);
     expect(Math.max(...ys), "des cibles du bas").toBeGreaterThan(24);
     for (let i = 0; i < 10; i++) {
-      expect(PETITE(cibleX(cibles, i), cibleY(cibles, i))).toBeGreaterThan(SEUIL_ALPHA);
+      expect(PETITE(cibleX(cibles, i), cibleY(cibles, i))).toBeGreaterThan(ALPHA_MINIMAL);
     }
   });
 

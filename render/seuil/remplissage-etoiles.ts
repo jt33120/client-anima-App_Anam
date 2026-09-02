@@ -59,7 +59,7 @@ export const PAS_DEFAUT = 3;
 export const MAX_ETOILES_DEFAUT = 500;
 
 /** Un pixel compte comme « silhouette » quand son alpha DÉPASSE ce seuil (strictement). */
-export const SEUIL_ALPHA = 128;
+export const ALPHA_MINIMAL = 128;
 
 /** TAILLE. Plafonds physiques : DPR 2 au plus, et jamais plus que le 2x de l'asset (400×520). */
 export const DPR_MAX = 2;
@@ -178,7 +178,7 @@ export function cadreContenu(
  * PURE : c'est elle que les tests éprouvent sans canvas.
  *
  *   1. on parcourt la grille au `pas` donné et on garde les pixels dont l'alpha dépasse
- *      `SEUIL_ALPHA` — le bord plumeux de l'asset (matte rembg) est ainsi exclu ;
+ *      `ALPHA_MINIMAL` — le bord plumeux de l'asset (matte rembg) est ainsi exclu ;
  *   2. on MÉLANGE (Fisher–Yates avec le générateur injecté) puis on tronque à `maxEtoiles` : le
  *      sous-ensemble gardé est uniforme sur toute la silhouette, pas « les premières lignes » ;
  *   3. on TRIE par y décroissant, tri STABLE : l'ordre du tableau devient l'ordre d'arrivée, du bas
@@ -199,7 +199,7 @@ export function echantillonnerAlpha(
   const ys: number[] = [];
   for (let y = 0; y < hauteur; y += p) {
     for (let x = 0; x < largeur; x += p) {
-      if (donnees[(y * largeur + x) * 4 + 3] > SEUIL_ALPHA) {
+      if (donnees[(y * largeur + x) * 4 + 3] > ALPHA_MINIMAL) {
         xs.push(x);
         ys.push(y);
       }
