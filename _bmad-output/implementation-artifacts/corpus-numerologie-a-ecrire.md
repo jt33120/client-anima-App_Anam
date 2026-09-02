@@ -10,6 +10,13 @@ Le code est prêt et il attend. Aujourd'hui, l'application calcule les nombres j
 honnêtement, pour chacun : *ce texte n'est pas encore écrit*. Elle ne bouche pas le trou avec du
 générique.
 
+> **Mise à jour du 2026-09-02.** Les 69 créneaux portent désormais un **texte de départ**, non
+> signé, écrit sur décision de Julian (2026-08-23) puis restructuré sur son retour du 2026-08-31 :
+> une première phrase factuelle qui nomme la famille et le nombre et dit ce qu'il symbolise, puis
+> une ou deux phrases qui parlent à la personne, au tutoiement, sans tiret cadratin. La liste
+> ci-dessous reste la liste de ce qu'Anima relit : elle reprend la main créneau par créneau, dans
+> `lib/corpus/textes-de-base.ts`, et son texte remplace le texte de départ à la clé près.
+
 ---
 
 ## Comment ça marche, concrètement

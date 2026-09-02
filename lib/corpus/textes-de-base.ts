@@ -35,8 +35,8 @@
  *
  * ── 2026-08-31 : LA STRUCTURE DES 69 LECTURES NUMÉROLOGIQUES A ÉTÉ REVUE, SUR RETOUR DU FONDATEUR ──
  *
- * Les 69 textes `chemin_de_vie:N` … `annee_personnelle:N` ont été restructurés le 2026-08-31 sur
- * retour de Julian, verbatim : « rajoute le chiffre à côté de ce à quoi il correspond, exemple :
+ * Les 69 textes `chemin_de_vie:N` … `annee_personnelle:N` ont été restructurés le 2026-09-02 sur
+ * retour de Julian du 2026-08-31, verbatim : « rajoute le chiffre à côté de ce à quoi il correspond, exemple :
  * Chemin de vie (7). Ensuite les textes doivent se structurer avec une analyse factuelle au début :
  * le chemin de vie 7 symbolise…, puis décrire la personne ou ses défis potentiels. Utilise le
  * tutoiement pour créer de la proximité. » Et, pour toute l'app : bannir les tirets cadratins,
