@@ -39,7 +39,8 @@
  * La remarque du 2026-08-26 tranche plus précisément : la frontière n'est pas une durée arbitraire,
  * c'est le JOUR CIVIL de la personne. Une pause de quatre heures le même jour ne doit pas produire
  * un second accueil ; le premier accès du lendemain doit en produire un, même dix minutes après
- * minuit. Le fuseau explicite est Europe/Paris, celui du quotidien déjà affiché sur « Moi ».
+ * minuit. Le fuseau explicite est Europe/Paris, celui du quotidien déjà affiché sur « Aujourd’hui »,
+ * la région d'accueil (nommée « Moi » jusqu'au 2026-09-02).
  */
 export const FUSEAU_JOUR_ANAM = "Europe/Paris";
 

@@ -3,6 +3,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { ETAPES } from "@/lib/domain/copie-guide";
 import { ENTREES_MENU } from "@/lib/domain/menu-compte";
+import { REGIONS, nomDeRegion } from "@/lib/scene";
 import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
 
 /**
@@ -242,6 +243,28 @@ describe("[fondateur 2026-09-01] le tour tient en cinq étapes d'une ou deux phr
   const h2Rendus = (src: string) =>
     [...sansCommentaires(src).matchAll(/<h2\b[^>]*>\s*([^<{]+?)\s*<\/h2>/g)].map((m) => m[1]);
   const H2_ACCUEIL = FICHIERS_ACCUEIL.flatMap((f) => h2Rendus(lire(f)));
+  /**
+   * Les NOMS DE RÉGION, lus au catalogue et jamais recopiés ici (`tests/scene-modele.test.ts` [7.9]).
+   *
+   * ⚠️ POURQUOI ILS COMPTENT COMME DES TITRES (2026-09-02). La région d'accueil s'appelle
+   * « Aujourd’hui » depuis le retour du fondateur (E1-S4), et son <h1> dit ce nom sur l'écran même
+   * où se posent les trois premières bulles. Un titre d'étape qui reprendrait un nom de région
+   * redoublerait ce <h1> exactement comme il redoublerait un <h2> : deux entêtes de même nom sur un
+   * écran, et un lecteur d'écran ne les distingue plus. C'est le mot que E1-S5 interdit nommément
+   * pour l'étape 3. Lire le catalogue plutôt que recopier le nom fait suivre cette garde au prochain
+   * renommage sans qu'une ligne change ; le h2 interne de la section quotidienne, lui, dit
+   * « Ce que le jour propose » (décision D7) précisément pour ne plus porter le nom de la région.
+   *
+   * ⚠️ « Anam » EST EXCLU, pour la raison qu'écrit `tests/scene-modele.test.ts` : c'est le nom du
+   * PRODUIT autant que celui d'une région, et l'étape qui présente Anam s'intitule « Anam » par
+   * décision du fondateur (E1-S5). Le <h1> de cette région et ce titre disent le même mot parce
+   * qu'ils désignent la même personne, pas parce qu'un titre a été recopié d'un entête. Les noms
+   * qui BOUGENT, eux, sont tous couverts.
+   */
+  const NOM_DU_PRODUIT = "Anam";
+  const NOMS_DE_REGION = REGIONS.map((r) => r.nom).filter((n) => n !== NOM_DU_PRODUIT);
+  /** Tout ce qu'un titre d'étape n'a pas le droit de répéter : les <h2> de l'accueil et les régions. */
+  const TITRES_INTERDITS = [...H2_ACCUEIL, ...NOMS_DE_REGION];
 
   it("[LE CŒUR] cinq étapes, et plus aucune sur le « ? » de secours", () => {
     expect(ETAPES, "le tour a regrossi, ou une étape a disparu sans qu'on le décide").toHaveLength(5);
@@ -298,19 +321,22 @@ describe("[fondateur 2026-09-01] le tour tient en cinq étapes d'une ou deux phr
     expect(arbre[0].texte).toContain("grandit et évolue avec toi");
   });
 
-  it("[LE CŒUR] aucun titre d'étape ne répète un <h2> rendu sur l'accueil", () => {
+  it("[LE CŒUR] aucun titre d'étape ne répète un <h2> rendu sur l'accueil, ni un nom de région", () => {
     // ⚠️ POURQUOI : la bulle du tour porte un <h2> (`render/guide/Guide.tsx`, `guide-titre`), et
     // les trois premières étapes se posent sur l'accueil, qui en rend déjà : « Trois dimensions »
-    // (premier passage, exactement quand le tour se joue) et « Aujourd’hui » (section quotidienne).
-    // Deux entêtes de niveau 2 de même nom sur un écran, et un lecteur d'écran ne les distingue
-    // plus : c'est ce qui est arrivé le 2026-08-25 avec « Trois places ». Les titres sont donc
-    // comparés aux <h2> RÉELLEMENT rendus, pas à une liste recopiée ici.
+    // (premier passage, exactement quand le tour se joue) et « Ce que le jour propose » (section
+    // quotidienne, qui disait « Aujourd’hui » jusqu'au 2026-09-02 : ce mot est devenu le nom de la
+    // RÉGION, donc son <h1>, et le h2 a cédé la place, décision D7). Deux entêtes de même nom sur un
+    // écran, et un lecteur d'écran ne les distingue plus : c'est ce qui est arrivé le 2026-08-25
+    // avec « Trois places ». Les titres sont donc comparés aux <h2> RÉELLEMENT rendus et aux noms
+    // de région RÉELLEMENT catalogués, pas à une liste recopiée ici.
     expect(
       H2_ACCUEIL,
       "l'extracteur ne retrouve plus les <h2> connus de l'accueil : la garde ne mesure rien",
-    ).toEqual(expect.arrayContaining(["Trois dimensions", "Aujourd’hui"]));
-    const collisions = ETAPES.map((e) => e.titre).filter((t) => H2_ACCUEIL.includes(t));
-    expect(collisions, "un titre d'étape porte le même nom qu'un <h2> de l'accueil").toEqual([]);
+    ).toEqual(expect.arrayContaining(["Trois dimensions", "Ce que le jour propose"]));
+    expect(NOMS_DE_REGION.length, "aucun nom de région lu au catalogue : la garde ne mesure rien").toBeGreaterThan(0);
+    const collisions = ETAPES.map((e) => e.titre).filter((t) => TITRES_INTERDITS.includes(t));
+    expect(collisions, "un titre d'étape porte le même nom qu'un <h2> de l'accueil ou qu'une région").toEqual([]);
   });
 
   it("[ANTI-VACUITÉ] le compteur de phrases, le détecteur de tiret et l'extracteur de <h2> mordent", () => {
@@ -324,5 +350,9 @@ describe("[fondateur 2026-09-01] le tour tient en cinq étapes d'une ou deux phr
       "Aujourd’hui",
     ]);
     expect(h2Rendus(`{/* <h2>Trois places</h2> */}<h3>Pas un h2</h3>`)).toEqual([]);
+    // Et la liste des titres interdits porte bien le nom de la région d'accueil, lu au catalogue :
+    // un titre d'étape fabriqué avec ce nom serait une collision.
+    const fabrique = [nomDeRegion("accueil")].filter((t) => TITRES_INTERDITS.includes(t));
+    expect(fabrique, "un titre d'étape au nom de la région d'accueil passerait").toHaveLength(1);
   });
 });

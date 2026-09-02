@@ -46,10 +46,18 @@ export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
 
   return (
     <div className={s.bibliotheque}>
+      {/* ⚠️ « CE QUE LE JOUR PROPOSE », PAS « AUJOURD’HUI » (2026-09-02, décision D7). La région
+          entière s'appelle « Aujourd’hui » depuis le retour du fondateur du 2026-09-01
+          (`lib/scene/regions.ts`). Ce h2 disait le même mot, quelques lignes sous le h1 : un lecteur
+          d'écran aurait annoncé deux régions homonymes, et l'œil lu deux titres pour une seule chose.
+          La formule est celle du mode d'emploi (`lib/domain/copie-reperes.ts`) : elle dit ce qu'il y a
+          dessous, sans redire où l'on est. L'id `moi-aujourdhui` reste : un ancrage n'est pas un
+          texte, et le changer casserait des liens pour rien. `tests/rendu/bibliotheque.test.tsx`
+          refuse qu'un second « Aujourd’hui » réapparaisse ici. */}
       <section className={s.quotidien} aria-labelledby="moi-aujourdhui">
         <div className={s.enteteQuotidien}>
           <p className={`t-meta ${s.jour}`}>{date}</p>
-          <h2 id="moi-aujourdhui" className={`t-titre-sm ${s.titreQuotidien}`}>Aujourd’hui</h2>
+          <h2 id="moi-aujourdhui" className={`t-titre-sm ${s.titreQuotidien}`}>Ce que le jour propose</h2>
         </div>
         <div className={s.cartesQuotidiennes}>
           {ciel && <Carte carte={ciel} enAvant />}
@@ -92,6 +100,10 @@ function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
           <span className={s.fleche} aria-hidden>→</span>
           <IndicateurLien />
         </Link>
+        {/* L'action d'une porte arrive DÉJÀ décidée par `lib/domain/univers-moi.ts` : le test
+            d'ennéagramme sous Psychologie, l'heure de naissance sous Astrologie (E3-S5, 2026-09-02).
+            Le rendu ne sait pas laquelle il dessine, et c'est voulu : il n'a rien à décider, donc
+            rien à dire de l'état du compte (ni un mot sur ce qui manque, ni un compte, FR-031). */}
         {univers.action && (
           <Link className={s.actionUnivers} href={univers.action.url}>
             <span className="t-bouton">{univers.action.libelle}</span>

@@ -59,7 +59,9 @@ export const PLACES: readonly Place[] = Object.freeze([
       "l’aies vu venir. Une branche peut être nommée, corrigée, ou déclarée en pleine lumière.",
   },
   {
-    nom: "Moi",
+    // « Aujourd’hui » depuis le 2026-09-02 (retour du fondateur) : le nom est celui du catalogue,
+    // relu ici à la main puisque ce fichier est exempté de la garde des littéraux.
+    nom: "Aujourd’hui",
     quoi:
       "Ce que le jour propose : quelques cartes, la même chose pour tout le monde ce jour-là. " +
       "Rien n’y est calculé pour te retenir, et il n’y a rien à y rattraper si tu passes un jour.",

@@ -394,7 +394,8 @@ export default function Conversation({
   /*
    * LE GESTE QUI FAIT EXISTER LA PREMIÈRE PAROLE.
    *
-   * La conversation est montée sous `inert` dès l'ouverture de « Moi ». Déclencher cette action au
+   * La conversation est montée sous `inert` dès l'ouverture de la région d'accueil (« Aujourd’hui »,
+   * « Moi » jusqu'au 2026-09-02). Déclencher cette action au
    * montage écrirait et consommerait une visite d'Anam qui n'a jamais eu lieu. On attend donc
    * `regionActive`, puis on affiche uniquement la ligne rendue par la transaction atomique. Deux
    * onglets reçoivent les mêmes ids persistés. La réponse contient ensuite l'éventuelle parole

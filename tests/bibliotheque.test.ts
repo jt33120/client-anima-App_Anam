@@ -13,6 +13,8 @@ import {
 import { CLES_TERMES, chercherConfusionVocabulaire, terme } from "@/lib/domain/vocabulaire";
 import { chercherInterdits } from "@/lib/domain/lexique-interdit";
 import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
+import { universMoi } from "@/lib/domain/univers-moi";
+import { LIEN_AJOUTER } from "@/lib/domain/copie-naissance";
 import { ecrit, NON_ECRIT } from "@/lib/corpus/port";
 import type { JourCivil } from "@/lib/astro/quotidien";
 
@@ -289,5 +291,47 @@ describe("[5.6] les libellés du glossaire passent les contrôles de voix", () =
       expect(chercherInterdits(t.libelle), `lexique interdit dans « ${t.libelle} »`).toEqual([]);
       expect(chercherPredictions(t.libelle), `prédiction dans « ${t.libelle} »`).toEqual([]);
     }
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// E3-S5 : la porte Astrologie propose l'heure de naissance si, et seulement si, elle manque
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[E3-S5] la porte Astrologie propose l’heure de naissance si, et seulement si, elle manque", () => {
+  /**
+   * Le domaine reçoit un FAIT (`heureManque`, établi par `socle-incomplet.ts` sur le thème lu) et
+   * rend une porte avec ou sans action. Ce qu'on garde ici : l'équivalence dans les deux sens, le
+   * libellé unique du produit pour cette démarche, et que l'heure ne touche que SA porte.
+   */
+  const astrologie = (heureManque: boolean) =>
+    universMoi("connu", heureManque).find((u) => u.cle === "astrologie")!;
+
+  it("[LE CŒUR] quand l’heure manque : le libellé écrit pour cette démarche, vers /heure-naissance", () => {
+    expect(astrologie(true).action).toEqual({ libelle: LIEN_AJOUTER, url: "/heure-naissance" });
+    expect(LIEN_AJOUTER, "témoin : le libellé n'est pas vide").toMatch(/heure de naissance/);
+  });
+
+  it("[LE BORD] quand elle est connue : aucune action, et la porte reste entière", () => {
+    // Mutation-cible : `action: { … }` inconditionnel. Le CŒUR resterait vert ; celui-ci rougit.
+    expect(astrologie(false).action).toBeNull();
+    expect(astrologie(false).url).toBe("/socle?univers=astrologie");
+    expect(astrologie(false).titre).toBe("Astrologie");
+  });
+
+  it("[LE BORD] l’heure ne touche que SA porte : Numérologie et Psychologie ne bougent pas", () => {
+    for (const statut of ["connu", "absent", "en-cours", "indisponible"] as const) {
+      const autres = (heureManque: boolean) =>
+        universMoi(statut, heureManque).filter((u) => u.cle !== "astrologie");
+      expect(autres(true)).toEqual(autres(false));
+    }
+  });
+
+  it("[LE BORD] le libellé n’annonce rien : ni prédiction, ni compte, ni mot de manque, apostrophe typographique", () => {
+    const { libelle } = astrologie(true).action!;
+    expect(chercherInterdits(libelle), `lexique interdit dans « ${libelle} »`).toEqual([]);
+    expect(chercherPredictions(libelle), `prédiction dans « ${libelle} »`).toEqual([]);
+    expect(libelle).not.toMatch(/\d|%|incomplet|manque|reste/i);
+    expect(libelle, "apostrophe droite").not.toMatch(/[a-zà-ÿ]'[a-zà-ÿ]/i);
   });
 });

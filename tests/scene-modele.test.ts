@@ -20,7 +20,7 @@ import {
  */
 
 describe("Régions — catalogue et ordre de lecture (AC1/AC3)", () => {
-  it("expose exactement 3 destinations directes, dans l'ordre (Accueil, Anam, L'arbre)", () => {
+  it("expose exactement 3 destinations directes, dans l'ordre (accueil, anam, arbre)", () => {
     expect(REGIONS.map((r) => r.id)).toEqual(["accueil", "anam", "arbre"]);
     expect(REGIONS.every((r) => r.destinationDirecte)).toBe(true);
   });
@@ -96,6 +96,28 @@ describe("projectionInitiale — projection serveur en lecture seule, STUB (AC2)
 // [7.9] UNE SEULE SOURCE POUR LE NOM D'UN LIEU
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
+/**
+ * ⚠️ « Anam » EST EXCLU, ET CE N'EST PAS UN TROU : c'est la seule lecture correcte.
+ *
+ * C'est à la fois le nom d'une région ET le nom du PRODUIT : il apparaît dans le `<title>` de
+ * chaque page, dans l'expéditeur des courriels, dans la marque de la surimpression. Le refuser
+ * ferait rougir quarante fichiers pour rien, et la pression serait alors d'exempter fichier par
+ * fichier jusqu'à ce que la garde ne garde plus rien.
+ *
+ * Le risque résiduel est nul dans les faits : la région de conversation ne sera jamais renommée
+ * autrement que le produit. Les deux noms qui BOUGENT, et qui viennent de bouger deux fois, sont
+ * couverts. Ils sont lus au catalogue, jamais écrits ici : les deux gardes de ce fichier (le code
+ * source et les specs navigateur) suivent le prochain renommage sans qu'une ligne change.
+ */
+const NOM_DU_PRODUIT = "Anam";
+const NOMS = CATALOGUE_REGIONS.filter((r) => r.destinationDirecte)
+  .map((r) => r.nom)
+  .filter((n) => n !== NOM_DU_PRODUIT);
+
+/** Les commentaires ne cherchent rien : on les retire avant de lire (le `//` d'une URL reste). */
+const sansCommentaires = (src: string) =>
+  src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+
 describe("[7.9] aucun fichier hors du catalogue n'écrit un nom de région en littéral", () => {
   /**
    * ⚠️ CETTE GARDE EXISTE PARCE QUE LE RENOMMAGE A LAISSÉ UN FICHIER EN ARRIÈRE (2026-08-25).
@@ -107,6 +129,14 @@ describe("[7.9] aucun fichier hors du catalogue n'écrit un nom de région en li
    *
    * Le renommage suivant en oublierait un autre. On ne compte donc pas sur la vigilance : on refuse
    * le littéral.
+   *
+   * Le 2026-09-02, « Moi » est devenu « Aujourd’hui » (retour du fondateur) : le h1, les noms
+   * accessibles et les boutons de barre ont suivi le catalogue sans qu'un fichier de rendu change.
+   * C'est la preuve que la garde valait son prix. Ce qu'elle n'attrapait pas, elle le dit
+   * maintenant : « Revenir à Moi » vivait au fil d'une phrase dans
+   * `app/_erreur/ErreurApplication.tsx`, hors du motif « entre guillemets ou entre balises ». Les
+   * deux pages de sortie lisent désormais `nomDeRegion(REGION_FOYER)`, et
+   * `tests/rendu/erreur-application.test.tsx` le garde.
    */
   const RACINE = process.cwd();
   const lire = (f: string) => readFileSync(resolve(RACINE, f), "utf-8");
@@ -121,22 +151,6 @@ describe("[7.9] aucun fichier hors du catalogue n'écrit un nom de région en li
   const normaliser = (src: string) =>
     src.replace(/&rsquo;|&apos;|&#39;/g, "’").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 
-  /**
-   * ⚠️ « Anam » EST EXCLU, ET CE N'EST PAS UN TROU — c'est la seule lecture correcte.
-   *
-   * C'est à la fois le nom d'une région ET le nom du PRODUIT : il apparaît dans le `<title>` de
-   * chaque page, dans l'expéditeur des courriels, dans la marque de la surimpression. Le refuser
-   * ferait rougir quarante fichiers pour rien, et la pression serait alors d'exempter fichier par
-   * fichier jusqu'à ce que la garde ne garde plus rien.
-   *
-   * Le risque résiduel est nul dans les faits : la région de conversation ne sera jamais renommée
-   * autrement que le produit. Les deux noms qui BOUGENT — et qui viennent de bouger — sont couverts.
-   */
-  const NOM_DU_PRODUIT = "Anam";
-  const NOMS = CATALOGUE_REGIONS.filter((r) => r.destinationDirecte)
-    .map((r) => r.nom)
-    .filter((n) => n !== NOM_DU_PRODUIT);
-
   it("[CONTRÔLE DU CONTRÔLE] le balayage voit un corpus réel, et les noms ne sont pas vides", () => {
     const corpus = [...fichiersSource("app"), ...fichiersSource("render"), ...fichiersSource("lib")];
     expect(corpus.length, "le balayage ne regarde rien").toBeGreaterThan(150);
@@ -150,11 +164,21 @@ describe("[7.9] aucun fichier hors du catalogue n'écrit un nom de région en li
     //  • `copie-reperes.ts` : le mode d'emploi NOMME les lieux — c'est son objet, et il est relu
     //    à la main. Il est exempté ici et gardé par son propre test de cohérence.
     const EXEMPTS = new Set(["lib/scene/regions.ts", "lib/domain/copie-reperes.ts"]);
+    // Et UN mot toléré dans UN fichier, pas le fichier entier (2026-09-02, décision D7) :
+    //  • `render/conversation/Fil.tsx` : son séparateur de jour dit « Aujourd’hui » (rôle
+    //    `separator`, gardé par `tests/rendu/fil-retrouve.test.tsx`) depuis bien avant que la région
+    //    d'accueil porte ce nom. Ce n'est pas un nom de lieu, c'est le mot du calendrier : le fil ne
+    //    mène nulle part par lui. Exempter le fichier entier laisserait passer un « Mon arbre » en
+    //    dur dans le même fichier ; on n'exempte que le mot, et seulement tant qu'il y est.
+    const EXEMPTS_PAR_MOT: Readonly<Record<string, readonly string[]>> = {
+      "render/conversation/Fil.tsx": ["Aujourd’hui"],
+    };
     const fautifs: string[] = [];
     for (const f of [...fichiersSource("app"), ...fichiersSource("render"), ...fichiersSource("lib")]) {
       if (EXEMPTS.has(f)) continue;
       const src = normaliser(lire(f));
       for (const nom of NOMS) {
+        if (EXEMPTS_PAR_MOT[f]?.includes(nom)) continue;
         // On cherche le nom ENTRE GUILLEMETS ou entre balises — pas le mot au fil d'une phrase :
         // « Anam » est le nom du produit, il apparaît partout et légitimement.
         if (new RegExp(`["'>]\\s*${nom}\\s*["'<]`).test(src)) fautifs.push(`${f} → « ${nom} »`);
@@ -164,6 +188,17 @@ describe("[7.9] aucun fichier hors du catalogue n'écrit un nom de région en li
       fautifs,
       `un nom de région est réécrit hors du catalogue — le prochain renommage l'oubliera :\n${fautifs.join("\n")}`,
     ).toEqual([]);
+  });
+
+  it("[ANTI-VACUITÉ] l'exemption du séparateur de jour vise un mot qui est encore un nom de région, et qui est encore là", () => {
+    // Sans ce témoin, une exemption périmée (la région renommée une troisième fois, ou le séparateur
+    // reformulé) resterait dans la liste pour toujours, et personne ne saurait plus ce qu'elle
+    // tolère. Une exemption qui ne tolère plus rien est un trou en attente.
+    const src = normaliser(lire("render/conversation/Fil.tsx"));
+    expect(NOMS, "« Aujourd’hui » n'est plus un nom de région : l'exemption est morte").toContain("Aujourd’hui");
+    expect(src, "le séparateur de jour ne dit plus « Aujourd’hui » : l'exemption est morte").toMatch(
+      /["'>]\s*Aujourd’hui\s*["'<]/,
+    );
   });
 });
 
@@ -188,16 +223,21 @@ describe("[7.9] les spécifications au navigateur ne cherchent pas un nom de ré
     );
     expect(specs.length, "aucune spec trouvée : la garde ne mesure rien").toBeGreaterThan(8);
 
-    // Les noms d'AVANT le 2026-08-25. Ils ne doivent plus apparaître nulle part hors commentaire —
-    // ni entre guillemets, ni dans une expression régulière, ni dans un sélecteur.
-    const ANCIENS = ["Accueil", "L’arbre", "L'arbre", "L’accueil"];
+    // Les noms d'AVANT le 2026-08-25, et « Moi », d'avant le 2026-09-02. Ils ne doivent plus
+    // apparaître nulle part hors commentaire : ni entre guillemets, ni dans une expression
+    // régulière, ni dans un sélecteur.
+    //
+    // ⚠️ FRONTIÈRE DE MOT, ET PAS `includes` (2026-09-02). « Moi » est un préfixe ordinaire :
+    // « Mois », « Moins », « Moitié » rougiraient sur des specs justes, et « dis-moi » n'est pas
+    // un lieu (la casse compte). `\b` ne regarde que les lettres ASCII, ce qui suffit ici : chaque
+    // ancien commence et finit par une lettre, l'apostrophe de « L’arbre » est à l'intérieur du
+    // motif, jamais à son bord.
+    const ANCIENS = ["Accueil", "L’arbre", "L'arbre", "L’accueil", "Moi"];
     const fautifs: string[] = [];
     for (const f of specs) {
-      const src = readFileSync(resolve(RACINE_E2E, "e2e", f), "utf-8")
-        .replace(/\/\*[\s\S]*?\*\//g, "")
-        .replace(/(^|[^:])\/\/.*$/gm, "$1");
+      const src = sansCommentaires(readFileSync(resolve(RACINE_E2E, "e2e", f), "utf-8"));
       for (const ancien of ANCIENS) {
-        if (src.includes(ancien)) fautifs.push(`e2e/${f} → « ${ancien} »`);
+        if (new RegExp(`\\b${ancien}\\b`).test(src)) fautifs.push(`e2e/${f} → « ${ancien} »`);
       }
     }
     expect(
@@ -206,15 +246,36 @@ describe("[7.9] les spécifications au navigateur ne cherchent pas un nom de ré
     ).toEqual([]);
   });
 
-  it("[ANTI-VACUITÉ] les NOUVEAUX noms, eux, sont bien présents dans les specs", () => {
+  it("[ANTI-VACUITÉ] la frontière de mot attrape « Moi » sous ses formes cherchées, et laisse « Mois »", () => {
+    // Le motif est celui de la boucle ci-dessus, construit de la même façon. Sans ce témoin, un
+    // `\b` mal échappé rendrait la garde verte sur n'importe quelle spec.
+    const motif = new RegExp(`\\bMoi\\b`);
+    for (const forme of ['{ name: "Moi", level: 1 }', "/^Moi$/", 'section[aria-label="Moi"]', '["Moi", "Anam"].sort()']) {
+      expect(motif.test(forme), `la forme « ${forme} » échappe à la garde`).toBe(true);
+    }
+    for (const forme of ["Mois", "Moins", "Moitié", "dis-moi", "moi"]) {
+      expect(motif.test(forme), `« ${forme} » rougirait à tort`).toBe(false);
+    }
+  });
+
+  it("[ANTI-VACUITÉ] les noms du CATALOGUE, eux, sont bien cherchés par les specs, hors commentaire", () => {
     // Sans ce témoin, le refus ci-dessus serait vert sur un dossier `e2e/` qui ne nommerait plus
     // aucune région du tout — c'est-à-dire sur une suite qui aurait cessé de les éprouver.
+    //
+    // ⚠️ HORS COMMENTAIRE, ET DEPUIS LE CATALOGUE (2026-09-02). Lu avec les commentaires et avec un
+    // nom écrit en dur, ce témoin restait vert sur « Moi » grâce aux notes historiques des specs
+    // (`glissement.spec.ts`, `guide.spec.ts`) : il ne mesurait plus rien. Un nom de région compte
+    // ici s'il est CHERCHÉ, pas s'il est raconté ; et c'est le nom d'aujourd'hui qu'on cherche, pas
+    // celui que ce fichier connaissait au moment où il a été écrit. Tant que les specs disent
+    // encore « Moi », ce témoin est rouge : c'est le signal attendu, pas un défaut de la garde.
     const tout = readdirSync(resolve(RACINE_E2E, "e2e"), { encoding: "utf-8" })
       .filter((f) => f.endsWith(".ts"))
-      .map((f) => readFileSync(resolve(RACINE_E2E, "e2e", f), "utf-8"))
+      .map((f) => sansCommentaires(readFileSync(resolve(RACINE_E2E, "e2e", f), "utf-8")))
       .join("\n");
-    expect(tout, "les specs ne nomment plus « Moi »").toContain("Moi");
-    expect(tout, "les specs ne nomment plus « Mon arbre »").toContain("Mon arbre");
+    expect(NOMS.length, "aucun nom de région à chercher : le témoin ne mesure rien").toBeGreaterThan(0);
+    for (const nom of NOMS) {
+      expect(tout, `les specs ne cherchent plus « ${nom} »`).toContain(nom);
+    }
   });
 });
 

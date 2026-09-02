@@ -815,3 +815,43 @@ reste fermée tant que moteur, références de validation et droits d'usage ne s
   `pending` sans déplacement de mise en page, et les haltes dynamiques ont un `loading.tsx`.
 - Les glyphes et leurs lueurs utilisent les tokens existants ; au plus trois animations d'opacité,
   toutes supprimées sous `prefers-reduced-motion` et en lisibilité renforcée.
+
+## Amendement du 2026-09-02 : « Moi » devient « Aujourd’hui »
+
+Retour terrain du fondateur (Julian, 2026-09-01, retour 7) : la région d'accueil ne s'appelle plus
+« Moi » mais **« Aujourd’hui »**. Le mot est le sien, et il dit ce que la région fait : elle s'ouvre
+chaque jour sur le jour lui-même, la date, le ciel, le mantra, puis sur les univers qui ne bougent
+pas. « Moi » nommait la personne, et ce n'est pas elle qui change d'un jour à l'autre ;
+« Aujourd’hui » nomme ce qu'on vient y chercher.
+
+### 1. Ce qui change, et ce qui ne change pas
+
+- Le nom visible seulement. `lib/scene/regions.ts` reste la source unique ; le h1 de région, les
+  noms accessibles des sections et les boutons de la barre le suivent sans qu'un fichier de rendu
+  change. L'identifiant interne `accueil`, le foyer, l'URL et le stockage ne bougent pas.
+- La clause du §5 de l'amendement du 2026-08-25 tient telle quelle : la région reste un lieu, pas
+  un hub de compte. Aucune entrée de compte n'y déménage, aucune rubrique nominative au-dessus du
+  pli, aucune marque de complétude (FR-031).
+- Les deux pages de sortie (frontière d'erreur, page introuvable) disent « Revenir à Aujourd’hui »
+  en lisant le catalogue : « Revenir à Moi » y était écrit en dur, hors de portée de la garde des
+  littéraux, et le renommage l'a trouvé.
+
+### 2. Un seul « Aujourd’hui » par écran (décision D7)
+
+Le mot existait déjà deux fois dans le produit : en entête de la section quotidienne de la région,
+et comme séparateur de jour dans le fil d'Anam. Deux entêtes homonymes sur un même écran est un
+défaut documenté. L'entête interne devient donc **« Ce que le jour propose »**, la formule du mode
+d'emploi (`lib/domain/copie-reperes.ts`) ; son ancrage `moi-aujourdhui` est conservé. Le séparateur
+du fil garde son mot : ce n'est pas un nom de lieu, c'est le calendrier, et
+`tests/scene-modele.test.ts` l'exempte nommément pour cette raison.
+
+### 3. Ce que la CI garde
+
+- `tests/scene-modele.test.ts` : aucun littéral « Aujourd’hui » ou « Mon arbre » hors du catalogue
+  (hors exemptions nommées) ; aucune spec navigateur ne cherche plus « Moi », « Accueil »,
+  « L’arbre » ou « L’accueil », avec frontière de mot pour ne pas rougir sur « Mois » ; et les
+  noms du catalogue sont bien cherchés par les specs, commentaires retirés.
+- `tests/tronc-absence.test.ts` et `tests/rendu/premier-passage.test.tsx` écrivent l'ordre attendu
+  avec le nouveau nom ; `tests/rendu/bibliotheque.test.tsx` refuse qu'un second « Aujourd’hui »
+  réapparaisse dans la section quotidienne ; `tests/rendu/erreur-application.test.tsx` exige que
+  le nom du foyer soit lu au catalogue.

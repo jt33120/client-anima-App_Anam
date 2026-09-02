@@ -18,6 +18,7 @@ import {
   type StatutEnneagrammeMoi,
   type UniversMoi,
 } from "@/lib/domain/univers-moi";
+import { manqueLHeure } from "@/lib/domain/socle-incomplet";
 import { lireEnneagramme, lireTentativeEnneagramme } from "@/lib/data/lire-enneagramme";
 import { lireSocleQuotidien, jourCivilParis } from "@/lib/data/lire-quotidien";
 import type { ResultatThemeNatal } from "@/lib/data/depot-theme-natal";
@@ -106,6 +107,15 @@ export async function lireBibliotheque(
 ): Promise<ResultatBibliotheque> {
   const cartes: CarteBibliotheque[] = [];
   let statutEnneagramme: StatutEnneagrammeMoi = "indisponible";
+  // ⚠️ FAUX PAR DÉFAUT, ET CE N'EST PAS UNE VALEUR DE REPLI COMMODE (E3-S5, 2026-09-02). Le bouton
+  // « Ajouter mon heure de naissance » sous la porte Astrologie n'a le droit d'apparaître que sur
+  // un fait CONSTATÉ : un thème lu, dont l'inventaire dit qu'une absence serait comblée par l'heure
+  // (`manqueLHeure`, le prédicat du tronc, pas « les angles sont absents »). Un thème indisponible
+  // (naissance absente, lecture impossible, panne du client) n'est pas « tu ne l'as pas donnée » :
+  // on ne propose rien, comme le tronc ne se marque pas sur une panne
+  // (`lib/safety/projection-arbre.ts`). Et le thème est celui DÉJÀ lu par `lireSocleQuotidien` dans
+  // le même appel : décider du bouton ne coûte aucune lecture de plus.
+  let heureManque = false;
 
   // ── Le quotidien : mantra + horoscope + LE THÈME, en un seul appel ───────────────────────────
   // `lireSocleQuotidien` porte déjà son propre `try` interne (le mantra survit à une panne
@@ -114,6 +124,7 @@ export async function lireBibliotheque(
   try {
     const socle = await lireSocleQuotidien(supabase, utilisatriceId, maintenant, ephemeride, themeDejaLu);
     jour = socle.jour;
+    heureManque = socle.theme.statut === "calcule" && manqueLHeure(socle.theme.theme);
     // ⚠️ L'APLATISSEMENT DES UNIONS SE FAIT ICI, ET NULLE PART AILLEURS. `lib/domain` n'a pas le
     // droit de connaître les formes de `lib/data` (AD-10, appliqué par ESLint) — et c'est juste :
     // « naissance absente » et « lecture impossible » sont des états d'I/O, pas des états du socle.
@@ -167,7 +178,7 @@ export async function lireBibliotheque(
   return {
     ...assemblerBibliotheque(cartesDisponibles(cartes, aPremium), jour),
     jour,
-    univers: universMoi(statutEnneagramme),
+    univers: universMoi(statutEnneagramme, heureManque),
   };
 }
 

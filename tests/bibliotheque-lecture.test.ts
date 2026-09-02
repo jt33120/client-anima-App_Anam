@@ -1,4 +1,7 @@
 import { CATALOGUE_CARTES } from "@/lib/domain/bibliotheque";
+import { LIEN_AJOUTER } from "@/lib/domain/copie-naissance";
+import { calculerThemeNatal, type EntreesNaissance } from "@/lib/astro/theme-natal";
+import { ephemerideAstronomyEngine } from "@/lib/astro/adapters/astronomy-engine";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -33,6 +36,19 @@ vi.mock("@/lib/data/lire-enneagramme", () => ({
   lireEnneagramme: (...a: unknown[]) => lireEnneagramme(...a),
   lireTentativeEnneagramme: (...a: unknown[]) => lireTentativeEnneagramme(...a),
 }));
+// ⚠️ LE SOCLE RESTE RÉEL, SAUF QUAND UN TEST LE FAIT TOMBER (E3-S5). `lireSocleQuotidien` porte son
+// propre `try` : une panne du thème ou de l'horoscope ne la fait pas lever. Le seul chemin qui
+// atteint le `try` EXTERNE de `lireBibliotheque` est une panne du socle lui-même, et c'est le seul
+// chemin où une valeur par défaut compte. Sans ce crochet, ce chemin resterait inobservable.
+const socleQuotidien = vi.fn();
+vi.mock("@/lib/data/lire-quotidien", async (importOriginal) => {
+  const reel = await importOriginal<typeof import("@/lib/data/lire-quotidien")>();
+  socleQuotidien.mockImplementation(reel.lireSocleQuotidien);
+  return {
+    ...reel,
+    lireSocleQuotidien: (...a: Parameters<typeof reel.lireSocleQuotidien>) => socleQuotidien(...a),
+  };
+});
 const { lireBibliotheque } = await import("@/lib/data/lire-bibliotheque");
 
 const SUPABASE = {} as never;
@@ -228,7 +244,7 @@ describe("[5.6/T8] `app/page.tsx` lit le thème UNE FOIS et le passe à ses DEUX
   });
 });
 
-describe("[Moi] les trois univers sont câblés depuis l’état réel", () => {
+describe("[Aujourd’hui] les trois univers sont câblés depuis l’état réel", () => {
   it("un compte sans résultat reçoit un CTA direct vers le questionnaire", async () => {
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     expect(b.univers.map((u) => u.cle)).toEqual([
@@ -271,5 +287,72 @@ describe("[Moi] les trois univers sont câblés depuis l’état réel", () => {
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     expect(b.univers.find((u) => u.cle === "psychologie")?.action).toBeNull();
     expect(lireTentativeEnneagramme).not.toHaveBeenCalled();
+  });
+});
+
+describe("[E3-S5] l’heure manquante se lit sur le thème DÉJÀ lu, et jamais sur une panne", () => {
+  /**
+   * Le prédicat est `manqueLHeure` (`socle-incomplet.ts`), calculé sur le thème que
+   * `lireSocleQuotidien` rend dans le même appel : décider du bouton ne coûte aucune lecture.
+   * Et un thème INDISPONIBLE n'est pas un thème sans heure : une naissance absente ou une panne ne
+   * donne aucun bouton, parce qu'on ne propose pas de réparer un manque qu'on n'a pas constaté.
+   */
+  const EPHEMERIDE = ephemerideAstronomyEngine();
+  const themeCalcule = (entrees: EntreesNaissance) =>
+    ({ statut: "calcule", theme: calculerThemeNatal(entrees, EPHEMERIDE), version: 1 }) as const;
+  const SANS_HEURE: EntreesNaissance = { date: "1990-06-15" };
+  const AVEC_HEURE: EntreesNaissance = {
+    date: "1990-06-15",
+    heure: "07:15",
+    fuseau: "Europe/Paris",
+    latitude: 48.8566,
+    longitude: 2.3522,
+  };
+  const astrologie = (b: Awaited<ReturnType<typeof lireBibliotheque>>) =>
+    b.univers.find((u) => u.cle === "astrologie")!;
+
+  it("[LE CŒUR] thème calculé SANS heure : la porte Astrologie propose de l’ajouter, sans lecture de plus", async () => {
+    lireThemeNatal.mockResolvedValue(themeCalcule(SANS_HEURE));
+    const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false, EPHEMERIDE);
+    expect(astrologie(b).action).toEqual({ libelle: LIEN_AJOUTER, url: "/heure-naissance" });
+    expect(lireThemeNatal, "décider du bouton a coûté une lecture").toHaveBeenCalledTimes(1);
+  });
+
+  it("[LE BORD] thème calculé AVEC heure : rien à proposer", async () => {
+    // Mutation-cible : `heureManque = socle.theme.statut === "calcule"`. Le CŒUR resterait vert.
+    lireThemeNatal.mockResolvedValue(themeCalcule(AVEC_HEURE));
+    const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false, EPHEMERIDE);
+    expect(astrologie(b).action).toBeNull();
+  });
+
+  it("[LE BORD / DUR] naissance absente : rien, une donnée jamais donnée n’est pas un manque constaté", async () => {
+    // `beforeEach` : `lireThemeNatal` rend « indisponible / naissance_absente ».
+    const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
+    expect(astrologie(b).action).toBeNull();
+  });
+
+  it("[LE BORD / DUR] panne de lecture du thème : rien non plus, une panne n’est pas « tu ne l’as pas donnée »", async () => {
+    lireThemeNatal.mockRejectedValue(new Error("timeout"));
+    const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
+    expect(astrologie(b).action).toBeNull();
+    expect(b.univers, "la panne a emporté les portes").toHaveLength(3);
+  });
+
+  it("[LE BORD / DUR] panne du socle LUI-MÊME : rien, et le reste de l’accueil tient", async () => {
+    // Mutation-cible : `let heureManque = true` par défaut. Elle a SURVÉCU aux trois cas ci-dessus
+    // (campagne du 2026-09-02) : tous passent par `lireSocleQuotidien`, qui réassigne la valeur.
+    // Seule une panne du socle lui-même laisse la valeur par défaut parler, et c'est ici qu'on
+    // l'entend.
+    socleQuotidien.mockRejectedValueOnce(new Error("client"));
+    const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
+    expect(astrologie(b).action).toBeNull();
+    expect(b.univers).toHaveLength(3);
+    expect(b.cartes.map((c) => c.cle).sort(), "la panne a vidé l'accueil").toEqual([...CATALOGUE_CARTES].sort());
+  });
+
+  it("le thème passé par la page suffit : zéro appel, et le bouton quand même", async () => {
+    const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false, EPHEMERIDE, themeCalcule(SANS_HEURE));
+    expect(lireThemeNatal).not.toHaveBeenCalled();
+    expect(astrologie(b).action?.url).toBe("/heure-naissance");
   });
 });

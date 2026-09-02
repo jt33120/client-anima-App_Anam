@@ -32,7 +32,7 @@ describe("[H4] quand le passage EST dû", () => {
   it("[LE CŒUR] les trois dimensions sont nommées, et il n'y en a pas une quatrième", () => {
     monte({ du: true, desCartesAttendent: false });
     const noms = screen.getAllByRole("term").map((e) => e.textContent);
-    expect(noms).toEqual(["Anam", "Mon arbre", "Moi"]);
+    expect(noms).toEqual(["Anam", "Mon arbre", "Aujourd’hui"]);
   });
 
   it("chaque dimension a sa définition — un nom sans phrase n'explique rien", () => {

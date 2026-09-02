@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { REGION_FOYER, nomDeRegion } from "@/lib/scene";
 import s from "./cgu/cgu.module.css";
 
 export const metadata = { title: "Anam" };
@@ -25,6 +26,13 @@ export const metadata = { title: "Anam" };
  * compris. Un écran d'erreur est le dernier endroit où l'on peut se permettre de retirer la sortie
  * de secours : quelqu'un qui atterrit ici est déjà perdu.
  *
+ * ── LE RETOUR PORTE LE NOM DU FOYER, PRIS AU CATALOGUE ─────────────────────────────────────────
+ *
+ * Elle disait « Revenir à l'accueil » : un mot de site, celui que la Story 7.9 avait retiré de la
+ * barre le 2026-08-25, et qui avait survécu ici parce qu'une phrase n'est pas un littéral entre
+ * guillemets. Depuis le 2026-09-02 le foyer s'appelle « Aujourd’hui » (retour du fondateur), et
+ * cette page le lit dans `lib/scene/regions.ts` : le prochain renommage ne pourra plus l'oublier.
+ *
  * ⚠️ `not-found.tsx` est rendu par le routeur SANS session : il ne peut donc RIEN dire du compte, et
  * il ne doit rien tenter de lire. Aucun appel à Supabase ici — un 404 qui plante devient un 500.
  */
@@ -39,7 +47,7 @@ export default function PageIntrouvable() {
           ou elle a changé de place.
         </p>
         <p className="t-corps">
-          <Link href="/">Revenir à l&rsquo;accueil</Link>
+          <Link href="/">Revenir à {nomDeRegion(REGION_FOYER)}</Link>
           {" · "}
           <Link href="/aide">Aide et ressources</Link>
         </p>

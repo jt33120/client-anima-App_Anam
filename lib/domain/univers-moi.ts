@@ -1,6 +1,10 @@
+import { LIEN_AJOUTER } from "@/lib/domain/copie-naissance";
+
 /**
- * Les portes stables de « Moi ». Ce module est pur : il nomme les destinations et la seule action
- * conditionnelle, sans lire le compte ni décider d'une mise en page.
+ * Les portes stables de la région d'accueil (« Aujourd’hui » depuis le 2026-09-02, « Moi » avant :
+ * le module garde son nom de fichier, comme l'identifiant `accueil` garde le sien). Ce module est
+ * pur : il nomme les destinations et les deux actions conditionnelles, sans lire le compte ni
+ * décider d'une mise en page.
  */
 export type CleUniversMoi = "astrologie" | "numerologie" | "psychologie";
 
@@ -31,14 +35,36 @@ function actionEnneagrammePour(statut: StatutEnneagrammeMoi): ActionUniversMoi |
   return null;
 }
 
-export function universMoi(statutEnneagramme: StatutEnneagrammeMoi): readonly UniversMoi[] {
+/**
+ * ⚠️ L'HEURE DE NAISSANCE SE PROPOSE ICI, SOUS LA PORTE ASTROLOGIE (E3-S5, 2026-09-02).
+ *
+ * Avant, la seule invitation à ajouter son heure vivait dans la fiche du tronc (`FicheTronc`),
+ * derrière un geste sur l'arbre : qui n'y allait pas ne la voyait jamais, et son ascendant restait
+ * absent sans qu'on le lui dise. La région d'accueil est l'écran qu'on ouvre chaque jour, et la
+ * porte Astrologie est celle que l'heure répare. Le bouton se pose donc là, avec le libellé déjà
+ * écrit pour cette démarche (`copie-naissance.ts`, une seule formulation dans tout le produit), et
+ * il disparaît dès que l'heure est connue : ce n'est pas un rappel, c'est une porte.
+ *
+ * `heureManque` est un FAIT déjà établi par `lib/domain/socle-incomplet.ts` depuis le thème lu par
+ * l'appelant (`lib/data/lire-bibliotheque.ts`) : ce module ne lit rien et ne décide pas ce que
+ * « manquer » veut dire. Il n'y a ni persistance ni dépense : ce bouton n'est pas une parole
+ * proactive d'Anam (décision D9), il est là tant que le fait est vrai, et c'est tout.
+ */
+function actionHeurePour(heureManque: boolean): ActionUniversMoi | null {
+  return heureManque ? { libelle: LIEN_AJOUTER, url: "/heure-naissance" } : null;
+}
+
+export function universMoi(
+  statutEnneagramme: StatutEnneagrammeMoi,
+  heureManque: boolean,
+): readonly UniversMoi[] {
   return Object.freeze([
     {
       cle: "astrologie",
       titre: "Astrologie",
       accroche: "Ton ciel de naissance, tes planètes, tes angles et tes maisons.",
       url: "/socle?univers=astrologie",
-      action: null,
+      action: actionHeurePour(heureManque),
     },
     {
       cle: "numerologie",
