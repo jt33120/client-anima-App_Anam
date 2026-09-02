@@ -133,9 +133,29 @@ export interface MatiereOuverture {
  * avec un prénom on lisait « Louise, qu'est-ce qui… », sans prénom on lisait « qu'est-ce qui… ».
  * Un cas sur deux, et le plus fréquent au début, sortait bancal.
  */
+/**
+ * ⚠️ LA SOUDURE EST UN DEUX-POINTS, PLUS UN TIRET (retour du fondateur, 2026-09-02) : « dans
+ * l'ensemble des textes de l'app, bannir les — qui font très IA ». Le tiret cadratin rattachait
+ * l'accueil à la première phrase ; il est parti de TOUTES les chaînes de ce module. Les commentaires
+ * peuvent en garder : personne d'autre que nous ne les lit.
+ *
+ * POURQUOI UN DEUX-POINTS ET PAS UN POINT. La voix (2.8, `voix-anam.ts`) définit la ponctuation
+ * finale comme un groupe de `. ! ? …` — le deux-points n'en fait pas partie, donc « Te voilà,
+ * Louise : » reste dans la phrase qu'il ouvre et ne compte pas pour une phrase. Un point ferait de
+ * la salutation une phrase à elle seule : la première venue (deux phrases de confiance et une
+ * question) et le retour sur une branche passeraient à QUATRE, là où la voix en plafonne trois —
+ * très exactement le défaut que « le prénom ne prend pas une phrase à lui » avait déjà réparé. Le
+ * test « [LA COUTURE] » le prouve avec le vrai coupeur de la voix, pas avec un compte maison.
+ *
+ * ⚠️ CES PHRASES SONT PERSISTÉES. `reclamerOuvertureDuJour` (`app/_ouverture/reclamer-ouverture.ts`)
+ * grave la phrase générique — et l'événement salué — dans le journal immuable à la première
+ * ouverture du jour. Changer une chaîne ici ne réécrit donc AUCUNE ouverture déjà dite : seules les
+ * ouvertures futures changent, et c'est voulu, on ne retouche pas ce qu'on lui a déjà dit. Aucune
+ * migration, aucune donnée.
+ */
 const accueillir = (prenom: string | null, dejaVenue: boolean | null, suite: string): string => {
   const arrivee = dejaVenue === true ? "Te revoilà" : "Te voilà";
-  return prenom ? `${arrivee}, ${prenom} — ${suite}` : `${arrivee} — ${suite}`;
+  return prenom ? `${arrivee}, ${prenom} : ${suite}` : `${arrivee} : ${suite}`;
 };
 
 /**
@@ -156,9 +176,12 @@ export function saluerOuvertureEvenement(
   m: Pick<MatiereOuverture, "prenom" | "dejaVenue">,
 ): string {
   const salutation = salutationDOuverture(m).replace(/\.$/, "");
-  // Le tiret rattache l'accueil à la première phrase : un événement déjà long de trois phrases
-  // ne franchit pas silencieusement le plafond de voix en devenant une quatrième phrase.
-  return `${salutation} — ${phrase}`;
+  // Le deux-points rattache l'accueil à la première phrase (il n'est pas une ponctuation finale
+  // pour la voix, voir `accueillir`) : un événement déjà long de trois phrases ne franchit pas
+  // silencieusement le plafond en devenant une quatrième. La phrase de l'événement est reprise
+  // TELLE QUELLE, majuscule comprise — une ou plusieurs phrases complètes après un deux-points
+  // gardent leur majuscule, et ce module ne retouche pas une parole écrite ailleurs.
+  return `${salutation} : ${phrase}`;
 }
 
 export function phraseDOuverture(m: MatiereOuverture): string {
@@ -182,23 +205,36 @@ export function phraseDOuverture(m: MatiereOuverture): string {
     // ⚠️ LE PRÉNOM NE PREND PAS UNE PHRASE À LUI, et c'est encore une garde qui l'a dit : « Louise. »
     // en ouverture faisait quatre phrases là où la voix en plafonne trois. Il s'attache à la
     // première, où il sert d'adresse au lieu de compter pour une salutation.
+    //
+    // ⚠️ ET L'IGNORANCE EST DITE SANS SÉCHERESSE (retour du fondateur, 2026-09-02). « Je ne sais
+    // rien de toi et on fera avec » était « trop sec » : l'aveu était juste, mais il la laissait
+    // seule avec. Le noyau « je ne sais rien de toi » reste (c'est ce qui distingue une première
+    // venue d'un retour, et un test l'exige) ; ce qui suit rassure au lieu de constater — c'est
+    // normal, on avance à son rythme, rien n'est attendu d'elle. Au présent, sans « tu verras » ni
+    // aucun futur adressé (FR-053), sans impératif : c'est elle qui décide. « Même sans savoir par
+    // où prendre », qui faisait une troisième phrase, se replie dans la seconde pour que la
+    // question reste la troisième et dernière. Ces mots sont gravés au journal à la première
+    // ouverture du jour (voir `accueillir`) : les ouvertures déjà dites ne changent pas.
     return accueillir(
       m.prenom,
       false,
-      `je ne sais rien de toi pour l’instant, et on va faire avec. ` +
-        `Qu’est-ce qui t’occupe en ce moment ? Même mal dit, même sans savoir par où prendre.`,
+      `je ne sais rien de toi pour l’instant, et c’est normal. ` +
+        `On avance à ton rythme, rien n’est attendu de toi, pas même de savoir par où commencer. ` +
+        `Qu’est-ce qui t’occupe en ce moment ?`,
     );
   }
 
   const branche = m.branchesVivantes[0];
   if (branche) {
     // Le nom de la branche est SON mot. On le lui rend, et on lui laisse le refuser dans la même
-    // phrase : reprendre n'est pas une consigne.
+    // phrase : reprendre n'est pas une consigne. La question fait sa propre phrase (trois en tout,
+    // salutation soudée comprise) : le tiret qui la rattachait à l'alternative est parti avec les
+    // autres (retour du fondateur, 2026-09-02).
     return accueillir(
       m.prenom,
       true,
       `on avait laissé « ${branche} » en chemin. ` +
-        `On peut reprendre là, ou partir d’ailleurs — qu’est-ce qui t’occupe aujourd’hui ?`,
+        `On peut reprendre là, ou partir d’ailleurs. Qu’est-ce qui t’occupe aujourd’hui ?`,
     );
   }
 
