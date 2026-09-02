@@ -1,7 +1,7 @@
 ---
 status: final
 created: 2026-07-21
-updated: 2026-07-22
+updated: 2026-09-02
 sources:
   - _bmad-output/planning-artifacts/prds/prd-Anima-2026-07-21/prd.md
   - _bmad-output/brainstorming/brainstorm-anima-app-2026-07-20/anam-voice.md
@@ -9,8 +9,8 @@ sources:
   - _bmad-output/planning-artifacts/ux-designs/ux-Anima-2026-07-21/.working/color-themes-1.html
   - images/anam-gemini/  # personnage « Anam-la-nuit » — formats Seuil / Présence / Veille + planche du signe (réf. visuelle de la direction)
 name: Anam
-description: Compagne d'introspection francophone. Direction « Nuit galactique » — indigo profond, violet, lotus bleu lumineux, argent lunaire. Sombre natif, très imagé, texte blanc et petit qui apparaît en fondu. Anam a désormais un visage peint qui paraît aux seuils ; l'arbre de vie au centre. Rien ne mesure, rien ne brille en vain, rien ne trahit.
-palette: "Nuit galactique — mode sombre natif, ratios WCAG recalculés et vérifiés. Les tokens -clair ne sont PLUS un thème jour : ils portent le mode d'accessibilité « contraste renforcé / imagerie atténuée »."
+description: Compagne d'introspection francophone. Direction « Nuit galactique », teinte « Soft Balance » depuis le 2026-09-01 : navy profond, bleu ciel du lotus, argent lunaire, le violet en nébuleuse de décor. Sombre natif, très imagé, texte ivoire et petit qui apparaît en fondu. Anam a désormais un visage peint qui paraît aux seuils ; l'arbre de vie au centre. Rien ne mesure, rien ne brille en vain, rien ne trahit.
+palette: "Nuit navy « Soft Balance » (retour terrain de Julian, 2026-09-01) : mode sombre natif, ratios WCAG recalculés avec app/styles/contraste.ts et gardés par tests/contraste.test.ts. Les tokens -clair ne sont PLUS un thème jour : ils portent le mode d'accessibilité « contraste renforcé / imagerie atténuée », et c'est là que vivent Ivory et Beige."
 colors:
   # ═══ MODE SOMBRE — MODE NATIF ET QUASI UNIQUE ═══
   # L'app se vit le soir, sur imagerie nocturne. Les tokens SANS suffixe sont la nuit.
@@ -18,44 +18,50 @@ colors:
   # d'accessibilité (tokens -clair, plus bas), déclenché par besoin, pas par goût.
   # UI froide et nocturne. La seule chaleur du produit (cheveux auburn) vient du
   # PERSONNAGE peint, jamais de l'interface.
-  fond: '#0C0A1E'          # nuit profonde, indigo presque noir — jamais un noir pur, jamais un gris
-  surface: '#16132F'       # premier voile de nuit
-  surface-elevee: '#201C42' # second et dernier niveau — trois surfaces empilées, c'est une de trop
-  texte: '#EEECF7'         # blanc lunaire, très légèrement mauve — jamais #FFFFFF pur (halation sur nuit)
-  texte-doux: '#ABA6C9'    # pervenche éteinte — méta, dates, aide. JAMAIS le contenu de l'utilisatrice
-  bordure: '#2A2648'       # séparateur purement décoratif — exempté WCAG 1.4.11
-  bordure-forte: '#77719C' # tout ce qui délimite un contrôle + anneau de focus — doit rester ≥3:1
-  accent: '#8FC1EF'        # LE lotus bleu. Couleur de l'ACTION uniquement (bouton, lien, point d'accroche d'une branche)
-  accent-doux: '#241F47'   # aplat de mise en avant discret — porte du texte `texte`, jamais du `accent`
-  sur-accent: '#0C0A1E'    # encre sur remplissage accent (= fond)
-  arbre-tronc: '#6A6690'   # écorce LUNAIRE argentée — aucun brun, c'est un arbre de nuit
-  arbre-branche: '#9A96BE' # bois clair argenté
-  arbre-feuillage: '#8FB6D8' # feuillage bleu-lune
-  succes: '#86B79E'        # vert-jade éteint — en texte seulement, jamais en fond ni pastille
-  alerte: '#D0A05C'        # ambre lunaire — en texte seulement. PAS de rouge dans ce système
-  lueur: '#CDE4F8'         # NOUVEAU — nacre lumineuse : points de lumière, halo du lotus, pleine lumière d'une branche (le rayonnement), point du signe. N'est PAS l'accent-action
+  # 2026-09-01, palette « Soft Balance » (Julian) : la nuit passe de l'indigo au NAVY,
+  # Sky devient l'accent ET la lueur, le violet ne survit qu'en `nebuleuse` (décor).
+  fond: '#1C2740'          # Navy de la palette : le ciel. Jamais un noir pur, jamais un gris
+  surface: '#26324D'       # premier voile de nuit
+  surface-elevee: '#33415E' # second et dernier niveau (le navy clair de la palette)
+  texte: '#F0EFEA'         # Ivory : le blanc de la palette. Jamais #FFFFFF pur (halation sur navy)
+  texte-doux: '#C9C6BD'    # Gray éclairci (le #B8B5AC brut ne tient que 4,52:1 sous voile). JAMAIS le contenu de l'utilisatrice
+  bordure: '#33415E'       # séparateur purement décoratif (= surface-elevee), exempté WCAG 1.4.11
+  bordure-forte: '#7A90C9' # Periwinkle : tout ce qui délimite un contrôle + anneau de focus, ≥3:1 partout
+  accent: '#D3DBF0'        # Sky, LE lotus. Couleur de l'ACTION uniquement (bouton, lien, point d'accroche d'une branche)
+  accent-doux: '#26324D'   # aplat de mise en avant discret (= surface) : porte du texte `texte`, jamais du `accent`
+  sur-accent: '#1C2740'    # encre navy sur remplissage Sky (= fond)
+  arbre-tronc: '#8C88B0'   # écorce LUNAIRE, argent violacé : aucun brun, c'est un arbre de nuit
+  arbre-branche: '#A9B8E6' # bois clair, entre Periwinkle et Sky
+  arbre-feuillage: '#9CC5E8' # feuillage bleu-lune
+  succes: '#86B79E'        # vert-jade éteint, inchangé : en texte seulement, jamais en fond ni pastille
+  alerte: '#D0A05C'        # ambre lunaire, inchangé : en texte seulement. PAS de rouge dans ce système
+  lueur: '#D3DBF0'         # = Sky, comme l'accent : points de lumière, halo, pleine lumière d'une branche. Admis parce que la lueur n'est JAMAIS cliquable
+  nebuleuse: '#2E2A5A'     # l'ancien violet, DÉCOR seulement (1,13:1 sur fond) : halo et couche nébuleuse du monde. Jamais sous du texte
   # ═══ MODE ACCESSIBILITÉ « CONTRASTE RENFORCÉ » — tokens -clair ═══
   # Ce N'EST PAS un thème jour. C'est l'accommodation lisibilité : fond clair,
   # texte quasi-noir (cible AAA quand possible), IMAGERIE ATTÉNUÉE (les fonds
   # illustrés sont remplacés par des aplats). Déclenché par prefers-contrast: more
   # ou le réglage « Lisibilité renforcée », jamais proposé comme préférence de style.
   # Noms conservés (-clair) pour compatibilité EXPERIENCE.md / CSS existant.
-  fond-clair: '#F3F1FB'
-  surface-clair: '#FBFAFE'
-  surface-elevee-clair: '#FFFFFF'
-  texte-clair: '#1B1836'
-  texte-doux-clair: '#4C476B'
-  bordure-clair: '#DCD8EE'
-  bordure-forte-clair: '#565179'
-  accent-clair: '#265F91'
-  accent-doux-clair: '#E2ECF8'
+  # 2026-09-01 : Ivory, Beige, Gray et les bleus de la palette Soft Balance, foncés
+  # jusqu'au seuil (le Gray brut ne fait que 1,78:1 sur Ivory, le Periwinkle brut 2,74:1).
+  fond-clair: '#F0EFEA'       # Ivory
+  surface-clair: '#FFFFFF'
+  surface-elevee-clair: '#D3DBF0' # Sky en aplat
+  texte-clair: '#1C2740'      # Navy
+  texte-doux-clair: '#5F5D57' # Gray foncé (5,72:1 sur Ivory)
+  bordure-clair: '#B8B5AC'    # Gray, décoratif
+  bordure-forte-clair: '#4C63A8' # Periwinkle foncé (4,99:1 sur Ivory)
+  accent-clair: '#41579B'     # Periwinkle foncé (5,96:1 sur Ivory)
+  accent-doux-clair: '#D3DBF0' # Sky
   sur-accent-clair: '#FFFFFF'
-  arbre-tronc-clair: '#5A5680'
-  arbre-branche-clair: '#4A4670'
-  arbre-feuillage-clair: '#3C6C93'
+  arbre-tronc-clair: '#4C63A8'
+  arbre-branche-clair: '#41579B'
+  arbre-feuillage-clair: '#33415E'
   succes-clair: '#3B7357'
   alerte-clair: '#8A5A16'
-  lueur-clair: '#3C6C93'
+  lueur-clair: '#41579B'      # = accent-clair, même règle qu'en nuit
+  nebuleuse-clair: '#E0D2C7'  # Beige, décor seulement (1,28:1 sur Ivory)
 typography:
   display:
     fontFamily: 'Fraunces'
@@ -167,7 +173,7 @@ components:
     opacite-grand-texte: 0.70     # sous display/titre — garantit ≥3:1 (plancher mesuré 48,7%)
     luminance-fond-max-courant: 0.15  # luminance du fond composité tolérée sous un glyphe (texte courant)
     luminance-fond-max-grand: 0.25    # idem, grand texte
-    forme-seuil: 'linear-gradient(to top, {colors.fond} 0%, {colors.fond} 22%, rgba(12,10,30,0.72) 48%, transparent 80%)'
+    forme-seuil: 'linear-gradient(to top, {colors.fond} 0%, {colors.fond} 22%, rgba(28,39,64,0.72) 48%, transparent 80%)'
     portee: 'TOUT texte posé sur imagerie, sans exception'
   imagerie:
     source: 'images/anam-gemini/'
@@ -179,7 +185,7 @@ components:
     epaisseur: 2px
     offset: 2px
     rayon: '{rounded.sm}'
-    ratio-verifie: '4,29:1 nuit sur fond · 3,54:1 nuit sur surface-elevee · 6,59:1 accessibilité'
+    ratio-verifie: '4,71:1 nuit sur fond · 3,24:1 nuit sur surface-elevee · 4,99:1 accessibilité'
   bouton-primaire:
     fond: '{colors.accent}'
     texte: '{colors.sur-accent}'
@@ -187,7 +193,7 @@ components:
     hauteur: '{spacing.cible-tactile}'
     padding: '0 {spacing.5}'
     typo: '{typography.bouton}'
-    ratio-verifie: '10,25:1 nuit · 6,71:1 accessibilité'
+    ratio-verifie: '10,72:1 nuit · 6,86:1 accessibilité'
   bouton-fantome:
     fond: 'transparent'
     texte: '{colors.accent}'
@@ -290,7 +296,7 @@ components:
 
 Anam est une compagne d'introspection qui refuse de dire ce qui arrange. Le produit tient sur trois refus : **ne rien mesurer, ne rien prédire, ne rien trahir.** L'identité visuelle est la traduction littérale de ces trois refus.
 
-**La direction est « Nuit galactique ».** Indigo profond, violet, nuit étoilée, lotus bleu lumineux, argent lunaire. Apaisant *et* rêveur. L'objet de référence n'est plus un atelier d'argile : c'est une **nuit claire** au bord de l'eau — étoiles, phases de lune, reflets, une présence qui flotte. Mat et lumineux à la fois : jamais une nuit lourde, jamais un noir d'écran, jamais du néon. La chaleur (les cheveux auburn du personnage) vient de la figure peinte ; **l'interface, elle, reste froide et nocturne.**
+**La direction est « Nuit galactique ».** Depuis le retour terrain de Julian du 2026-09-01 (« le fond est trop violet et trop sombre »), sa teinte est celle de la palette **« Soft Balance »** : navy profond, bleu ciel du lotus (Sky), argent lunaire ; le violet ne subsiste qu'en nébuleuse de décor. Nuit étoilée, lotus bleu lumineux, argent lunaire. Apaisant *et* rêveur. L'objet de référence n'est plus un atelier d'argile : c'est une **nuit claire** au bord de l'eau — étoiles, phases de lune, reflets, une présence qui flotte. Mat et lumineux à la fois : jamais une nuit lourde, jamais un noir d'écran, jamais du néon. La chaleur (les cheveux auburn du personnage) vient de la figure peinte ; **l'interface, elle, reste froide et nocturne.**
 
 **Anam a désormais un visage** — une femme peinte, un lotus bleu à la main, sous la lune. C'est un revirement assumé par rapport à l'ancienne charte (« Anam n'a pas de visage »). La transparence exigée par l'AI Act (art. 50, FR-013) **ne repose plus sur l'absence de figure** mais sur deux garde-fous : le rendu est ouvertement **peint, jamais photoréaliste** (on ne peut pas la confondre avec une personne réelle), et la **`mention-ia` persistante** reste le porteur littéral de la transparence. Anam paraît aux **seuils** — elle n'est pas collée à chaque message.
 
@@ -314,28 +320,31 @@ Quatre principes s'appliquent partout :
 
 Palette **« Nuit galactique »**, échantillonnée au pixel sur l'imagerie de référence (`images/anam-gemini/`) puis **ajustée par calcul WCAG réel**. Aucune valeur n'est laissée non vérifiée ; les valeurs qui ne passaient pas ont été corrigées et la correction est indiquée.
 
+> **2026-09-01, palette « Soft Balance » (retour terrain n° 2, story E5-S1, décision D5).** Julian, image à l'appui : « le fond est trop violet et trop sombre, il faut une interface plus contrastée et lisible, avec le violet et le bleu ciel de la fleur de lotus, des textures et des dégradés ; utilise la palette fournie ». Six teintes : Ivory `#F0EFEA`, Sky `#D3DBF0`, Gray `#B8B5AC`, Beige `#E0D2C7`, Periwinkle `#7A90C9`, Navy `#1C2740`. La palette brute ne tient pas le gate sur Ivory (Gray 1,78:1, Periwinkle 2,74:1) et un fond Ivory natif contredirait la doctrine « pas de thème jour » ; elle est donc **déclinée** : la nuit devient **navy** (fond `#1C2740`), **Sky est à la fois `accent` et `lueur`** (admis parce que la lueur n'est jamais cliquable), Ivory et Beige vivent dans le mode contraste renforcé, et l'ancien violet survit en **`nebuleuse`** (`#2E2A5A`, décor seul, 1,13:1). Toutes les valeurs ci-dessous sont recalculées avec `ratioContraste` (`app/styles/contraste.ts`) et gardées par `tests/contraste.test.ts` ; `PALETTE_LUNAIRE` de l'arbre reste gelée (D6, bois `#9A96BE` à 5,29:1 sur navy).
+
 > ⚠️ **Le mode sombre est le mode natif.** Les tokens sans suffixe (`fond`, `texte`, `accent`…) sont la **nuit**. En CSS : `:root` porte la nuit ; le mode accessibilité (`-clair`) s'active via `:root[data-a11y="contraste"]`, `@media (prefers-contrast: more)` et le réglage « Lisibilité renforcée ». **Il n'y a pas de `@media (prefers-color-scheme: light)` qui bascule vers un thème jour** — ce media query, s'il est branché, pointe vers le mode accessibilité, pas vers un décor de jour.
 
 ### Les rôles (mode nuit)
 
-- **Fond `#0C0A1E`** — nuit profonde, indigo presque noir. Jamais un noir pur (qui ferait « écran éteint »), jamais un gris. C'est le socle sur lequel l'imagerie et l'arbre respirent.
-- **Surface `#16132F`** et **surface élevée `#201C42`** — les deux seuls niveaux de profondeur. Trois surfaces empilées, c'est déjà une de trop.
-- **Texte `#EEECF7`** — blanc lunaire à peine mauve. **Jamais `#FFFFFF` pur** : le blanc pur sur indigo profond provoque de la halation (le texte vibre) et fatigue le soir.
-- **Texte doux `#ABA6C9`** — pervenche éteinte : métadonnées, dates, mentions, aide. **Jamais** pour le contenu écrit par l'utilisatrice.
-- **Accent `#8FC1EF`** — **le lotus bleu.** C'est la couleur de l'action, et seulement de l'action : bouton primaire, lien, point d'accroche d'une branche. Jamais un fond de section, jamais un état, jamais décorative. La lueur du lotus dans l'imagerie n'est pas cet accent-UI : c'est de la peinture.
-- **Lueur `#CDE4F8`** *(nouveau)* — nacre lumineuse pour les **points de lumière** : halo du lotus, la pleine lumière d'une branche (le rayonnement), point du signe, l'« essence de lumière ». **Distincte de l'accent** : la lueur brille mais n'est jamais cliquable. Ne jamais l'utiliser comme couleur d'action.
-- **Accent doux `#241F47`** — aplat de mise en avant discret. Porte du texte `texte` uniquement, jamais du texte `accent`.
-- **Succès `#86B79E`** et **Alerte `#D0A05C`** — discrets, **en texte uniquement**, jamais en fond ni en pastille. Il n'y a **pas de rouge** dans ce système : Anam est un journal, pas un formulaire (voir *porte de secours*).
-- **Arbre : tronc `#6A6690`, branche `#9A96BE`, feuillage `#8FB6D8`** — argent lunaire et bleu-lune, réservés à l'illustration de l'arbre. **Aucun brun** : c'est un arbre de nuit. Ne jamais les employer comme couleurs d'interface.
+- **Fond `#1C2740`** (Navy) : la nuit navy de la palette Soft Balance. Jamais un noir pur (qui ferait « écran éteint »), jamais un gris, et plus l'indigo violacé d'avant. C'est le socle sur lequel l'imagerie et l'arbre respirent.
+- **Surface `#26324D`** et **surface élevée `#33415E`** : les deux seuls niveaux de profondeur. Trois surfaces empilées, c'est déjà une de trop.
+- **Texte `#F0EFEA`** (Ivory) : le blanc de la palette. **Jamais `#FFFFFF` pur** : le blanc pur sur navy provoque de la halation (le texte vibre) et fatigue le soir.
+- **Texte doux `#C9C6BD`** : le Gray de la palette, éclairci d'un cran (le `#B8B5AC` brut ne tient que 4,52:1 sous le voile du Seuil, marge trop juste). Métadonnées, dates, mentions, aide. **Jamais** pour le contenu écrit par l'utilisatrice.
+- **Accent `#D3DBF0`** (Sky) : **le lotus.** C'est la couleur de l'action, et seulement de l'action : bouton primaire, lien, point d'accroche d'une branche. Jamais un fond de section, jamais un état, jamais décorative.
+- **Lueur `#D3DBF0`** : **la même teinte Sky que l'accent**, pour les **points de lumière** : halo du lotus, la pleine lumière d'une branche (le rayonnement), point du signe. La teinte est partagée, les rôles ne le sont pas : **la lueur n'est jamais cliquable**, c'est ce qui rend le partage admissible (D5). Ne jamais l'utiliser comme couleur d'action, ne jamais poser l'accent en décor.
+- **Nébuleuse `#2E2A5A`** *(nouveau, E5-S1)* : l'ancien violet de la nuit galactique, gardé comme **décor seulement** (halo, couche nébuleuse du monde, E5-S2). À 1,13:1 sur le fond, c'est une nuance, pas une couleur : jamais sous du texte, jamais sur un contrôle.
+- **Accent doux `#26324D`** : aplat de mise en avant discret (la teinte de `surface`). Porte du texte `texte` uniquement, jamais du texte `accent`.
+- **Succès `#86B79E`** et **Alerte `#D0A05C`** : inchangés, discrets, **en texte uniquement**, jamais en fond ni en pastille. Il n'y a **pas de rouge** dans ce système : Anam est un journal, pas un formulaire (voir *porte de secours*).
+- **Arbre : tronc `#8C88B0`, branche `#A9B8E6`, feuillage `#9CC5E8`** : argent violacé et bleu-lune, réservés à l'illustration de l'arbre. **Aucun brun** : c'est un arbre de nuit. Ne jamais les employer comme couleurs d'interface. (`PALETTE_LUNAIRE` du moteur reste gelée sur ses teintes indigo, D6.)
 
 ### Les deux bordures — ne pas les confondre
 
 | Token | Valeur | Rôle | Seuil |
 |---|---|---|---|
-| `bordure` | `#2A2648` | Séparateur **purement décoratif** : filets, divisions de liste, contour de carte. | Aucun. Exempté par WCAG 1.4.11. Mesuré à 1,36:1 sur `fond` — **c'est normal**. |
-| `bordure-forte` | `#77719C` | Tout ce qui **délimite un contrôle** (champ, case, sélecteur) et **l'anneau de focus clavier**. | ≥ 3:1 obligatoire. Vérifié 4,29:1 sur `fond`, 3,96:1 sur `surface`, **3,54:1 sur `surface-elevee`**. |
+| `bordure` | `#33415E` | Séparateur **purement décoratif** : filets, divisions de liste, contour de carte. | Aucun. Exempté par WCAG 1.4.11. Mesuré à 1,46:1 sur `fond` : **c'est normal**. |
+| `bordure-forte` | `#7A90C9` | Tout ce qui **délimite un contrôle** (champ, case, sélecteur) et **l'anneau de focus clavier**. | ≥ 3:1 obligatoire. Vérifié 4,71:1 sur `fond`, 4,05:1 sur `surface`, **3,24:1 sur `surface-elevee`**. |
 
-> **Correction appliquée.** La valeur de départ `#6C6690` ne tenait qu'à **3,02:1** sur `surface-elevee` (le fond du `champ-saisie`) — au ras du seuil, donc à la merci de l'anti-crénelage. Elle a été **éclaircie à `#77719C`** pour remonter cette paire à **3,54:1**. Un champ de saisie bordé de `bordure` (décorative) reste un défaut d'accessibilité, pas une variante.
+> **Corrections appliquées (2026-09-01).** Le Periwinkle `#7A90C9` de la palette est pris tel quel en `bordure-forte` : il tient 4,71:1 sur le fond navy et **3,24:1 sur `surface-elevee`** (le fond du `champ-saisie`), la marge la plus serrée du mode nuit, gardée par `tests/contraste.test.ts`. Ne pas éclaircir `surface-elevee` sans re-mesurer. Un champ de saisie bordé de `bordure` (décorative) reste un défaut d'accessibilité, pas une variante. Historique : la valeur de départ de 2026-07 (`#6C6690`, 3,02:1) avait déjà été éclaircie pour la même raison.
 
 ### Contrastes vérifiés — mode nuit
 
@@ -343,28 +352,31 @@ Ratios calculés par la formule WCAG 2.x (luminance relative sRGB linéarisée).
 
 | Paire (premier plan / fond) | Seuil | Ratio | Verdict |
 |---|---|---|---|
-| `texte` / `fond` | 4,5:1 | **16,68** | PASS AA |
-| `texte` / `surface` | 4,5:1 | **15,39** | PASS AA |
-| `texte` / `surface-elevee` | 4,5:1 | **13,76** | PASS AA |
-| `texte-doux` / `fond` | 4,5:1 | **8,38** | PASS AA |
-| `texte-doux` / `surface` | 4,5:1 | **7,73** | PASS AA |
-| `texte-doux` / `surface-elevee` | 4,5:1 | **6,91** | PASS AA |
-| `accent` en texte / `fond` | 4,5:1 | **10,25** | PASS AA |
-| `accent` en texte / `surface` | 4,5:1 | **9,45** | PASS AA |
-| `sur-accent` / remplissage `accent` | 4,5:1 | **10,25** | PASS AA |
-| `texte` / `accent-doux` | 4,5:1 | **13,20** | PASS AA |
-| `texte-doux` / `accent-doux` | 4,5:1 | **6,63** | PASS AA |
-| `succes` en texte / `surface` | 4,5:1 | **7,94** | PASS AA |
-| `alerte` en texte / `surface` | 4,5:1 | **7,59** | PASS AA |
-| `bordure` / `fond` | — | 1,36 | exempté (1.4.11) |
-| `bordure-forte` / focus sur `fond` | 3:1 | **4,29** | PASS |
-| `bordure-forte` sur `surface-elevee` (champ) | 3:1 | **3,54** | PASS |
-| `accent` (point d'accroche) / `fond` | 3:1 | **10,25** | PASS |
-| `arbre-tronc` / `fond` (ciel) | 3:1 | **3,63** | PASS |
-| `arbre-branche` / `fond` | 3:1 | **6,94** | PASS |
-| `arbre-feuillage` / `fond` | 3:1 | **9,14** | PASS |
+| `texte` / `fond` | 4,5:1 | **12,90** | PASS AA |
+| `texte` / `surface` | 4,5:1 | **11,08** | PASS AA |
+| `texte` / `surface-elevee` | 4,5:1 | **8,86** | PASS AA |
+| `texte-doux` / `fond` | 4,5:1 | **8,70** | PASS AA |
+| `texte-doux` / `surface` | 4,5:1 | **7,47** | PASS AA |
+| `texte-doux` / `surface-elevee` | 4,5:1 | **5,97** | PASS AA |
+| `accent` en texte / `fond` | 4,5:1 | **10,72** | PASS AA |
+| `accent` en texte / `surface` | 4,5:1 | **9,21** | PASS AA |
+| `sur-accent` / remplissage `accent` | 4,5:1 | **10,72** | PASS AA |
+| `texte` / `accent-doux` | 4,5:1 | **11,08** | PASS AA |
+| `texte-doux` / `accent-doux` | 4,5:1 | **7,47** | PASS AA |
+| `succes` en texte / `surface` | 4,5:1 | **5,64** | PASS AA |
+| `alerte` en texte / `surface` | 4,5:1 | **5,39** | PASS AA |
+| `bordure` / `fond` | aucun | 1,46 | exempté (1.4.11) |
+| `nebuleuse` / `fond` (décor) | aucun | 1,13 | exempté (décor, jamais sous du texte) |
+| `bordure-forte` / focus sur `fond` | 3:1 | **4,71** | PASS |
+| `bordure-forte` sur `surface-elevee` (champ) | 3:1 | **3,24** | PASS |
+| `accent` (point d'accroche) / `fond` | 3:1 | **10,72** | PASS |
+| `lueur` (= Sky) / `fond` | 3:1 | **10,72** | PASS |
+| `arbre-tronc` / `fond` (ciel) | 3:1 | **4,43** | PASS |
+| `arbre-branche` / `fond` | 3:1 | **7,56** | PASS |
+| `arbre-feuillage` / `fond` | 3:1 | **8,18** | PASS |
+| texte sous voile (`fond` à 85 % sur image blanche) | 4,5:1 | **8,06** (`texte`), **5,43** (`texte-doux`) | PASS AA |
 
-> **La marge la plus faible du mode nuit est `arbre-tronc` / `fond` = 3,63:1** (objet graphique, seuil 3:1). Le tronc se dessine **contre le ciel `fond`**, pas contre `surface-elevee` — c'est cette paire qui fait foi. Ne pas assombrir le tronc, ne pas le poser sur une surface plus claire que `fond` sans re-mesurer. Le trait de 5px lui donne en outre de la marge perceptive.
+> **La marge la plus faible du mode nuit est `bordure-forte` / `surface-elevee` = 3,24:1** (objet graphique, seuil 3:1), suivie de `arbre-tronc` / `fond` = 4,43:1. Le tronc se dessine **contre le ciel `fond`**, pas contre `surface-elevee` : c'est cette paire qui fait foi. Ne pas assombrir le tronc, ne pas éclaircir `surface-elevee`, ne pas poser l'un sur une surface plus claire que `fond` sans re-mesurer. Le trait de 5px du tronc lui donne en outre de la marge perceptive. Sous voile, le Gray brut `#B8B5AC` n'aurait tenu qu'à 4,52:1 : c'est pour cela que `texte-doux` est `#C9C6BD`.
 
 ### Contrastes vérifiés — mode accessibilité (`-clair`)
 
@@ -372,15 +384,18 @@ Ce mode **remplace l'imagerie par des aplats** et pousse le texte vers l'AAA qua
 
 | Paire | Seuil | Ratio | Verdict |
 |---|---|---|---|
-| `texte-clair` / `fond-clair` | 4,5:1 | **15,27** | PASS (AAA) |
-| `texte-doux-clair` / `fond-clair` | 4,5:1 | **7,76** | PASS (AAA) |
-| `accent-clair` en texte / `fond-clair` | 4,5:1 | **6,01** | PASS AA |
-| `sur-accent-clair` / remplissage `accent-clair` | 4,5:1 | **6,71** | PASS AA |
-| `texte-clair` / `accent-doux-clair` | 4,5:1 | **14,29** | PASS (AAA) |
-| `succes-clair` / `fond-clair` | 4,5:1 | **4,98** | PASS AA |
-| `alerte-clair` / `fond-clair` | 4,5:1 | **5,28** | PASS AA |
-| `bordure-forte-clair` / focus | 3:1 | **6,59** | PASS |
-| `arbre-feuillage-clair` / `fond-clair` | 3:1 | **5,00** | PASS |
+| `texte-clair` / `fond-clair` | 4,5:1 | **12,90** | PASS (AAA) |
+| `texte-doux-clair` / `fond-clair` | 4,5:1 | **5,72** | PASS AA |
+| `accent-clair` en texte / `fond-clair` | 4,5:1 | **5,96** | PASS AA |
+| `sur-accent-clair` / remplissage `accent-clair` | 4,5:1 | **6,86** | PASS AA |
+| `texte-clair` / `accent-doux-clair` | 4,5:1 | **10,72** | PASS (AAA) |
+| `succes-clair` / `fond-clair` | 4,5:1 | **4,83** | PASS AA (la marge la plus serrée du mode) |
+| `alerte-clair` / `fond-clair` | 4,5:1 | **5,13** | PASS AA |
+| `bordure-forte-clair` / focus | 3:1 | **4,99** | PASS |
+| `arbre-feuillage-clair` / `fond-clair` | 3:1 | **8,86** | PASS |
+| `texte-doux-clair` / `surface-elevee-clair` (Sky) | 4,5:1 | 4,75 | PASS AA, hors gate : à surveiller |
+| `bordure-clair` / `fond-clair` | aucun | 1,78 | exempté (1.4.11) |
+| `nebuleuse-clair` (Beige) / `fond-clair` | aucun | 1,28 | exempté (décor) |
 
 Toute couleur ajoutée au système arrive avec son ratio mesuré, ou n'arrive pas.
 
@@ -439,7 +454,7 @@ Poser du **texte blanc et petit sur de l'imagerie galactique** est le cas d'acce
 Un dégradé de `{colors.fond}` posé **entre l'image et le texte**, dense là où le texte vit, transparent ailleurs (l'image respire).
 
 **Cible chiffrée.** Sous chaque glyphe, la **luminance du fond composité** doit tomber :
-- **≤ 0,15** pour le texte courant (`corps`, `anam`, `meta`) → ratio ≥ **4,5:1** avec `texte` `#EEECF7` ;
+- **≤ 0,15** pour le texte courant (`corps`, `anam`, `meta`) → ratio ≥ **4,5:1** avec `texte` `#F0EFEA` ;
 - **≤ 0,25** pour le grand texte (`display`, `titre`) → ratio ≥ **3:1**.
 
 **Traduction en opacité de voile.** Sur le **pire cas absolu** — un pixel **blanc** sous le texte — un voile `fond` doit atteindre au minimum **60,6 %** d'opacité (texte courant) et **48,7 %** (grand texte) pour tenir ces planchers. Comme l'imagerie est générée et non mesurable pixel par pixel par un dev seul, on **spécifie une marge** :
@@ -537,7 +552,7 @@ Un seul niveau de modale, jamais deux. La fiche de branche n'est pas une modale 
 
 ## Elevation & Depth
 
-**En nuit — le mode natif — la profondeur passe par le ton et le voile, jamais par l'ombre.** Une ombre portée ne se lit pas sur `#0C0A1E` ; elle y produit une auréole sale. Empilement : `fond` → `surface` → `surface-elevee`, plus un filet `bordure` 1px **seulement** si le ton et la respiration ne suffisent pas — **jamais pour _fermer_ une région** : dans la scène continue, un filet ne cerne rien et n'encadre pas le monde. Un panneau flottant sur imagerie se détache par son **voile** (mécanisme B), pas par une ombre. `{components.ombre.sombre}` vaut `aucune`, littéralement.
+**En nuit — le mode natif — la profondeur passe par le ton et le voile, jamais par l'ombre.** Une ombre portée ne se lit pas sur `#1C2740` ; elle y produit une auréole sale. Empilement : `fond` → `surface` → `surface-elevee`, plus un filet `bordure` 1px **seulement** si le ton et la respiration ne suffisent pas — **jamais pour _fermer_ une région** : dans la scène continue, un filet ne cerne rien et n'encadre pas le monde. Un panneau flottant sur imagerie se détache par son **voile** (mécanisme B), pas par une ombre. `{components.ombre.sombre}` vaut `aucune`, littéralement.
 
 **En mode accessibilité**, deux ombres seulement, teintées d'indigo froid (`rgba(27, 24, 54, …)`), jamais de gris neutre :
 
@@ -676,7 +691,7 @@ Le composant le plus contraint après l'icône. L'aperçu vit sur un écran verr
 
 ### `icone-app` — DISCRÉTION (NFR-015)
 
-Deux couleurs maximum, tout mat. Fond `surface-elevee` (`#201C42`, indigo nuit), forme `arbre-branche` (`#9A96BE`, trait argent lunaire). Une forme abstraite d'un seul geste : glyphe, galet, nœud, ou fragment de jonction tronc-branche assez abstrait pour ne pas se lire comme « arbre ».
+Deux couleurs maximum, tout mat. Fond `surface-elevee` (`#33415E`, navy), forme `arbre-branche` (`#A9B8E6`, trait argent lunaire). Une forme abstraite d'un seul geste : glyphe, galet, nœud, ou fragment de jonction tronc-branche assez abstrait pour ne pas se lire comme « arbre ».
 
 **Liste noire, sans exception — sur l'ICÔNE uniquement** (à l'intérieur de l'app, lune/lotus/étoiles sont désormais permis) : lune, croissant, étoile, constellation, lotus, roue du zodiaque, symbole planétaire, cristal, mandala, chakra, œil, main, carte de tarot, chiffre, visage, silhouette, robot, cerveau, bulle de chat.
 
@@ -698,19 +713,19 @@ Ces composants **n'existent pas** et ne doivent pas être créés (FR-031) : bar
 
 | ✅ Faire | ❌ Ne pas faire |
 |---|---|
-| Nuit native, `#0C0A1E` indigo profond, mat et lumineux | Noir pur · gris neutre · nuit lourde d'écran éteint |
+| Nuit native, `#1C2740` navy « Soft Balance », mat et lumineux ; le violet en `nebuleuse` de décor seulement | Noir pur · gris neutre · nuit lourde d'écran éteint · violet plein en fond (retour du 2026-09-01) |
 | **Violet, étoiles, lune, lotus — avec goût** : ils sont désormais permis | **Violet fluo · paillettes clinquantes · or brillant façon voyance de foire · scintillement kitsch** |
-| Texte blanc `#EEECF7`, petit, qui **paraît en fondu** | `#FFFFFF` pur (halation) · texte qui glisse ou « pop » |
+| Texte ivoire `#F0EFEA`, petit, qui **paraît en fondu** | `#FFFFFF` pur (halation) · texte qui glisse ou « pop » |
 | **Voile de lisibilité sous tout texte posé sur image** (≥85 % courant / ≥70 % grand) | **Texte directement sur image sans voile** · `text-shadow` en guise de voile |
 | Personnage aux **seuils** (ouverture, nomination, clôture), sinon le signe | **Avatar réaliste collé à chaque message** · personnage photoréaliste · cercle/vignette autour d'elle |
 | Anam en illustration **peinte** + `mention-ia` persistante pour la transparence | Faire passer Anam pour une personne réelle · masquer la mention IA |
 | Arbre de **vie**, de nuit : écorce argentée, feuillage bleu-lune, branche vécue en pleine lumière, ciel étoilé | Arbre brun/terreux ou doré · fruit-pomme / objet-récompense suspendu · halo de récompense · pop de célébration au changement d'état |
 | L'arbre comme unique représentation du chemin | Barres de progression · jauges · séries · scores · badges · pourcentages |
 | Signe abstrait (courbe du voile) en argent lunaire, ≤ 2 couleurs, lisible à 12px | Signe en `accent` (dilue l'action) · visage · orbe · bulle · onde sonore |
-| Accent `#8FC1EF` = action seule ; `lueur` = points de lumière (jamais cliquables) | Accent en fond de section ou en état · lueur sur un bouton |
+| Accent `#D3DBF0` (Sky) = action seule ; `lueur` = la même teinte, points de lumière (jamais cliquables) | Accent en fond de section ou en état · lueur sur un bouton · `nebuleuse` sous du texte |
 | Sérif pour Anam, grotesque pour l'utilisatrice et l'interface, `WONK 0`, graisse ≤ 500 | Mélanger les voix · tout en sérif · variantes wonky · gras · capitales de titre |
 | Texte seul pour les états (« Noté. ») | Icônes d'état · coches vertes · pastilles · **emojis** |
-| Deux tokens de bordure distincts, focus ≥ 3:1 (bordure-forte `#77719C`) | Border un champ avec `bordure` décorative |
+| Deux tokens de bordure distincts, focus ≥ 3:1 (bordure-forte `#7A90C9`) | Border un champ avec `bordure` décorative |
 | Grain de nuit ≤ 5 % (dither le banding), aucune ombre en nuit | Dégradé numérique gratuit · glow · lens flare · 3D · métallisé · ombre nette material |
 | Une seule chose importante par vue, marges généreuses (le ciel) | Tableau de bord · grille dense · liste serrée · barre d'onglets chargée |
 | **Scène continue sans bord** : régions reliées en fondu, séparation par le ton, le voile et la respiration ; filets **fonctionnels** seulement (focus, champs, contrôles) | **Cadre ou filet décoratif qui _ferme_ une zone** · basculement d'écran sec · barre/bande bordée persistante · encadrer une région ou le personnage |

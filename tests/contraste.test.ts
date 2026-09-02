@@ -8,6 +8,10 @@ import { ratioContraste, luminanceRelative } from "@/app/styles/contraste";
  * doit tenir son seuil : 4,5:1 texte courant, 3:1 grand texte / objets graphiques /
  * bordure-forte-focus. Un token modifié qui fait chuter une paire → test rouge → CI rouge.
  * `bordure/fond` est EXCLUE (séparateur décoratif, exempté WCAG 1.4.11).
+ *
+ * Palette « Soft Balance » (retour terrain du 2026-09-01, E5-S1) : les PAIRES sont inchangées,
+ * seules les marges citées en commentaire ont été recalculées avec `ratioContraste`. Le token
+ * `nebuleuse` (décor, 1,13:1) n'entre dans aucune paire : il ne porte jamais de texte.
  */
 
 type Paire = { fg: CleCouleur; bg: CleCouleur; seuil: number };
@@ -28,9 +32,9 @@ const pairesNuit: Paire[] = [
   { fg: "succes", bg: "surface", seuil: 4.5 },
   { fg: "alerte", bg: "surface", seuil: 4.5 },
   // Objets graphiques / focus (seuil 3:1) — inclut les marges les plus serrées
-  { fg: "bordure-forte", bg: "fond", seuil: 3 }, // focus sur fond
-  { fg: "bordure-forte", bg: "surface-elevee", seuil: 3 }, // champ (marge serrée 3,54)
-  { fg: "arbre-tronc", bg: "fond", seuil: 3 }, // marge la plus serrée du mode nuit (3,63)
+  { fg: "bordure-forte", bg: "fond", seuil: 3 }, // focus sur fond (4,71)
+  { fg: "bordure-forte", bg: "surface-elevee", seuil: 3 }, // champ : la marge la plus serrée du mode nuit (3,24)
+  { fg: "arbre-tronc", bg: "fond", seuil: 3 }, // le tronc contre le ciel (4,43)
   { fg: "arbre-branche", bg: "fond", seuil: 3 },
   { fg: "arbre-feuillage", bg: "fond", seuil: 3 },
 ];
@@ -42,10 +46,10 @@ const pairesClair: Paire[] = [
   { fg: "accent", bg: "fond", seuil: 4.5 },
   { fg: "sur-accent", bg: "accent", seuil: 4.5 },
   { fg: "texte", bg: "accent-doux", seuil: 4.5 },
-  { fg: "succes", bg: "fond", seuil: 4.5 },
+  { fg: "succes", bg: "fond", seuil: 4.5 }, // la marge la plus serrée du mode clair (4,83)
   { fg: "alerte", bg: "fond", seuil: 4.5 },
   { fg: "bordure-forte", bg: "fond", seuil: 3 },
-  { fg: "arbre-feuillage", bg: "fond", seuil: 3 }, // marge serrée (5,00)
+  { fg: "arbre-feuillage", bg: "fond", seuil: 3 }, // 8,86
 ];
 
 function verifier(palette: Record<CleCouleur, string>, paires: Paire[]) {

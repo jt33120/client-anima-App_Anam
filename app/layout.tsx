@@ -44,7 +44,7 @@ export const viewport: Viewport = {
   // défaut du navigateur, en bordure d'une scène de nuit. C'est `--fond`, et rien d'autre : le mode
   // « contraste renforcé » est un réglage d'accessibilité qui s'active à la main, pas un thème jour
   // — il n'y a donc pas de variante `prefers-color-scheme` à déclarer ici.
-  themeColor: "#0C0A1E",
+  themeColor: "#1C2740",
 };
 
 // UX-DR-36 : lang="fr" sur le document.
