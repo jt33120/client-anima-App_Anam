@@ -19,7 +19,7 @@ import {
   SENS_DU_CIEL_NON_ECRIT,
   LECTURE_NUMEROLOGIE_NON_ECRITE,
   NAISSANCE_ABSENTE,
-  BOUTON_COMPLETER_CIEL,
+  BOUTON_AJOUTER_HEURE,
   RESUME_DETAIL_HEURE,
   TITRE_DETAIL_POSITIONS,
   CIEL_DU_JOUR_NON_ECRIT,
@@ -66,7 +66,7 @@ const COPIE = {
   titrePortes: TITRE_PORTES,
   sensDuCielNonEcrit: SENS_DU_CIEL_NON_ECRIT,
   typeSansTexte: MESSAGE_TYPE_SANS_TEXTE,
-  boutonCompleterCiel: BOUTON_COMPLETER_CIEL,
+  boutonAjouterHeure: BOUTON_AJOUTER_HEURE,
   resumeDetailHeure: RESUME_DETAIL_HEURE,
   titreDetailPositions: TITRE_DETAIL_POSITIONS,
   cielDuJourNonEcrit: CIEL_DU_JOUR_NON_ECRIT,
@@ -466,7 +466,7 @@ describe("[retour 2026-09-01] l'heure de naissance, bien avant", () => {
     const liens = [...section.querySelectorAll("a")];
     expect(liens.length, "aucun lien dans la section").toBeGreaterThan(0);
     expect(liens[0].getAttribute("href")).toBe("/heure-naissance");
-    expect(liens[0].textContent).toBe(BOUTON_COMPLETER_CIEL);
+    expect(liens[0].textContent).toBe(BOUTON_AJOUTER_HEURE);
     // Mutation-cible : remettre l'appel EN BAS, là où il vivait. L'horoscope et le bouton existent
     // toujours, mais dans l'ordre d'avant.
     const carte = carteJour(container);
@@ -484,7 +484,7 @@ describe("[retour 2026-09-01] l'heure de naissance, bien avant", () => {
     const section = sectionCiel(container);
     expect(section.querySelectorAll("a[href='/heure-naissance']").length).toBe(0);
     expect(section.textContent ?? "").not.toContain(BULLE_SANS_HEURE);
-    expect(section.textContent ?? "").not.toContain(BOUTON_COMPLETER_CIEL);
+    expect(section.textContent ?? "").not.toContain(BOUTON_AJOUTER_HEURE);
   });
 
   it("[LE CŒUR] l'aveu long et « où la trouver » restent, sous un pli FERMÉ, après le bouton (FR-050)", () => {
@@ -567,7 +567,7 @@ describe("[retour 2026-09-01] l'horoscope d'abord", () => {
     for (const mode of ["tout", "numerologie"] as const) {
       const { container } = dessiner(avecCielDuJour(sansHeureNiNom, HOROSCOPE_ECRIT), mode);
       expect(carteJour(container), mode).toBeNull();
-      expect(container.textContent ?? "", mode).not.toContain(BOUTON_COMPLETER_CIEL);
+      expect(container.textContent ?? "", mode).not.toContain(BOUTON_AJOUTER_HEURE);
       expect(container.textContent ?? "", mode).not.toContain(BULLE_SANS_HEURE);
       cleanup();
     }

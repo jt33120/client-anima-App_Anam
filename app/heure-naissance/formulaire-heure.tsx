@@ -99,14 +99,22 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
    * commune » à quelqu'un qui vient de le faire.
    */
   const lieuManquant = demanderLieu && !choisi;
-  const bloque = lieuManquant || (!demanderLieu && !demanderHeure);
+  // Revue du 2026-09-02 : commune déjà gravée, heure manquante, case « je ne connais pas mon
+  // heure » cochée. Il n'y a alors rien à écrire, et le serveur l'aurait refusé APRÈS l'envoi
+  // avec un message faux (« tout ce que tu peux ajouter est déjà enregistré »). C'est exactement
+  // le profil que la porte « Ajouter mon heure de naissance » d'Aujourd’hui envoie ici : le
+  // bouton se ferme, et le motif le dit avant le geste (patron T18).
+  const rienAEcrire = !demanderLieu && demanderHeure && sansHeure;
+  const bloque = lieuManquant || (!demanderLieu && !demanderHeure) || rienAEcrire;
   const motifBlocage = lieuManquant
     ? requete.trim().length > 0
       ? "Choisis ta commune dans la liste qui s’ouvre sous le champ : je ne reconnais pas encore ce que tu as tapé."
       : "Indique ta commune de naissance pour que je puisse enregistrer."
-    : bloque
-      ? "Tout est déjà enregistré : il n’y a rien à écrire ici."
-      : null;
+    : rienAEcrire
+      ? "Ta commune est déjà enregistrée. Sans ton heure, il n’y a rien de plus à écrire ici ; tu peux revenir quand tu l’as."
+      : bloque
+        ? "Tout est déjà enregistré : il n’y a rien à écrire ici."
+        : null;
 
   // Recherche différée : on n'interroge pas le serveur à chaque frappe. 250 ms est le seuil
   // au-delà duquel une frappe est finie sans que l'attente se sente.
@@ -292,7 +300,7 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
           manque encore, et une heure OU sa déclaration d'absence si l'heure manque encore.
 
           LE GROS BOUTON (2026-09-01) : pleine largeur, plus haut, et un libellé qui dit ce que le
-          geste OUVRE (« Compléter mon ciel ») plutôt que ce que la base fait (« Enregistrer »). Il
+          geste est le sien (« Enregistrer », gros et pleine largeur ; revue du 2026-09-02 : « Compléter mon ciel » faisait du ciel un objet incomplet, le vocabulaire de jauge que FR-031 écarte). Il
           reste fermé exactement dans les mêmes cas, et il dit toujours pourquoi (T18, ci-dessous). */}
       <button
         type="submit"
@@ -300,7 +308,7 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
         disabled={enCours || bloque}
         aria-describedby={motifBlocage ? "motif-blocage-heure" : undefined}
       >
-        <span className={`t-bouton ${s.libellePrincipal}`}>{enCours ? "…" : "Compléter mon ciel"}</span>
+        <span className={`t-bouton ${s.libellePrincipal}`}>{enCours ? "…" : "Enregistrer"}</span>
       </button>
 
       {/* QA tour 1 (T18) — LE MOTIF DU BLOCAGE EST ÉCRIT EN TOUTES LETTRES.

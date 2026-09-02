@@ -47,7 +47,7 @@ export default function PageIntrouvable() {
           ou elle a changé de place.
         </p>
         <p className="t-corps">
-          <Link href="/">Revenir à {nomDeRegion(REGION_FOYER)}</Link>
+          <Link href="/">Revenir à « {nomDeRegion(REGION_FOYER)} »</Link>
           {" · "}
           <Link href="/aide">Aide et ressources</Link>
         </p>

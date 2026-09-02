@@ -41,7 +41,7 @@ export default function ErreurApplication({
               renommage en « Aujourd’hui » (2026-09-02) qui l'a trouvé. `tests/rendu/erreur-application.test.tsx`
               refuse qu'il revienne. */}
           <a className={s.actionSecondaire} href="/">
-            Revenir à {nomDeRegion(REGION_FOYER)}
+            Revenir à « {nomDeRegion(REGION_FOYER)} »
           </a>
         </div>
         <a className={s.aide} href="/aide">

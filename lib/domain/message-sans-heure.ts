@@ -76,7 +76,7 @@ export const OU_TROUVER_SON_HEURE =
  * ni demi-cadratin (interdits dans tout texte affiché), aucun compteur ni pourcentage (FR-031).
  */
 export const BULLE_SANS_HEURE =
-  "Il me manque ton heure de naissance. Avec elle, ton ciel est complet : ascendant, maisons, " +
+  "Il me manque ton heure de naissance. Avec elle, ton ascendant et tes maisons se calculent, " +
   "et ton horoscope devient plus juste.";
 
 /**

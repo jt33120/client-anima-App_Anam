@@ -104,8 +104,8 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
        « tes nombres, tes données, ton abonnement, l'aide » était la liste de trois-ou-quatre qui
        sent la génération, et « une seule porte, jamais un labyrinthe » la formule creuse. */
     texte:
-      "Ce lieu a trois dimensions, et je te les montre une par une. Tout ce qui te concerne se " +
-      "trouve derrière la silhouette en haut à droite.",
+      "Ce lieu a trois dimensions, et je te les montre une par une. Ton compte, tes données et l’aide sont " +
+      "derrière la silhouette en haut à droite.",
   },
   {
     region: "accueil",
@@ -121,11 +121,13 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
   {
     region: "accueil",
     cible: "[class*='bibliotheque'] article",
-    /* ⚠️ NI « Aujourd’hui » NI « L’accueil ». Le premier est déjà le <h2> de la section quotidienne
-       (`render/accueil/Bibliotheque.tsx`) : même raison que pour la première étape. Le second
-       nommait la région sous son ancien nom ; elle s'appelle « Moi » depuis la Story 7.9, et le
-       tour n'a pas à rouvrir un second vocabulaire. « Ta journée » reprend les mots du bloc de
-       premier passage (« le ciel et le mantra de ta journée »). */
+    /* ⚠️ NI « Aujourd’hui », NI « Ce que le jour propose », NI « L’accueil ». « Aujourd’hui » est
+       le nom de la région depuis le 2026-09-02, donc son h1 ; « Ce que le jour propose » est le
+       <h2> de la section quotidienne (`render/accueil/Bibliotheque.tsx`) : même raison que pour la
+       première étape, un titre d'étape ne doit pas doubler un entête de l'écran. « L’accueil »
+       nommait la région sous un nom encore plus ancien (avant « Moi », Story 7.9), et le tour n'a
+       pas à rouvrir un second vocabulaire. « Ta journée » reprend les mots du bloc de premier
+       passage (« le ciel et le mantra de ta journée »). */
     titre: "Ta journée",
     /* Réécrit avec l'écran le 2026-08-25 (Story 7.7 : l'accueil ne garde que ce qui change), puis
        raccourci le 2026-09-01. « Rien à rattraper si tu passes un jour, rien qui compte tes

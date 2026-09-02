@@ -260,8 +260,8 @@ describe("[L'IMAGE] la toile est décorative, dans la section Seuil, au-dessus d
     expect(seuil.querySelectorAll("img").length).toBe(1);
   });
 
-  it("[LE CŒUR] hors seuil : aucune toile ailleurs, et quand le seuil est déjà franchi rien ne se dessine", () => {
-    const contexte = installerContexte2d();
+  it("[LE CŒUR] hors seuil : aucune toile ailleurs, et quand le seuil est déjà franchi rien ne se dessine", async () => {
+    installerContexte2d();
     const demander = vi.fn(() => 1);
     vi.stubGlobal("requestAnimationFrame", demander);
     vi.stubGlobal("cancelAnimationFrame", () => {});
@@ -275,7 +275,25 @@ describe("[L'IMAGE] la toile est décorative, dans la section Seuil, au-dessus d
     // La toile, elle, n'est jamais dessinée dans une région inerte : `demarrerRemplissage` n'est
     // pas appelé, donc aucun contexte 2D n'est demandé SUR ELLE (l'arbre a le sien).
     const toile = toiles[0] as HTMLCanvasElement;
-    expect(contexte.getContext, "témoin : le double est installé").toBeGreaterThanOrEqual(0);
+    // Revue du 2026-09-02 : l'ancien témoin (`>= 0` sur un compteur) ne pouvait pas rougir. Le
+    // double du prototype enregistre le `this` de chaque appel : on laisse l'image « charger » et
+    // le décodage se résoudre, puis on vérifie qu'aucun contexte n'a été demandé SUR CETTE toile
+    // (l'arbre a le sien) et qu'aucune trame n'a été réclamée. Un `vi.spyOn(toile, …)` ne ferait
+    // que renvoyer le double du prototype, déjà appelé par l'arbre : c'est le piège évité ici.
+    const proto = HTMLCanvasElement.prototype.getContext as unknown as { mock: { contexts: unknown[] } };
+    const surLaToile = () => proto.mock.contexts.filter((c) => c === toile).length;
+    const img = sectionSeuil().querySelector("img");
+    await act(async () => {
+      if (img) fireEvent.load(img);
+      await Promise.resolve();
+      await Promise.resolve();
+      // On draine aussi les tâches différées de la scène (l'arbre décode ses planches puis
+      // réclame SES trames) pour qu'elles ne fuient pas dans le test suivant.
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(surLaToile(), "un contexte 2D a été demandé sur la toile d'une région inerte").toBe(0);
+    // `demander` n'est PAS un témoin ici : l'arbre de la scène a le droit de réclamer ses trames.
+    // Ce que la toile du seuil n'a pas fait, c'est demander un contexte : c'est l'assertion.
     expect(toile.width, "la toile a été dimensionnée : le remplissage a démarré dans une région inerte").toBe(300);
   });
 

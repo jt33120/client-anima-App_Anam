@@ -47,13 +47,13 @@ describe("[E1-S4] les deux pages de sortie ramènent vers le foyer sous le nom d
   it("[LE CŒUR] la frontière d'erreur dit « Revenir à Aujourd’hui », vers la racine", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     render(<Erreur error={Object.assign(new Error("x"), { digest: "abc" })} retry={() => undefined} />);
-    expect(screen.getByRole("link", { name: `Revenir à ${foyer}` }).getAttribute("href")).toBe("/");
+    expect(screen.getByRole("link", { name: `Revenir à « ${foyer} »` }).getAttribute("href")).toBe("/");
     expect(screen.queryByText(/Revenir à Moi/)).toBeNull();
   });
 
   it("[LE CŒUR] la page introuvable aussi, et plus « l'accueil »", () => {
     render(<PageIntrouvable />);
-    expect(screen.getByRole("link", { name: `Revenir à ${foyer}` }).getAttribute("href")).toBe("/");
+    expect(screen.getByRole("link", { name: `Revenir à « ${foyer} »` }).getAttribute("href")).toBe("/");
     expect(screen.queryByText(/accueil/i)).toBeNull();
   });
 
@@ -67,7 +67,7 @@ describe("[E1-S4] les deux pages de sortie ramènent vers le foyer sous le nom d
       expect(src, `${f} recopie le nom du foyer`).not.toMatch(
         /Revenir à (?:Moi|Aujourd’hui|l&rsquo;accueil|l’accueil|l'accueil)/,
       );
-      expect(src, `${f} ne lit pas le catalogue`).toMatch(/Revenir à \{nomDeRegion\(REGION_FOYER\)\}/);
+      expect(src, `${f} ne lit pas le catalogue`).toMatch(/Revenir à « \{nomDeRegion\(REGION_FOYER\)\} »/);
     }
   });
 });

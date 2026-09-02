@@ -156,7 +156,12 @@ describe("[fondateur 2026-09-02] après le clic : la feuille, et les neuf textes
     const { container } = monter();
     const { feuille } = ouvrir(container);
     const texte = feuille.textContent ?? "";
-    for (const tournure of [/\d+\s*(?:sur|\/)\s*\d+/, /%/, /\bétapes?\b/i]) {
+    // `\b` est ASCII : « \bétape » ne matchait JAMAIS (revue du 2026-09-02). Frontières Unicode,
+    // et un témoin qui prouve que le motif mord.
+    const etape = /(?<![\p{L}])étapes?(?![\p{L}])/iu;
+    expect("une étape par type").toMatch(etape);
+    expect("Étapes").toMatch(etape);
+    for (const tournure of [/\d+\s*(?:sur|\/)\s*\d+/, /%/, etape]) {
       expect(texte, `tournure de compte dans la feuille : ${tournure}`).not.toMatch(tournure);
     }
     expect(feuille.querySelectorAll("progress, meter, [role='progressbar']").length).toBe(0);

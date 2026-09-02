@@ -28,7 +28,7 @@ import { BULLE_SANS_HEURE } from "@/lib/domain/message-sans-heure";
 import {
   INTRODUCTION_ASTROLOGIE,
   INTRODUCTION_NUMEROLOGIE,
-  BOUTON_COMPLETER_CIEL,
+  BOUTON_AJOUTER_HEURE,
   RESUME_DETAIL_HEURE,
   TITRE_DETAIL_POSITIONS,
   CIEL_DU_JOUR_NON_ECRIT,
@@ -567,7 +567,11 @@ describe("[retour 2026-09-01] « Ton ciel du jour » traverse la fiche, à l'ide
     // La halte et l'accueil montrent la même carte ; deux silences différents se liraient comme
     // une panne d'un côté et un vide de l'autre. Le rendu de l'accueil porte la phrase en dur
     // (`render/accueil/Bibliotheque.tsx`) : on vérifie qu'elle y est, à l'identique.
-    const accueil = readFileSync(resolve(process.cwd(), "render/accueil/Bibliotheque.tsx"), "utf-8");
+    // Commentaires retirés : une prose qui citerait l'ancienne phrase ne doit pas suffire
+    // (revue du 2026-09-02) ; la phrase doit être dans le JSX ou une chaîne.
+    const accueil = readFileSync(resolve(process.cwd(), "render/accueil/Bibliotheque.tsx"), "utf-8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/(^|[^:"'])\/\/.*$/gm, "$1");
     expect(accueil).toContain(CIEL_DU_JOUR_NON_ECRIT);
   });
 });
@@ -596,7 +600,7 @@ describe("[retour 2026-09-01] la nouvelle copie de l'univers Astrologie passe le
   const NOUVELLES: ReadonlyArray<[string, string]> = [
     ["INTRODUCTION_ASTROLOGIE", INTRODUCTION_ASTROLOGIE],
     ["INTRODUCTION_NUMEROLOGIE", INTRODUCTION_NUMEROLOGIE],
-    ["BOUTON_COMPLETER_CIEL", BOUTON_COMPLETER_CIEL],
+    ["BOUTON_AJOUTER_HEURE", BOUTON_AJOUTER_HEURE],
     ["RESUME_DETAIL_HEURE", RESUME_DETAIL_HEURE],
     ["TITRE_DETAIL_POSITIONS", TITRE_DETAIL_POSITIONS],
     ["CIEL_DU_JOUR_NON_ECRIT", CIEL_DU_JOUR_NON_ECRIT],
@@ -620,7 +624,7 @@ describe("[retour 2026-09-01] la nouvelle copie de l'univers Astrologie passe le
     // « L'app est beaucoup trop verbeuse » : la phrase d'avant faisait 128 caractères et nommait
     // « ton heure » à des comptes qui n'en ont pas. Mutation-cible : la remettre.
     expect([...INTRODUCTION_ASTROLOGIE].length).toBeLessThan(100);
-    expect(INTRODUCTION_ASTROLOGIE).toMatch(/\b(?:tu|ton|ta|tes)\b/i);
+    expect(INTRODUCTION_ASTROLOGIE).toMatch(/(?<![\p{L}’])(?:tu|ton|ta|tes)(?![\p{L}])/iu);
     expect(INTRODUCTION_ASTROLOGIE).not.toMatch(/heure/i);
     expect(INTRODUCTION_ASTROLOGIE, "la garantie « pas un modèle » reste").toMatch(/modèle/i);
   });

@@ -1,4 +1,5 @@
 import type { RaisonNombreAbsent } from "@/lib/astro/numerologie";
+import { LIEN_AJOUTER } from "./copie-naissance";
 import type { RaisonSansAngles, RaisonAbsenceCorps } from "@/lib/astro/theme-natal";
 
 /**
@@ -119,12 +120,15 @@ export const TITRE_PORTES = "Ce que tu peux changer";
  * (`message-sans-heure.ts`), la même que sur `/heure-naissance`, transportée par la fiche. Deux
  * vérités concurrentes sur la même absence sont un défaut, et la fiche le dit déjà pour l'aveu.
  *
- * ⚠️ AUCUN TIRET, AUCUN FUTUR ADRESSÉ, AUCUN COMPTEUR (FR-031) : « Compléter mon ciel » nomme un
- * geste, pas un pourcentage ; « ton ciel est complet » est un état, pas une jauge.
+ * ⚠️ AUCUN TIRET, AUCUN FUTUR ADRESSÉ, AUCUN COMPTEUR (FR-031). La première version disait
+ * « Compléter mon ciel » : la revue du 2026-09-02 y a lu une jauge en mots (un ciel « à
+ * compléter » est un ciel incomplet, exactement ce que FR-031 et EXPERIENCE.md écartent), et un
+ * second libellé pour la même porte que « Ajouter mon heure de naissance » sous Aujourd’hui. Un
+ * seul libellé, celui du geste, partout : `LIEN_AJOUTER`.
  */
 
-/** Le bouton principal de l'appel, vers `/heure-naissance`. À la première personne : c'est elle qui agit. */
-export const BOUTON_COMPLETER_CIEL = "Compléter mon ciel";
+/** Le bouton principal de l'appel, vers `/heure-naissance` : le même libellé que la porte d'Aujourd’hui. */
+export const BOUTON_AJOUTER_HEURE = LIEN_AJOUTER;
 
 /**
  * Le résumé du `<details>` qui replie, sous le bouton, l'aveu long (`MESSAGE_SANS_HEURE`) et « où

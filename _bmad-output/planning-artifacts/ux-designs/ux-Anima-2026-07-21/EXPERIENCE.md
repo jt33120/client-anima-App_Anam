@@ -839,7 +839,7 @@ pas. « Moi » nommait la personne, et ce n'est pas elle qui change d'un jour à
 ### 2. Un seul « Aujourd’hui » par écran (décision D7)
 
 Le mot existait déjà deux fois dans le produit : en entête de la section quotidienne de la région,
-et comme séparateur de jour dans le fil d'Anam. Deux entêtes homonymes sur un même écran est un
+et comme séparateur de jour dans le fil d'Anam. Deux entêtes homonymes sur un même écran, c’est un
 défaut documenté. L'entête interne devient donc **« Ce que le jour propose »**, la formule du mode
 d'emploi (`lib/domain/copie-reperes.ts`) ; son ancrage `moi-aujourdhui` est conservé. Le séparateur
 du fil garde son mot : ce n'est pas un nom de lieu, c'est le calendrier, et

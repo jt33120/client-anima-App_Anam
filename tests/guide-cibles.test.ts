@@ -303,7 +303,7 @@ describe("[fondateur 2026-09-01] le tour tient en cinq étapes d'une ou deux phr
 
   it("[LE CŒUR] le tour tutoie, au présent, et ne s'adresse à personne au futur (FR-053)", () => {
     for (const e of ETAPES) {
-      expect(e.texte, `« ${e.titre} » ne tutoie pas`).toMatch(/\b(?:tu|te|ton|ta|tes|toi)\b|\bt’/i);
+      expect(e.texte, `« ${e.titre} » ne tutoie pas`).toMatch(/(?<![\p{L}’])(?:tu|te|ton|ta|tes|toi)(?![\p{L}])|(?<![\p{L}])t’/iu);
       const trouvees = chercherPredictions(`${e.titre}. ${e.texte}`);
       expect(trouvees, `« ${e.titre} » prédit : ${JSON.stringify(trouvees)}`).toEqual([]);
     }

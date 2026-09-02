@@ -151,8 +151,8 @@ export const MESSAGE_TYPE_SANS_TEXTE =
  * manque » à l'aveu est devenu un point. L'état est dit, puis expliqué, en deux phrases courtes.
  */
 export const MESSAGE_TYPE_ABSENT =
-  "Le test n’a pas encore été passé. C’est lui qui manque, pas le texte : les neuf types sont " +
-  "écrits et t’attendent. Il est court, et tu peux t’arrêter en route.";
+  "Tu n’as pas encore passé le test. Les neuf types sont écrits et t’attendent ; il est court, " +
+  "et tu peux t’arrêter en route.";
 
 /** Où le passer. Constante unique — un test vérifie que la page existe. */
 /**

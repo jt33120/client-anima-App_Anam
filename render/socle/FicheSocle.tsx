@@ -293,7 +293,7 @@ function AppelHeure({
     <div className={s.appelHeure}>
       <p className={`t-anam ${s.bulleAppel}`}>{sansHeure.appel}</p>
       <Link className={`t-bouton ${s.boutonPrincipal}`} href={sansHeure.reparation.url}>
-        {copie.boutonCompleterCiel}
+        {copie.boutonAjouterHeure}
       </Link>
       <details className={s.devoilement}>
         <summary className="t-corps">{copie.resumeDetailHeure}</summary>
@@ -443,7 +443,7 @@ export interface ProprietesFicheSocle {
     readonly sensDuCielNonEcrit: string;
     readonly typeSansTexte: string;
     /** Univers Astrologie (2026-09-01) : le bouton de l'appel, ses deux résumés de pli, le silence du jour. */
-    readonly boutonCompleterCiel: string;
+    readonly boutonAjouterHeure: string;
     readonly resumeDetailHeure: string;
     readonly titreDetailPositions: string;
     readonly cielDuJourNonEcrit: string;

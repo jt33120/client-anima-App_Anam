@@ -157,8 +157,13 @@ describe("[E5-S2] le ciel consomme `--nebuleuse` : le jeton n'est pas mort", () 
     // Les invariants de tête de `monde.module.css` : le fondu de région est la seule grammaire de
     // mouvement, la respiration le seul mouvement en boucle. Une nébuleuse qui dériverait, ou un
     // `mix-blend-mode` plein écran, serait exactement le mode d'échec mesuré à 4 im/s le 2026-08-20.
+    // La FAMILLE de propriétés, pas seulement le raccourci : `animation-name: x; animation-iteration-count:
+    // infinite;` ferait dériver la nébuleuse sans jamais écrire `animation:` (revue du 2026-09-02).
+    const motif = (interdit: string) => new RegExp(`(?:^|[\\s;])${interdit}(?:-[a-z-]+)?\\s*:`);
+    expect(".monde { animation-name: x; }", "témoin : la forme longue est vue").toMatch(motif("animation"));
+    expect(".monde { transition-property: y; }").toMatch(motif("transition"));
     for (const interdit of ["animation", "transition", "mix-blend-mode", "backdrop-filter", "filter"]) {
-      expect(ciel, `\`${interdit}\` sur le ciel`).not.toMatch(new RegExp(`(?:^|[\\s;])${interdit}\\s*:`));
+      expect(ciel, `\`${interdit}\` sur le ciel`).not.toMatch(motif(interdit));
     }
   });
 

@@ -526,9 +526,12 @@ function defautsDeStructure(nombre: NomNombre, valeur: number, texte: string): s
   if (longueur > LONGUEUR_MAX_LECTURE) defauts.push(`(c) ${longueur} caractères, plus de ${LONGUEUR_MAX_LECTURE}`);
   const phrases = nombreDePhrases(texte);
   if (phrases < 2 || phrases > 4) defauts.push(`(c) ${phrases} phrase(s), il en faut deux à quatre`);
-  if (!/\b(?:tu|ton|ta|tes)\b/i.test(texte)) defauts.push("(d) aucun tutoiement");
+  // Frontières UNICODE : `\b` est ASCII et laissait passer « fêtes », « bâton », « têtes » comme
+  // des « tes »/« ton » (revue du 2026-09-02). L'apostrophe typographique compte comme lettre
+  // (« t’attend » n'est pas « ta »).
+  if (!/(?<![\p{L}’])(?:tu|ton|ta|tes)(?![\p{L}])/iu.test(texte)) defauts.push("(d) aucun tutoiement");
   // « rendez-VOUS » n'est pas un vouvoiement — même précaution que `qa-visuelle-19-aout.test.ts`.
-  if (/(?<!-)\b(?:vous|vos|votre)\b/i.test(texte)) defauts.push("(d) vouvoiement");
+  if (/(?<![\p{L}-])(?:vous|vos|votre)(?![\p{L}])/iu.test(texte)) defauts.push("(d) vouvoiement");
   return defauts;
 }
 
@@ -806,5 +809,17 @@ describe("aucun commentaire ne renvoie vers un fichier qui n'existe pas", () => 
       }
     }
     expect(morts, `migration(s) citée(s) et absente(s) : ${morts.join(" | ")}`).toEqual([]);
+  });
+});
+
+describe("[revue 2026-09-02] le détecteur de tutoiement a des frontières Unicode", () => {
+  it("[CONTRÔLE DU CONTRÔLE] « fêtes », « bâton », « têtes » ne passent plus pour « tes » / « ton »", () => {
+    const sansTu = "Le chemin de vie 7 symbolise les fêtes et le bâton. Les têtes se lèvent, on observe.";
+    expect(defautsDeStructure("chemin_de_vie", 7, sansTu)).toContain("(d) aucun tutoiement");
+    const avecTu = "Ton chemin de vie 7 symbolise les fêtes. Tu observes, et ça t’attend.";
+    expect(defautsDeStructure("chemin_de_vie", 7, avecTu)).not.toContain("(d) aucun tutoiement");
+    // « rendez-vous » n'est toujours pas un vouvoiement ; « vous » seul l'est.
+    expect(defautsDeStructure("chemin_de_vie", 7, "Ton chemin de vie 7 symbolise le rendez-vous. Tu y vas.")).not.toContain("(d) vouvoiement");
+    expect(defautsDeStructure("chemin_de_vie", 7, "Ton chemin de vie 7 symbolise. Vous y allez.")).toContain("(d) vouvoiement");
   });
 });

@@ -93,6 +93,16 @@ export default function AvatarSeuil({ actif, alt }: { actif: boolean; alt: strin
       return;
     }
 
+    // Revue du 2026-09-02 : en paysage bas (`max-height: 600px`) et en contraste renforcé,
+    // `.avatar` est `display: none`. Animer 4,5 s de `drawImage` dans une boîte que personne ne
+    // voit serait du travail pour rien : on montre l'état final et on ne dessine pas.
+    const vue = toile.ownerDocument.defaultView;
+    const boite = enveloppe.current;
+    if (vue && boite && vue.getComputedStyle(boite).display === "none") {
+      setPret(true);
+      return;
+    }
+
     let annule = false;
     let remplissage: Remplissage | null = null;
     const montrer = () => {

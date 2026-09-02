@@ -78,7 +78,7 @@ function envoi(): FormData {
   return new FormData(form);
 }
 
-const bouton = () => screen.getByRole("button", { name: /compléter mon ciel/i }) as HTMLButtonElement;
+const bouton = () => screen.getByRole("button", { name: /^Enregistrer$/ }) as HTMLButtonElement;
 
 describe("[A2] la commune se demande même quand l’heure manque", () => {
   it("[CONTRÔLE POSITIF] par défaut, les deux sont demandés", () => {
@@ -274,11 +274,14 @@ describe("[2026-09-01] beaucoup moins de texte", () => {
 });
 
 describe("[2026-09-01] un gros bouton", () => {
-  it("[LE CŒUR] le bouton principal dit ce qu’il ouvre : « Compléter mon ciel »", () => {
+  it("[LE CŒUR] le bouton principal est « Enregistrer », gros et pleine largeur", () => {
     render(<FormulaireHeure deja={RIEN} />);
-    const b = screen.getByRole("button", { name: "Compléter mon ciel" });
+    const b = screen.getByRole("button", { name: "Enregistrer" });
     expect(b.getAttribute("type")).toBe("submit");
-    expect(screen.queryByRole("button", { name: /^enregistrer$/i }), "l’ancien verbe technique").toBeNull();
+    // « Compléter mon ciel » (essayé le 2026-09-01) faisait du ciel un objet incomplet : le
+    // vocabulaire de jauge que FR-031 écarte (revue du 2026-09-02). Le geste, gros et pleine
+    // largeur, garde son verbe ; il ne revient nulle part sous l'autre forme.
+    expect(screen.queryByRole("button", { name: /compléter mon ciel/i }), "le vocabulaire de complétude est revenu").toBeNull();
   });
 
   it("[ANTI-VACUITÉ] il est pleine largeur et plus haut que la cible minimale, en tokens, dans le module", () => {
