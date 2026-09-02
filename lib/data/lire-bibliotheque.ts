@@ -21,6 +21,7 @@ import {
 import { manqueLHeure } from "@/lib/domain/socle-incomplet";
 import { lireEnneagramme, lireTentativeEnneagramme } from "@/lib/data/lire-enneagramme";
 import { lireSocleQuotidien, jourCivilParis } from "@/lib/data/lire-quotidien";
+import { texteDuJourGenere } from "@/lib/ai/texte-du-jour";
 import type { ResultatThemeNatal } from "@/lib/data/depot-theme-natal";
 import { NON_ECRIT } from "@/lib/corpus/port";
 
@@ -130,7 +131,23 @@ export async function lireBibliotheque(
     // « naissance absente » et « lecture impossible » sont des états d'I/O, pas des états du socle.
     // Le domaine ne reçoit donc qu'une chose : le thème, ou rien.
     cartes.push(carteMantra(socle.mantra));
-    cartes.push(carteHoroscope(socle.horoscope.statut === "calcule" ? socle.horoscope.horoscope : null));
+    // ⚠️ LA MÊME ÉCRITURE QUE DANS L'UNIVERS ASTROLOGIE, PAS UNE DEUXIÈME (2026-09-02).
+    //
+    // La carte « Ton ciel du jour » paraît à DEUX endroits : ici, en avant sur l'accueil, et dans la
+    // halte du socle. Servir le texte de modèle d'un côté et la phrase de corpus de l'autre
+    // donnerait deux textes sous le même titre, le même jour — et rien ne rougirait, puisque les
+    // deux sont plausibles. `texteDuJourGenere` mémoïse par signature de ciel : le second appel de
+    // la même journée ne repart pas au modèle, il relit.
+    const ecritureDuJour =
+      socle.horoscope.statut === "calcule"
+        ? await texteDuJourGenere(supabase, utilisatriceId, socle.horoscope.horoscope)
+        : null;
+    cartes.push(
+      carteHoroscope(
+        socle.horoscope.statut === "calcule" ? socle.horoscope.horoscope : null,
+        ecritureDuJour,
+      ),
+    );
     // ⚠️ LE THÈME N'EST PLUS UNE CARTE (Story 7.7), MAIS IL EST TOUJOURS LU. `lireSocleQuotidien`
     // le rend dans le même appel, et `troncIncomplet` (projection de l'arbre) s'en sert : le
     // retirer de la lecture coûterait un aller-retour ailleurs. C'est la CARTE qui part, pas

@@ -83,9 +83,23 @@ export interface ManqueVue {
  * (retour du 2026-09-01 : l'horoscope est la première information de l'univers Astrologie).
  * Pas de date, pas de nombre : la seule forme numérique de cette frontière reste le type.
  */
+/** Un texte de modèle et sa mention — voir `render/accueil/types.ts`, même forme et même raison. */
+export interface EcritureModeleVue {
+  readonly texte: string;
+  readonly mention: string;
+}
+
 export interface HoroscopeVue {
   readonly titre: string;
   readonly texte: TexteVue;
+  /**
+   * Le texte écrit par un modèle pour ce ciel, AVEC la mention qui dit d'où il vient (2026-09-02).
+   *
+   * ⚠️ IL EST À CÔTÉ DE `texte`, PAS DEDANS, et la mention est DANS l'objet, pas à côté. `texte` est
+   * ce qu'Anima a écrit ; un rendu qui ne verrait qu'une chaîne ne saurait plus lequel des deux il
+   * affiche, et une mention rangée ailleurs est une mention qu'on oublie de rendre.
+   */
+  readonly ecritureModele: EcritureModeleVue | null;
 }
 
 export interface SectionNombresVue {

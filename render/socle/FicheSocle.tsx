@@ -326,7 +326,18 @@ function CielDuJour({
   return (
     <article className={s.carteJour} aria-labelledby="socle-ciel-du-jour">
       <h3 id="socle-ciel-du-jour" className="t-titre-sm">{horoscope.titre}</h3>
-      {horoscope.texte.statut === "ecrit" ? (
+      {/* ⚠️ TROIS RENDUS, ET LE PREMIER N'EST PAS EN `t-anam` (2026-09-02).
+
+          Un texte de modèle rendu dans le style d'Anam le ferait passer pour le sien : c'est
+          exactement ce que FR-086 refuse, et aucune mention placée en dessous ne rattraperait un
+          style qui, lui, affirme. D'où `t-corps` et sa mention collée, contre `t-anam` pour ce
+          qu'Anima a écrit. La règle du choix, elle, ne vit pas ici mais dans `texteMontre`. */}
+      {horoscope.ecritureModele !== null ? (
+        <>
+          <p className={`t-corps ${s.texte}`}>{horoscope.ecritureModele.texte}</p>
+          <p className={`t-meta ${s.mentionModele}`}>{horoscope.ecritureModele.mention}</p>
+        </>
+      ) : horoscope.texte.statut === "ecrit" ? (
         <p className={`t-anam ${s.texte}`}>{horoscope.texte.texte}</p>
       ) : (
         <p className={`t-meta ${s.noteCorpus}`}>{copie.cielDuJourNonEcrit}</p>

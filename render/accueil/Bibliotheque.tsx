@@ -165,6 +165,15 @@ function Carte({ carte, enAvant }: { carte: CarteVue; enAvant: boolean }) {
           Rendu en `t-corps`, JAMAIS en `t-anam` : ce ne sont pas ses mots (FR-054/FR-086). */}
       {carte.etat !== null ? (
         <p className={`t-corps ${s.etatProduit}`}>{carte.etat}</p>
+      ) : carte.ecritureModele !== null ? (
+        /* ⚠️ LE TEXTE DE MODÈLE, EN `t-corps` ET AVEC SA MENTION (2026-09-02). Même raison que
+           l'état juste au-dessus, et elle est ici plus forte encore : ces mots ne sont ceux de
+           personne. Le style qui affirme et la mention qui dit d'où ça vient vont ensemble ; l'un
+           sans l'autre rend la carte fausse. */
+        <>
+          <p className="t-corps">{carte.ecritureModele.texte}</p>
+          <p className={`t-meta ${s.mentionModele}`}>{carte.ecritureModele.mention}</p>
+        </>
       ) : carte.texte.statut === "ecrit" ? (
         <p className="t-anam">{carte.texte.texte}</p>
       ) : (

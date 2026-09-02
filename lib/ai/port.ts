@@ -35,7 +35,13 @@ export type CapaciteIa =
   | "detection"
   | "retour_theme"
   | "hypothese_enneagramme"
-  | "lecture";
+  | "lecture"
+  /**
+   * Le texte du jour de l'univers Astrologie (2026-09-02). SEULE capacité dont la charge utile ne
+   * contient AUCUN mot de l'utilisatrice : elle part d'une `SignatureDuCiel`, c'est-à-dire des
+   * énumérations et des entiers de 0 à 11.
+   */
+  | "horoscope";
 export type TierIa = "leger" | "fort";
 /** Niveau de détresse (Story 2.3 le PRODUIT ; ici, la politique le CONSOMME — défaut 0). */
 export type NiveauSecurite = 0 | 1 | 2 | 3;

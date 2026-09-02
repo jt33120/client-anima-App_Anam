@@ -30,6 +30,19 @@ export interface LigneFaitVue {
  */
 export type TexteVue = { readonly statut: "ecrit"; readonly texte: string } | { readonly statut: "non_ecrit" };
 
+/**
+ * UN TEXTE DE MODÈLE ET SA MENTION, indissociables (2026-09-02).
+ *
+ * ⚠️ TYPE NOMMÉ, ET NON OBJET EN LIGNE. `tests/bibliotheque-frontiere.test.ts` compare les champs
+ * des deux déclarations de la frontière en lisant les `readonly` du corps de l'interface : un objet
+ * écrit en ligne y injecte ses propres champs et la garde compare alors des listes qui ne veulent
+ * plus rien dire. Le type nommé garde la mesure lisible des deux côtés.
+ */
+export interface EcritureModeleVue {
+  readonly texte: string;
+  readonly mention: string;
+}
+
 export interface CarteVue {
   readonly cle: string;
   readonly titre: string;
@@ -46,6 +59,16 @@ export interface CarteVue {
    * écrire « 3 sur 5 » : `tests/bibliotheque-frontiere.test.ts` refuse qu'une valeur en porte une.
    */
   readonly etat: string | null;
+
+  /**
+   * CE QU'UN MODÈLE A ÉCRIT, avec sa mention, ou `null` (2026-09-02). Quatrième registre, pour la
+   * même raison que le troisième juste au-dessus, en plus net : un texte fabriqué à l'instant n'est
+   * écrit par personne. Il se rend dans son propre style, avec sa mention, jamais en `t-anam`.
+   *
+   * ⚠️ LA MENTION EST DANS L'OBJET. Rangée ailleurs, elle deviendrait une chose à ne pas oublier —
+   * et le jour où on l'oublie, le produit attribue à quelqu'un des mots qui ne sont de personne.
+   */
+  readonly ecritureModele: EcritureModeleVue | null;
 }
 
 /**

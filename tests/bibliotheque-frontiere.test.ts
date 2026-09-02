@@ -97,12 +97,26 @@ describe("[5.6/AD-10] le rendu ne connaît pas le domaine, et c'est ce qui impos
     //
     // La liste reste EXHAUSTIVE des deux côtés : c'est ce qui fait la garde. Un champ de plus ne
     // passe pas sans qu'on relise cette décision.
-    expect(champs(corpsInterface(RENDU, "CarteVue"))).toEqual(["cle", "etat", "faits", "texte", "titre"]);
+    //
+    // ⚠️ `ecritureModele` A ÉTÉ AJOUTÉ LE 2026-09-02 : un QUATRIÈME registre, pour un texte écrit
+    // par un modèle. Même raison que le troisième, en plus net — ces mots ne sont ceux de personne,
+    // et les glisser dans `texte` les ferait paraître en `t-anam`, sous le nom d'une personne
+    // réelle (FR-054/FR-086). Il porte SA MENTION avec lui, dans le même objet : une mention rangée
+    // à côté est une mention qu'un rendu peut oublier.
+    expect(champs(corpsInterface(RENDU, "CarteVue"))).toEqual([
+      "cle",
+      "ecritureModele",
+      "etat",
+      "faits",
+      "texte",
+      "titre",
+    ]);
     // Le domaine porte `terme` en plus : il décide de la disponibilité (FR-080/FR-055). Ce champ
     // ne DOIT PAS traverser — le rendu n'a pas à savoir si une carte est premium, puisqu'une carte
     // indisponible n'est jamais construite (AC2).
     expect(champs(corpsInterface(DOMAINE, "CarteBibliotheque"))).toEqual([
       "cle",
+      "ecritureModele",
       "etat",
       "faits",
       "terme",

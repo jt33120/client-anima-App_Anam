@@ -4,6 +4,7 @@ import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
 import { lireNumerologie } from "@/lib/data/lire-numerologie";
 import { lireThemeNatal } from "@/lib/data/depot-theme-natal";
 import { lireEnneagramme } from "@/lib/data/lire-enneagramme";
+import { texteDuJourGenere } from "@/lib/ai/texte-du-jour";
 import { lireSocleQuotidien } from "@/lib/data/lire-quotidien";
 import { ficheSocle } from "@/lib/domain/fiche-socle";
 import {
@@ -143,6 +144,22 @@ export default async function Page({
           .catch(() => null)
       : null;
 
+  // ══ LE TEXTE DU JOUR, ÉCRIT PAR LE MODÈLE (retour du 2026-09-02) ═════════════════════════════
+  //
+  // « Il manque l'horoscope. » Le calcul ne manquait pas : c'est la mise en mots qui tenait en
+  // vingt-sept phrases écrites d'avance, dont une seule paraissait, sans jamais nommer le jour.
+  //
+  // ⚠️ APRÈS l'horoscope et SEULEMENT s'il est calculé : sans ciel, il n'y a rien à mettre en mots,
+  // et un appel au modèle au-dessus d'un « il me manque ta date » se paierait pour rien.
+  //
+  // ⚠️ IL NE PEUT PAS FAIRE ÉCHOUER LA PAGE. `texteDuJourGenere` ne jette jamais et rend `null` sur
+  // tous ses chemins d'échec (pas de consentement art. 9, panne, quota, texte refusé) ; la carte
+  // retombe alors sur le corpus, qui est écrit et relu. Le `catch` ici est une ceinture de plus.
+  const ecritureDuJour =
+    horoscope === null
+      ? null
+      : await texteDuJourGenere(supabase, auth.user.id, horoscope).catch(() => null);
+
   // ⚠️ « JE N'ARRIVE PAS À LIRE » N'EST PAS « TU N'AS RIEN » (leçon 4.6 puis 4.9). Les deux raisons
   // d'indisponibilité ne se disent pas pareil : « naissance_absente » est un parcours inachevé,
   // « lecture_impossible » est un incident. Les confondre ferait croire à une perte de données.
@@ -166,6 +183,7 @@ export default async function Page({
     { nombres: raisonNombres, ciel: raisonCiel },
     numerologie?.statut === "calcule" ? numerologie.entrees : null,
     horoscope,
+    ecritureDuJour,
   );
 
   return (

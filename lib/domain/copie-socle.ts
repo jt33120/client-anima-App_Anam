@@ -56,8 +56,8 @@ export const URL_AJOUTER_SON_HEURE: PorteSocle = Object.freeze({
 export const TITRE_HALTE = "Ton socle";
 
 export const INTRODUCTION =
-  "Ce qui a été calculé à partir de ta date, de ton heure et de ton nom. Rien ici ne vient d’un " +
-  "modèle : les nombres suivent les conventions affichées et les positions viennent du calcul natal.";
+  "Ce qui a été calculé à partir de ta date, de ton heure et de ton nom. Les nombres suivent les " +
+  "conventions affichées et les positions viennent du calcul natal.";
 
 /**
  * ── LES DEUX INTRODUCTIONS D'UNIVERS, ET POURQUOI CELLE DU CIEL EST COURTE ──────────────────────
@@ -74,7 +74,7 @@ export const INTRODUCTION =
  * Celle de la numérologie est déplacée MOT POUR MOT : le mode numérologie ne change pas d'aspect.
  */
 export const INTRODUCTION_ASTROLOGIE =
-  "Ton ciel, calculé à partir de ta naissance. Rien ici ne vient d’un modèle.";
+  "Ton ciel, calculé à partir de ta naissance. Le texte du jour, lui, est écrit par un modèle.";
 
 export const INTRODUCTION_NUMEROLOGIE =
   "Tes nombres, calculés à partir de ta naissance et de ton nom. L’année personnelle suit l’année civile indiquée.";

@@ -525,7 +525,11 @@ describe("[retour 2026-09-01] « Ton ciel du jour » traverse la fiche, à l'ide
     // choisi autrement que la carte (dominante, sinon Lune relative, sinon NON_ECRIT).
     const carte = carteHoroscope(HOROSCOPE);
     const ciel = sectionCiel(themeSansHeure, null, HOROSCOPE);
-    expect(ciel.horoscope).toEqual({ titre: carte.titre, texte: carte.texte });
+    expect(ciel.horoscope).toEqual({
+      titre: carte.titre,
+      texte: carte.texte,
+      ecritureModele: carte.ecritureModele,
+    });
     expect(Object.isFrozen(ciel.horoscope)).toBe(true);
   });
 

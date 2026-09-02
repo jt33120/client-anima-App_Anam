@@ -7,6 +7,7 @@ import { NON_ECRIT, type TexteCorpus } from "@/lib/corpus/port";
 import type { TypeEnneagramme } from "./enneagramme";
 import { MESSAGE_TYPE_ABSENT } from "./enneagramme-items";
 import type { CarteBibliotheque } from "./bibliotheque";
+import { MENTION_ECRITURE_MODELE } from "./copie-modele";
 
 /**
  * cartes-socle.ts — LES CINQ CARTES, CONSTRUITES DEPUIS CE QUE LE SOCLE A CALCULÉ (Story 5.6, T5).
@@ -129,6 +130,9 @@ export function carteMantra(texte: TexteCorpus): CarteBibliotheque {
     // Rien à dire de l'état : quand le créneau est vide, la carte le dit déjà par `texte`, et
     // c'est bien Anima qui n'a pas écrit — pas un geste qui attend quelqu'un.
     etat: null,
+    // Le mantra n'est PAS écrit par un modèle, et ne le sera pas : il tient en une phrase qu'on
+    // relit, et c'est le seul morceau du socle qui ne demande rien à personne (5.4, AC6).
+    ecritureModele: null,
   };
 }
 
@@ -144,7 +148,18 @@ export function carteMantra(texte: TexteCorpus): CarteBibliotheque {
  * story). C'est le ciel qui est ainsi, pas un blocage : d'où la DATE portée par la carte, sans
  * laquelle deux jours identiques se liraient comme une panne.
  */
-export function carteHoroscope(horoscope: HoroscopeDuJour | null): CarteBibliotheque {
+export function carteHoroscope(
+  horoscope: HoroscopeDuJour | null,
+  /**
+   * Le texte écrit par le modèle pour CE ciel, ou `null` (retour du 2026-09-02). Il ne remplace pas
+   * `texte` : il vit dans son propre registre, avec sa mention, et `texte` reste le repli relu.
+   *
+   * ⚠️ SANS HOROSCOPE CALCULÉ, IL EST IGNORÉ. Un texte de modèle au-dessus d'un « je n'ai pas ta
+   * date » décrirait un ciel qu'on n'a pas su calculer ; l'appelant ne devrait pas en produire un,
+   * et si cela arrive, cette carte n'est pas l'endroit où l'incohérence doit passer.
+   */
+  texteDuModele: string | null = null,
+): CarteBibliotheque {
   return {
     cle: "horoscope",
     titre: "Ton ciel du jour",
@@ -156,6 +171,10 @@ export function carteHoroscope(horoscope: HoroscopeDuJour | null): CarteBiblioth
     // Un horoscope indisponible (pas de date de naissance, ou panne) n'a pas de texte non plus : on
     // ne fabrique pas un repli, on transmet l'absence telle quelle.
     texte: horoscope === null ? NON_ECRIT : texteDuCiel(horoscope),
+    ecritureModele:
+      horoscope === null || texteDuModele === null
+        ? null
+        : { texte: texteDuModele, mention: MENTION_ECRITURE_MODELE },
   };
 }
 
@@ -243,5 +262,7 @@ export function carteEnneagramme(type: TypeEnneagramme | null, texte: TexteCorpu
      * défaut que la 6.5b a déjà payé sur les libellés de signes.
      */
     etat: type === null ? MESSAGE_TYPE_ABSENT : null,
+    // Les neuf textes de type sont écrits et relus : rien à faire écrire ici.
+    ecritureModele: null,
   };
 }
