@@ -10,14 +10,15 @@ import {
   type TraceReductionNumerologique,
 } from "@/lib/astro/numerologie";
 import { placer, type ThemeNatal } from "@/lib/astro/theme-natal";
+import type { HoroscopeDuJour } from "@/lib/astro/quotidien";
 import { texteDe } from "@/lib/corpus/numerologie";
 import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
 import type { TexteCorpus } from "@/lib/corpus/port";
 import type { TypeEnneagramme } from "./enneagramme";
 import { MESSAGE_TYPE_SANS_TEXTE, MESSAGE_TYPE_ABSENT, URL_PASSER_LE_TEST } from "./enneagramme-items";
-import { CORPS_LIBELLE, NOMBRE_LIBELLE, SIGNE_LIBELLE, enSigne } from "./cartes-socle";
+import { CORPS_LIBELLE, NOMBRE_LIBELLE, SIGNE_LIBELLE, carteHoroscope, enSigne } from "./cartes-socle";
 import { manquantsDuSocle, reparableParLHeure, type Manquant } from "./socle-incomplet";
-import { MESSAGE_SANS_HEURE, OU_TROUVER_SON_HEURE } from "./message-sans-heure";
+import { MESSAGE_SANS_HEURE, OU_TROUVER_SON_HEURE, BULLE_SANS_HEURE } from "./message-sans-heure";
 import {
   RAISON_NOMBRE,
   RAISON_ANGLES,
@@ -144,6 +145,26 @@ export interface ManqueFiche {
   readonly reparation: Reparation | null;
 }
 
+/**
+ * « TON CIEL DU JOUR », TEL QUE L'ACCUEIL LE MONTRE (retour terrain du 2026-09-01 : « La première
+ * information c'est l'horoscope »).
+ *
+ * C'est la carte de `carteHoroscope` (`cartes-socle.ts`), réduite à ce que la halte affiche : son
+ * titre et son texte de corpus. La MÊME carte, pas une seconde mise en mots : même titre, même
+ * choix de texte (la configuration dominante, sinon la Lune relative), et donc le même silence
+ * quand rien n'est écrit. Deux versions de l'horoscope dans le produit auraient dérivé au premier
+ * renommage, sans que rien ne rougisse.
+ *
+ * ⚠️ AUCUN CHAMP NUMÉRIQUE, ET PAS DE DATE NON PLUS. `HoroscopeDuJour` porte le jour civil (trois
+ * nombres) ; il ne traverse pas. La frontière n'a qu'un seul nombre autorisé, le type retenu, et
+ * `tests/socle-frontiere.test.ts` comme `tests/fiche-socle.test.ts` le vérifient. `texte` reste
+ * l'union du corpus, jamais aplatie : « non écrit » et « rien à dire » ne se ressemblent pas.
+ */
+export interface HoroscopeFiche {
+  readonly titre: string;
+  readonly texte: TexteCorpus;
+}
+
 export interface SectionNombres {
   /** `null` = la lecture a échoué ou la naissance manque ; la phrase EST dans `indisponible`. */
   readonly indisponible: string | null;
@@ -172,8 +193,19 @@ export interface SectionCiel {
    * L'aveu de FR-050, quand — et seulement quand — son heure réparerait quelque chose. C'est
    * `MESSAGE_SANS_HEURE` et `OU_TROUVER_SON_HEURE`, RÉUTILISÉS : deux vérités concurrentes sur la
    * même absence sont un défaut, et celle-ci a déjà son écran (`/heure-naissance`) et sa formulation.
+   *
+   * `appel` (2026-09-01) : la phrase COURTE de la bulle, en tête de l'univers Astrologie, au-dessus
+   * du bouton. C'est `BULLE_SANS_HEURE`, la même que sur `/heure-naissance`, pour la même raison :
+   * une seule vérité par absence. L'aveu long et « où chercher » restent dessous, repliés.
    */
-  readonly sansHeure: { readonly aveu: string; readonly ouChercher: string; readonly reparation: Reparation } | null;
+  readonly sansHeure: { readonly appel: string; readonly aveu: string; readonly ouChercher: string; readonly reparation: Reparation } | null;
+  /**
+   * L'horoscope du jour, ou `null` : sans thème (naissance absente, panne), il n'y a pas de ciel du
+   * jour à montrer, et la phrase d'`indisponible` suffit. Avec un thème mais sans horoscope reçu
+   * (l'éphéméride du jour a échoué), `null` aussi : mieux vaut l'absence du bloc qu'un « Anima n'a
+   * pas encore écrit » qui accuserait l'autrice d'une panne de calcul.
+   */
+  readonly horoscope: HoroscopeFiche | null;
 }
 
 export interface SectionType {
@@ -407,7 +439,21 @@ function longitudeProjetee(longitude: number): string {
   return longitudeNormalisee(longitude).toFixed(6);
 }
 
-export function sectionCiel(theme: ThemeNatal | null, indisponible: string | null): SectionCiel {
+/**
+ * La carte du jour, réduite à ce que la halte affiche. `carteHoroscope` décide du texte (dominante,
+ * sinon Lune relative, sinon `NON_ECRIT`) ; ici on ne choisit rien, on transporte.
+ */
+function horoscopeFiche(horoscope: HoroscopeDuJour | null): HoroscopeFiche | null {
+  if (horoscope === null) return null;
+  const carte = carteHoroscope(horoscope);
+  return Object.freeze({ titre: carte.titre, texte: carte.texte });
+}
+
+export function sectionCiel(
+  theme: ThemeNatal | null,
+  indisponible: string | null,
+  horoscope: HoroscopeDuJour | null = null,
+): SectionCiel {
   if (theme === null) {
     return Object.freeze({
       indisponible,
@@ -417,6 +463,10 @@ export function sectionCiel(theme: ThemeNatal | null, indisponible: string | nul
       cuspides: [],
       manques: [],
       sansHeure: null,
+      // Sans thème, pas de ciel du jour, même si l'appelant en a un sous la main : la page dit déjà
+      // pourquoi il n'y a rien (naissance absente ou panne), et un horoscope au-dessus d'un
+      // « il me manque ta date » se contredirait lui-même.
+      horoscope: null,
     });
   }
   const avecDegre = theme.precision === "heure_connue";
@@ -492,11 +542,13 @@ export function sectionCiel(theme: ThemeNatal | null, indisponible: string | nul
     manques: Object.freeze(manques),
     sansHeure: reparableParElle
       ? Object.freeze({
+          appel: BULLE_SANS_HEURE,
           aveu: MESSAGE_SANS_HEURE,
           ouChercher: OU_TROUVER_SON_HEURE,
           reparation: { libelle: URL_AJOUTER_SON_HEURE.libelle, url: URL_AJOUTER_SON_HEURE.url },
         })
       : null,
+    horoscope: horoscopeFiche(horoscope),
   });
 }
 
@@ -627,9 +679,15 @@ export function ficheSocle(
   type: TypeEnneagramme | null,
   indisponibles: { readonly nombres: string | null; readonly ciel: string | null },
   entreesNumerologie?: EntreesNumerologie | null,
+  /**
+   * L'horoscope du jour (2026-09-01), lu par la page avec le MÊME thème (`lireSocleQuotidien`,
+   * `themeDejaLu`) pour ne jamais payer deux fois la lecture du thème (piège P10). Facultatif : les
+   * modes « tout » et « numérologie » ne le lisent pas, et n'en montrent rien.
+   */
+  horoscope: HoroscopeDuJour | null = null,
 ): FicheSocle {
   const nombres = sectionNombres(numerologie, indisponibles.nombres, entreesNumerologie);
-  const ciel = sectionCiel(theme, indisponibles.ciel);
+  const ciel = sectionCiel(theme, indisponibles.ciel, horoscope);
   const sectionDuType = sectionType(type);
   return Object.freeze({
     nombres,

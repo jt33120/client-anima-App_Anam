@@ -478,7 +478,86 @@
   border-bottom: 0;
 }
 
+/* ── L'univers Astrologie : l'appel à l'heure, le ciel du jour, le pli (retour du 2026-09-01) ────
+   « bouton ton heure de naissance bien avant … Il faudrait presque qu'Anam arrive avec une bulle ».
+   Une bulle dans la voix d'Anam, un bouton principal PLEINE LARGEUR sur mobile (c'est le geste de
+   la section, pas un lien parmi d'autres), et l'aveu long replié dessous. Aucune paire de couleurs
+   nouvelle : `texte` sur `surface` et `sur-accent` sur `accent` sont déjà passées par
+   `tests/contraste.test.ts` (4,5:1 dans les deux modes) ; la bordure est décorative (1.4.11). */
+.appelHeure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+/* La bulle : même grammaire que `.parole` de `/heure-naissance` (surface sobre, bordure fine,
+   grand rayon), sans queue de bande dessinée. Le coin bas gauche plus serré suffit à dire d'où
+   elle part. */
+.bulleAppel {
+  margin: 0;
+  padding: var(--esp-4) var(--esp-5);
+  color: var(--texte);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
+  border-bottom-left-radius: var(--rayon-sm);
+}
+
+/* Le bouton principal : même forme que `.bouton` de `/heure-naissance`, où il mène. Pleine largeur
+   sur mobile pour qu'il se prenne au pouce ; il reprend sa largeur naturelle dès 640 px. */
+.boutonPrincipal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--cible-tactile);
+  padding: 0 var(--esp-5);
+  border-radius: var(--rayon);
+  background: var(--accent);
+  color: var(--sur-accent);
+  text-decoration: none;
+}
+
+.boutonPrincipal:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
+/* Le contenu d'un dévoilement : ce qui était éparpillé en sous-sections vit sous un seul pli. */
+.contenuDevoilement {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  padding: 0 var(--esp-4) var(--esp-4);
+}
+
+.contenuDevoilement .raison {
+  line-height: 1.6;
+}
+
+/* « Ton ciel du jour » : la même carte que l'accueil, posée AVANT la carte natale. La bordure
+   forte la distingue des blocs d'information : c'est la première chose à lire, pas une note. */
+.carteJour {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon-md);
+  background: color-mix(in srgb, var(--surface-elevee) 58%, transparent);
+}
+
+.carteJour h3 {
+  margin: 0;
+  color: var(--texte);
+}
+
 @media (min-width: 640px) {
+  .boutonPrincipal {
+    width: auto;
+    align-self: flex-start;
+  }
+
   .halte {
     padding-right: var(--marge-desktop);
     padding-left: var(--marge-desktop);

@@ -258,6 +258,83 @@ function PositionTextuelle({
   );
 }
 
+/**
+ * L'APPEL À L'HEURE DE NAISSANCE : LE PREMIER BLOC DE L'UNIVERS ASTROLOGIE.
+ *
+ * Retour terrain du fondateur (2026-09-01) : « bouton ton heure de naissance bien avant. Il faudrait
+ * presque qu'Anam arrive avec une bulle : il manque l'heure de naissance ; une fois qu'on l'a on
+ * accède à l'horoscope. Si la personne n'a pas l'heure, on laisse passer. »
+ *
+ * Jusqu'ici l'aveu `MESSAGE_SANS_HEURE` et son lien vivaient EN BAS de la section, après la carte,
+ * les positions, les angles et les maisons : le seul geste qui complète son ciel était la dernière
+ * chose qu'on voyait, sous quatre écrans de texte. Ici : la phrase courte de la fiche (`appel`, dans
+ * la voix d'Anam, en bulle), UN bouton principal, et l'aveu long REPLIÉ juste dessous.
+ *
+ * ⚠️ L'AVEU ET « OÙ LA TROUVER » NE DISPARAISSENT PAS. FR-050 exige qu'Anam dise ce qui manque,
+ * pourquoi, et où chercher. Ils sont sous un `<details>` fermé : présents dans le DOM, à un geste,
+ * plus jamais à la place de l'horoscope. `tests/rendu/fiche-socle.test.tsx` garde l'ordre.
+ *
+ * ⚠️ PAS D'`ImageAnam` ICI, ET C'EST DIT POUR QU'ON NE L'AJOUTE PAS PAR RÉFLEXE. Le seul format à
+ * l'échelle d'une bulle, `veille`, n'a aucun asset sous `public/scene/veille/` (dossier vide) :
+ * chaque affichage ferait un 404 puis un repli plumeux. Le format `presence`, lui, est dimensionné
+ * par `conversation.module.css` à 40 vw (150 à 240 px) : posé au-dessus de l'horoscope, il
+ * repousserait sous le pli la « première information » que ce retour demande de mettre en avant.
+ * Le portrait vit déjà sur `/heure-naissance`, à un tap du bouton. La bulle est donc
+ * typographique : la voix d'Anam, pas son portrait, dans la même grammaire que celle de l'écran.
+ */
+function AppelHeure({
+  sansHeure,
+  copie,
+}: {
+  readonly sansHeure: NonNullable<SectionCielVue["sansHeure"]>;
+  readonly copie: ProprietesFicheSocle["copie"];
+}) {
+  return (
+    <div className={s.appelHeure}>
+      <p className={`t-anam ${s.bulleAppel}`}>{sansHeure.appel}</p>
+      <Link className={`t-bouton ${s.boutonPrincipal}`} href={sansHeure.reparation.url}>
+        {copie.boutonCompleterCiel}
+      </Link>
+      <details className={s.devoilement}>
+        <summary className="t-corps">{copie.resumeDetailHeure}</summary>
+        <div className={s.contenuDevoilement}>
+          <p className={`t-anam ${s.raison}`}>{sansHeure.aveu}</p>
+          <p className={`t-corps ${s.raison}`}>{sansHeure.ouChercher}</p>
+        </div>
+      </details>
+    </div>
+  );
+}
+
+/**
+ * « TON CIEL DU JOUR » : LA PREMIÈRE INFORMATION DE L'UNIVERS ASTROLOGIE (2026-09-01 : « La
+ * première information c'est l'horoscope. Il faut que ça aille plus vite. »).
+ *
+ * C'est la MÊME carte que l'accueil (`carteHoroscope`, transportée par la fiche) : même titre, même
+ * texte du corpus, même silence quand rien n'est écrit. Le rendu ne choisit rien et ne fabrique
+ * rien : la phrase du silence arrive par `copie`, comme toute copie (AD-7), et
+ * `tests/socle-frontiere.test.ts` refuse ici toute phrase de corpus en dur comme tout `?? ""`.
+ * En `t-anam` quand c'est écrit (ce sont ses mots), en `t-meta` sinon (ce n'est pas elle qui parle).
+ */
+function CielDuJour({
+  horoscope,
+  copie,
+}: {
+  readonly horoscope: NonNullable<SectionCielVue["horoscope"]>;
+  readonly copie: ProprietesFicheSocle["copie"];
+}) {
+  return (
+    <article className={s.carteJour} aria-labelledby="socle-ciel-du-jour">
+      <h3 id="socle-ciel-du-jour" className="t-titre-sm">{horoscope.titre}</h3>
+      {horoscope.texte.statut === "ecrit" ? (
+        <p className={`t-anam ${s.texte}`}>{horoscope.texte.texte}</p>
+      ) : (
+        <p className={`t-meta ${s.noteCorpus}`}>{copie.cielDuJourNonEcrit}</p>
+      )}
+    </article>
+  );
+}
+
 function SectionAstrologie({
   ciel,
   copie,
@@ -265,6 +342,7 @@ function SectionAstrologie({
   readonly ciel: SectionCielVue;
   readonly copie: ProprietesFicheSocle["copie"];
 }) {
+  const aDuDetail = ciel.positions.length > 0 || ciel.angles.length > 0 || ciel.cuspides.length > 0;
   return (
     <section className={`${s.section} ${s.sectionCiel}`} aria-labelledby="socle-ciel">
       <div className={s.enteteSection}>
@@ -273,49 +351,61 @@ function SectionAstrologie({
       </div>
 
       {ciel.indisponible && <p className={`t-corps ${s.panne}`}>{ciel.indisponible}</p>}
+
+      {/* L'ORDRE EST LE SUJET (retour du 2026-09-01), et il est gardé par
+          `tests/rendu/fiche-socle.test.tsx` : l'appel à l'heure quand elle manque, PUIS l'horoscope
+          du jour, PUIS la carte, PUIS le détail replié, PUIS les manques. Avant : carte, positions,
+          angles, maisons, et seulement ensuite l'aveu et son lien. */}
+      {ciel.sansHeure && <AppelHeure sansHeure={ciel.sansHeure} copie={copie} />}
+      {ciel.horoscope && <CielDuJour horoscope={ciel.horoscope} copie={copie} />}
       <CarteNatale ciel={ciel} />
 
-      {ciel.positions.length > 0 && (
-        <div className={s.equivalentTextuel} aria-labelledby="socle-positions-texte">
-          <h3 id="socle-positions-texte" className="t-titre-sm">Les positions, en texte</h3>
-          <ul className={s.listePositions}>
-            {ciel.positions.map((position) => <PositionTextuelle key={position.cle} position={position} />)}
-          </ul>
-        </div>
-      )}
-
-      {ciel.positions.length > 0 && <p className={`t-meta ${s.noteCorpus}`}>{copie.sensDuCielNonEcrit}</p>}
-
-      {ciel.angles.length > 0 && (
-        <div className={s.sousSection}>
-          <h3 className="t-titre-sm">{copie.titreAngles}</h3>
-          <ul className={s.listePositions}>
-            {ciel.angles.map((angle) => <PositionTextuelle key={angle.intitule} position={angle} />)}
-          </ul>
-        </div>
-      )}
-
-      {ciel.cuspides.length > 0 && (
+      {/* ⚠️ TOUT LE TABLEAU D'ÉPHÉMÉRIDES SOUS UN SEUL PLI, FERMÉ (2026-09-01 : « Toggle et cache
+          les positions en texte, on s'en fout, mets l'accent sur l'horoscope »). Les positions,
+          la note de corpus, les angles et les maisons restent dans le DOM (l'équivalent textuel du
+          SVG que son `<desc>` promet, et que `tests/rendu/fiche-socle.test.tsx` exige), mais ils
+          ne se lisent plus qu'à la demande. `sensDuCielNonEcrit` ne paraît qu'ici : une note sur
+          des positions qu'on ne voit pas n'a pas de sens au-dessus du pli. */}
+      {aDuDetail && (
         <details className={s.devoilement}>
-          <summary className="t-corps">{copie.titreMaisons}</summary>
-          <ul className={s.listePositions}>
-            {ciel.cuspides.map((cuspide) => (
-              <li key={cuspide.intitule} className={s.position}>
-                <span className={`t-meta ${s.etiquette}`}>{cuspide.intitule}</span>
-                <span className={`t-corps ${s.valeur}`}>{cuspide.valeur}</span>
-                {cuspide.longitude && <span className={`t-meta ${s.longitude}`}>Longitude : {cuspide.longitude}</span>}
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
+          <summary className="t-corps">{copie.titreDetailPositions}</summary>
+          <div className={s.contenuDevoilement}>
+            {ciel.positions.length > 0 && (
+              <div className={s.equivalentTextuel} aria-labelledby="socle-positions-texte">
+                <h3 id="socle-positions-texte" className="t-titre-sm">Les positions, en texte</h3>
+                <ul className={s.listePositions}>
+                  {ciel.positions.map((position) => <PositionTextuelle key={position.cle} position={position} />)}
+                </ul>
+              </div>
+            )}
 
-      {ciel.sansHeure && (
-        <div className={s.manque}>
-          <p className={`t-anam ${s.raison}`}>{ciel.sansHeure.aveu}</p>
-          <p className={`t-corps ${s.raison}`}>{ciel.sansHeure.ouChercher}</p>
-          <Lien reparation={ciel.sansHeure.reparation} />
-        </div>
+            {ciel.positions.length > 0 && <p className={`t-meta ${s.noteCorpus}`}>{copie.sensDuCielNonEcrit}</p>}
+
+            {ciel.angles.length > 0 && (
+              <div className={s.sousSection}>
+                <h3 className="t-titre-sm">{copie.titreAngles}</h3>
+                <ul className={s.listePositions}>
+                  {ciel.angles.map((angle) => <PositionTextuelle key={angle.intitule} position={angle} />)}
+                </ul>
+              </div>
+            )}
+
+            {ciel.cuspides.length > 0 && (
+              <div className={s.sousSection}>
+                <h3 className="t-titre-sm">{copie.titreMaisons}</h3>
+                <ul className={s.listePositions}>
+                  {ciel.cuspides.map((cuspide) => (
+                    <li key={cuspide.intitule} className={s.position}>
+                      <span className={`t-meta ${s.etiquette}`}>{cuspide.intitule}</span>
+                      <span className={`t-corps ${s.valeur}`}>{cuspide.valeur}</span>
+                      {cuspide.longitude && <span className={`t-meta ${s.longitude}`}>Longitude : {cuspide.longitude}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </details>
       )}
 
       {ciel.manques.length > 0 && (
@@ -352,6 +442,11 @@ export interface ProprietesFicheSocle {
     readonly titrePortes: string;
     readonly sensDuCielNonEcrit: string;
     readonly typeSansTexte: string;
+    /** Univers Astrologie (2026-09-01) : le bouton de l'appel, ses deux résumés de pli, le silence du jour. */
+    readonly boutonCompleterCiel: string;
+    readonly resumeDetailHeure: string;
+    readonly titreDetailPositions: string;
+    readonly cielDuJourNonEcrit: string;
   };
 }
 

@@ -4,10 +4,13 @@ import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
 import { lireNumerologie } from "@/lib/data/lire-numerologie";
 import { lireThemeNatal } from "@/lib/data/depot-theme-natal";
 import { lireEnneagramme } from "@/lib/data/lire-enneagramme";
+import { lireSocleQuotidien } from "@/lib/data/lire-quotidien";
 import { ficheSocle } from "@/lib/domain/fiche-socle";
 import {
   TITRE_HALTE,
   INTRODUCTION,
+  INTRODUCTION_ASTROLOGIE,
+  INTRODUCTION_NUMEROLOGIE,
   TITRE_NOMBRES,
   TITRE_CIEL,
   TITRE_APERCU,
@@ -23,6 +26,10 @@ import {
   NOMBRES_INDISPONIBLES,
   CIEL_INDISPONIBLE,
   NAISSANCE_ABSENTE,
+  BOUTON_COMPLETER_CIEL,
+  RESUME_DETAIL_HEURE,
+  TITRE_DETAIL_POSITIONS,
+  CIEL_DU_JOUR_NON_ECRIT,
 } from "@/lib/domain/copie-socle";
 import { MESSAGE_TYPE_SANS_TEXTE } from "@/lib/domain/enneagramme-items";
 import FicheSocle from "@/render/socle/FicheSocle";
@@ -101,11 +108,40 @@ export default async function Page({
   if (etape === "consentement") redirect("/consentement");
   if (etape === "revoque") redirect("/consentement/revoque");
 
+  // Une seule horloge pour toute la page : deux `new Date()` pourraient tomber de part et d'autre
+  // de minuit, et l'année personnelle et le ciel du jour se liraient sur deux jours différents.
+  //
+  // ⚠️ AUCUNE ÉPHÉMÉRIDE COMPOSÉE ICI, et ce n'est pas un oubli : `tests/astro-architecture.test.ts`
+  // ÉNUMÈRE les points de composition de l'adaptateur (`app/page.tsx`, `lib/data/…`), et cette
+  // halte n'en est pas un. `lireThemeNatal` et `lireSocleQuotidien` composent chacun la leur par
+  // défaut ; deux instances du même adaptateur portent le même identifiant, et la mémoïsation du
+  // ciel du jour n'en connaît que l'identifiant. Rien n'est calculé deux fois pour autant : le
+  // thème, lui, est passé DÉJÀ LU (voir plus bas).
+  const maintenant = new Date();
   const [numerologie, theme, enneagramme] = await Promise.all([
-    mode === "astrologie" ? Promise.resolve(null) : lireNumerologie(supabase, auth.user.id, new Date()).catch(() => null),
+    mode === "astrologie" ? Promise.resolve(null) : lireNumerologie(supabase, auth.user.id, maintenant).catch(() => null),
     mode === "numerologie" ? Promise.resolve(null) : lireThemeNatal(supabase, auth.user.id).catch(() => null),
     mode === "tout" ? lireEnneagramme(supabase, auth.user.id).catch(() => null) : Promise.resolve(null),
   ]);
+
+  // ══ L'HOROSCOPE DU JOUR, EN MODE ASTROLOGIE (retour terrain du 2026-09-01) ═══════════════════
+  //
+  // « La première information c'est l'horoscope. » Il vivait sur l'accueil seulement ; l'univers
+  // Astrologie ouvrait sur la carte natale et des positions en texte. Il est lu ICI, avec le thème
+  // DÉJÀ LU ci-dessus (`themeDejaLu`) : `lireSocleQuotidien` ne refait alors aucune requête, et
+  // `lireThemeNatal`, qui peut ÉCRIRE (recalcul après ajout de l'heure, 5.3), n'est appelé qu'une
+  // fois par page (piège P10). Le ciel du jour, lui, est mémoïsé et identique pour tout le monde.
+  //
+  // Seulement en mode astrologie : les deux autres modes n'en montrent rien, et ne le paient pas.
+  // Sans thème calculé (naissance absente, panne), pas d'horoscope : la phrase de `raisonCiel`
+  // suffit, et un ciel du jour au-dessus d'un « il me manque ta date » se contredirait.
+  // Repli sûr → `null` : le bloc n'existe pas, le reste de la halte s'affiche.
+  const horoscope =
+    mode === "astrologie" && theme?.statut === "calcule"
+      ? await lireSocleQuotidien(supabase, auth.user.id, maintenant, undefined, theme)
+          .then((socle) => (socle.horoscope.statut === "calcule" ? socle.horoscope.horoscope : null))
+          .catch(() => null)
+      : null;
 
   // ⚠️ « JE N'ARRIVE PAS À LIRE » N'EST PAS « TU N'AS RIEN » (leçon 4.6 puis 4.9). Les deux raisons
   // d'indisponibilité ne se disent pas pareil : « naissance_absente » est un parcours inachevé,
@@ -129,6 +165,7 @@ export default async function Page({
     enneagramme?.statut === "calcule" ? enneagramme.type : null,
     { nombres: raisonNombres, ciel: raisonCiel },
     numerologie?.statut === "calcule" ? numerologie.entrees : null,
+    horoscope,
   );
 
   return (
@@ -142,11 +179,13 @@ export default async function Page({
         fiche={fiche}
         mode={mode}
         copie={{
+          // Les trois introductions vivent dans `copie-socle.ts` (2026-09-02) : plus une phrase
+          // visible en dur ici, hors du contrôle de voix et du détecteur de prédiction.
           introduction:
             mode === "astrologie"
-              ? "Ton ciel de naissance, calculé à partir de ta date, de ton heure et de ton lieu. Rien ici n’est généré par un modèle."
+              ? INTRODUCTION_ASTROLOGIE
               : mode === "numerologie"
-                ? "Tes nombres, calculés à partir de ta naissance et de ton nom. L’année personnelle suit l’année civile indiquée."
+                ? INTRODUCTION_NUMEROLOGIE
                 : INTRODUCTION,
           titreNombres: TITRE_NOMBRES,
           titreApercu: TITRE_APERCU,
@@ -161,6 +200,10 @@ export default async function Page({
           titrePortes: TITRE_PORTES,
           sensDuCielNonEcrit: SENS_DU_CIEL_NON_ECRIT,
           typeSansTexte: MESSAGE_TYPE_SANS_TEXTE,
+          boutonCompleterCiel: BOUTON_COMPLETER_CIEL,
+          resumeDetailHeure: RESUME_DETAIL_HEURE,
+          titreDetailPositions: TITRE_DETAIL_POSITIONS,
+          cielDuJourNonEcrit: CIEL_DU_JOUR_NON_ECRIT,
         }}
       />
 
