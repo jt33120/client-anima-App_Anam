@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { ouvrirUnCompteNeuf } from "./_entrer";
+import { couleursNuit } from "../app/styles/tokens";
 
 /**
  * clavier.spec.ts — LA TABULATION RÉELLE, CE QUE PERSONNE N'AVAIT PU MESURER
@@ -20,8 +21,17 @@ import { ouvrirUnCompteNeuf } from "./_entrer";
  * recevoir le focus. Les deux gardes se complètent, aucune ne remplace l'autre.
  */
 
-/** L'anneau de la charte : `2px solid #77719C`, décalé de 2px. */
-const ANNEAU = { largeur: "2px", style: "solid", couleur: "rgb(119, 113, 156)" };
+/** `#RRGGBB` → `rgb(r, g, b)`, la forme que `getComputedStyle` rend en navigateur. */
+function hexVersRgb(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+}
+
+/** L'anneau de la charte : `2px solid var(--bordure-forte)`, décalé de 2px. La couleur est
+ *  DÉRIVÉE du jeton, plus écrite en dur : la palette Soft Balance (retour du fondateur,
+ *  2026-09-01) a changé la teinte (#77719C → #7A90C9) sans changer la règle, et une valeur
+ *  recopiée ici aurait rougi cette spec pour une bonne raison mécanique sans rien dire de vrai. */
+const ANNEAU = { largeur: "2px", style: "solid", couleur: hexVersRgb(couleursNuit["bordure-forte"]) };
 
 type Arret = {
   readonly balise: string;
@@ -185,8 +195,8 @@ test.describe("La tabulation, avec de vraies frappes", () => {
 
   test("[LE RISQUE SIGNALÉ] l'anneau est peint DEHORS, jamais collé au bord", async ({ page }) => {
     // Le tour de QA 2 l'a nommé avant qu'il n'arrive : `--bordure-forte` sur l'accent donnerait
-    // 2,39:1, sous le seuil. Ça ne se produit pas parce que le décalage dessine l'anneau sur le
-    // fond de page, où il tient à 4,29:1. Une garde de source interdit déjà `outline-offset: 0` ;
+    // 2,28:1 (palette Soft Balance ; 2,39 avant elle), sous le seuil. Ça ne se produit pas parce
+    // que le décalage dessine l'anneau sur le fond de page, où il tient à 4,71:1. Une garde de source interdit déjà `outline-offset: 0` ;
     // celle-ci vérifie ce que le navigateur CALCULE, cascade comprise.
     await page.goto("/entrer");
     const arrets = await traverser(page);

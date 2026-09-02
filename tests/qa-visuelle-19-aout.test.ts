@@ -301,9 +301,10 @@ describe("[QA 19/08] trois règles de la charte qui s'étaient perdues", () => {
 
   it("l'anneau de focus reste DEHORS — sinon le bouton primaire perd le sien", () => {
     // ⚠️ UN RISQUE SIGNALÉ AVANT QU'IL N'ARRIVE (tour de QA 2). L'anneau `--bordure-forte` sur
-    // l'accent `#8FC1EF` donnerait 2,39:1 — sous le seuil de 3:1. Le cas ne se produit pas
-    // aujourd'hui parce que `outline-offset: 2px` dessine l'anneau à l'EXTÉRIEUR du bouton, donc
-    // sur le fond de page, où il tient à 4,29:1. Passer ce décalage à 0 ferait disparaître
+    // l'accent Sky `#D3DBF0` donnerait 2,28:1 (2,39 avec l'accent d'avant la palette Soft
+    // Balance) — sous le seuil de 3:1. Le cas ne se produit pas aujourd'hui parce que
+    // `outline-offset: 2px` dessine l'anneau à l'EXTÉRIEUR du bouton, donc sur le fond de page,
+    // où il tient à 4,71:1. Passer ce décalage à 0 ferait disparaître
     // visuellement l'anneau du bouton primaire de `/entrer` — sans qu'aucune règle ne change de
     // couleur, et sans que rien ne rougisse. C'est le seul endroit du produit où ça peut arriver.
     const nuls: string[] = [];
