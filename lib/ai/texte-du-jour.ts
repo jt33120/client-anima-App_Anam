@@ -60,6 +60,43 @@ import type { AiPort } from "./port";
 /** Combien de textes le mémo garde. Une journée n'a qu'une poignée de configurations distinctes. */
 const MEMO_TAILLE_MAX = 64;
 
+/**
+ * LE DÉLAI AU-DELÀ DUQUEL LA PAGE N'ATTEND PLUS.
+ *
+ * ⚠️ CE N'EST PAS UN RÉGLAGE DE CONFORT. Ce module est appelé depuis `lireBibliotheque`, donc depuis
+ * l'ACCUEIL — la page la plus vue du produit, et celle dont le commentaire dit qu'« une panne de
+ * socle ne doit fermer ni la conversation ni l'arbre ». Un appel réseau qui pend n'est pas une
+ * panne : c'est une page qui ne répond pas, et rien dans `completer()` ne borne son attente. Sur
+ * une fonction serverless, l'attente finit par emporter la requête entière.
+ *
+ * Six secondes : au-delà du temps qu'un texte de trois phrases demande à un modèle léger, et bien
+ * en deçà du plafond d'exécution. Une génération qui dépasse rend `null` — donc le corpus — mais
+ * elle N'EST PAS ANNULÉE : si elle aboutit, elle remplit le mémo, et la vue suivante l'y trouve.
+ */
+const DELAI_MAX_MS = 6_000;
+
+/**
+ * Une course entre le travail et l'horloge.
+ *
+ * ⚠️ LA PROMESSE PERDANTE EST TOUJOURS RATTRAPÉE (`catch`). Sans ça, un échec réseau arrivé APRÈS
+ * le délai deviendrait un rejet non traité : sur Node, cela n'a plus rien à voir avec l'horoscope,
+ * ça met fin au processus.
+ */
+async function sousDelai<T>(travail: Promise<T>, delaiMs: number): Promise<T | "delai"> {
+  travail.catch(() => {});
+  let minuterie: ReturnType<typeof setTimeout> | undefined;
+  const horloge = new Promise<"delai">((resoudre) => {
+    minuterie = setTimeout(() => resoudre("delai"), delaiMs);
+  });
+  try {
+    return await Promise.race([travail, horloge]);
+  } finally {
+    // La minuterie est libérée dans tous les cas : une fonction serverless qui garde un `setTimeout`
+    // vivant reste éveillée pour rien, et en test le processus ne rendrait pas la main.
+    if (minuterie !== undefined) clearTimeout(minuterie);
+  }
+}
+
 /** `clé de signature → texte accepté`. Jamais de texte refusé : on ne mémorise pas un rebut. */
 const memoTexte = new Map<string, string>();
 
@@ -113,15 +150,49 @@ export async function texteDuJourGenere(
     if (dejaLa !== undefined) return dejaLa;
 
     const adaptateur = await deps.creerPort();
-    const envoi = await envoyerSousEgressArt9({
-      supabase,
-      adaptateur,
-      requete: {
-        capacite: "horoscope",
-        messages: [...messagesHoroscope(signature, horoscope.jour)],
-        contientArt9: true,
-      },
-    });
+    const course = await sousDelai(
+      envoyerSousEgressArt9({
+        supabase,
+        adaptateur,
+        requete: {
+          capacite: "horoscope",
+          messages: [...messagesHoroscope(signature, horoscope.jour)],
+          contientArt9: true,
+        },
+      }).then(async (envoi) => {
+        // ⚠️ LE VERDICT ET LE MÉTRAGE VIVENT DANS LA COURSE, pas après elle. Si la génération
+        // aboutit hors délai, elle doit quand même être mesurée (les jetons sont dus) et remplir le
+        // mémo : c'est ce qui fait que le texte est là au prochain affichage plutôt que jamais.
+        if (envoi.bloque) return envoi;
+        const verdict = verdictHoroscope(envoi.reponse.texte);
+        await deps.metrer({
+          utilisatriceId,
+          cleIdempotence: `texte_du_jour:${cle}`,
+          operation: "texte_du_jour",
+          capacite: "horoscope",
+          tier: envoi.reponse.tier,
+          modele: envoi.reponse.modele,
+          tokensEntree: envoi.reponse.usage.tokensEntree,
+          tokensSortie: envoi.reponse.usage.tokensSortie,
+          // Hors quota produit : ce n'est pas un tour de conversation, et le texte est le même pour
+          // toutes celles qui partagent ce ciel. Le coût fournisseur, lui, reste comptabilisé (FR-043).
+          exempteQuota: true,
+          comptabiliseFinancierement: true,
+          // Non lu : rien ici n'en dépend, et l'inventer serait pire que l'absence.
+          premiumAuMomentAppel: null,
+        });
+        if (verdict.accepte) retenir(cle, verdict.texte);
+        return { bloque: false as const, verdict };
+      }),
+      DELAI_MAX_MS,
+    );
+
+    if (course === "delai") {
+      // La page n'attend plus ; la génération, elle, continue et remplira le mémo si elle aboutit.
+      console.error("texte du jour : délai dépassé", { delaiMs: DELAI_MAX_MS });
+      return null;
+    }
+    const envoi = course;
     if (envoi.bloque) {
       // La raison n'est pas du contenu : la journaliser rend la différence entre « pas de clé » et
       // « pas de consentement » lisible, sans jamais dire de qui il s'agit (NFR-022).
@@ -129,37 +200,14 @@ export async function texteDuJourGenere(
       return null;
     }
 
-    const verdict = verdictHoroscope(envoi.reponse.texte);
-
-    // ⚠️ LE MÉTRAGE A LIEU MÊME QUAND LE TEXTE EST REFUSÉ. L'appel a eu lieu, les jetons sont dus,
-    // et un refus coûte exactement autant qu'une acceptation. Ne compter que les textes servis
-    // ferait disparaître des factures une consigne qui déraille.
-    await deps.metrer({
-      utilisatriceId,
-      cleIdempotence: `texte_du_jour:${cle}`,
-      operation: "texte_du_jour",
-      capacite: "horoscope",
-      tier: envoi.reponse.tier,
-      modele: envoi.reponse.modele,
-      tokensEntree: envoi.reponse.usage.tokensEntree,
-      tokensSortie: envoi.reponse.usage.tokensSortie,
-      // Hors quota produit : ce n'est pas un tour de conversation, et le texte est le même pour
-      // toutes celles qui partagent ce ciel. Le coût fournisseur, lui, reste comptabilisé (FR-043).
-      exempteQuota: true,
-      comptabiliseFinancierement: true,
-      // Non lu : rien ici n'en dépend, et l'inventer serait pire que l'absence.
-      premiumAuMomentAppel: null,
-    });
-
-    if (!verdict.accepte) {
+    if (!envoi.verdict.accepte) {
       // Le MOTIF, jamais le texte : un texte refusé pour prédiction est du contenu produit sur une
       // personne, et il n'a rien à faire dans un journal d'exploitation.
-      console.error("texte du jour : refusé", { motif: verdict.motif });
+      console.error("texte du jour : refusé", { motif: envoi.verdict.motif });
       return null;
     }
 
-    retenir(cle, verdict.texte);
-    return verdict.texte;
+    return envoi.verdict.texte;
   } catch (e) {
     console.error("texte du jour : exception", { nom: e instanceof Error ? e.name : "inconnu" });
     return null;

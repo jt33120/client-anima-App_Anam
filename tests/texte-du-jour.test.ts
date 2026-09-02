@@ -63,10 +63,11 @@ const supabaseRevoque = {
   rpc: async () => ({ data: false, error: null }),
 } as unknown as SupabaseClient;
 
-function fauxPort(texte: string) {
+function fauxPort(texte: string, delaiMs = 0) {
   const recues: RequeteIa[] = [];
   const completer = vi.fn(async (req: RequeteIa) => {
     recues.push(req);
+    if (delaiMs > 0) await new Promise((r) => setTimeout(r, delaiMs));
     return {
       texte,
       tier: "leger" as const,
@@ -191,6 +192,28 @@ describe("[LE BORD] tous les échecs se ressemblent, vus de la page", () => {
       metrer: vi.fn(async () => {}),
     };
     expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, quiJette)).toBeNull();
+  });
+
+  it("un modèle trop lent ne retient pas la page, et son texte sert au tour suivant", async () => {
+    // L'accueil est la page la plus vue du produit, et rien dans `completer()` ne borne son
+    // attente : un appel qui pend emporterait la requête entière sur une fonction serverless.
+    vi.useFakeTimers();
+    try {
+      const port = fauxPort(BON, 30_000);
+      const d = deps(port);
+      const course = texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, d.deps);
+
+      await vi.advanceTimersByTimeAsync(6_000);
+      expect(await course, "au délai, la page repart avec le corpus").toBeNull();
+
+      // ⚠️ ET LA GÉNÉRATION N'EST PAS ANNULÉE : quand elle aboutit, elle remplit le mémo.
+      await vi.advanceTimersByTimeAsync(30_000);
+      const port2 = fauxPort("un texte qui ne devrait jamais être demandé, le mémo répond avant.");
+      expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, deps(port2).deps)).toBe(BON);
+      expect(port2.completer).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("un ciel sans rien de personnel à dire n’appelle pas le modèle", async () => {
