@@ -18,7 +18,7 @@ import {
  *
  * ⚠️ CET EN-TÊTE A MENTI PENDANT UNE SEMAINE, ET IL A COÛTÉ UNE DEMI-JOURNÉE. Il disait « aucun
  * n'est ÉCRIT », ce qui était vrai à la Story 5.2 et faux depuis qu'Anima a livré sa prose. Les
- * textes ne sont pas ici, ils sont dans `lib/corpus/textes-de-base.ts:150-229`, et `creneau()`
+ * textes ne sont pas ici, ils sont dans `lib/corpus/textes-de-base.ts:171-250`, et `creneau()`
  * (`lib/corpus/port.ts:103-106`) les résout par clé. Un fichier « vide de texte » qui rend des
  * créneaux `ecrit` : les deux moitiés sont vraies, l'en-tête n'en disait qu'une.
  *
