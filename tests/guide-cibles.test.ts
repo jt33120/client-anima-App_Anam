@@ -3,6 +3,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { ETAPES } from "@/lib/domain/copie-guide";
 import { ENTREES_MENU } from "@/lib/domain/menu-compte";
+import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
 
 /**
  * guide-cibles.test.ts — LE TOUR GUIDÉ NE DÉSIGNE QUE CE QUE LA SCÈNE REND (2026-08-25).
@@ -177,9 +178,17 @@ describe("[2026-08-25] Chaque étape du tour désigne quelque chose que la SCÈN
   it("[LE CŒUR] et le tour ne NOMME pas une surface que la scène ne porte plus", () => {
     // Le vrai défaut était là : la cible existait encore (au premier passage), mais le TEXTE
     // parlait de « Repères en haut de chaque écran » alors que la surimpression ne le portait plus.
+    const CITATION = /«\s*([A-ZÀ-Ý][^»]{1,20}?)\s*»/g;
     const cites = new Set<string>();
-    for (const e of ETAPES)
-      for (const m of e.texte.matchAll(/«\s*([A-ZÀ-Ý][^»]{1,20}?)\s*»/g)) cites.add(m[1]);
+    for (const e of ETAPES) for (const m of e.texte.matchAll(CITATION)) cites.add(m[1]);
+
+    // ⚠️ DEPUIS LE 2026-09-01, LE TOUR PEUT NE CITER AUCUNE SURFACE ENTRE GUILLEMETS : les cinq
+    // étapes courtes nomment le socle et les univers sans « ». `cites` peut donc être vide, et
+    // cette garde verte pour une mauvaise raison. On prouve l'extracteur sur une phrase fabriquée
+    // pour qu'elle morde le jour où une citation revient, plutôt que de la retirer.
+    expect([...`Il t’attend dans « Ton socle », en entier.`.matchAll(CITATION)].map((m) => m[1])).toEqual([
+      "Ton socle",
+    ]);
 
     // ⚠️ CE QUE « LA SCÈNE PORTE » A GRANDI LE 2026-08-25, ET LA GARDE DOIT SUIVRE — sans quoi elle
     // interdirait de parler de ce qui est désormais atteignable.
@@ -198,5 +207,122 @@ describe("[2026-08-25] Chaque étape du tour désigne quelque chose que la SCÈN
       introuvables,
       `le tour nomme des surfaces que la scène ne rend pas : ${introuvables.join(", ")}`,
     ).toEqual([]);
+  });
+});
+
+/**
+ * ══ [FONDATEUR 2026-09-01] LE TOUR EST COURT, HUMAIN, ET COMPTE CINQ ÉTAPES ═════════════════════
+ *
+ * Retour terrain, mot pour mot : « Les textes du tutoriel ne sont pas clairs, trop générés par IA.
+ * Pas de "-". Trop directif. Il faut que les gens se sentent en confiance. [...] Retire l'étape
+ * "Et si tu perds le fil". Beaucoup plus concis, une ou deux phrases très simples par étape. »
+ *
+ * Ce qui se mesure ici est de la FORME, sans lire le sens : le nombre d'étapes, le nombre de
+ * phrases et de caractères, l'absence de tiret, la présence de la phrase du fondateur sur l'arbre,
+ * l'absence de futur adressé (FR-053), et l'absence de collision entre un titre d'étape et un
+ * <h2> de l'écran où la bulle se pose. La chaleur et la clarté restent une relecture humaine ;
+ * ces gardes empêchent seulement que le tour regrossisse sans qu'on le décide.
+ *
+ * ⚠️ GARDES D'ABSENCE, DONC ÉPROUVÉES POUR ELLES-MÊMES : le compteur de phrases, le détecteur de
+ * tiret et l'extracteur de <h2> sont chacun vérifiés sur des chaînes fabriquées connues-mauvaises
+ * ET connues-bonnes, sans quoi une expression régulière cassée laisserait tout au vert.
+ */
+describe("[fondateur 2026-09-01] le tour tient en cinq étapes d'une ou deux phrases, sans tiret", () => {
+  const TIRET = /[—–]/;
+  /** « Une ou deux phrases très simples » : la borne est nommée, pas devinée. */
+  const PHRASES_MAX = 2;
+  /** Mesuré en points de code, pas en octets : « é » et « ’ » comptent pour un. */
+  const CARACTERES_MAX = 200;
+  /** Même découpe que `tests/corpus-architecture.test.ts` : un point, un `!` ou un `?` final. */
+  const nombreDePhrases = (texte: string) =>
+    texte.split(/[.!?]+(?:\s+|$)/).filter((p) => p.trim().length > 0).length;
+
+  /** Les <h2> LITTÉRAUX que l'accueil rend : c'est là que se posent les trois premières bulles. */
+  const FICHIERS_ACCUEIL = ["render/premier-passage.tsx", "render/accueil/Bibliotheque.tsx"];
+  const h2Rendus = (src: string) =>
+    [...sansCommentaires(src).matchAll(/<h2\b[^>]*>\s*([^<{]+?)\s*<\/h2>/g)].map((m) => m[1]);
+  const H2_ACCUEIL = FICHIERS_ACCUEIL.flatMap((f) => h2Rendus(lire(f)));
+
+  it("[LE CŒUR] cinq étapes, et plus aucune sur le « ? » de secours", () => {
+    expect(ETAPES, "le tour a regrossi, ou une étape a disparu sans qu'on le décide").toHaveLength(5);
+    // L'étape retirée visait `[class*='porteSecours']` et s'appelait « Et si tu perds le fil ».
+    // Le « ? » reste sur chaque écran (FR-077) : il n'a pas besoin d'un tour pour exister.
+    expect(ETAPES.map((e) => e.titre)).not.toContain("Et si tu perds le fil");
+    expect(ETAPES.filter((e) => e.cible?.includes("porteSecours")).map((e) => e.titre)).toEqual([]);
+    // Et l'ordre du parcours tient : on atterrit sur l'accueil, on finit sur l'arbre.
+    expect(ETAPES[0].region).toBe("accueil");
+    expect(ETAPES[ETAPES.length - 1].region).toBe("arbre");
+  });
+
+  it("[LE CŒUR] chaque étape tient en une ou deux phrases et 200 caractères au plus", () => {
+    const trop = ETAPES.filter(
+      (e) => nombreDePhrases(e.texte) > PHRASES_MAX || [...e.texte].length > CARACTERES_MAX,
+    ).map((e) => `« ${e.titre} » : ${nombreDePhrases(e.texte)} phrases, ${[...e.texte].length} caractères`);
+    expect(trop, "le tour est redevenu verbeux").toEqual([]);
+    // Et jamais une étape vide : « une ou deux » commence à une.
+    for (const e of ETAPES) expect(nombreDePhrases(e.texte), `« ${e.titre} » est vide`).toBeGreaterThan(0);
+    // Un titre est un nom, pas une phrase : court, sans ponctuation finale.
+    for (const e of ETAPES) {
+      expect([...e.titre].length, `le titre « ${e.titre} » est trop long`).toBeLessThanOrEqual(30);
+      expect(e.titre, `le titre « ${e.titre} » se termine comme une phrase`).not.toMatch(/[.!?]$/);
+    }
+  });
+
+  it("[LE CŒUR] aucun tiret cadratin ni demi-cadratin, ni dans les étapes ni dans aucune chaîne du module", () => {
+    for (const e of ETAPES) {
+      expect(e.titre, `un tiret dans le titre « ${e.titre} »`).not.toMatch(TIRET);
+      expect(e.texte, `un tiret dans « ${e.titre} »`).not.toMatch(TIRET);
+    }
+    // Les libellés de boutons aussi : le source est lu commentaires retirés, pour qu'un tiret glissé
+    // dans une chaîne future rougisse sans qu'on pense à l'exercer (patron d'`ouverture-seance`).
+    expect(sansCommentaires(lire("lib/domain/copie-guide.ts"))).not.toMatch(TIRET);
+  });
+
+  it("[LE CŒUR] le tour tutoie, au présent, et ne s'adresse à personne au futur (FR-053)", () => {
+    for (const e of ETAPES) {
+      expect(e.texte, `« ${e.titre} » ne tutoie pas`).toMatch(/\b(?:tu|te|ton|ta|tes|toi)\b|\bt’/i);
+      const trouvees = chercherPredictions(`${e.titre}. ${e.texte}`);
+      expect(trouvees, `« ${e.titre} » prédit : ${JSON.stringify(trouvees)}`).toEqual([]);
+    }
+    // Contrôle du contrôle : la version que « tu verras » aurait donnée est bien attrapée.
+    expect(chercherPredictions("Tu verras, il grandira avec toi.").length).toBeGreaterThan(0);
+  });
+
+  it("[LE CŒUR] l'étape de l'arbre dit la phrase du fondateur : il « grandit et évolue avec toi »", () => {
+    // « Au fur et à mesure que tu as des compréhensions, l'arbre grandit et évolue avec toi. »
+    // Le mot « compréhensions » et le fragment final sont tenus tels quels : c'est la promesse
+    // qu'il a choisie, pas une paraphrase.
+    const arbre = ETAPES.filter((e) => e.region === "arbre");
+    expect(arbre, "le tour ne passe plus par l'arbre").toHaveLength(1);
+    expect(arbre[0].texte).toContain("compréhensions");
+    expect(arbre[0].texte).toContain("grandit et évolue avec toi");
+  });
+
+  it("[LE CŒUR] aucun titre d'étape ne répète un <h2> rendu sur l'accueil", () => {
+    // ⚠️ POURQUOI : la bulle du tour porte un <h2> (`render/guide/Guide.tsx`, `guide-titre`), et
+    // les trois premières étapes se posent sur l'accueil, qui en rend déjà : « Trois dimensions »
+    // (premier passage, exactement quand le tour se joue) et « Aujourd’hui » (section quotidienne).
+    // Deux entêtes de niveau 2 de même nom sur un écran, et un lecteur d'écran ne les distingue
+    // plus : c'est ce qui est arrivé le 2026-08-25 avec « Trois places ». Les titres sont donc
+    // comparés aux <h2> RÉELLEMENT rendus, pas à une liste recopiée ici.
+    expect(
+      H2_ACCUEIL,
+      "l'extracteur ne retrouve plus les <h2> connus de l'accueil : la garde ne mesure rien",
+    ).toEqual(expect.arrayContaining(["Trois dimensions", "Aujourd’hui"]));
+    const collisions = ETAPES.map((e) => e.titre).filter((t) => H2_ACCUEIL.includes(t));
+    expect(collisions, "un titre d'étape porte le même nom qu'un <h2> de l'accueil").toEqual([]);
+  });
+
+  it("[ANTI-VACUITÉ] le compteur de phrases, le détecteur de tiret et l'extracteur de <h2> mordent", () => {
+    expect(nombreDePhrases("Une. Deux ! Trois ?")).toBe(3);
+    expect(nombreDePhrases("Ici, ce qui change : ton ciel, ton mantra. Le reste t’attend.")).toBe(2);
+    expect(nombreDePhrases("Une seule phrase sans point final")).toBe(1);
+    expect(TIRET.test("Ton thème — en entier")).toBe(true);
+    expect(TIRET.test("de 9 h – 12 h")).toBe(true);
+    expect(TIRET.test("Ton socle, lui : en entier. Un trait-d’union reste libre.")).toBe(false);
+    expect(h2Rendus(`<h2 id="x" className={\`a \${s.b}\`}>Aujourd’hui</h2><h2>{carte.titre}</h2>`)).toEqual([
+      "Aujourd’hui",
+    ]);
+    expect(h2Rendus(`{/* <h2>Trois places</h2> */}<h3>Pas un h2</h3>`)).toEqual([]);
   });
 });
