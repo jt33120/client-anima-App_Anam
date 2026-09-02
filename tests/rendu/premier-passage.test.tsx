@@ -29,19 +29,19 @@ describe("[H4] quand le passage n'est PAS dû", () => {
 });
 
 describe("[H4] quand le passage EST dû", () => {
-  it("[LE CŒUR] les trois places sont nommées, et il n'y en a pas une quatrième", () => {
+  it("[LE CŒUR] les trois dimensions sont nommées, et il n'y en a pas une quatrième", () => {
     monte({ du: true, desCartesAttendent: false });
     const noms = screen.getAllByRole("term").map((e) => e.textContent);
     expect(noms).toEqual(["Anam", "Mon arbre", "Moi"]);
   });
 
-  it("chaque place a sa définition — un nom sans phrase n'explique rien", () => {
+  it("chaque dimension a sa définition — un nom sans phrase n'explique rien", () => {
     monte({ du: true, desCartesAttendent: false });
     expect(screen.getAllByRole("definition")).toHaveLength(3);
   });
 
   it("[LE CŒUR] il dit par quoi commencer — c'est la moitié du constat H4", () => {
-    // « je viens de m'inscrire » → « je sais quoi faire ». Nommer les places sans dire par où
+    // « je viens de m'inscrire » → « je sais quoi faire ». Nommer les dimensions sans dire par où
     // commencer ne répond qu'à la première moitié.
     monte({ du: true, desCartesAttendent: false });
     expect(screen.getByText(/Le plus simple/)).toBeTruthy();
@@ -50,7 +50,10 @@ describe("[H4] quand le passage EST dû", () => {
   it("le bloc est un repère nommé pour un lecteur d'écran", () => {
     monte({ du: true, desCartesAttendent: false });
     const titre = screen.getByRole("heading", { level: 2 });
-    expect(titre.textContent).toBe("Trois places");
+    // ⚠️ « Trois dimensions », plus « Trois places » : retour du fondateur du 2026-09-02. Le mot a
+    // changé, pas la garde : un <h2> nommé, en Fraunces, sous le <h1> du seuil. Le refus du retour
+    // de « places » vit dans `tests/trois-dimensions.test.ts`, qui lit aussi la halte Repères.
+    expect(titre.textContent).toBe("Trois dimensions");
     // La voix de titre reste UNE : Fraunces (`--pile-anam`), jamais l'interface.
     expect(titre.className).toContain("t-titre-sm");
   });

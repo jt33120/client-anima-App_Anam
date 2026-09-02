@@ -77,10 +77,13 @@ export const SECTIONS: readonly Section[] = Object.freeze([
     paragraphes: [
       "Les trois noms sont toujours affichés — en bas sur un téléphone, à gauche sur un écran large. " +
         "Un nom, un endroit : il n’y a pas de menu caché.",
-      "Au doigt, on peut aussi glisser latéralement d’une place à l’autre, dans l’ordre où les noms " +
+      // ⚠️ « dimension », plus « place » (2026-09-02, retour du fondateur) : c'est le mot du titre
+      // juste au-dessus (« Les trois dimensions »), et un mode d'emploi qui change de mot entre son
+      // titre et sa phrase fabrique deux vocabulaires pour un seul produit.
+      "Au doigt, on peut aussi glisser latéralement d’une dimension à l’autre, dans l’ordre où les noms " +
         "sont écrits. Le geste ne mène nulle part que les noms ne mènent déjà : si tu préfères " +
         "toucher, rien ne te manque.",
-      "Sur l’arbre, le doigt déplace l’arbre — c’est son geste à lui. Pour changer de place depuis " +
+      "Sur l’arbre, le doigt déplace l’arbre — c’est son geste à lui. Pour changer de dimension depuis " +
         "là, les noms sont toujours là.",
     ],
   },

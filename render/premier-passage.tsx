@@ -62,8 +62,12 @@ export default function PremierPassage({
     <section className={classe} aria-labelledby="premier-passage-titre">
       {/* Un <h2> sous le <h1> « Anam » du seuil : la hiérarchie reste lisible au lecteur d'écran,
           et la voix de titre reste UNE (Fraunces) — voir la garde d'échelle typographique. */}
+      {/* ⚠️ « TROIS DIMENSIONS », PLUS « TROIS PLACES » (2026-09-02, retour du fondateur). Le mot
+          commun aux trois lieux est « dimension » ; « place » ne survit qu'en commentaire. La halte
+          Repères le dit sous le même mot (`render/reperes/Reperes.tsx`), et
+          `tests/trois-dimensions.test.ts` refuse que l'une des deux surfaces revienne en arrière. */}
       <h2 id="premier-passage-titre" className="t-titre-sm">
-        Trois places
+        Trois dimensions
       </h2>
 
       {/* Une liste de définitions, parce que c'est exactement ce que c'est : un nom, ce qu'il
@@ -108,7 +112,7 @@ export default function PremierPassage({
         Commence par où tu veux. Le plus simple, c&rsquo;est de parler à Anam.
       </p>
 
-      {/* ⚠️ CE BLOC SE DIT UNE FOIS, ET C'EST LÀ SA LIMITE. « Trois places » est court par
+      {/* ⚠️ CE BLOC SE DIT UNE FOIS, ET C'EST LÀ SA LIMITE. « Trois dimensions » est court par
           contrainte mesurée (voir plus haut) et ne paraît qu'au premier passage : quelqu'un qui
           n'a pas tout saisi ce jour-là n'avait plus rien à relire — c'est exactement le constat de
           la QA manuelle du 2026-08-19. Le lien mène à la version longue, qui, elle, reste. */}
