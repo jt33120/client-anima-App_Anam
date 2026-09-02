@@ -186,3 +186,25 @@ export const URL_PASSER_LE_TEST: { readonly libelle: string; readonly url: strin
   libelle: "Le test d’ennéagramme",
   url: "/enneagramme",
 });
+
+/**
+ * ⚠️ LES NEUF REPÈRES NE S'EMPILENT PLUS DANS LA PAGE (retour du fondateur, 2026-09-02 : « les
+ * tiroirs sont un peu longs. Moins de scroll, plus de pop-up, une app plus dynamique »).
+ *
+ * L'introduction rendait, avant « Commencer », un tiroir qui contenait neuf tiroirs : une colonne
+ * entière à faire défiler avant la première situation. Les neuf textes vivent désormais dans une
+ * FEUILLE (`render/Feuille.tsx`, le patron de `render/menu/MenuCompte.tsx`) qu'un seul bouton
+ * ouvre ; la page redevient courte : trois paragraphes, une porte, « Commencer ».
+ *
+ * Trois libellés de voix PRODUIT, ici et nulle part ailleurs : le bouton qui ouvre, le titre de la
+ * feuille, le bouton qui ferme. Aucun n'interprète un type (FR-054) ; « Type 1 » à « Type 9 »
+ * restent sans nom, les nommer relève de la voix d'Anima (FR-086, story à part). Des infinitifs,
+ * jamais un impératif : une porte se nomme, elle ne commande pas (`arbitrage-ouverture.ts`).
+ *
+ * `tests/rendu/reperes-enneagramme.test.tsx` refuse que l'une de ces chaînes soit réécrite en dur
+ * dans `app/` ou `render/` : deux formulations pour un même geste, à deux fichiers d'écart, est le
+ * défaut que la 6.5b a payé.
+ */
+export const LIBELLE_OUVRIR_REPERES = "Voir les neuf repères";
+export const TITRE_FEUILLE_REPERES = "Les neuf repères";
+export const LIBELLE_FERMER_REPERES = "Fermer";

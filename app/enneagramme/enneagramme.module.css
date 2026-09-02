@@ -49,34 +49,53 @@
   margin: 0;
 }
 
-.reperes {
-  width: 100%;
-  border-top: 1px solid var(--bordure);
-  padding-top: var(--esp-3);
-}
-
-.reperes > summary {
+/* ── La porte des neuf repères et leur feuille (retour du fondateur, 2026-09-02) ───────────────
+   « Les tiroirs sont un peu longs. Moins de scroll, plus de pop-up. » Le tiroir de neuf tiroirs a
+   quitté la page : `.ouvrirReperes` est le SEUL bouton qui reste ici, et il ouvre une feuille
+   (`render/feuille.module.css`). Un chemin de service, pas une offre : aucun fond, aucune couleur
+   d'accent, un filet au-dessus pour le détacher des trois paragraphes. */
+.ouvrirReperes {
   display: flex;
   align-items: center;
+  width: 100%;
   min-height: var(--cible-tactile);
+  margin: 0;
+  padding: var(--esp-3) 0 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--bordure);
+  border-radius: 0;
   color: var(--texte);
+  text-align: left;
   cursor: pointer;
+  transition: color var(--duree-standard) var(--courbe);
+}
+.ouvrirReperes:hover,
+.ouvrirReperes[aria-expanded="true"] {
+  color: var(--accent);
 }
 
+/* Dans la feuille : neuf `<details>` qui partagent un `name` (accordéon exclusif natif, un seul
+   texte ouvert à la fois). Une seule boîte bordée, des filets entre les entrées et AUCUN écart :
+   neuf résumés de 44 px doivent tenir dans la feuille sans défiler sur 390 × 664. */
 .listeReperes {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-3);
   list-style: none;
-  margin: var(--esp-3) 0 0;
+  margin: 0;
   padding: 0;
+  overflow: hidden;
+  background: var(--surface-elevee);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-md);
 }
 
 .repere {
-  padding: var(--esp-4);
-  background: var(--surface-elevee);
-  border: 1px solid var(--bordure);
-  border-radius: var(--rayon);
+  padding: 0 var(--esp-4);
+  border-bottom: 1px solid var(--bordure);
+}
+.listeReperes li:last-child .repere {
+  border-bottom: none;
 }
 
 .repere summary {
@@ -87,11 +106,15 @@
 }
 
 .repere p {
-  margin-top: var(--esp-3);
+  margin: 0 0 var(--esp-4);
 }
 
 .nomRepere {
   color: var(--texte-doux);
+  transition: color var(--duree-standard) var(--courbe);
+}
+.repere[open] .nomRepere {
+  color: var(--texte);
 }
 
 .question {
@@ -154,7 +177,7 @@
 .reponse:focus-visible,
 .bouton:focus-visible,
 .discret:focus-visible,
-.reperes > summary:focus-visible,
+.ouvrirReperes:focus-visible,
 .repere summary:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
