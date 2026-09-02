@@ -9,7 +9,7 @@ import { ouvrirUnCompteNeuf } from "./_entrer";
  *
  * ══ CE QUI SE MESURE, ET POURQUOI DES BOÎTES ═════════════════════════════════════════════════
  *
- * La différence entre un tour et six boîtes de texte n'est pas dans la copie : elle est dans le
+ * La différence entre un tour et cinq boîtes de texte n'est pas dans la copie : elle est dans le
  * fait que le projecteur COÏNCIDE avec l'élément dont on parle. Une garde qui vérifierait la
  * présence des textes serait verte sur six modales posées au hasard — c'est-à-dire sur l'objet
  * qu'on refuse. On mesure donc des rectangles : celui du trou contre celui de la cible.
@@ -57,7 +57,7 @@ test.describe("Le tour guidé", () => {
   test("[IL DÉSIGNE] le projecteur coïncide avec l'élément dont il parle", async ({
     page,
   }) => {
-    // ⚠️ C'EST LA PROPRIÉTÉ QUI SÉPARE UN TOUR D'UNE PILE DE MODALES. Sans elle, six boîtes de
+    // ⚠️ C'EST LA PROPRIÉTÉ QUI SÉPARE UN TOUR D'UNE PILE DE MODALES. Sans elle, cinq boîtes de
     // texte posées au centre de l'écran passeraient toutes les autres gardes de ce fichier.
     await arriverDansLeMonde(page);
     await dialogue(page).getByRole("button", { name: "Suivant" }).click();
