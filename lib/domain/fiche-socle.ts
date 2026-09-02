@@ -98,7 +98,11 @@ export interface FaitFiche {
   readonly valeur: string;
 }
 
-/** Une lecture écrite : séparée du nombre et de son calcul. */
+/**
+ * Une lecture écrite : séparée du nombre et de son calcul. L'intitulé porte le nombre lu —
+ * « Chemin de vie (7) » — pour que le libellé et le texte (« Ton chemin de vie 7 symbolise… ») se
+ * répondent sous le pli, là où la grille des nombres n'est plus sous les yeux (retour du 2026-09-02).
+ */
 export interface LectureSymboliqueFiche {
   readonly cle: NomNombre;
   readonly intitule: string;
@@ -292,15 +296,25 @@ export function sectionNombres(
     const lecture = numerologie.nombres[cle];
     const intitule = NOMBRE_LIBELLE[cle];
     if (lecture.statut === "calcule") {
+      const valeur = String(lecture.valeur);
       nombres.push({
         cle,
         intitule,
-        valeur: String(lecture.valeur),
+        valeur,
         calcul: calculLisible(cle, trace?.nombres[cle] ?? null),
       });
       const texte = lecteurTexte(cle, lecture);
       if (texte?.statut === "ecrit") {
-        lecturesSymboliques.push({ cle, intitule, texte: texte.texte });
+        // Retour du fondateur (2026-09-02) : « rajoute le chiffre à côté de ce à quoi il
+        // correspond, exemple : Chemin de vie (7) ». La lecture vit sous un pli, loin de la grille
+        // où le nombre s'affiche en grand ; sans lui, « Chemin de vie » coiffe un texte qui commence
+        // par « Ton chemin de vie 7 symbolise… » et les deux ne se répondent pas. On enrichit
+        // l'INTITULÉ plutôt que d'ajouter un champ : la frontière de rendu (`render/socle/types.ts`,
+        // gardée champ pour champ) ne bouge pas et le rendu reste muet (AD-7). Un nombre maître
+        // s'écrit « Expression (11) », jamais « (11/2) » : la réduction est déjà dite dans le texte,
+        // et « 11/2 » a la forme d'un compte (FR-031). La grille, elle, garde son intitulé nu — y
+        // répéter « (7) » sous un 7 en `t-display` serait absurde.
+        lecturesSymboliques.push({ cle, intitule: `${intitule} (${valeur})`, texte: texte.texte });
       } else {
         auMoinsUnTexteAbsent = true;
       }

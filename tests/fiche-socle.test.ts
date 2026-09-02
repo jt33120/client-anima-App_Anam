@@ -93,6 +93,79 @@ describe("[7.5 · 13.9] les six nombres et leur lecture sont deux couches distin
   });
 });
 
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// Retour du 2026-09-02 — sous le pli, chaque lecture dit le nombre qu'elle lit
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[retour 2026-09-02] l'intitulé d'une lecture symbolique porte son nombre : « Chemin de vie (7) »", () => {
+  // POURQUOI : la « Lecture symbolique d'Anima » vit sous un `<details>` fermé, loin de la grille
+  // où le nombre s'affiche en grand. Un article coiffé de « Chemin de vie » au-dessus de « Ton
+  // chemin de vie 4 symbolise… » oblige à remonter pour savoir de quel 4 on parle. Le fondateur
+  // demande le chiffre À CÔTÉ de ce à quoi il correspond — et c'est l'intitulé qui le porte, pas
+  // un champ de plus : la frontière de rendu (`socle-frontiere.test.ts`) ne bouge pas.
+  const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
+
+  it("[CONTRÔLE DU CONTRÔLE] le jeu d'essai porte au moins un nombre maître, sinon « (11) » ne serait jamais éprouvé", () => {
+    // Sans ce témoin, la règle « jamais (11/2) » ci-dessous serait vraie sur un jeu sans maître.
+    const maitres = NOMBRES.filter((n) => {
+      const lecture = NUM_COMPLETE.nombres[n];
+      return lecture.statut === "calcule" && lecture.maitre;
+    });
+    expect(maitres.length, "le jeu d'essai ne porte aucun nombre maître").toBeGreaterThan(0);
+  });
+
+  it("[LE CŒUR] les six intitulés se terminent par la valeur du nombre de même clé, entre parenthèses", () => {
+    expect(section.lecturesSymboliques).toHaveLength(6);
+    for (const lecture of section.lecturesSymboliques) {
+      const nombre = section.nombres.find((n) => n.cle === lecture.cle);
+      expect(nombre, `${lecture.cle} : une lecture sans nombre calculé`).toBeDefined();
+      // Recalculé depuis la fiche, jamais codé en dur : changer l'année de référence ou le nom du
+      // jeu d'essai ne doit pas faire mentir cette garde. Mutations-cibles : retirer le suffixe
+      // (« Chemin de vie ») ou y mettre la valeur d'un autre nombre — les deux rougissent ici.
+      expect(lecture.intitule).toBe(`${nombre!.intitule} (${nombre!.valeur})`);
+    }
+  });
+
+  it("un nombre maître s'écrit « Expression (11) », jamais « (11/2) » — la réduction est déjà dans le texte", () => {
+    // « 11/2 » a la forme d'un compte (FR-031 refuse `\d+/\d+`), et le texte du corpus dit déjà
+    // « ce nombre maître se lit aussi comme un 2 ». On n'écrit donc que le nombre conservé.
+    for (const lecture of section.lecturesSymboliques) {
+      const brut = NUM_COMPLETE.nombres[lecture.cle];
+      if (brut.statut !== "calcule" || !brut.maitre) continue;
+      expect(lecture.intitule).toBe(`${section.nombres.find((n) => n.cle === lecture.cle)!.intitule} (${brut.valeur})`);
+      expect(lecture.intitule).not.toMatch(/\//);
+    }
+  });
+
+  it("le libellé et le texte se répondent : la première phrase du texte nomme le même nombre", () => {
+    // Le corpus commence chaque lecture par « Ton chemin de vie 7 symbolise… ». Si le nombre du
+    // titre et celui de la phrase divergeaient, la page contredirait sa propre lecture.
+    for (const lecture of section.lecturesSymboliques) {
+      const valeur = lecture.intitule.match(/ \((\d+)\)$/)?.[1];
+      expect(valeur, `intitulé sans nombre : « ${lecture.intitule} »`).toBeDefined();
+      const premierePhrase = lecture.texte.split(/[.!?]/)[0];
+      expect(premierePhrase, lecture.cle).toMatch(new RegExp(`(^|\\D)${valeur}(\\D|$)`));
+    }
+  });
+
+  it("[ANTI-VACUITÉ] sans nom, aucune lecture orpheline ni parenthèse vide — les trois nombres de lettres restent des MANQUES", () => {
+    // Le suffixe est fabriqué depuis la valeur calculée. Un nombre non calculé n'a pas de valeur :
+    // il ne doit pas produire « Expression () », « Expression (undefined) », ni aucun article.
+    const sansNom = sectionNombres(NUM_SANS_NOM, null);
+    const manquants = new Set(sansNom.manquants.map((m) => m.cle));
+    expect(manquants.size, "sans nom, il doit y avoir des manques — sinon la garde est vide").toBeGreaterThan(0);
+    expect(sansNom.lecturesSymboliques.length, "les nombres de date gardent leur lecture").toBeGreaterThan(0);
+    for (const lecture of sansNom.lecturesSymboliques) {
+      expect(manquants.has(lecture.cle), `${lecture.cle} : une lecture pour un nombre non calculé`).toBe(false);
+      expect(lecture.intitule).toMatch(/^\S.* \(\d+\)$/);
+      expect(lecture.intitule).not.toMatch(/\(\s*\)|undefined|null|NaN/);
+    }
+    for (const manque of sansNom.manquants) {
+      expect(manque.intitule, `${manque.cle} : un manque ne porte pas de nombre`).not.toMatch(/\(/);
+    }
+  });
+});
+
 describe("[13.9] les entrées et conventions sont traçables", () => {
   it("montre exactement la date, le nom et l'année utilisés", () => {
     const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);

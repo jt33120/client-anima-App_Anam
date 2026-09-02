@@ -221,6 +221,9 @@ function SectionNumerologie({
           <div className={s.contenuLecture}>
             {nombres.lecturesSymboliques.map((lecture) => (
               <article key={lecture.cle} className={s.lectureEcrite}>
+                {/* L'intitulé arrive du domaine AVEC son nombre — « Chemin de vie (7) » — pour
+                    répondre au texte qui commence par « Ton chemin de vie 7 symbolise… » (retour
+                    du 2026-09-02). Le rendu ne recompose rien : il ne décide pas (AD-7). */}
                 <h3 className={`t-meta ${s.etiquette}`}>{lecture.intitule}</h3>
                 <p className={`t-anam ${s.texte}`}>{lecture.texte}</p>
               </article>
