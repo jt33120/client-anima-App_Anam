@@ -4,6 +4,11 @@
  * Bâtie sur les MÊMES tokens que le formulaire de naissance (`app/(auth)/naissance/`) : c'est le
  * même geste, à un autre moment de la vie du compte, et il ne doit pas donner l'impression d'un
  * autre produit. Aucune couleur d'alerte, aucune jauge, aucun pourcentage (AC2).
+ *
+ * Retour terrain du 2026-09-01 (Julian) : « un écran qui saute aux yeux avec un gros bouton et
+ * beaucoup moins de texte. Il faudrait presque qu'Anam arrive avec une bulle. » Trois blocs ont été
+ * ajoutés en bas de ce fichier : la bulle, l'aide repliée, le bouton principal. Rien de nouveau
+ * dans les couleurs : chaque paire fond/texte employée est déjà passée par `tests/contraste.test.ts`.
  */
 
 .halte {
@@ -133,4 +138,92 @@
 .checkbox:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════════
+   ANAM ARRIVE AVEC UNE BULLE (retour terrain du 2026-09-01)
+   ══════════════════════════════════════════════════════════════════════════════════════════════
+   L'image est celle d'`ApparitionAnam` (format Présence, fondu de 700 ms, masquée en mode
+   contraste : voir `bulle-anam.tsx`). La bulle est une surface sobre : ni queue de bande dessinée,
+   ni ombre, ni cadre appuyé. C'est la même grammaire que la fiche du socle. `texte` sur `surface`
+   est une paire déjà vérifiée (4,5:1 minimum) ; la bordure est décorative, exemptée (1.4.11). */
+.bulle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-2);
+  width: 100%;
+  max-width: 24rem;
+}
+.parole {
+  margin: 0;
+  padding: var(--esp-4) var(--esp-5);
+  color: var(--texte);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════════
+   « OÙ TROUVER MON HEURE ? » : PRÉSENT, MAIS REPLIÉ (FR-050 ; retour du 2026-09-01)
+   ══════════════════════════════════════════════════════════════════════════════════════════════
+   Forme reprise TELLE QUELLE de l'accordéon « Lire le détail » du consentement
+   (`app/(auth)/consentement/`) : même marqueur, même hauteur de cible, même anneau de focus. Un
+   second dessin d'accordéon dans le même produit serait une divergence gratuite. Pas de filets
+   haut et bas ici : dans un formulaire, ils se liraient comme un champ de plus. */
+.details {
+  width: 100%;
+}
+.resume {
+  cursor: pointer;
+  list-style: none;
+  min-height: var(--cible-tactile);
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  color: var(--texte-doux);
+}
+.resume::-webkit-details-marker {
+  display: none;
+}
+.resume::before {
+  content: "＋";
+  font-family: var(--pile-ui);
+  color: var(--texte-doux);
+}
+.details[open] .resume::before {
+  content: "－";
+}
+.resume:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+.detailsCorps {
+  margin: 0;
+  padding: 0 0 var(--esp-2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════════
+   LE GROS BOUTON (retour du 2026-09-01)
+   ══════════════════════════════════════════════════════════════════════════════════════════════
+   Pleine largeur (donc pleine largeur de l'écran sur mobile, bornée par `.form`), et plus haut que
+   la cible tactile minimale : le token `min-height: var(--cible-tactile)` reste écrit TEL QUEL,
+   parce que `tests/cible-tactile.test.ts` le lit littéralement sur toute classe nommée « bouton » ;
+   la hauteur réelle vient du rembourrage vertical (`box-sizing: border-box` global : 16 + 24 + 16,
+   soit 56 px, la hauteur canonique d'un appel à l'action sur mobile). Libellé à 1,125 rem et
+   interligne 1,35 : la ligne `t-titre-sm` de l'ÉCHELLE (`globals.css`), jamais une valeur inventée
+   (`tests/qa-visuelle-19-aout.test.ts`). Il reste `.bouton` : même accent, même `sur-accent`, même
+   opacité quand il est fermé. Il est seulement plus grand.
+   Le sélecteur du libellé passe par `.form` et non par `.boutonPrincipal` : même spécificité
+   (elle l'emporte sur `.t-bouton` sans dépendre de l'ordre des feuilles), mais un nom sans
+   « bouton » dedans, sinon la garde des cibles tactiles y verrait une commande de plus. */
+.boutonPrincipal {
+  width: 100%;
+  min-height: var(--cible-tactile);
+  padding: var(--esp-4) var(--esp-5);
+}
+.form .libellePrincipal {
+  font-size: 1.125rem;
+  line-height: 1.35;
 }

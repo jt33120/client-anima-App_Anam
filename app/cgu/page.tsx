@@ -12,7 +12,7 @@ export default function PageCGU() {
       <article className={s.contenu}>
         <p className="t-surtitre">Anam</p>
         <h1 className="t-titre">Conditions d&rsquo;utilisation</h1>
-        <p className="t-meta">Version provisoire — à finaliser avant le lancement.</p>
+        <p className="t-meta">Version provisoire, à finaliser avant le lancement.</p>
 
         <h2 className="t-titre-sm">Ce qu&rsquo;est Anam</h2>
         <p className="t-corps">
@@ -45,7 +45,7 @@ export default function PageCGU() {
           modèle d&rsquo;intelligence artificielle, qui reçoit ce qui est nécessaire à la
           conversation et s&rsquo;engage à ne pas s&rsquo;en servir pour entraîner ses modèles
           ni à le conserver ; et un service d&rsquo;envoi de courriels, établi aux États-Unis,
-          qui reçoit <strong>ton adresse et la raison de l&rsquo;envoi — jamais un mot de ce
+          qui reçoit <strong>ton adresse et la raison de l&rsquo;envoi, jamais un mot de ce
           que tu écris ni de ce qui est écrit pour toi</strong>.
         </p>
         <p className="t-corps">

@@ -61,7 +61,7 @@ export default async function PageConsentement({
         {/* Échec de suppression (AC6) : jamais silencieux — la session est restée ouverte. */}
         {erreur === "suppression" ? (
           <p className={s.erreur} role="alert">
-            La suppression n&rsquo;a pas pu aboutir. Ton compte est toujours là — tu peux
+            La suppression n&rsquo;a pas pu aboutir. Ton compte est toujours là : tu peux
             réessayer.
           </p>
         ) : null}
@@ -69,7 +69,7 @@ export default async function PageConsentement({
         {/* Déclaration IA — FR-013 / AI Act art. 50, en français courant */}
         <p className="t-anam">
           Tu vas parler à une <strong>intelligence artificielle</strong>. Pas à un être
-          humain, pas à une voyante. Anam lit, relie et te répond — mais elle n&rsquo;a ni
+          humain, pas à une voyante. Anam lit, relie et te répond, mais elle n&rsquo;a ni
           conscience ni intuition.
         </p>
         {/* ⚠️ « ET GARDÉ CHIFFRÉ » A ÉTÉ RETIRÉ D'ICI (revue Epic 6, R9).
@@ -83,7 +83,7 @@ export default async function PageConsentement({
         <p className="t-corps">
           Ce que tu lui confies est <strong>conservé</strong>, pour qu&rsquo;elle se
           souvienne d&rsquo;une fois sur l&rsquo;autre. C&rsquo;est protégé quand ça circule et
-          quand c&rsquo;est rangé — mais pas au point que personne chez Anima ne puisse
+          quand c&rsquo;est rangé, mais pas au point que personne chez Anima ne puisse
           jamais le lire. Tu peux tout <strong>effacer</strong> quand tu veux : alors tout
           disparaît, chez elle comme chez ses prestataires techniques.
         </p>
@@ -110,7 +110,7 @@ export default async function PageConsentement({
                 déduction qu'on ne peut pas corriger n'est plus une hypothèse, c'est un verdict. */}
             <p className="t-corps">
               Anam ne conserve pas seulement ce que tu lui dis : elle en <strong>déduit</strong>{" "}
-              aussi des choses — les thèmes qui reviennent chez toi, et une lecture de ta façon de
+              aussi des choses : les thèmes qui reviennent chez toi, et une lecture de ta façon de
               fonctionner. Ces déductions sont elles aussi des données sensibles. Tu peux les{" "}
               <strong>corriger</strong> ou les <strong>effacer</strong> à tout moment, sans perdre
               le reste.

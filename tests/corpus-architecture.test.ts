@@ -21,7 +21,7 @@ import {
   texteDe,
   valeursPossibles,
 } from "@/lib/corpus/numerologie";
-import { NOMBRES } from "@/lib/astro/numerologie";
+import { NOMBRES, type NomNombre } from "@/lib/astro/numerologie";
 
 /**
  * Story 5.2 (T7) — LES INVARIANTS DE LA COUCHE CORPUS (FR-054, FR-086, FR-053, AD-1).
@@ -451,6 +451,149 @@ describe("[FR-053/FR-054] le corpus réel passe le balayage", () => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
+// 3 bis. LA STRUCTURE DES 69 LECTURES NUMÉROLOGIQUES — retour du fondateur du 2026-08-31
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * ══ POURQUOI CETTE GARDE EXISTE ═════════════════════════════════════════════════════════════════
+ *
+ * Le retour de Julian sur la halte « Ton socle », verbatim : « rajoute le chiffre à côté de ce à
+ * quoi il correspond, exemple : Chemin de vie (7). Ensuite les textes doivent se structurer avec
+ * une analyse factuelle au début : le chemin de vie 7 symbolise…, puis décrire la personne ou ses
+ * défis potentiels. Utilise le tutoiement pour créer de la proximité. » Et, pour toute l'app :
+ * « bannir les — qui font très IA », « beaucoup plus concis ».
+ *
+ * ⚠️ CE QUE CETTE GARDE RENVERSE, ET C'EST DIT ICI POUR QU'ON NE LE RÉTABLISSE PAS PAR RÉFLEXE. La
+ * fiche d'écriture (`_bmad-output/implementation-artifacts/corpus-numerologie-a-ecrire.md`) et les
+ * textes du 2026-08-23 tenaient la consigne inverse : le texte « ne répète pas » le nom du nombre
+ * ni sa valeur, parce que l'écran les affiche déjà au-dessus. Le fondateur a tranché le contraire
+ * le 2026-08-31 : la première phrase DOIT porter les deux, parce que c'est ce qui rend la lecture
+ * factuelle avant d'être symbolique. La consigne du cahier est donc caduque sur ce point.
+ *
+ * ══ CE QU'ELLE GARDE, ET CE QU'ELLE NE GARDE PAS ═══════════════════════════════════════════════
+ *
+ * Quatre propriétés de FORME, mesurables sans lire le sens :
+ *   (a) la PREMIÈRE phrase nomme la famille ET le nombre (« chemin de vie 7 », « année
+ *       personnelle 9 ») ;
+ *   (b) aucun tiret cadratin « — » ni demi-cadratin « – » ;
+ *   (c) 360 caractères au plus, et deux à quatre phrases ;
+ *   (d) tutoiement (« tu », « ton », « ta », « tes »), jamais de vouvoiement.
+ *
+ * Elle ne dit RIEN de la justesse du texte, de sa bienveillance, ni de ce qu'il affirme : ça, c'est
+ * la relecture d'Anima, toujours due. Et elle n'affaiblit aucune garde existante — le lexique, la
+ * prédiction et l'apostrophe restent tenus par leurs propres tests, sur les mêmes textes.
+ *
+ * ══ [ANTI-VACUITÉ] ══════════════════════════════════════════════════════════════════════════════
+ *
+ * C'est une garde d'absence sur des textes qui EXISTENT, donc elle peut être verte pour une
+ * mauvaise raison : un texte introuvable (`texteDeBase` rend `undefined`) ne contient ni tiret ni
+ * vouvoiement. Trois disciplines, comme pour le balayage plus haut : la fonction de contrôle est
+ * éprouvée sur des chaînes FABRIQUÉES connues-mauvaises ET connues-bonnes avant d'être appliquée ;
+ * la PRÉSENCE des 69 textes est assertée avant leur forme ; et les textes sont exigés DISTINCTS,
+ * sans quoi un gabarit recopié 69 fois passerait tout.
+ */
+
+/** Le nom de chaque famille, tel qu'il doit apparaître dans la première phrase (en minuscules). */
+const FAMILLE_DANS_LA_PHRASE: Readonly<Record<NomNombre, string>> = Object.freeze({
+  chemin_de_vie: "chemin de vie",
+  expression: "expression",
+  intime: "intime",
+  personnalite: "personnalité",
+  jour_de_naissance: "jour de naissance",
+  annee_personnelle: "année personnelle",
+});
+
+/** « Beaucoup plus concis » : la borne est nommée, mesurée en points de code, pas en octets. */
+const LONGUEUR_MAX_LECTURE = 360;
+
+function premierePhrase(texte: string): string {
+  return texte.split(/(?<=[.!?])\s+/)[0] ?? "";
+}
+
+function nombreDePhrases(texte: string): number {
+  return texte.split(/[.!?]+(?:\s+|$)/).filter((p) => p.trim().length > 0).length;
+}
+
+/** Les défauts de forme d'une lecture — vide si elle a la structure demandée. Écrit UNE fois. */
+function defautsDeStructure(nombre: NomNombre, valeur: number, texte: string): string[] {
+  const defauts: string[] = [];
+  const attendu = new RegExp(`\\b${FAMILLE_DANS_LA_PHRASE[nombre]} ${valeur}\\b`, "i");
+  if (!attendu.test(premierePhrase(texte))) {
+    defauts.push(`(a) la première phrase ne dit pas « ${FAMILLE_DANS_LA_PHRASE[nombre]} ${valeur} »`);
+  }
+  if (/[—–]/.test(texte)) defauts.push("(b) tiret cadratin ou demi-cadratin");
+  const longueur = [...texte].length;
+  if (longueur > LONGUEUR_MAX_LECTURE) defauts.push(`(c) ${longueur} caractères, plus de ${LONGUEUR_MAX_LECTURE}`);
+  const phrases = nombreDePhrases(texte);
+  if (phrases < 2 || phrases > 4) defauts.push(`(c) ${phrases} phrase(s), il en faut deux à quatre`);
+  // Frontières UNICODE : `\b` est ASCII et laissait passer « fêtes », « bâton », « têtes » comme
+  // des « tes »/« ton » (revue du 2026-09-02). L'apostrophe typographique compte comme lettre
+  // (« t’attend » n'est pas « ta »).
+  if (!/(?<![\p{L}’])(?:tu|ton|ta|tes)(?![\p{L}])/iu.test(texte)) defauts.push("(d) aucun tutoiement");
+  // « rendez-VOUS » n'est pas un vouvoiement — même précaution que `qa-visuelle-19-aout.test.ts`.
+  if (/(?<![\p{L}-])(?:vous|vos|votre)(?![\p{L}])/iu.test(texte)) defauts.push("(d) vouvoiement");
+  return defauts;
+}
+
+describe("[2026-08-31 / retour du fondateur] les 69 lectures ont la structure demandée", () => {
+  it("[CONTRÔLE DU CONTRÔLE] chaque propriété rougit sur une chaîne fabriquée qui la viole", () => {
+    // Sans ceci, une regex cassée ou un `[...texte].length` mal écrit rendrait la garde verte sur
+    // n'importe quoi. Chaque défaut est provoqué SEUL, et cité par sa lettre.
+    const bonne = "Ton chemin de vie 7 symbolise la recherche du sens. Tu observes avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, bonne)).toEqual([]);
+
+    const sansNombre = "Ton chemin de vie symbolise la recherche du sens. Tu observes avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, sansNombre).join()).toMatch(/^\(a\)/);
+    const nombreTropTard = "Tu observes avant d’agir. Ton chemin de vie 7 symbolise la recherche du sens.";
+    expect(defautsDeStructure("chemin_de_vie", 7, nombreTropTard).join()).toMatch(/^\(a\)/);
+    const mauvaiseFamille = "Ton nombre intime 7 symbolise la recherche du sens. Tu observes avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, mauvaiseFamille).join()).toMatch(/^\(a\)/);
+    const mauvaisNombre = "Ton chemin de vie 17 symbolise la recherche du sens. Tu observes avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, mauvaisNombre).join()).toMatch(/^\(a\)/);
+
+    expect(defautsDeStructure("chemin_de_vie", 7, bonne.replace(". Tu", " — tu")).join()).toMatch(/\(b\)/);
+    expect(defautsDeStructure("chemin_de_vie", 7, bonne.replace(". Tu", " – tu")).join()).toMatch(/\(b\)/);
+
+    const tropLong = `${bonne} ${"Le silence te nourrit. ".repeat(14)}`.trim();
+    expect([...tropLong].length).toBeGreaterThan(LONGUEUR_MAX_LECTURE);
+    expect(defautsDeStructure("chemin_de_vie", 7, tropLong).join()).toMatch(/\(c\) \d+ caractères/);
+    const unePhrase = "Ton chemin de vie 7 symbolise la recherche du sens et tu observes avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, unePhrase).join()).toMatch(/\(c\) 1 phrase/);
+    const cinqPhrases = `${bonne} Tu lis. Tu cherches. Tu attends.`;
+    expect(defautsDeStructure("chemin_de_vie", 7, cinqPhrases).join()).toMatch(/\(c\) 5 phrase/);
+
+    const sansTu = "Le chemin de vie 7 symbolise la recherche du sens. On observe avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, sansTu).join()).toMatch(/\(d\) aucun tutoiement/);
+    const vouvoie = "Votre chemin de vie 7 symbolise la recherche du sens. Vous observez avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, vouvoie).join()).toMatch(/\(d\) vouvoiement/);
+    // …et le témoin de la précaution « rendez-vous » : ce n'est pas un vouvoiement.
+    const rendezVous = "Ton chemin de vie 7 symbolise le rendez-vous avec le sens. Tu observes avant d’agir.";
+    expect(defautsDeStructure("chemin_de_vie", 7, rendezVous)).toEqual([]);
+  });
+
+  it("[PRÉSENCE] les 69 lectures existent dans la table de base, et sont toutes distinctes", () => {
+    // Un `undefined` n'a ni tiret ni vouvoiement : la forme ne se vérifie que sur un texte présent.
+    const textes = CLES_NUMEROLOGIE.map((cle) => texteDeBase(cle));
+    expect(textes.length).toBe(69);
+    for (const [i, t] of textes.entries()) {
+      expect(t, `${CLES_NUMEROLOGIE[i]} n'a pas de texte de base`).toBeDefined();
+    }
+    // Un gabarit recopié 69 fois passerait les quatre propriétés : les textes doivent différer.
+    expect(new Set(textes).size, "deux lectures identiques").toBe(69);
+  });
+
+  it("[LE CŒUR] chacune des 69 : famille et nombre en première phrase, sans tiret, concise, tutoyée", () => {
+    const refus: string[] = [];
+    for (const cle of CLES_NUMEROLOGIE) {
+      const [nombre, valeur] = cle.split(":") as [NomNombre, string];
+      const texte = texteDeBase(cle) ?? "";
+      for (const d of defautsDeStructure(nombre, Number(valeur), texte)) refus.push(`${cle} : ${d}`);
+    }
+    expect(refus, `lectures hors structure :\n${refus.join("\n")}`).toEqual([]);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
 // 4. Le contrat du port
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -666,5 +809,17 @@ describe("aucun commentaire ne renvoie vers un fichier qui n'existe pas", () => 
       }
     }
     expect(morts, `migration(s) citée(s) et absente(s) : ${morts.join(" | ")}`).toEqual([]);
+  });
+});
+
+describe("[revue 2026-09-02] le détecteur de tutoiement a des frontières Unicode", () => {
+  it("[CONTRÔLE DU CONTRÔLE] « fêtes », « bâton », « têtes » ne passent plus pour « tes » / « ton »", () => {
+    const sansTu = "Le chemin de vie 7 symbolise les fêtes et le bâton. Les têtes se lèvent, on observe.";
+    expect(defautsDeStructure("chemin_de_vie", 7, sansTu)).toContain("(d) aucun tutoiement");
+    const avecTu = "Ton chemin de vie 7 symbolise les fêtes. Tu observes, et ça t’attend.";
+    expect(defautsDeStructure("chemin_de_vie", 7, avecTu)).not.toContain("(d) aucun tutoiement");
+    // « rendez-vous » n'est toujours pas un vouvoiement ; « vous » seul l'est.
+    expect(defautsDeStructure("chemin_de_vie", 7, "Ton chemin de vie 7 symbolise le rendez-vous. Tu y vas.")).not.toContain("(d) vouvoiement");
+    expect(defautsDeStructure("chemin_de_vie", 7, "Ton chemin de vie 7 symbolise. Vous y allez.")).toContain("(d) vouvoiement");
   });
 });

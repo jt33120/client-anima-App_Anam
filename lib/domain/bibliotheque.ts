@@ -110,7 +110,8 @@ export interface CarteBibliotheque {
  *
  * ⚠️ CE QUE CETTE BORNE COMPTE : LES CLÉS DU CATALOGUE, DONC LES OBJETS DE CETTE GRILLE. L'ancienne
  * carte « Anam se manifeste » a été retirée : la conversation est déjà son espace et la répéter
- * ici brouillait « Moi ». La garde dédiée `tests/rendu/carte-anam.test.tsx` empêche son retour.
+ * ici brouillait la région d'accueil (« Moi » alors, « Aujourd’hui » depuis le 2026-09-02). La garde
+ * dédiée `tests/rendu/carte-anam.test.tsx` empêche son retour.
  *
  * ⚠️ LES QUATRE VALEURS SONT SOLIDAIRES, ET LA CI LE VÉRIFIE. Le plancher est écrit ici (commentaire
  * ET assertion), ligne 144 d'`EXPERIENCE.md`, dans son amendement, et dans UX-DR-30

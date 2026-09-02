@@ -1,32 +1,42 @@
 /*
  * globals.css — Fondation visuelle Anam (Story 1.2).
  * REFLET de app/styles/tokens.ts (source de vérité). tests/tokens-parite.test.ts
- * échoue si une seule valeur diverge. Ne pas ajuster « à l'œil ».
+ * échoue si une seule valeur diverge, dans CHACUN des trois blocs de couleurs
+ * ci-dessous (:root, :root[data-a11y="contraste"], @media prefers-contrast).
+ * Ne pas ajuster « à l'œil ».
  *
- * Mode sombre « Nuit galactique » = mode NATIF (:root). Il n'existe pas de thème
- * jour de confort. Le seul autre mode est l'accessibilité (-clair), déclenché par
- * prefers-contrast: more ou l'attribut data-a11y="contraste" — jamais par goût.
+ * Mode sombre = mode NATIF (:root). Depuis le 2026-09-01 (retour terrain de Julian :
+ * « le fond est trop violet et trop sombre », palette « Soft Balance » fournie), la
+ * nuit est NAVY (--fond #1C2740) avec Sky (#D3DBF0) en accent et en lueur ; l'ancien
+ * violet ne survit qu'en décor (--nebuleuse, E5-S2). La nuit RESTE native : seule sa
+ * teinte change. Il n'existe pas de thème jour de confort. Le seul autre mode est
+ * l'accessibilité (-clair : Ivory, Beige et les bleus foncés de la même palette),
+ * déclenché par prefers-contrast: more ou l'attribut data-a11y="contraste", jamais
+ * par goût.
  */
 
 /* ═══════════════════════════ TOKENS — MODE NUIT ═══════════════════════════ */
 :root {
-  /* Couleurs (rôles) */
-  --fond: #0C0A1E;
-  --surface: #16132F;
-  --surface-elevee: #201C42;
-  --texte: #EEECF7;
-  --texte-doux: #ABA6C9;
-  --bordure: #2A2648;
-  --bordure-forte: #77719C;
-  --accent: #8FC1EF;
-  --accent-doux: #241F47;
-  --sur-accent: #0C0A1E;
-  --arbre-tronc: #6A6690;
-  --arbre-branche: #9A96BE;
-  --arbre-feuillage: #8FB6D8;
+  /* Couleurs (rôles) : nuit navy « Soft Balance » (2026-09-01), ratios dans tokens.ts */
+  --fond: #1C2740;
+  --surface: #26324D;
+  --surface-elevee: #33415E;
+  --texte: #F0EFEA;
+  --texte-doux: #C9C6BD;
+  --bordure: #33415E;
+  --bordure-forte: #7A90C9;
+  --accent: #D3DBF0;
+  --accent-doux: #26324D;
+  --sur-accent: #1C2740;
+  --arbre-tronc: #8C88B0;
+  --arbre-branche: #A9B8E6;
+  --arbre-feuillage: #9CC5E8;
   --succes: #86B79E;
   --alerte: #D0A05C;
-  --lueur: #CDE4F8;
+  --lueur: #D3DBF0;
+  /* L'ancien violet, gardé en DÉCOR seulement (1,13:1 sur --fond) : halo et couche
+     nébuleuse du monde (E5-S2). Jamais sous du texte, jamais sur un contrôle. */
+  --nebuleuse: #2E2A5A;
 
   /* Piles typographiques (les var. de police viennent de next/font/local) */
   --pile-anam: var(--police-anam), "Iowan Old Style", Georgia, serif;
@@ -84,46 +94,51 @@
 }
 
 /* ═══════════ MODE ACCESSIBILITÉ « contraste renforcé » (-clair) ═══════════ */
-/* Mêmes rôles, valeurs -clair. PAS un thème jour. Deux déclencheurs équivalents. */
+/* Mêmes rôles, valeurs -clair. PAS un thème jour. Deux déclencheurs équivalents, et les
+   DEUX blocs sont gardés par tests/tokens-parite.test.ts : le second (@media) est celui que
+   le système déclenche pour de vrai, il ne doit jamais retarder sur le premier.
+   Ivory et Beige de la palette Soft Balance vivent ici (2026-09-01). */
 :root[data-a11y="contraste"] {
-  --fond: #F3F1FB;
-  --surface: #FBFAFE;
-  --surface-elevee: #FFFFFF;
-  --texte: #1B1836;
-  --texte-doux: #4C476B;
-  --bordure: #DCD8EE;
-  --bordure-forte: #565179;
-  --accent: #265F91;
-  --accent-doux: #E2ECF8;
+  --fond: #F0EFEA;
+  --surface: #FFFFFF;
+  --surface-elevee: #D3DBF0;
+  --texte: #1C2740;
+  --texte-doux: #5F5D57;
+  --bordure: #B8B5AC;
+  --bordure-forte: #4C63A8;
+  --accent: #41579B;
+  --accent-doux: #D3DBF0;
   --sur-accent: #FFFFFF;
-  --arbre-tronc: #5A5680;
-  --arbre-branche: #4A4670;
-  --arbre-feuillage: #3C6C93;
+  --arbre-tronc: #4C63A8;
+  --arbre-branche: #41579B;
+  --arbre-feuillage: #33415E;
   --succes: #3B7357;
   --alerte: #8A5A16;
-  --lueur: #3C6C93;
+  --lueur: #41579B;
+  --nebuleuse: #E0D2C7;
   --imagerie-opacite: 0; /* imagerie atténuée : les fonds illustrés cèdent aux aplats */
   color-scheme: light;
 }
 
 @media (prefers-contrast: more) {
   :root:not([data-a11y="nuit"]) {
-    --fond: #F3F1FB;
-    --surface: #FBFAFE;
-    --surface-elevee: #FFFFFF;
-    --texte: #1B1836;
-    --texte-doux: #4C476B;
-    --bordure: #DCD8EE;
-    --bordure-forte: #565179;
-    --accent: #265F91;
-    --accent-doux: #E2ECF8;
+    --fond: #F0EFEA;
+    --surface: #FFFFFF;
+    --surface-elevee: #D3DBF0;
+    --texte: #1C2740;
+    --texte-doux: #5F5D57;
+    --bordure: #B8B5AC;
+    --bordure-forte: #4C63A8;
+    --accent: #41579B;
+    --accent-doux: #D3DBF0;
     --sur-accent: #FFFFFF;
-    --arbre-tronc: #5A5680;
-    --arbre-branche: #4A4670;
-    --arbre-feuillage: #3C6C93;
+    --arbre-tronc: #4C63A8;
+    --arbre-branche: #41579B;
+    --arbre-feuillage: #33415E;
     --succes: #3B7357;
     --alerte: #8A5A16;
-    --lueur: #3C6C93;
+    --lueur: #41579B;
+    --nebuleuse: #E0D2C7;
     --imagerie-opacite: 0;
     color-scheme: light;
   }

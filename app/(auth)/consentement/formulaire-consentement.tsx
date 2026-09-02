@@ -139,10 +139,10 @@ export default function FormulaireConsentement() {
               nommait pas — une conformité d'apparence, exactement ce que FR-072 refuse. C'est donc
               le LIBELLÉ qui doit rattraper ce que la 5.5 ajoute, et avant toute écriture. */}
           <span className="t-corps">
-            Je consens à ce qu&rsquo;Anam traite mes <strong>données sensibles</strong> —
-            ce que je partage sur mon intériorité, mes croyances, mon vécu, et{" "}
-            <strong>ce qu&rsquo;elle en déduit</strong> sur ma façon de fonctionner — pour
-            m&rsquo;accompagner. C&rsquo;est le consentement « article&nbsp;9 » du RGPD.
+            Je consens à ce qu&rsquo;Anam traite mes <strong>données sensibles</strong> pour
+            m&rsquo;accompagner : ce que je partage sur mon intériorité, mes croyances, mon vécu,
+            et <strong>ce qu&rsquo;elle en déduit</strong> sur ma façon de fonctionner.
+            C&rsquo;est le consentement « article&nbsp;9 » du RGPD.
           </span>
         </label>
 

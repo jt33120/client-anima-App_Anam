@@ -452,6 +452,11 @@ export class MoteurArbreLunaire {
     contexte.fill();
   }
 
+  /**
+   * La graine au pied du tronc — appelée SEULEMENT quand l'arbre est là (voir `peindreBase`). À l'étape 0,
+   * la graine est le SVG `GraineAttente` que `ArbreInteractif` superpose au canevas : ses proportions,
+   * son inclinaison et ses teintes sont recopiées de cette fonction (viewBox 48, tokens de la palette).
+   */
   private peindreGraine(contexte: CanvasRenderingContext2D): void {
     const y = CENTRE_ARBRE.solY + 7;
     const gradient = contexte.createRadialGradient(
@@ -503,8 +508,15 @@ export class MoteurArbreLunaire {
       for (const joint of geometrie.joints) {
         if (joint.kind === "root" || joint.kind === "leader") this.peindreJoint(contexte, joint);
       }
+      // La graine au pied de l'arbre reste dans le bitmap : immobile, elle n'a besoin d'aucune couche.
+      this.peindreGraine(contexte);
     }
-    this.peindreGraine(contexte);
+    // ⚠️ À L'ÉTAPE 0, AUCUNE GRAINE N'EST PEINTE ICI — et ce n'est pas un oubli. La graine « qui n'attend
+    // que d'éclore » est désormais le SVG `GraineAttente`, superposé au canevas par `ArbreInteractif`
+    // sous la MÊME condition (`branches.length === 0`, celle de `contenuEtapeLunaire`). La peindre aussi
+    // dans le bitmap ferait deux graines au même point : une qui respire, une figée dessous. Le canevas
+    // de l'étape 0 est donc entièrement transparent ; le ciel de la scène le traverse.
+    // (Gardé par tests/rendu/moteur-arbre-lunaire.test.tsx et tests/rendu/graine-integree.test.tsx.)
   }
 
   private creerSpritesFeuilles(): readonly (readonly SpriteFeuille[])[] {

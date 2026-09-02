@@ -5,11 +5,15 @@ import {
   cleJourParis,
   delaiAvantProchainJourParis,
   phraseDOuverture,
+  salutationDOuverture,
   saluerOuvertureEvenement,
   type MatiereOuverture,
   estUneArrivee,
 } from "@/lib/domain/ouverture-seance";
 import { marquerPremierTourDuJour, tourDepuisLigne } from "@/lib/data/depot-fil";
+import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
+import { chercherInterdits } from "@/lib/domain/lexique-interdit";
+import { tronquerATroisPhrases } from "@/lib/domain/voix-anam";
 
 /**
  * ouverture-seance.test.ts — C'EST ANAM QUI PARLE LA PREMIÈRE (retour du 2026-08-23).
@@ -60,12 +64,16 @@ describe("[ELLE PARLE, ET ELLE MÈNE]", () => {
   });
 
   it("une ouverture précise porte la salutation dans le même tour", () => {
+    // Retour du fondateur (2026-09-02) : « bannir les — qui font très IA ». La soudure était un
+    // tiret cadratin ; c'est un deux-points, et pas un point, qui ferait de la salutation une
+    // phrase de plus (voir « [LA COUTURE] » plus bas). La phrase de l'événement est reprise telle
+    // quelle, majuscule comprise : ce module ne retouche pas une parole écrite ailleurs.
     expect(
       saluerOuvertureEvenement("Tu veux regarder ça avec moi ?", {
         prenom: "Louise",
         dejaVenue: true,
       }),
-    ).toBe("Te revoilà, Louise — Tu veux regarder ça avec moi ?");
+    ).toBe("Te revoilà, Louise : Tu veux regarder ça avec moi ?");
   });
 });
 
@@ -106,6 +114,119 @@ describe("[ELLE SAIT, OU ELLE DIT QU'ELLE NE SAIT PAS]", () => {
   it("[FR-031] aucun chiffre, quelle que soit la matière", () => {
     const p = dire({ dejaVenue: true, prenom: "Louise", branchesVivantes: ["a", "b", "c", "d", "e"] });
     expect(p.match(/\d+/g) ?? []).toEqual([]);
+  });
+});
+
+describe("[2026-09-02] DEUX RETOURS DU FONDATEUR : plus de confiance, plus de tirets", () => {
+  // Les deux retours, tels quels : « "Je ne sais rien de toi et on fera avec" : trop sec, mets plus
+  // en confiance » ; et « dans l'ensemble des textes de l'app, bannir les — qui font très IA ».
+  //
+  // ⚠️ CE QUE CES GARDES NE FONT PAS : réécrire le passé. La phrase d'ouverture est GRAVÉE dans le
+  // journal immuable à la première ouverture du jour (`reclamerOuvertureDuJour`). Une chaîne
+  // changée dans le module ne change que les ouvertures futures : c'est voulu, et aucune donnée
+  // n'est touchée. Ces tests parlent donc de ce qu'Anam DIRA, jamais de ce qu'elle a dit.
+
+  const MATIERES: Partial<MatiereOuverture>[] = [
+    {},
+    { prenom: "Louise" },
+    { dejaVenue: true },
+    { dejaVenue: true, prenom: "Louise" },
+    { dejaVenue: true, branchesVivantes: ["le déménagement"] },
+    { dejaVenue: true, prenom: "Louise", branchesVivantes: ["le déménagement", "ma sœur"] },
+    { dejaVenue: null },
+    { dejaVenue: null, prenom: "Louise" },
+  ];
+  const SALUTS: Pick<MatiereOuverture, "prenom" | "dejaVenue">[] = [
+    { prenom: null, dejaVenue: false },
+    { prenom: "Louise", dejaVenue: false },
+    { prenom: null, dejaVenue: true },
+    { prenom: "Louise", dejaVenue: true },
+    { prenom: null, dejaVenue: null },
+    { prenom: "Louise", dejaVenue: null },
+  ];
+  const EVENEMENT = "Tu veux regarder ça avec moi ?";
+  /** Tout ce que le module peut dire : les trois fonctions publiques, avec et sans prénom. */
+  const toutesLesParoles = (): string[] => [
+    ...MATIERES.map(dire),
+    ...SALUTS.map(salutationDOuverture),
+    ...SALUTS.map((s) => saluerOuvertureEvenement(EVENEMENT, s)),
+  ];
+  const TIRET = /[—–]/;
+
+  it("[LE CŒUR] aucune parole produite ne contient de tiret cadratin ni demi-cadratin", () => {
+    for (const p of toutesLesParoles()) {
+      expect(p, `un tiret dans « ${p} »`).not.toMatch(TIRET);
+    }
+  });
+
+  it("[LE CŒUR] et aucune CHAÎNE du module n'en garde un (les commentaires, eux, peuvent)", () => {
+    // Le test précédent ne voit que les branches qu'il exerce ; celui-ci lit le source, commentaires
+    // retirés, pour qu'un tiret glissé dans une chaîne future rougisse sans qu'on pense à l'exercer.
+    const source = readFileSync(resolve(process.cwd(), "lib/domain/ouverture-seance.ts"), "utf-8");
+    expect(source.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "")).not.toMatch(TIRET);
+  });
+
+  it("[ANTI-VACUITÉ] le module ne blanchit pas un tiret venu d'ailleurs : la garde vise SA soudure", () => {
+    // Si les deux gardes ci-dessus passaient grâce à un nettoyage de l'entrée, elles ne prouveraient
+    // rien sur la soudure. La phrase d'un événement est reprise telle quelle : un tiret qu'elle
+    // porte est à bannir là où elle est écrite (`PHRASE_PAUSE`, `PHRASE_SOCLE_COMPLETE`…), pas ici.
+    expect(saluerOuvertureEvenement("Tu peux continuer — les deux se valent.", SALUTS[3])).toMatch(TIRET);
+  });
+
+  it("la soudure est un deux-points, avec et sans prénom, et l'événement garde sa majuscule", () => {
+    expect(saluerOuvertureEvenement(EVENEMENT, SALUTS[0])).toBe("Te voilà : Tu veux regarder ça avec moi ?");
+    expect(dire({ prenom: "Louise" })).toMatch(/^Te voilà, Louise : je /);
+    expect(dire({})).toMatch(/^Te voilà : je /);
+  });
+
+  it("[LA COUTURE] la salutation ne compte pas pour une phrase aux yeux de la voix (2.8)", () => {
+    // ⚠️ C'EST LA RAISON DU DEUX-POINTS, prouvée avec le VRAI coupeur de `voix-anam.ts` et non avec
+    // un compte maison : `:` n'est pas une ponctuation finale, donc « Te voilà, Louise : » reste
+    // dans la première phrase. Avec un point, une première venue (deux phrases de confiance et une
+    // question) ou un événement de trois phrases passeraient à quatre, et seraient tronqués.
+    for (const p of toutesLesParoles()) {
+      expect(tronquerATroisPhrases(p), `tronquée : « ${p} »`).toEqual({ texte: p, tronque: false });
+    }
+    const troisPhrases = "Tu es venue souvent. Ce que tu as déposé reste là. Tu peux laisser reposer, ou continuer.";
+    expect(tronquerATroisPhrases(saluerOuvertureEvenement(troisPhrases, SALUTS[3])).tronque).toBe(false);
+    // Et la preuve par le contraire : la même salutation suivie d'un point EST une quatrième phrase.
+    expect(tronquerATroisPhrases(`Te revoilà, Louise. ${troisPhrases}`).tronque).toBe(true);
+  });
+
+  it("[LE CŒUR] première venue : l'ignorance reste dite, et la suite met en confiance", () => {
+    // Le noyau « je ne sais rien de toi » est ce qui distingue une première venue d'un retour ; la
+    // suite ne constate plus (« on va faire avec »), elle rassure : c'est normal, à son rythme, rien
+    // n'est attendu d'elle. Les trois mots-clés ci-dessous sont STABLES : ils SONT la marque de
+    // confiance, et une reformulation qui les perdrait doit repasser par ici.
+    for (const m of [{}, { prenom: "Louise" }]) {
+      const p = dire(m);
+      expect(p).toMatch(/je ne sais rien de toi/i);
+      expect(p).toMatch(/c’est normal/);
+      expect(p).toMatch(/à ton rythme/);
+      expect(p).toMatch(/rien n’est attendu de toi/);
+      // La formule jugée « trop sec » ne revient pas, ni au futur ni au présent.
+      expect(p).not.toMatch(/on (va faire|fera) avec/);
+      // Elle demande, elle n'ordonne pas : le tout premier jet disait « Raconte-moi ».
+      expect(p).not.toMatch(/\b(raconte|dis|parle|explique)(-moi)?\b/i);
+    }
+  });
+
+  it("[ANTI-VACUITÉ] la confiance se dit à la première venue, elle n'est pas récitée à chaque retour", () => {
+    // Sans ce test, les mots-clés ci-dessus pourraient être un tic de langage présent partout, et la
+    // garde ne distinguerait plus une première venue d'un retour.
+    for (const m of [{ dejaVenue: true }, { dejaVenue: true, branchesVivantes: ["ma sœur"] }, { dejaVenue: null }]) {
+      expect(dire(m)).not.toMatch(/rythme|rien n’est attendu/);
+    }
+  });
+
+  it("[FR-053] aucune prédiction adressée, et rien du lexique interdit, dans aucune parole", () => {
+    // « On avance à ton rythme » est au présent : ce n'est ni « tu verras », ni « tu vas
+    // découvrir ». Le détecteur de prédiction et le lexique de la voix sont ceux qui relisent le
+    // corpus : une ouverture qui les ferait rougir n'a pas le droit d'être dite.
+    for (const p of toutesLesParoles()) {
+      expect(chercherPredictions(p), `prédiction dans « ${p} »`).toEqual([]);
+      expect(chercherInterdits(p), `interdit dans « ${p} »`).toEqual([]);
+    }
   });
 });
 

@@ -113,6 +113,28 @@
   height: 100%;
   background: transparent;
 }
+/* ── LA GRAINE QUI N'ATTEND QUE D'ÉCLORE (étape 0) ──────────────────────────────────────────────
+   Le SVG `GraineAttente` (render/arbre/GraineAttente.tsx), posé SUR le canevas, dans le repère de
+   `.monde` — celui de `.cibleTronc` et des accroches : `left` = CENTRE_ARBRE.x / CANEVAS.largeur
+   (704 / 1408), `top` = (CENTRE_ARBRE.solY + 7) / CANEVAS.hauteur (1367 / 2503), soit le centre
+   exact de l'ellipse que `peindreGraine` posait dans le bitmap (le test compare aux constantes de
+   geometrie.ts). `--taille-graine` fait rendre la boîte de 48 unités à 48 px : les « 3 px » du
+   soulèvement (graine-attente.module.css) sont alors 3 px à l'écran au zoom 1. Pas de
+   contre-échelle : la graine grandit avec le monde au zoom, comme la graine peinte le faisait —
+   c'est un objet du dessin, pas une cible tactile.
+   ⚠️ SEULEMENT DU PLACEMENT ICI. L'animation vit dans graine-attente.module.css et nulle part
+   ailleurs ; une `animation`, une `transition` ou une promotion de couche posées ici feraient un
+   second endroit où le mouvement peut naître, hors de portée des gardes de
+   tests/rendu/graine-attente.test.tsx. Une classe, jamais un `style=` : le composant se garde sans
+   style inline, et le bloc reduced-motion de cette feuille ne doit jamais la masquer (elle sait
+   se figer toute seule). Gardé par tests/rendu/graine-integree.test.tsx. */
+.graineAttente {
+  position: absolute;
+  left: 50%;
+  top: 54.61%;
+  transform: translate(-50%, -50%);
+  --taille-graine: 48px;
+}
 /* La cible du tronc : même taille de touche que les accroches (≥44 px), sans point dessiné —
    le tronc EST son propre repère visuel, un pastille de plus ferait un objet qui n'existe pas. */
 .cibleTronc {

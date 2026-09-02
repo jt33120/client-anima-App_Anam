@@ -43,7 +43,7 @@ export default async function PageRevoque({
 
         {erreur === "suppression" ? (
           <p className={s.erreur} role="alert">
-            La suppression n&rsquo;a pas pu aboutir. Ton compte est toujours là — tu peux
+            La suppression n&rsquo;a pas pu aboutir. Ton compte est toujours là : tu peux
             réessayer.
           </p>
         ) : null}

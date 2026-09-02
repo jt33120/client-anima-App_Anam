@@ -430,7 +430,7 @@ chacun rend une journée non vide pour tout le monde à la fois.
 
 **Où ça paraît.** La carte « Tes nombres », sous les chiffres déjà calculés et affichés.
 
-**Ce qui contraint le texte.** Les nombres sont calculés et visibles. Le texte les habite, il ne les répète pas.
+**Ce qui contraint le texte.** Les nombres sont calculés et visibles. Le texte s’ouvre sur ce que le nombre symbolise (« Ton chemin de vie 7 symbolise… »), puis parle à la personne, au tutoiement, en deux à quatre phrases, sans tiret cadratin (retour du fondateur du 2026-08-31, livré le 2026-09-02 ; la charpente est gardée par `tests/corpus-architecture.test.ts`, bloc « [2026-08-31] »). Ceci remplace l’ancienne consigne « le texte les habite, il ne les répète pas ».
 
 ### `chemin_de_vie:1`
 

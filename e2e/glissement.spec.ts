@@ -103,9 +103,9 @@ const panneauxVisibles = (page: Page) =>
 async function dansLeMonde(page: Page) {
   await ouvrirUnCompteNeuf(page);
   await page.goto("/");
-  await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+  await page.getByRole("button", { name: /commencer/i }).click();
   await passerLeTour(page);
-  await expect(page.getByRole("heading", { name: /^Moi$/, level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
   await page.waitForTimeout(1200);
 }
 
@@ -133,8 +133,8 @@ test.describe("Le glissement entre régions", () => {
     expect(
       pendant.map((p) => p.nom).sort(),
       `régions peintes à mi-course : ${JSON.stringify(pendant)}`,
-    ).toEqual(["Moi", "Anam"].sort());
-    const accueil = pendant.find((p) => p.nom === "Moi")!;
+    ).toEqual(["Aujourd’hui", "Anam"].sort());
+    const accueil = pendant.find((p) => p.nom === "Aujourd’hui")!;
     const anam = pendant.find((p) => p.nom === "Anam")!;
     expect(accueil.x, "la région courante ne suit pas le doigt").toBe(-120);
     expect(anam.x, "la voisine n'arrive pas collée à elle").toBe(largeur - 120);
@@ -150,12 +150,12 @@ test.describe("Le glissement entre régions", () => {
 
     await doigt(page, { x: 300, y: 400 }, [{ x: 160, y: 0 }]);
     await page.waitForTimeout(700);
-    expect(await regionActive(page), "on ne revient pas en arrière").toBe("Moi");
+    expect(await regionActive(page), "on ne revient pas en arrière").toBe("Aujourd’hui");
 
     // Trop court : le monde revient exactement d'où il vient.
     await doigt(page, { x: 300, y: 400 }, [{ x: -30, y: 0 }]);
     await page.waitForTimeout(700);
-    expect(await regionActive(page), "un frôlement de 30 px suffit à changer d'écran").toBe("Moi");
+    expect(await regionActive(page), "un frôlement de 30 px suffit à changer d'écran").toBe("Aujourd’hui");
     expect(
       (await panneauxVisibles(page)).map((p) => p.x),
       "le panneau n'est pas revenu à sa place après un geste avorté",
@@ -284,7 +284,7 @@ test.describe("Le glissement entre régions", () => {
     expect(
       await regionActive(page),
       "commencé vertical, fini horizontal : un défilement qui dérive a fait changer d'écran",
-    ).toBe("Moi");
+    ).toBe("Aujourd’hui");
 
     await doigt(page, { x: 300, y: 300 }, [
       { x: -160, y: 0 },
@@ -301,7 +301,7 @@ test.describe("Le glissement entre régions", () => {
     await dansLeMonde(page);
     await doigt(page, { x: 300, y: 400 }, [{ x: -70, y: 220 }]);
     await page.waitForTimeout(700);
-    expect(await regionActive(page), "un geste vertical a changé de région").toBe("Moi");
+    expect(await regionActive(page), "un geste vertical a changé de région").toBe("Aujourd’hui");
   });
 
   test("[LE MONDE NE BOUCLE PAS] aux extrémités, il résiste au lieu de sauter", async ({ page }) => {
@@ -310,13 +310,13 @@ test.describe("Le glissement entre régions", () => {
 
     await doigt(page, { x: 200, y: 400 }, [{ x: 240, y: 0 }], { lacher: false });
     const pendant = await panneauxVisibles(page);
-    expect(pendant.map((p) => p.nom), "une région est apparue à gauche de la première").toEqual(["Moi"]);
+    expect(pendant.map((p) => p.nom), "une région est apparue à gauche de la première").toEqual(["Aujourd’hui"]);
     // Il RÉPOND quand même — sans quoi le geste paraît cassé — mais au quart de la course.
     expect(pendant[0].x, "aux extrémités, le geste est mort ou entier").toBe(Math.round(240 * 0.25));
 
     await doigt(page, { x: 200, y: 400 }, [{ x: 240, y: 0 }]);
     await page.waitForTimeout(700);
-    expect(await regionActive(page), "le monde a bouclé").toBe("Moi");
+    expect(await regionActive(page), "le monde a bouclé").toBe("Aujourd’hui");
     expect(largeur).toBeGreaterThan(0);
   });
 
@@ -329,7 +329,7 @@ test.describe("Le glissement entre régions", () => {
     for (let i = 1; i <= 8; i++) await page.mouse.move(300 - (160 * i) / 8, 400);
     await page.mouse.up();
     await page.waitForTimeout(700);
-    expect(await regionActive(page), "la souris a fait glisser le monde").toBe("Moi");
+    expect(await regionActive(page), "la souris a fait glisser le monde").toBe("Aujourd’hui");
   });
 
   test("[L'AUTRE MOITIÉ] `touch-action: pan-y` laisse le défilement au navigateur", async ({ page }) => {

@@ -40,13 +40,48 @@
  * « +01:00 » rendrait faux tout thème d'un été, et tout thème français d'avant 1976.
  */
 export interface LieuNaissance {
-  /** Le nom tel qu'il s'affiche et tel qu'il sera stocké dans `utilisatrice.lieu_naissance`. */
+  /**
+   * Le nom OFFICIEL de la commune (« Saint-Denis »), tel qu'il est stocké aujourd'hui dans
+   * `utilisatrice.lieu_naissance`. Il n'est PAS unique : 1 441 noms sont partagés par 3 675
+   * communes (mesuré sur le référentiel). Pour l'affichage, préférer `libelle`.
+   */
   readonly nom: string;
   /** Identifiant stable de la source (code INSEE pour la France). Jamais montré. */
   readonly code: string;
   readonly latitude: number;
   readonly longitude: number;
   readonly fuseau: string;
+  /**
+   * Population municipale d'après la source (dernier recensement publié), `0` si inconnue.
+   * Sert au CLASSEMENT entre homonymes — la ville que l'on cherche est, sauf preuve du contraire,
+   * la plus peuplée — et à rien d'autre : ce n'est pas une donnée du thème.
+   */
+  readonly population: number;
+  /** Le département (ou la collectivité d'outre-mer) qui DÉPARTAGE les homonymes. */
+  readonly departement: Departement;
+  /**
+   * « Saint-Denis (93) », « Saint-Denis (974) », « Ajaccio (2A) » — voir `libelleLieu`.
+   * C'est la ligne à montrer quand plusieurs communes portent le même `nom`.
+   */
+  readonly libelle: string;
+}
+
+/**
+ * Un département au sens du Code officiel géographique — ou, outre-mer, la collectivité qui en
+ * tient lieu (Polynésie française, Nouvelle-Calédonie, Saint-Pierre-et-Miquelon…). C'est LE
+ * discriminant des homonymes : deux communes de même nom sont toujours dans deux départements
+ * distincts (le COG l'impose au sein d'un même département).
+ *
+ * ⚠️ LE CODE POSTAL N'EST PAS UN DISCRIMINANT, et on pourrait le croire. Une commune porte souvent
+ * PLUSIEURS codes postaux (Paris, Marseille, Lyon, les communes nouvelles), et un même code postal
+ * est PARTAGÉ par plusieurs communes (un bureau distributeur dessert des villages voisins). Ni
+ * injectif, ni surjectif : il ne désigne pas une commune. Le département, lui, oui.
+ */
+export interface Departement {
+  /** « 93 », « 974 », « 2A » — voir `codeDepartement`. */
+  readonly code: string;
+  /** « Seine-Saint-Denis », « La Réunion », « Corse-du-Sud ». */
+  readonly nom: string;
 }
 
 export interface LieuxPort {
@@ -71,6 +106,38 @@ export interface LieuxPort {
    * une identité. C'est elle que le serveur emploie pour re-résoudre ce que le client a choisi.
    */
   trouverParCode(code: string): LieuNaissance | null;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// Le département — déduit du code INSEE, jamais stocké à part
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Le code du département d'une commune, lu dans son code INSEE.
+ *
+ * La règle du Code officiel géographique : les deux premiers caractères, SAUF outre-mer (`97x`,
+ * `98x`) où le département tient sur trois. « 2A004 » → « 2A », « 93066 » → « 93 »,
+ * « 97411 » → « 974 ». La Corse ne demande aucun cas particulier : ses lettres sont déjà dans
+ * les deux premiers caractères.
+ *
+ * Cette règle n'est pas « de mémoire » : `scripts/construire-lieux-france.mjs` la confronte, pour
+ * CHAQUE commune, au `departement.code` que la source renvoie, et refuse d'écrire si elle diverge.
+ */
+export function codeDepartement(codeInsee: string): string {
+  return codeInsee.startsWith("97") || codeInsee.startsWith("98")
+    ? codeInsee.slice(0, 3)
+    : codeInsee.slice(0, 2);
+}
+
+/**
+ * « Saint-Denis (93) » — le nom suivi du CODE du département entre parenthèses.
+ *
+ * Le code plutôt que le nom : c'est ainsi que les Françaises désignent une ville homonyme à l'oral
+ * (« Saint-Denis, le 93 »), c'est court, et c'est ce que l'état civil imprime. Le nom du
+ * département reste disponible dans `LieuNaissance.departement.nom` pour une ligne secondaire.
+ */
+export function libelleLieu(nom: string, departement: Departement): string {
+  return `${nom} (${departement.code})`;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════

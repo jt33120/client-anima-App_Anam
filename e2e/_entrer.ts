@@ -54,7 +54,7 @@ export async function ouvrirUnCompteNeuf(page: Page): Promise<Compte> {
  * l'accueil, et ce helper doit servir dans les deux cas.
  */
 export async function entrerDansLaRegion(page: Page, nom: string | RegExp): Promise<void> {
-  const porte = page.getByRole("button", { name: /entrer dans le monde/i });
+  const porte = page.getByRole("button", { name: /commencer/i });
   if (await porte.isVisible().catch(() => false)) await porte.click();
   await passerLeTour(page);
   await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: nom }).click();

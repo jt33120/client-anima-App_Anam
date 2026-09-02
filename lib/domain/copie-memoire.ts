@@ -62,4 +62,4 @@ export const CORRECTION_APRES_REVOCATION =
 export const REFUS_VIDE =
   "Une phrase vide effacerait la ligne sans le dire. Si c’est ce que tu veux, utilise Supprimer.";
 export const REFUS_TROP_LONGUE = "C’est trop long pour une ligne. Une phrase suffit.";
-export const REFUS_INCHANGEE = "C’est la même phrase — il n’y a rien à enregistrer.";
+export const REFUS_INCHANGEE = "C’est la même phrase : il n’y a rien à enregistrer.";

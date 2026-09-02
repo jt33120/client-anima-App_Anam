@@ -5,7 +5,8 @@ import s from "./conversation.module.css";
 
 /**
  * ImageAnam — le système d'assets du personnage (Story 2.2, B5 ; UX-DR-15, AC9). Sert les TROIS
- * formats en WebP/AVIF + repli PNG, @2x, `loading="lazy"`, `alt` SOBRE non-révélateur. Chemins
+ * formats en WebP/AVIF + repli PNG, @2x, `loading="lazy"` (ou `eager` pour le héros du seuil),
+ * `alt` SOBRE non-révélateur. Chemins
  * stables sous `public/scene/<format>/anam-<format>.{avif,webp,png}`.
  *
  * REPLI GRACIEUX (AC9) : tant que l'asset peint n'existe pas (Phase C, production Gemini), une
@@ -23,10 +24,18 @@ export default function ImageAnam({
   format,
   alt,
   className,
+  chargement = "lazy",
 }: {
   format: FormatAnam;
   alt: string;
   className?: string;
+  /**
+   * `lazy` par défaut (les portraits de la conversation arrivent sous la ligne de flottaison).
+   * `eager` pour l'image HÉROS de la première peinture : au seuil, l'avatar est le premier objet
+   * à l'écran et le remplissage d'étoiles attend son bitmap ; un chargement différé y ajoute une
+   * attente vide avant la toute première trame (revue du 2026-09-02).
+   */
+  chargement?: "lazy" | "eager";
 }) {
   const [absent, setAbsent] = useState(false);
   const base = `/scene/${format}/anam-${format}`;
@@ -51,7 +60,8 @@ export default function ImageAnam({
             src={`${base}.png`}
             srcSet={`${base}@2x.png 2x`}
             alt=""
-            loading="lazy"
+            loading={chargement}
+            fetchPriority={chargement === "eager" ? "high" : undefined}
             decoding="async"
             onError={() => setAbsent(true)}
             className={s.imageAnamImg}

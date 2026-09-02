@@ -50,8 +50,11 @@ export default function Reperes(p: ProprietesReperes) {
           <span className="t-bouton">{p.relancerLeTour}</span>
         </Link>
 
-        <section className={s.section} aria-label="Les trois places">
-          <h2 className="t-titre-sm">Les trois places</h2>
+        {/* ⚠️ « LES TROIS DIMENSIONS », PLUS « LES TROIS PLACES » (2026-09-02, retour du fondateur).
+            Le nom accessible de la section et son <h2> disent le même mot que le bloc d'accueil
+            (`render/premier-passage.tsx`) ; `tests/trois-dimensions.test.ts` tient les deux. */}
+        <section className={s.section} aria-label="Les trois dimensions">
+          <h2 className="t-titre-sm">Les trois dimensions</h2>
           <dl className={s.places}>
             {p.places.map((place) => (
               <div key={place.nom}>

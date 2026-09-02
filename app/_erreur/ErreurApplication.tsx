@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { REGION_FOYER, nomDeRegion } from "@/lib/scene";
 import s from "./erreur-application.module.css";
 
 interface ErreurAvecEmpreinte extends Error {
@@ -34,8 +35,13 @@ export default function ErreurApplication({
           <button type="button" className={s.actionPrimaire} onClick={retry}>
             Réessayer
           </button>
+          {/* Le nom du foyer vient du catalogue, jamais d'ici : « Revenir à Moi » est resté écrit en
+              dur pendant tout le temps où la région s'appelait ainsi, hors de portée de la garde des
+              littéraux (un nom au fil d'une phrase n'est pas un nom entre guillemets), et c'est le
+              renommage en « Aujourd’hui » (2026-09-02) qui l'a trouvé. `tests/rendu/erreur-application.test.tsx`
+              refuse qu'il revienne. */}
           <a className={s.actionSecondaire} href="/">
-            Revenir à Moi
+            Revenir à « {nomDeRegion(REGION_FOYER)} »
           </a>
         </div>
         <a className={s.aide} href="/aide">

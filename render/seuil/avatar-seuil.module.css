@@ -1,0 +1,133 @@
+/*
+ * avatar-seuil.module.css — L'AVATAR DU SEUIL : sa boîte, sa toile, son lotus.
+ *
+ * ══ LA GÉOMÉTRIE, DÉCLARÉE UNE FOIS ═════════════════════════════════════════════════════════════
+ *
+ * `--avatar-h` est le SEUL réglage de taille. La largeur s'en déduit par le rapport de l'asset
+ * (`public/scene/seuil/anam-seuil.png` fait 200 × 260, cf. `LARGEUR_SEUIL`/`HAUTEUR_SEUIL` dans
+ * `remplissage-etoiles.ts`) : `tests/scene-sans-bords.test.ts` relit les deux constantes et refuse
+ * que ce rapport s'en écarte. Un rapport faux ici, c'est un cadre `contain` qui laisse de l'air
+ * dans la boîte, et des étoiles qui atterrissent à côté de la silhouette.
+ *
+ * ══ LE BUDGET VERTICAL (iPhone 14, 390 × 664) — c'est lui qui fixe `54vw` ════════════════════════
+ *
+ * Mesuré le 2026-08-19 : quand le seuil présentait le lieu, « entrer dans le monde » sortait
+ * ENTIÈREMENT du viewport. La porte doit rester visible sans défiler. Le calcul, en px CSS :
+ *
+ *   réserve haute de `.region`      44 + 32          =  76   (surimpression)
+ *   avatar                          54vw = 210,6     = 211
+ *   `row-gap` de `.seuil`           --esp-7          =  48
+ *   h1 « Anam » (t-display 2rem × 1,15)              =  37
+ *   gap                             --esp-5          =  24
+ *   phrase (t-anam 19 px × 1,6, 3 lignes budgétées)  =  91   (2 lignes probables à 390 : 61)
+ *   gap                             --esp-5          =  24
+ *   porte (margin 12 + cible 44)                     =  56
+ *   réserve basse de `.region`      44 + 32          =  76
+ *                                                     ─────
+ *                                                      643 ≤ 664 : 21 px de marge, 51 à 2 lignes.
+ *
+ * Le plafond `16rem` (256 px) sert les écrans larges, où `t-display` passe à 2,5rem et où la
+ * hauteur ne manque pas. Sous 600 px de haut (paysage, zoom 200 %), l'avatar se retire : voir plus
+ * bas — c'est la même décision que celle prise pour l'arbre.
+ *
+ * ══ MOUVEMENT ═══════════════════════════════════════════════════════════════════════════════════
+ *
+ * La toile n'est pas animée par CSS : c'est un bitmap que `remplissage-etoiles.ts` repeint pendant
+ * une durée FINIE, puis plus jamais (voir `AvatarSeuil.tsx` pour ce que ça ne contredit pas). Ici il
+ * n'y a que deux fondus, à sens unique : l'image qui se montre à la fin (`--duree-standard`), et le
+ * lotus qui paraît (`fondu-image`, la classe globale). Aucun `will-change`, aucune boucle.
+ */
+
+.avatar {
+  --avatar-h: min(54vw, 16rem);
+  /* Le rapport de l'asset — 200 / 260 — et RIEN d'autre (garde : scene-sans-bords). */
+  --avatar-l: calc(var(--avatar-h) * 200 / 260);
+
+  position: relative;
+  flex: none;
+  width: var(--avatar-l);
+  height: var(--avatar-h);
+  /* L'image est un décor qu'on regarde, pas une cible : le doigt passe au travers, vers rien. */
+  pointer-events: none;
+}
+
+/* ── L'IMAGE — sous la toile, invisible jusqu'à la fin ──────────────────────────────────────────
+   `.imageAnam.seuil` (conversation.module.css) pose sa propre largeur et un rapport 4/5 : ici la
+   boîte est celle de l'avatar, au rapport exact de l'asset, et c'est l'enveloppe qui remplit la
+   boîte. Trois classes pour l'emporter sur les deux de la règle d'origine sans dépendre de l'ordre
+   des feuilles. */
+.avatar .image.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  opacity: 0;
+  transition: opacity var(--duree-standard) var(--courbe);
+}
+.avatar .imagePrete.imagePrete {
+  opacity: 1;
+}
+
+/* ── LA TOILE — la même boîte que l'image, au pixel ─────────────────────────────────────────────
+   `demarrerRemplissage` lit `clientWidth/Height` et cale l'image en `contain` dedans : la boîte
+   doit être CELLE de l'image, sinon les étoiles convergent vers une silhouette décalée. */
+.toile {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── LE LOTUS — aux mains d'Anam ───────────────────────────────────────────────────────────────
+   Sur l'asset, la main levée est en HAUT du cadre, légèrement à GAUCHE du centre : à l'œil, son
+   centre est vers 24 % de la largeur et 6 % de la hauteur. Les deux nombres ci-dessous sont LE
+   réglage de position ; `translate(-50%, -50%)` centre le lotus sur ce point. Sa taille suit
+   l'avatar (pourcentage de la largeur) pour rester dans la main à toutes les largeurs. */
+.lotus {
+  position: absolute;
+  left: 24%;
+  top: 6%;
+  width: 26%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  /* `fondu-image` (globals) porte l'apparition ; rien d'autre ne bouge ici. */
+}
+.lotus > svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+/* ── SOUS 600 px DE HAUT, L'AVATAR SE RETIRE (paysage, zoom 200 %) ─────────────────────────────
+   Même décision que pour l'arbre (monde.module.css) : il reste ~308 px utiles, la colonne en
+   prend ~200, il n'y a pas de place pour une image — seulement pour une image écrasée. Retiré du
+   flux (`display: none`), il ne réserve pas de vide non plus. */
+@media (max-height: 600px) {
+  .avatar {
+    display: none;
+  }
+}
+
+/* ── EN CONTRASTE RENFORCÉ, L'IMAGERIE CÈDE AUX APLATS ──────────────────────────────────────────
+   `ImageAnam` retire déjà son `<img>` (conversation.module.css) ; on retire l'avatar ENTIER, toile
+   comprise, sinon des étoiles convergeraient vers une silhouette absente — et la boîte réserverait
+   du vide au-dessus du nom. */
+:global(:root[data-a11y="contraste"]) .avatar {
+  display: none;
+}
+@media (prefers-contrast: more) {
+  :global(:root:not([data-a11y="nuit"])) .avatar {
+    display: none;
+  }
+}
+
+/* ── MOINS DE MOUVEMENT : état final immédiat, jamais rien de vide ─────────────────────────────
+   Le module dessine l'état final une fois, sans boucle ; ici les deux fondus deviennent instantanés.
+   L'image et le lotus sont là dès que l'asset est décodé. */
+@media (prefers-reduced-motion: reduce) {
+  .avatar .image.image {
+    transition: none;
+  }
+}

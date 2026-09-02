@@ -1,0 +1,138 @@
+/* La feuille modale générique (`render/Feuille.tsx`) : le fond, la feuille, son en-tête.
+
+   Copie du dessin de `render/menu/menu-compte.module.css` (Story 7.3), à deux différences près, et
+   toutes deux viennent de ce que cette feuille n'est PAS ancrée à un glyphe : sur grand écran elle
+   se CENTRE (le pop-up de `render/guide/guide.module.css`) au lieu de se poser sous le coin
+   supérieur droit ; et elle apparaît en fondu (`.fondu-texte` de `globals.css`, transform et
+   opacité seuls, `prefers-reduced-motion` y est déjà tenu).
+
+   ⚠️ AUCUN `font-size` ICI. L'échelle vit dans `app/styles/globals.css` et arrive par les classes
+   globales (`t-titre-sm`, `t-meta`). */
+
+/* ── Le fond ───────────────────────────────────────────────────────────────────────────────────
+   Il assombrit sans flouter. ⚠️ AUCUN `backdrop-filter`, ET C'EST MESURÉ : un flou plein écran a
+   plafonné la scène à 4 im/s contre 25 (`render/monde.module.css`, la voie lactée). Son apparition
+   est une opacité seule : un fond qui dériverait de six pixels laisserait un liseré nu en haut. */
+.fond {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--fond) 72%, transparent);
+  pointer-events: auto;
+  animation: feuille-fond var(--duree-standard) var(--courbe) both;
+}
+
+@keyframes feuille-fond {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── La feuille ────────────────────────────────────────────────────────────────────────────────
+   Elle monte du bas sur téléphone : le geste et le pouce y sont. `max-height` puis défilement
+   interne : un contenu coupé hors de l'écran est un contenu qui n'existe pas (le défaut H4). */
+.feuille {
+  position: fixed;
+  z-index: 61;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-height: 86vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border-top: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg) var(--rayon-lg) 0 0;
+  padding: var(--esp-3) var(--esp-3) max(var(--esp-5), env(safe-area-inset-bottom));
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+@media (min-width: 40rem) {
+  /* Sur grand écran elle se pose au centre : venir du bas y serait un réflexe de téléphone
+     appliqué là où il ne veut rien dire, et elle n'a aucun glyphe sous lequel s'aligner.
+     ⚠️ `translate`, PAS `transform` : `.fondu-texte` anime `transform` et le laisserait à `none`
+     en fin de course, ce qui décentrerait la feuille d'un demi-écran. Les deux propriétés sont
+     indépendantes. */
+  .feuille {
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    translate: -50% -50%;
+    width: min(calc(100vw - 2 * var(--esp-4)), var(--contenu-max));
+    max-height: 78vh;
+    border: 1px solid var(--bordure-forte);
+    border-radius: var(--rayon-lg);
+    padding: var(--esp-4) var(--esp-5) var(--esp-5);
+  }
+}
+
+.enTete {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  padding-bottom: var(--esp-2);
+  background: var(--surface);
+}
+
+.titre {
+  font-family: var(--pile-anam);
+  font-weight: 400;
+  color: var(--texte);
+  margin: 0;
+  min-width: 0;
+}
+
+.fermer {
+  flex: none;
+  min-height: var(--cible-tactile);
+  min-width: var(--cible-tactile);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--texte-doux);
+  cursor: pointer;
+  transition: color var(--duree-standard) var(--courbe);
+}
+.fermer:hover {
+  color: var(--texte);
+}
+/* L'état d'appui : sur un écran tactile, `:hover` n'existe pas. Une propriété qui change suffit ;
+   ce n'est pas un effet, c'est un accusé de réception. */
+.fermer:active {
+  color: var(--texte);
+  transform: scale(0.94);
+}
+.fermer:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+  border-radius: var(--rayon-sm);
+}
+
+.contenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Le contenu RESTE, seul le mouvement cède (UX-DR-38). Le fond garde son apparition, courte. */
+  .fond {
+    animation-duration: var(--duree-courte);
+  }
+  .fermer:active {
+    transform: none;
+  }
+}

@@ -40,7 +40,14 @@ describe("Mon arbre — port lunaire réel", () => {
     const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
     expect(canvas.tagName).toBe("CANVAS");
     expect(canvas.getAttribute("data-etape-arbre")).toBe("graine");
-    expect(container.querySelector("svg"), "l'ancien tronc SVG ne doit plus exister").toBeNull();
+    // ADAPTÉ : la graine « qui n'attend que d'éclore » est un SVG superposé au canevas (`GraineAttente`,
+    // crochet `data-graine-attente`, tests/rendu/graine-integree.test.tsx) — le SEUL admis. L'ancien tronc
+    // SVG alternatif, lui, reste interdit : on l'exclut par son crochet, pas par le nom de balise.
+    expect(
+      container.querySelector("svg:not([data-graine-attente])"),
+      "l'ancien tronc SVG ne doit plus exister",
+    ).toBeNull();
+    expect(container.querySelector("[data-graine-attente]"), "la graine d'attente manque à l'étape 0").not.toBeNull();
     expect(screen.getByText(VIDE_TITRE)).toBeTruthy();
   });
 

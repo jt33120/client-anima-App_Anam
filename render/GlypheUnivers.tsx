@@ -1,7 +1,8 @@
 /**
  * Le vocabulaire graphique partagé des trois univers.
  *
- * Ces tracés viennent de la porte canonique « Moi ». Ils restent décoratifs : le lien ou le
+ * Ces tracés viennent de la porte canonique de la région d'accueil (« Aujourd’hui » depuis le
+ * 2026-09-02, « Moi » avant). Ils restent décoratifs : le lien ou le
  * contrôle qui les accueille porte déjà son propre nom accessible.
  */
 export type CleGlypheUnivers = "astrologie" | "numerologie" | "psychologie";

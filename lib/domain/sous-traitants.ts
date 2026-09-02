@@ -73,7 +73,7 @@ export const SOUS_TRAITANTS: readonly SousTraitant[] = [
     // lecture factuellement fausse. Les mots « prestataire » et « paiement » n'apparaissaient nulle
     // part sur la page, ni sur /aide, ni sur /cgu : l'acteur n'était récupérable d'aucun chemin.
     motif:
-      "garde les factures déjà émises — une pièce comptable relève d’une obligation légale de " +
+      "garde les factures déjà émises : une pièce comptable relève d’une obligation légale de " +
       "conservation, pas d’un consentement qu’on retire.",
     garde: "porte:conservation-comptable",
   },
@@ -82,7 +82,7 @@ export const SOUS_TRAITANTS: readonly SousTraitant[] = [
     role: "l’envoi des courriels",
     verdict: "aucun_art9",
     motif:
-      "aucun courriel ne porte de contenu sensible — ni un extrait, ni un titre qui en dirait un. " +
+      "aucun courriel ne porte de contenu sensible : ni un extrait, ni un titre qui en dirait un. " +
       "Ce qui subsiste chez lui est une adresse dans un journal d’envoi, borné par son contrat.",
     garde: "tests/courriel-origine.test.ts",
   },

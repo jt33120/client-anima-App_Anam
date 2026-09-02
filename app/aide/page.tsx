@@ -172,7 +172,7 @@ export default function PageAide() {
           <h2 className="t-titre-sm">Anam est une IA</h2>
           <p className="t-anam">
             Tu parles à une <strong>intelligence artificielle</strong>. Pas à un être humain,
-            pas à une voyante. Anam lit, relie et te répond — mais elle n&rsquo;a ni conscience
+            pas à une voyante. Anam lit, relie et te répond, mais elle n&rsquo;a ni conscience
             ni intuition.
           </p>
           <p className="t-corps">

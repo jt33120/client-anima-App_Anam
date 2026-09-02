@@ -164,7 +164,9 @@ export async function verifierCode(_prev: EtatCode, formData: FormData): Promise
     const essais = attente.essais + 1;
     if (essais >= ESSAIS_MAX) {
       await poserAttente(null);
-      return { message: "Trop d’essais. Redemande un code — celui-là ne sert plus." };
+      // Le fait d’abord (ce code est mort), le geste ensuite : sans tiret cadratin, retour du
+      // fondateur du 2026-09-01.
+      return { message: "Trop d’essais. Celui-là ne sert plus : redemande un code." };
     }
     await poserAttente({ ...attente, essais });
     return { message: "Ce code ne correspond pas. Vérifie-le, ou redemande-en un." };

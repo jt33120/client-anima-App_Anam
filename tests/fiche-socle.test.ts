@@ -23,6 +23,19 @@ import { calculerNumerologie, NOMBRES } from "@/lib/astro/numerologie";
 import { calculerThemeNatal, type EntreesNaissance } from "@/lib/astro/theme-natal";
 import { ephemerideAstronomyEngine } from "@/lib/astro/adapters/astronomy-engine";
 import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
+import { carteHoroscope } from "@/lib/domain/cartes-socle";
+import { BULLE_SANS_HEURE } from "@/lib/domain/message-sans-heure";
+import {
+  INTRODUCTION_ASTROLOGIE,
+  INTRODUCTION_NUMEROLOGIE,
+  BOUTON_AJOUTER_HEURE,
+  RESUME_DETAIL_HEURE,
+  TITRE_DETAIL_POSITIONS,
+  CIEL_DU_JOUR_NON_ECRIT,
+  TITRE_LECTURE_NUMEROLOGIE,
+  LECTURE_NUMEROLOGIE_PARTIELLE,
+} from "@/lib/domain/copie-socle";
+import type { HoroscopeDuJour } from "@/lib/astro/quotidien";
 
 /**
  * fiche-socle.test.ts — [7.5] LA PREMIÈRE FOIS QUE FR-055 EST TENU.
@@ -90,6 +103,79 @@ describe("[7.5 · 13.9] les six nombres et leur lecture sont deux couches distin
     const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
     for (const nombre of section.nombres) expect(nombre.calcul.length, nombre.cle).toBeGreaterThan(0);
     expect(section.nombres.find((nombre) => nombre.cle === "chemin_de_vie")?.calcul.join(" ")).toContain("Total :");
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// Retour du 2026-09-02 — sous le pli, chaque lecture dit le nombre qu'elle lit
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[retour 2026-09-02] l'intitulé d'une lecture symbolique porte son nombre : « Chemin de vie (7) »", () => {
+  // POURQUOI : la « Lecture symbolique d'Anima » vit sous un `<details>` fermé, loin de la grille
+  // où le nombre s'affiche en grand. Un article coiffé de « Chemin de vie » au-dessus de « Ton
+  // chemin de vie 4 symbolise… » oblige à remonter pour savoir de quel 4 on parle. Le fondateur
+  // demande le chiffre À CÔTÉ de ce à quoi il correspond — et c'est l'intitulé qui le porte, pas
+  // un champ de plus : la frontière de rendu (`socle-frontiere.test.ts`) ne bouge pas.
+  const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
+
+  it("[CONTRÔLE DU CONTRÔLE] le jeu d'essai porte au moins un nombre maître, sinon « (11) » ne serait jamais éprouvé", () => {
+    // Sans ce témoin, la règle « jamais (11/2) » ci-dessous serait vraie sur un jeu sans maître.
+    const maitres = NOMBRES.filter((n) => {
+      const lecture = NUM_COMPLETE.nombres[n];
+      return lecture.statut === "calcule" && lecture.maitre;
+    });
+    expect(maitres.length, "le jeu d'essai ne porte aucun nombre maître").toBeGreaterThan(0);
+  });
+
+  it("[LE CŒUR] les six intitulés se terminent par la valeur du nombre de même clé, entre parenthèses", () => {
+    expect(section.lecturesSymboliques).toHaveLength(6);
+    for (const lecture of section.lecturesSymboliques) {
+      const nombre = section.nombres.find((n) => n.cle === lecture.cle);
+      expect(nombre, `${lecture.cle} : une lecture sans nombre calculé`).toBeDefined();
+      // Recalculé depuis la fiche, jamais codé en dur : changer l'année de référence ou le nom du
+      // jeu d'essai ne doit pas faire mentir cette garde. Mutations-cibles : retirer le suffixe
+      // (« Chemin de vie ») ou y mettre la valeur d'un autre nombre — les deux rougissent ici.
+      expect(lecture.intitule).toBe(`${nombre!.intitule} (${nombre!.valeur})`);
+    }
+  });
+
+  it("un nombre maître s'écrit « Expression (11) », jamais « (11/2) » — la réduction est déjà dans le texte", () => {
+    // « 11/2 » a la forme d'un compte (FR-031 refuse `\d+/\d+`), et le texte du corpus dit déjà
+    // « ce nombre maître se lit aussi comme un 2 ». On n'écrit donc que le nombre conservé.
+    for (const lecture of section.lecturesSymboliques) {
+      const brut = NUM_COMPLETE.nombres[lecture.cle];
+      if (brut.statut !== "calcule" || !brut.maitre) continue;
+      expect(lecture.intitule).toBe(`${section.nombres.find((n) => n.cle === lecture.cle)!.intitule} (${brut.valeur})`);
+      expect(lecture.intitule).not.toMatch(/\//);
+    }
+  });
+
+  it("le libellé et le texte se répondent : la première phrase du texte nomme le même nombre", () => {
+    // Le corpus commence chaque lecture par « Ton chemin de vie 7 symbolise… ». Si le nombre du
+    // titre et celui de la phrase divergeaient, la page contredirait sa propre lecture.
+    for (const lecture of section.lecturesSymboliques) {
+      const valeur = lecture.intitule.match(/ \((\d+)\)$/)?.[1];
+      expect(valeur, `intitulé sans nombre : « ${lecture.intitule} »`).toBeDefined();
+      const premierePhrase = lecture.texte.split(/[.!?]/)[0];
+      expect(premierePhrase, lecture.cle).toMatch(new RegExp(`(^|\\D)${valeur}(\\D|$)`));
+    }
+  });
+
+  it("[ANTI-VACUITÉ] sans nom, aucune lecture orpheline ni parenthèse vide — les trois nombres de lettres restent des MANQUES", () => {
+    // Le suffixe est fabriqué depuis la valeur calculée. Un nombre non calculé n'a pas de valeur :
+    // il ne doit pas produire « Expression () », « Expression (undefined) », ni aucun article.
+    const sansNom = sectionNombres(NUM_SANS_NOM, null);
+    const manquants = new Set(sansNom.manquants.map((m) => m.cle));
+    expect(manquants.size, "sans nom, il doit y avoir des manques — sinon la garde est vide").toBeGreaterThan(0);
+    expect(sansNom.lecturesSymboliques.length, "les nombres de date gardent leur lecture").toBeGreaterThan(0);
+    for (const lecture of sansNom.lecturesSymboliques) {
+      expect(manquants.has(lecture.cle), `${lecture.cle} : une lecture pour un nombre non calculé`).toBe(false);
+      expect(lecture.intitule).toMatch(/^\S.* \(\d+\)$/);
+      expect(lecture.intitule).not.toMatch(/\(\s*\)|undefined|null|NaN/);
+    }
+    for (const manque of sansNom.manquants) {
+      expect(manque.intitule, `${manque.cle} : un manque ne porte pas de nombre`).not.toMatch(/\(/);
+    }
   });
 });
 
@@ -407,5 +493,149 @@ describe("[7.5] les gardes de voix et de chemins", () => {
     expect(fiche.ciel.indisponible).toBe("panne B");
     expect(fiche.nombres.nombres).toHaveLength(0);
     expect(fiche.ciel.positions).toHaveLength(0);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// Retour du 2026-09-01 — l'horoscope d'abord, l'heure bien avant (univers Astrologie)
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Un horoscope du jour MINIMAL, comme dans `tests/cartes-socle.test.ts` : la halte ne lit ni le
+ * ciel ni les configurations, elle transporte ce que `carteHoroscope` en fait. Le jour porte trois
+ * NOMBRES, et c'est voulu : la garde FR-031 plus bas doit prouver qu'ils ne traversent pas.
+ */
+const HOROSCOPE: HoroscopeDuJour = {
+  jour: { a: 2026, m: 9, j: 1 },
+  ciel: {} as never,
+  configurations: [],
+  luneRelative: { statut: "calcule", distance: 3 } as never,
+};
+
+describe("[retour 2026-09-01] « Ton ciel du jour » traverse la fiche, à l'identique de l'accueil", () => {
+  it("[CONTRÔLE DU CONTRÔLE] la carte de l'accueil existe et porte un titre", () => {
+    // Sans ce témoin, « la même carte » serait vrai de deux objets vides.
+    const carte = carteHoroscope(HOROSCOPE);
+    expect(carte.titre).toBe("Ton ciel du jour");
+    expect(["ecrit", "non_ecrit"]).toContain(carte.texte.statut);
+  });
+
+  it("[LE CŒUR] la fiche porte le titre et le texte de `carteHoroscope`, sans autre mise en mots", () => {
+    // Mutations-cibles : rendre `null` malgré l'horoscope ; un titre recopié à la main ; un texte
+    // choisi autrement que la carte (dominante, sinon Lune relative, sinon NON_ECRIT).
+    const carte = carteHoroscope(HOROSCOPE);
+    const ciel = sectionCiel(themeSansHeure, null, HOROSCOPE);
+    expect(ciel.horoscope).toEqual({ titre: carte.titre, texte: carte.texte });
+    expect(Object.isFrozen(ciel.horoscope)).toBe(true);
+  });
+
+  it("sans horoscope reçu, le bloc n'existe pas (il n'est pas « non écrit »)", () => {
+    // Une panne d'éphéméride du jour n'est pas un silence d'Anima : accuser l'autrice d'une panne
+    // de calcul serait le mensonge inverse de celui de la revue 4.6.
+    expect(sectionCiel(themeSansHeure, null).horoscope).toBeNull();
+    expect(sectionCiel(themeComplet, null, null).horoscope).toBeNull();
+  });
+
+  it("sans thème (naissance absente, panne), pas de ciel du jour même si l'appelant en a un", () => {
+    expect(sectionCiel(null, "panne", HOROSCOPE).horoscope).toBeNull();
+  });
+
+  it("[LE CŒUR] `ficheSocle` transporte l'horoscope jusqu'à la section du ciel", () => {
+    const fiche = ficheSocle(NUM_SANS_NOM, themeSansHeure, null, RIEN, undefined, HOROSCOPE);
+    expect(fiche.ciel.horoscope?.titre).toBe("Ton ciel du jour");
+    // Et sans le sixième argument, rien : les modes « tout » et « numérologie » ne le lisent pas.
+    expect(ficheSocle(NUM_SANS_NOM, themeSansHeure, null, RIEN).ciel.horoscope).toBeNull();
+  });
+
+  it("[FR-031 DUR] avec l'horoscope, le SEUL nombre de la fiche reste le type : le jour civil ne traverse pas", () => {
+    // `HoroscopeDuJour.jour` porte trois nombres. Mutation-cible : transporter la carte entière, ou
+    // ajouter `jour` à `HoroscopeFiche` « pour la date » : le compte fuirait par le type (4.10).
+    const fiche = ficheSocle(NUM_SANS_NOM, themeSansHeure, 4, RIEN, undefined, HOROSCOPE);
+    const nombresTrouves: string[] = [];
+    const parcourir = (v: unknown, chemin: string) => {
+      if (typeof v === "number") nombresTrouves.push(chemin);
+      else if (Array.isArray(v)) v.forEach((e, i) => parcourir(e, `${chemin}[${i}]`));
+      else if (v && typeof v === "object") {
+        for (const [k, e] of Object.entries(v)) parcourir(e, `${chemin}.${k}`);
+      }
+    };
+    parcourir(fiche, "fiche");
+    expect(nombresTrouves).toEqual(["fiche.type.type"]);
+  });
+
+  it("[LE CŒUR] le silence du jour est MOT POUR MOT celui de la carte de l'accueil", () => {
+    // La halte et l'accueil montrent la même carte ; deux silences différents se liraient comme
+    // une panne d'un côté et un vide de l'autre. Le rendu de l'accueil porte la phrase en dur
+    // (`render/accueil/Bibliotheque.tsx`) : on vérifie qu'elle y est, à l'identique.
+    // Commentaires retirés : une prose qui citerait l'ancienne phrase ne doit pas suffire
+    // (revue du 2026-09-02) ; la phrase doit être dans le JSX ou une chaîne.
+    const accueil = readFileSync(resolve(process.cwd(), "render/accueil/Bibliotheque.tsx"), "utf-8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/(^|[^:"'])\/\/.*$/gm, "$1");
+    expect(accueil).toContain(CIEL_DU_JOUR_NON_ECRIT);
+  });
+});
+
+describe("[retour 2026-09-01] l'appel à l'heure : une seule vérité, en tête", () => {
+  it("[LE CŒUR] sans heure, la fiche porte la bulle de `/heure-naissance`, mot pour mot", () => {
+    // Mutation-cible : une seconde phrase écrite ici « pour la halte ». Deux vérités concurrentes
+    // sur la même absence sont un défaut ; celle-ci est déjà écrite et déjà affichée ailleurs.
+    const ciel = sectionCiel(themeSansHeure, null);
+    expect(ciel.sansHeure?.appel).toBe(BULLE_SANS_HEURE);
+    expect(ciel.sansHeure?.reparation.url).toBe("/heure-naissance");
+  });
+
+  it("avec l'heure, aucun appel", () => {
+    expect(sectionCiel(themeComplet, null).sansHeure).toBeNull();
+  });
+
+  it("[CONTRÔLE DU CONTRÔLE] la bulle est courte, et c'est sa raison d'être", () => {
+    // Si elle grandissait jusqu'à la taille de l'aveu, on aurait remis l'aveu en tête sous un autre nom.
+    expect(BULLE_SANS_HEURE.length).toBeGreaterThan(40);
+    expect(BULLE_SANS_HEURE.length).toBeLessThan(MESSAGE_SANS_HEURE.length / 2);
+  });
+});
+
+describe("[retour 2026-09-01] la nouvelle copie de l'univers Astrologie passe les gardes de voix", () => {
+  const NOUVELLES: ReadonlyArray<[string, string]> = [
+    ["INTRODUCTION_ASTROLOGIE", INTRODUCTION_ASTROLOGIE],
+    ["INTRODUCTION_NUMEROLOGIE", INTRODUCTION_NUMEROLOGIE],
+    ["BOUTON_AJOUTER_HEURE", BOUTON_AJOUTER_HEURE],
+    ["RESUME_DETAIL_HEURE", RESUME_DETAIL_HEURE],
+    ["TITRE_DETAIL_POSITIONS", TITRE_DETAIL_POSITIONS],
+    ["CIEL_DU_JOUR_NON_ECRIT", CIEL_DU_JOUR_NON_ECRIT],
+    ["TITRE_LECTURE_NUMEROLOGIE", TITRE_LECTURE_NUMEROLOGIE],
+  ];
+
+  it("[PRÉSENCE AVANT ABSENCE] les sept constantes existent et ne sont pas vides", () => {
+    for (const [nom, texte] of NOUVELLES) expect(texte.length, nom).toBeGreaterThan(3);
+  });
+
+  it.each(NOUVELLES)("%s : aucune prédiction, aucun tiret, apostrophe typographique, aucune mesure", (nom, texte) => {
+    expect(chercherPredictions(texte), `${nom} prédit`).toEqual([]);
+    // Interdits dans tout texte affiché depuis le 2026-09-01 : le tiret cadratin et le demi-cadratin.
+    expect(texte, `${nom} porte un tiret`).not.toMatch(/[—–]/);
+    expect(texte, `${nom} porte une apostrophe droite`).not.toMatch(/'/);
+    // FR-031 : ni pourcentage, ni « débloqué », ni « x sur y ».
+    expect(texte.toLowerCase(), nom).not.toMatch(/%|débloqu|\d+\s*(?:sur|\/)\s*\d+/);
+  });
+
+  it("[LE CŒUR] l'introduction du ciel est COURTE et tutoie", () => {
+    // « L'app est beaucoup trop verbeuse » : la phrase d'avant faisait 128 caractères et nommait
+    // « ton heure » à des comptes qui n'en ont pas. Mutation-cible : la remettre.
+    expect([...INTRODUCTION_ASTROLOGIE].length).toBeLessThan(100);
+    expect(INTRODUCTION_ASTROLOGIE).toMatch(/(?<![\p{L}’])(?:tu|ton|ta|tes)(?![\p{L}])/iu);
+    expect(INTRODUCTION_ASTROLOGIE).not.toMatch(/heure/i);
+    expect(INTRODUCTION_ASTROLOGIE, "la garantie « pas un modèle » reste").toMatch(/modèle/i);
+  });
+
+  it("[FR-086] « Lecture symbolique » ne signe plus personne, et la note d'état garde Anima", () => {
+    // Les 69 lectures sont des textes de départ non signés : le TITRE ne peut pas les attribuer.
+    // Les NOTES, elles, décrivent un état (ce qu'Anima n'a pas encore écrit), pas une signature :
+    // elles restent. Ce témoin prouve que la garde vise le titre, pas le mot « Anima ».
+    expect(TITRE_LECTURE_NUMEROLOGIE).toBe("Lecture symbolique");
+    expect(TITRE_LECTURE_NUMEROLOGIE).not.toMatch(/anima/i);
+    expect(LECTURE_NUMEROLOGIE_NON_ECRITE).toMatch(/anima/i);
+    expect(LECTURE_NUMEROLOGIE_PARTIELLE).toMatch(/anima/i);
   });
 });

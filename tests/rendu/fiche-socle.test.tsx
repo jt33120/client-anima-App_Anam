@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import FicheSocle from "@/render/socle/FicheSocle";
-import type { FicheSocleVue } from "@/render/socle/types";
+import type { FicheSocleVue, HoroscopeVue } from "@/render/socle/types";
 import { ficheSocle } from "@/lib/domain/fiche-socle";
 import {
   INTRODUCTION,
@@ -18,8 +18,15 @@ import {
   TITRE_PORTES,
   SENS_DU_CIEL_NON_ECRIT,
   LECTURE_NUMEROLOGIE_NON_ECRITE,
+  NAISSANCE_ABSENTE,
+  BOUTON_AJOUTER_HEURE,
+  RESUME_DETAIL_HEURE,
+  TITRE_DETAIL_POSITIONS,
+  CIEL_DU_JOUR_NON_ECRIT,
 } from "@/lib/domain/copie-socle";
 import { MESSAGE_TYPE_SANS_TEXTE, MESSAGE_TYPE_ABSENT } from "@/lib/domain/enneagramme-items";
+import { MESSAGE_SANS_HEURE, OU_TROUVER_SON_HEURE, BULLE_SANS_HEURE } from "@/lib/domain/message-sans-heure";
+import type { HoroscopeDuJour } from "@/lib/astro/quotidien";
 import { calculerNumerologie } from "@/lib/astro/numerologie";
 import { calculerThemeNatal, type EntreesNaissance } from "@/lib/astro/theme-natal";
 import { ephemerideAstronomyEngine } from "@/lib/astro/adapters/astronomy-engine";
@@ -59,6 +66,10 @@ const COPIE = {
   titrePortes: TITRE_PORTES,
   sensDuCielNonEcrit: SENS_DU_CIEL_NON_ECRIT,
   typeSansTexte: MESSAGE_TYPE_SANS_TEXTE,
+  boutonAjouterHeure: BOUTON_AJOUTER_HEURE,
+  resumeDetailHeure: RESUME_DETAIL_HEURE,
+  titreDetailPositions: TITRE_DETAIL_POSITIONS,
+  cielDuJourNonEcrit: CIEL_DU_JOUR_NON_ECRIT,
 };
 
 const complete = ficheSocle(
@@ -88,6 +99,12 @@ const corpusNumerologieVide: FicheSocleVue = {
 
 const dessiner = (fiche: FicheSocleVue, mode: "tout" | "astrologie" | "numerologie" = "tout") =>
   render(<FicheSocle fiche={fiche} copie={COPIE} mode={mode} />);
+
+/** Le `<details>` « Lecture symbolique d'Anima », reconnu par son résumé — pas par sa position. */
+const pliDeLecture = (container: HTMLElement) =>
+  [...container.querySelectorAll("details")].find((detail) =>
+    (detail.querySelector("summary")?.textContent ?? "").includes(TITRE_LECTURE_NUMEROLOGIE),
+  );
 
 afterEach(cleanup);
 
@@ -183,6 +200,51 @@ describe("[7.5 · 13.9] les six nombres, avec leurs six preuves de calcul", () =
     expect(lecture).toBeDefined();
     expect(lecture?.open).toBe(false);
     expect(lecture?.querySelectorAll("article")).toHaveLength(6);
+  });
+
+  /**
+   * Retour du fondateur (2026-09-02) : « rajoute le chiffre à côté de ce à quoi il correspond,
+   * exemple : Chemin de vie (7) ». Sous le pli, la grille n'est plus sous les yeux : un article
+   * coiffé de « Chemin de vie » au-dessus de « Ton chemin de vie 4 symbolise… » oblige à remonter
+   * pour savoir de quel 4 on parle. Le titre et le texte doivent se répondre sans quitter le pli.
+   */
+  it("[LE CŒUR] sous le pli, chacun des six articles est coiffé de son nombre — « Chemin de vie (4) »", () => {
+    const { container } = dessiner(complete, "numerologie");
+    const articles = [...(pliDeLecture(container)?.querySelectorAll("article") ?? [])];
+    expect(articles).toHaveLength(6);
+    for (const article of articles) {
+      const titre = article.querySelector("h3")?.textContent ?? "";
+      const decoupe = titre.match(/^(.+) \((\d+)\)$/);
+      expect(decoupe, `intitulé sans nombre : « ${titre} »`).not.toBeNull();
+      // Le nombre du titre est celui de la grille, recalculé depuis la fiche — jamais une valeur
+      // inventée par le rendu. Mutations-cibles : suffixe retiré, ou valeur d'un autre nombre.
+      const nombre = complete.nombres.nombres.find((n) => n.intitule === decoupe![1]);
+      expect(nombre, `« ${decoupe![1]} » ne correspond à aucun nombre de la grille`).toBeDefined();
+      expect(decoupe![2], titre).toBe(nombre!.valeur);
+    }
+  });
+
+  it("[ANTI-VACUITÉ] la grille garde son intitulé nu : « (4) » ne se répète pas sous un 4 en grand", () => {
+    // Le retour vise la lecture, pas la grille. Une étiquette « Chemin de vie (4) » au-dessus d'un
+    // 4 en `t-display` dirait deux fois la même chose — et FR-031 lit de travers tout doublon.
+    const { container } = dessiner(complete, "numerologie");
+    const etiquettes = [...container.querySelectorAll("li[class*='entree'] p[class*='etiquette']")];
+    expect(etiquettes).toHaveLength(6);
+    for (const e of etiquettes) expect(e.textContent ?? "").not.toMatch(/\(/);
+  });
+
+  it("[ANTI-VACUITÉ] sans nom, les lectures restantes portent leur nombre et aucune parenthèse n'est vide", () => {
+    // Un nombre non calculé n'a pas de valeur : ni « Expression () », ni article orphelin. Les
+    // trois nombres de lettres restent des manques DITS (AC2), et les trois de date gardent leur
+    // lecture, avec leur nombre.
+    const { container } = dessiner(sansHeureNiNom, "numerologie");
+    const titres = [...(pliDeLecture(container)?.querySelectorAll("article h3") ?? [])].map(
+      (h) => h.textContent ?? "",
+    );
+    expect(titres.length, "les nombres de date gardent leur lecture").toBeGreaterThan(0);
+    expect(titres.length, "les nombres de lettres ne peuvent pas avoir de lecture sans nom").toBeLessThan(6);
+    for (const t of titres) expect(t).toMatch(/^\S.* \(\d+\)$/);
+    expect(container.textContent ?? "").not.toMatch(/\(\s*\)|undefined|NaN/);
   });
 });
 
@@ -355,5 +417,208 @@ describe("[13.6] la structure résumée du document", () => {
 
   it("l'introduction dit d'où viennent ces données — et qu'elles ne viennent pas d'un modèle", () => {
     expect(dessiner(complete).container.textContent ?? "").toContain(INTRODUCTION);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// Retour du 2026-09-01 — l'horoscope d'abord, l'heure bien avant, les positions repliées
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * « bouton ton heure de naissance bien avant … La première information c'est l'horoscope … Toggle
+ * et cache les positions en texte. » Trois exigences d'ORDRE et de PLI, que seul le DOM peut
+ * prouver : un test de domaine ne sait pas ce qui précède quoi à l'écran.
+ *
+ * Les textes d'horoscope sont posés À LA MAIN sur le modèle de vue : le corpus du jour est celui
+ * qu'il est, et ce fichier garde que le rendu montre CE QU'ON LUI DONNE, écrit ou non écrit. Le
+ * passage du domaine réel est éprouvé une fois, avec un vrai `HoroscopeDuJour`.
+ */
+const HOROSCOPE_ECRIT: HoroscopeVue = {
+  titre: "Ton ciel du jour",
+  texte: { statut: "ecrit", texte: "Le ciel du jour, tel qu’il est écrit dans le corpus." },
+};
+const HOROSCOPE_NON_ECRIT: HoroscopeVue = { titre: "Ton ciel du jour", texte: { statut: "non_ecrit" } };
+
+const avecCielDuJour = (fiche: FicheSocleVue, horoscope: HoroscopeVue | null): FicheSocleVue => ({
+  ...fiche,
+  ciel: { ...fiche.ciel, horoscope },
+});
+
+const HOROSCOPE_REEL: HoroscopeDuJour = {
+  jour: { a: 2026, m: 9, j: 1 },
+  ciel: {} as never,
+  configurations: [],
+  luneRelative: { statut: "calcule", distance: 3 } as never,
+};
+
+const sectionCiel = (container: HTMLElement) => container.querySelector("section[aria-labelledby='socle-ciel']")!;
+const carteJour = (container: HTMLElement) => container.querySelector("article[class*='carteJour']");
+/** `a` précède `b` dans l'ordre du document. */
+const precede = (a: Element, b: Element) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+/** Le `<details>` reconnu par son résumé, jamais par sa position. */
+const pli = (racine: ParentNode, resume: string) =>
+  [...racine.querySelectorAll("details")].find((d) => (d.querySelector("summary")?.textContent ?? "") === resume);
+
+describe("[retour 2026-09-01] l'heure de naissance, bien avant", () => {
+  it("[LE CŒUR] sans heure, le bouton vers /heure-naissance est le PREMIER lien de la section, et il précède l'horoscope", () => {
+    const { container } = dessiner(avecCielDuJour(sansHeureNiNom, HOROSCOPE_ECRIT), "astrologie");
+    const section = sectionCiel(container);
+    const liens = [...section.querySelectorAll("a")];
+    expect(liens.length, "aucun lien dans la section").toBeGreaterThan(0);
+    expect(liens[0].getAttribute("href")).toBe("/heure-naissance");
+    expect(liens[0].textContent).toBe(BOUTON_AJOUTER_HEURE);
+    // Mutation-cible : remettre l'appel EN BAS, là où il vivait. L'horoscope et le bouton existent
+    // toujours, mais dans l'ordre d'avant.
+    const carte = carteJour(container);
+    expect(carte, "pas de « Ton ciel du jour » à précéder").not.toBeNull();
+    expect(precede(liens[0], carte!), "le bouton doit précéder l'horoscope").toBe(true);
+    // Et la bulle, dans la voix d'Anam, précède le bouton.
+    const bulle = [...section.querySelectorAll("p")].find((p) => p.textContent === BULLE_SANS_HEURE);
+    expect(bulle, "la bulle courte manque").toBeDefined();
+    expect(bulle!.className).toMatch(/t-anam/);
+    expect(precede(bulle!, liens[0])).toBe(true);
+  });
+
+  it("[LE CŒUR] avec l'heure, aucun appel : ni bulle, ni bouton, ni lien vers /heure-naissance", () => {
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_ECRIT), "astrologie");
+    const section = sectionCiel(container);
+    expect(section.querySelectorAll("a[href='/heure-naissance']").length).toBe(0);
+    expect(section.textContent ?? "").not.toContain(BULLE_SANS_HEURE);
+    expect(section.textContent ?? "").not.toContain(BOUTON_AJOUTER_HEURE);
+  });
+
+  it("[LE CŒUR] l'aveu long et « où la trouver » restent, sous un pli FERMÉ, après le bouton (FR-050)", () => {
+    const { container } = dessiner(avecCielDuJour(sansHeureNiNom, HOROSCOPE_ECRIT), "astrologie");
+    const section = sectionCiel(container);
+    const detail = pli(section, RESUME_DETAIL_HEURE);
+    expect(detail, "le pli de l'aveu manque").toBeDefined();
+    expect(detail!.hasAttribute("open"), "le pli doit être fermé par défaut").toBe(false);
+    expect(detail!.textContent ?? "").toContain(MESSAGE_SANS_HEURE);
+    expect(detail!.textContent ?? "").toContain(OU_TROUVER_SON_HEURE);
+    const bouton = section.querySelector("a[href='/heure-naissance']")!;
+    expect(precede(bouton, detail!), "le pli vient SOUS le bouton").toBe(true);
+    // Et l'aveu ne paraît NULLE PART hors du pli : le remettre en clair au-dessus serait revenir en arrière.
+    for (const p of section.querySelectorAll("p")) {
+      if (p.textContent === MESSAGE_SANS_HEURE || p.textContent === OU_TROUVER_SON_HEURE) {
+        expect(p.closest("details"), "l'aveu long est rendu hors du pli").not.toBeNull();
+      }
+    }
+  });
+});
+
+describe("[retour 2026-09-01] l'horoscope d'abord", () => {
+  it("[LE CŒUR] « Ton ciel du jour » précède la carte natale (le SVG)", () => {
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_ECRIT), "astrologie");
+    const carte = carteJour(container);
+    const svg = container.querySelector("svg[role='img']");
+    expect(carte).not.toBeNull();
+    expect(svg, "avec l'heure, la carte exacte est là").not.toBeNull();
+    expect(precede(carte!, svg!), "l'horoscope doit précéder le SVG").toBe(true);
+    expect(carte!.querySelector("h3")?.textContent).toBe("Ton ciel du jour");
+  });
+
+  it("[ANTI-VACUITÉ] le texte rendu est CELUI DE LA FICHE, dans la voix d'Anam", () => {
+    // Sans ce témoin, un bloc « Ton ciel du jour » vide ou décoratif passerait les tests d'ordre.
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_ECRIT), "astrologie");
+    const parole = carteJour(container)!.querySelector("p");
+    expect(parole?.textContent).toBe(HOROSCOPE_ECRIT.texte.statut === "ecrit" ? HOROSCOPE_ECRIT.texte.texte : "");
+    expect(parole?.className, "ce sont les mots d'Anima : t-anam").toMatch(/t-anam/);
+    expect(container.textContent ?? "").not.toContain(CIEL_DU_JOUR_NON_ECRIT);
+  });
+
+  it("[ANTI-VACUITÉ] non écrit : la phrase de l'accueil, JAMAIS un texte inventé, jamais en t-anam", () => {
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_NON_ECRIT), "astrologie");
+    const carte = carteJour(container)!;
+    const paragraphes = [...carte.querySelectorAll("p")];
+    expect(paragraphes).toHaveLength(1);
+    expect(paragraphes[0].textContent).toBe(CIEL_DU_JOUR_NON_ECRIT);
+    // Mutation-cible : `?? "…"` ou un repli « Le ciel est calme aujourd'hui » : une citation
+    // inventée, attribuée à une personne réelle (FR-054/FR-086).
+    expect(carte.querySelector(".t-anam, [class*='t-anam']")).toBeNull();
+  });
+
+  it("sans thème (date de naissance absente), aucun « Ton ciel du jour » : la raison suffit", () => {
+    const vide = ficheSocle(null, null, null, { nombres: NAISSANCE_ABSENTE, ciel: NAISSANCE_ABSENTE }) as unknown as FicheSocleVue;
+    const { container } = dessiner(vide, "astrologie");
+    expect(carteJour(container)).toBeNull();
+    expect(container.textContent ?? "").toContain(NAISSANCE_ABSENTE);
+    expect(container.textContent ?? "").not.toContain("Ton ciel du jour");
+  });
+
+  it("[LE CŒUR] le domaine RÉEL transporte un vrai `HoroscopeDuJour` jusqu'au DOM", () => {
+    // Le reste de ce bloc pose le texte à la main ; ce témoin prouve que la chaîne complète tient.
+    const fiche = ficheSocle(
+      calculerNumerologie({ date: "1990-06-15", nomComplet: null }, 2026),
+      calculerThemeNatal(SANS_HEURE, ephemeride),
+      null,
+      { nombres: null, ciel: null },
+      { date: "1990-06-15", nomComplet: null },
+      HOROSCOPE_REEL,
+    ) as unknown as FicheSocleVue;
+    const { container } = dessiner(fiche, "astrologie");
+    const carte = carteJour(container);
+    expect(carte).not.toBeNull();
+    expect(carte!.querySelector("h3")?.textContent).toBe(fiche.ciel.horoscope!.titre);
+    const attendu = fiche.ciel.horoscope!.texte;
+    expect(carte!.querySelector("p")?.textContent).toBe(attendu.statut === "ecrit" ? attendu.texte : CIEL_DU_JOUR_NON_ECRIT);
+  });
+
+  it("les modes « tout » et « numérologie » ne changent pas : ni appel, ni ciel du jour", () => {
+    for (const mode of ["tout", "numerologie"] as const) {
+      const { container } = dessiner(avecCielDuJour(sansHeureNiNom, HOROSCOPE_ECRIT), mode);
+      expect(carteJour(container), mode).toBeNull();
+      expect(container.textContent ?? "", mode).not.toContain(BOUTON_AJOUTER_HEURE);
+      expect(container.textContent ?? "", mode).not.toContain(BULLE_SANS_HEURE);
+      cleanup();
+    }
+  });
+});
+
+describe("[retour 2026-09-01] les positions, repliées", () => {
+  it("[LE CŒUR] positions, angles et maisons vivent sous UN SEUL <details> sans attribut `open`", () => {
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_ECRIT), "astrologie");
+    const section = sectionCiel(container);
+    const detail = pli(section, TITRE_DETAIL_POSITIONS);
+    expect(detail, "le pli « Le détail des positions » manque").toBeDefined();
+    expect(detail!.hasAttribute("open"), "il doit être FERMÉ par défaut").toBe(false);
+    // Mutation-cible : laisser une des trois listes hors du pli. Chaque ligne de position est
+    // reconnue par sa classe (comme le test [7.5/AC3] plus haut), et chacune doit être dedans.
+    const lignes = section.querySelectorAll("li[class*='position']");
+    expect(lignes.length).toBeGreaterThan(10);
+    for (const ligne of lignes) expect(detail!.contains(ligne), ligne.textContent ?? "").toBe(true);
+    for (const titre of ["Les positions, en texte", TITRE_ANGLES, TITRE_MAISONS]) {
+      expect(detail!.textContent ?? "", `${titre} hors du pli`).toContain(titre);
+    }
+    // Un seul pli pour les trois : pas un `<details>` dans un `<details>`.
+    expect(detail!.querySelectorAll("details").length).toBe(0);
+  });
+
+  it("[LE CŒUR] l'aveu du corpus (« ce qu'elles racontent n'est pas encore écrit ») ne paraît QUE sous le pli", () => {
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_ECRIT), "astrologie");
+    const section = sectionCiel(container);
+    const notes = [...section.querySelectorAll("p")].filter((p) => p.textContent === SENS_DU_CIEL_NON_ECRIT);
+    expect(notes, "l'aveu du corpus a disparu").toHaveLength(1);
+    expect(notes[0].closest("details")?.querySelector("summary")?.textContent).toBe(TITRE_DETAIL_POSITIONS);
+  });
+
+  it("l'ordre complet, avec l'heure : horoscope, carte, pli des positions", () => {
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_ECRIT), "astrologie");
+    const section = sectionCiel(container);
+    const carte = carteJour(container)!;
+    const svg = section.querySelector("svg[role='img']")!;
+    const detail = pli(section, TITRE_DETAIL_POSITIONS)!;
+    expect(precede(carte, svg)).toBe(true);
+    expect(precede(svg, detail)).toBe(true);
+  });
+
+  it("sans heure, pas de carte exacte, mais les positions certaines restent lisibles sous le pli", () => {
+    const { container } = dessiner(avecCielDuJour(sansHeureNiNom, HOROSCOPE_ECRIT), "astrologie");
+    const section = sectionCiel(container);
+    expect(section.querySelector("svg[role='img']")).toBeNull();
+    const detail = pli(section, TITRE_DETAIL_POSITIONS);
+    expect(detail).toBeDefined();
+    expect(detail!.textContent ?? "").toContain("Soleil");
+    // Le pli des positions vient APRÈS l'appel à l'heure et l'horoscope.
+    expect(precede(carteJour(container)!, detail!)).toBe(true);
   });
 });

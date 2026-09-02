@@ -7,7 +7,12 @@ import {
   reparableParLHeure,
   type Manquant,
 } from "@/lib/domain/socle-incomplet";
-import { MESSAGE_SANS_HEURE, OU_TROUVER_SON_HEURE } from "@/lib/domain/message-sans-heure";
+import {
+  MESSAGE_SANS_HEURE,
+  OU_TROUVER_SON_HEURE,
+  BULLE_SANS_HEURE,
+  RESUME_OU_TROUVER,
+} from "@/lib/domain/message-sans-heure";
 import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
 import { calculerThemeNatal, type EntreesNaissance } from "@/lib/astro/theme-natal";
 import { ephemerideAstronomyEngine } from "@/lib/astro/adapters/astronomy-engine";
@@ -279,5 +284,47 @@ describe("[B6/FR-053] aucune surface du socle ne s’adresse à elle au futur", 
         `${f} s’adresse à elle au futur — FR-053`,
       ).toEqual([]);
     }
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// La bulle de l'écran (retour terrain du 2026-09-01)
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[2026-09-01 / FR-050] la bulle de l’écran : courte, dans la voix d’Anam, sans tiret", () => {
+  /**
+   * `MESSAGE_SANS_HEURE` est la phrase de la FICHE et reste longue ; `BULLE_SANS_HEURE` est celle
+   * de l'ÉCRAN `/heure-naissance`, où Anam arrive avec une bulle. « Beaucoup moins de texte » se
+   * mesure : la bulle tient en moins de la moitié de l'aveu. Les deux autres exigences ne changent
+   * pas de surface : voix d'Anam (lexique), aucun futur adressé (détecteur de la 5.2).
+   */
+  it("[NON-VACUITÉ] elle existe, et elle est courte : moins de la moitié de l’aveu de la fiche", () => {
+    expect(BULLE_SANS_HEURE.length).toBeGreaterThan(60);
+    expect(BULLE_SANS_HEURE.length).toBeLessThan(MESSAGE_SANS_HEURE.length / 2);
+  });
+
+  it("[LE CŒUR] elle dit ce qui manque, dans la voix d’Anam, et ce que ça ouvre", () => {
+    expect(BULLE_SANS_HEURE).toMatch(/^Il me manque ton heure de naissance\./);
+    expect(BULLE_SANS_HEURE).toMatch(/ascendant/i);
+    expect(BULLE_SANS_HEURE).toMatch(/maisons/i);
+    expect(BULLE_SANS_HEURE, "« une fois qu’on l’a, on accède à l’horoscope »").toMatch(/horoscope/i);
+  });
+
+  it("[5.2 / DUR] aucune marque de prédiction : « devient », jamais « deviendra »", () => {
+    const trouvees = chercherPredictions(BULLE_SANS_HEURE);
+    expect(trouvees, JSON.stringify(trouvees)).toEqual([]);
+  });
+
+  it("[LE BORD] aucun tiret cadratin ni demi-cadratin, aucun chiffre ni pourcentage (FR-031)", () => {
+    for (const texte of [BULLE_SANS_HEURE, RESUME_OU_TROUVER]) {
+      expect(texte).not.toMatch(/[—–]/);
+      expect(texte).not.toMatch(/\d|%/);
+      expect(texte, "apostrophe typographique seulement").not.toMatch(/[a-zà-ÿ]'[a-zà-ÿ]/i);
+    }
+  });
+
+  it("le résumé replié dit bien OÙ : c’est la moitié de FR-050 qu’on garde visible", () => {
+    // Ce qu'on replie derrière ce résumé est `OU_TROUVER_SON_HEURE`, inchangée et gardée plus haut.
+    expect(RESUME_OU_TROUVER).toMatch(/^Où trouver mon heure \?$/);
   });
 });

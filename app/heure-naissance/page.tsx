@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
-import { OU_TROUVER_SON_HEURE } from "@/lib/domain/message-sans-heure";
 import FormulaireHeure from "./formulaire-heure";
+import BulleAnam from "./bulle-anam";
 import s from "./heure-naissance.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
@@ -49,6 +49,18 @@ export const metadata = { title: "Anam" };
  * chercher une copie intégrale d'acte de naissance à la mairie — entre elle et sa première séance.
  * FR-048 rend d'ailleurs ces champs facultatifs. On les demande le jour où elle le décide, depuis
  * son tronc.
+ *
+ * ── UN ÉCRAN QUI SAUTE AUX YEUX (retour terrain du 2026-09-01) ────────────────────────────────
+ *
+ * Julian, en test : « bouton ton heure de naissance bien avant. Un écran qui saute aux yeux avec un
+ * gros bouton et beaucoup moins de texte. Il faudrait presque qu'Anam arrive avec une bulle. Il
+ * faut que ça aille plus vite. L'app est beaucoup trop verbeuse. »
+ *
+ * La page affichait `OU_TROUVER_SON_HEURE` en clair sous le titre : trois lignes sur la mairie et
+ * la copie intégrale, AVANT le premier champ, pour quelqu'un qui vient précisément de décider de
+ * donner son heure. Elle ouvre maintenant sur Anam et une phrase (`BulleAnam`) ; « où trouver »
+ * n'a pas disparu (FR-050 l'exige), il est replié dans le formulaire, sous le champ de l'heure,
+ * derrière « Où trouver mon heure ? ». Le titre reste : c'est lui que le menu du compte promet.
  */
 export default async function Page({
   searchParams,
@@ -85,12 +97,18 @@ export default async function Page({
     .eq("id", user.id)
     .maybeSingle<{ heure_naissance: string | null; lieu_naissance: string | null }>();
 
+  const heureManque = (deja?.heure_naissance ?? null) === null;
+
   return (
     <main className={s.halte}>
       <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className="t-titre">Ton heure de naissance</h1>
-      {/* La même phrase que la fiche du tronc, depuis la même source : un second texte divergerait. */}
-      <p className="t-corps">{OU_TROUVER_SON_HEURE}</p>
+      {/* Anam arrive avec une bulle (2026-09-01). Le titre reste PREMIER dans l'ordre du document :
+          un lecteur d'écran entre par lui ; l'œil, lui, tombe sur elle. */}
+      {/* La bulle dit « il me manque ton heure » : elle ne se montre qu'à celle dont l'heure
+          manque vraiment. Une heure déjà gravée (retour par le menu, ou pour la commune seule)
+          rendrait la phrase fausse : Anam ne réclame pas ce qu'elle a (revue du 2026-09-02). */}
+      {heureManque && <BulleAnam />}
       <FormulaireHeure deja={{ heure: deja?.heure_naissance ?? null, lieu: deja?.lieu_naissance ?? null }} />
       {/* Story 6.9 (QA T7) — la porte de secours (FR-077) et, là où elle est due, la mention
           IA (art. 50). Le MODÈLE décide ; ce composant dessine. */}

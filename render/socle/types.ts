@@ -78,6 +78,16 @@ export interface ManqueVue {
   readonly reparation: ReparationVue | null;
 }
 
+/**
+ * « Ton ciel du jour » : le titre et le texte de la carte de l'accueil, transportés par la fiche
+ * (retour du 2026-09-01 : l'horoscope est la première information de l'univers Astrologie).
+ * Pas de date, pas de nombre : la seule forme numérique de cette frontière reste le type.
+ */
+export interface HoroscopeVue {
+  readonly titre: string;
+  readonly texte: TexteVue;
+}
+
 export interface SectionNombresVue {
   readonly indisponible: string | null;
   readonly entrees: readonly FaitVue[];
@@ -100,7 +110,10 @@ export interface SectionCielVue {
   readonly angles: readonly AngleVue[];
   readonly cuspides: readonly AngleVue[];
   readonly manques: readonly ManqueVue[];
-  readonly sansHeure: { readonly aveu: string; readonly ouChercher: string; readonly reparation: ReparationVue } | null;
+  /** `appel` : la phrase courte de la bulle, en tête ; `aveu` et `ouChercher` : le long, replié dessous. */
+  readonly sansHeure: { readonly appel: string; readonly aveu: string; readonly ouChercher: string; readonly reparation: ReparationVue } | null;
+  /** `null` = pas de thème, ou pas d'horoscope reçu : le bloc n'existe pas, il n'est pas vide. */
+  readonly horoscope: HoroscopeVue | null;
 }
 
 export interface SectionTypeVue {

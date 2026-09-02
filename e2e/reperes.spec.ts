@@ -31,10 +31,10 @@ test.describe("Repères", () => {
       "le seuil n'offre aucun chemin vers l'explication",
     ).toBeVisible();
 
-    await page.getByRole("button", { name: /entrer dans le monde/i }).click();
+    await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     const barre = page.getByRole("navigation", { name: "Régions" });
-    for (const region of ["Moi", "Anam", "Mon arbre"]) {
+    for (const region of ["Aujourd’hui", "Anam", "Mon arbre"]) {
       await barre.getByRole("button", { name: region, exact: true }).click();
       await expect(
         page.getByRole("link", { name: "Repères" }),
@@ -53,7 +53,7 @@ test.describe("Repères", () => {
     }
   });
 
-  test("[CE QU'ELLE EXPLIQUE] les trois places, le geste, et qui écrit quoi", async ({ page }) => {
+  test("[CE QU'ELLE EXPLIQUE] les trois dimensions, le geste, et qui écrit quoi", async ({ page }) => {
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
     await page.getByRole("link", { name: "Repères" }).click();
@@ -62,8 +62,8 @@ test.describe("Repères", () => {
     await expect(page.getByRole("heading", { name: "Repères", level: 1 })).toBeVisible();
 
     // Les trois noms sont ceux de la barre : ce qu'on vient de lire est atteignable sous le même mot.
-    const places = page.getByRole("region", { name: "Les trois places" });
-    await expect(places.getByRole("term")).toHaveText(["Anam", "Mon arbre", "Moi"]);
+    const places = page.getByRole("region", { name: "Les trois dimensions" });
+    await expect(places.getByRole("term")).toHaveText(["Anam", "Mon arbre", "Aujourd’hui"]);
 
     // Le geste ajouté le même jour est EXPLIQUÉ, pas seulement disponible : un geste qu'on ne
     // découvre qu'en tâtonnant n'existe pas pour qui ne tâtonne pas.
@@ -79,7 +79,7 @@ test.describe("Repères", () => {
 
     // On revient d'où l'on vient, sans passer par l'historique du navigateur.
     await page.getByRole("link", { name: /Revenir/ }).click();
-    await expect(page.getByRole("heading", { name: /^Moi$|^Anam$|^Mon arbre$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Aujourd’hui$|^Anam$|^Mon arbre$/, level: 1 })).toBeVisible();
   });
 
   test("[LA PORTE DE SECOURS N'EST PAS UN MODE D'EMPLOI] les deux pages ne se confondent pas", async ({
@@ -96,7 +96,7 @@ test.describe("Repères", () => {
     ).toBeVisible();
     const aide = (await page.locator("main").innerText()).toLowerCase();
     expect(
-      /les trois places|glisser latéralement|mode d’emploi/.test(aide),
+      /les trois dimensions|glisser latéralement|mode d’emploi/.test(aide),
       "/aide s'est mise à expliquer le produit : quelqu'un en détresse y arrive d'abord",
     ).toBe(false);
 

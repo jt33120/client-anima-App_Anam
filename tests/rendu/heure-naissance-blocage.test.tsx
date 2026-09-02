@@ -22,7 +22,10 @@ vi.mock("@/app/heure-naissance/actions", () => ({
 
 const FormulaireHeure = (await import("@/app/heure-naissance/formulaire-heure")).default;
 
-const bouton = () => screen.getByRole("button", { name: /Enregistrer/ }) as HTMLButtonElement;
+// Le bouton reste « Enregistrer » (« Compléter mon ciel », essayé le 2026-09-01, faisait du ciel
+// un objet incomplet : revue du 2026-09-02) ; le bouton a
+// changé de mot, pas de raison de se fermer. Les quatre gardes ci-dessous restent les mêmes.
+const bouton = () => screen.getByRole("button", { name: /^Enregistrer$/ }) as HTMLButtonElement;
 const communeChamp = () => document.getElementById("recherche_lieu") as HTMLInputElement;
 
 beforeEach(() => {
@@ -64,5 +67,21 @@ describe("[QA T18] la commune non choisie s'explique", () => {
     render(<FormulaireHeure deja={{ heure: "07:15:00", lieu: "Bordeaux" }} />);
     expect(bouton().disabled).toBe(true);
     expect(screen.getByText(/rien à écrire ici/)).toBeTruthy();
+  });
+});
+
+describe("[revue 2026-09-02] commune gravée, heure manquante, « je ne connais pas mon heure » : rien à écrire", () => {
+  it("[LE CŒUR] le bouton se ferme et le motif le dit AVANT l'envoi", () => {
+    // Le profil exact que la porte « Ajouter mon heure de naissance » d'Aujourd’hui envoie ici.
+    // Avant : bouton ouvert, envoi, puis un refus serveur au message faux (« tout ce que tu peux
+    // ajouter est déjà enregistré »). Mutation-cible : retirer `rienAEcrire` du calcul de `bloque`.
+    render(<FormulaireHeure deja={{ heure: null, lieu: "Bordeaux" }} />);
+    expect(bouton().disabled, "avant la case, on peut écrire son heure").toBe(false);
+    fireEvent.click(screen.getByLabelText(/je ne connais pas mon heure/i));
+    expect(bouton().disabled).toBe(true);
+    expect(screen.getByText(/rien de plus à écrire ici/i).textContent).toMatch(/Ta commune est déjà enregistrée/);
+    // Décocher rouvre : la case n'est pas un piège.
+    fireEvent.click(screen.getByLabelText(/je ne connais pas mon heure/i));
+    expect(bouton().disabled).toBe(false);
   });
 });

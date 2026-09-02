@@ -19,6 +19,12 @@ import {
 } from "@/app/_ouverture/reclamer-ouverture";
 import { ETAPES, SUIVANT, TERMINER, QUITTER } from "@/lib/domain/copie-guide";
 import {
+  TITRE_SEUIL,
+  TAGLINE_SEUIL,
+  ACTION_SEUIL,
+  ALT_AVATAR_SEUIL,
+} from "@/lib/domain/copie-seuil";
+import {
   GROUPES_MENU,
   LIBELLE_GLYPHE,
   TITRE_FEUILLE,
@@ -163,6 +169,15 @@ export default async function Page() {
         libelleGlyphe: LIBELLE_GLYPHE,
         titreFeuille: TITRE_FEUILLE,
         libelleFermer: LIBELLE_FERMER,
+      }}
+      // Le seuil (retour du fondateur, 2026-09-02) : le nom, la phrase, la porte et le nom
+      // accessible de l'avatar vivent dans `lib/domain/copie-seuil.ts` — ils étaient écrits en dur
+      // dans le rendu, hors de portée des gardes de voix. Même patron que les deux blocs ci-dessus.
+      copieSeuil={{
+        titre: TITRE_SEUIL,
+        tagline: TAGLINE_SEUIL,
+        action: ACTION_SEUIL,
+        altAvatar: ALT_AVATAR_SEUIL,
       }}
     />
   );

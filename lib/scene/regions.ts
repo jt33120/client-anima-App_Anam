@@ -13,7 +13,7 @@ export interface Region {
   readonly id: IdRegion;
   /** Libellé du lien nommé (doublage non-spatial de rang égal, UX-DR-37). */
   readonly nom: string;
-  /** Apparaît dans la barre basse / le rail latéral (Moi, Anam, Mon arbre). */
+  /** Apparaît dans la barre basse / le rail latéral (Aujourd’hui, Anam, Mon arbre). */
   readonly destinationDirecte: boolean;
 }
 
@@ -29,11 +29,23 @@ export interface Region {
  * synonymes plus jolis : « Accueil » est un mot de SITE — la page d'entrée d'un lieu public —,
  * « Moi » est un mot de personne. Le produit n'est pas un site qu'on visite.
  *
+ * ⚠️ ET « Moi » EST DEVENU « Aujourd’hui » LE 2026-09-02 (retour terrain du fondateur, 2026-09-01,
+ * story E1-S4). Le mot est le sien. La région s'ouvre chaque jour sur ce que le jour propose : la
+ * date, le ciel, le mantra, puis les univers qui ne bougent pas. « Aujourd’hui » nomme ce qu'on
+ * vient y chercher ; « Moi » nommait la personne, et ce n'est pas elle qui change d'un jour à
+ * l'autre. Seul le nom visible change : l'identifiant `accueil`, `REGION_FOYER`, l'URL et le
+ * stockage restent, et c'est exactement ce que ce catalogue permet. Deux conséquences, décidées le
+ * même jour (D7) : le h2 de la section quotidienne (`render/accueil/Bibliotheque.tsx`) dit « Ce que
+ * le jour propose », parce que deux entêtes « Aujourd’hui » sur un même écran nommeraient deux fois
+ * la même chose ; et le séparateur de jour du fil (`render/conversation/Fil.tsx`) garde son mot,
+ * qui n'est pas un nom de lieu (il est exempté nommément dans `tests/scene-modele.test.ts`).
+ *
  * ⚠️ ET LA RÉGION RESTE UN LIEU, PAS UN HUB DE COMPTE (amendement d'`EXPERIENCE.md` §5, clause
- * écrite AVANT ce renommage précisément pour qu'il ne dérive pas). Un lieu qui s'appelle « Moi »
- * et affiche un taux de complétude n'est plus un lieu : c'est un tableau de bord, et le produit
- * n'en a pas. Aucune entrée de compte n'y déménage, aucune rubrique nominative au-dessus du pli
- * (`EXPERIENCE.md` ligne 452), aucune pastille (FR-031, DUR).
+ * écrite AVANT le renommage du 2026-08-25 précisément pour qu'il ne dérive pas, et qui tient pour
+ * celui du 2026-09-02). Un lieu, qu'il s'appelle « Moi » ou « Aujourd’hui », qui affiche un taux de
+ * complétude n'est plus un lieu : c'est un tableau de bord, et le produit n'en a pas. Aucune entrée
+ * de compte n'y déménage, aucune rubrique nominative au-dessus du pli (`EXPERIENCE.md` ligne 452),
+ * aucune pastille (FR-031, DUR).
  *
  * ⚠️ ET C'EST LA SEULE SOURCE DE CES NOMS. `tests/scene-modele.test.ts` échoue si un fichier hors
  * de celui-ci écrit un nom de région en littéral : sans quoi le renommage suivant en oublierait un,
@@ -41,7 +53,7 @@ export interface Region {
  */
 export const CATALOGUE_REGIONS: readonly Region[] = [
   { id: "seuil", nom: "Seuil", destinationDirecte: false },
-  { id: "accueil", nom: "Moi", destinationDirecte: true },
+  { id: "accueil", nom: "Aujourd’hui", destinationDirecte: true },
   { id: "anam", nom: "Anam", destinationDirecte: true },
   { id: "arbre", nom: "Mon arbre", destinationDirecte: true },
 ] as const;
@@ -75,3 +87,16 @@ const IDS: readonly string[] = CATALOGUE_REGIONS.map((r) => r.id);
 
 /** Garde de type : `v` est-il un identifiant de région connu ? */
 export const estRegion = (v: string): v is IdRegion => IDS.includes(v);
+
+/**
+ * Le nom visible d'une région, pris au catalogue et jamais recopié.
+ *
+ * C'est par lui que les écrans HORS de la scène (la frontière d'erreur, la page introuvable) disent
+ * « Revenir à … » : le renommage du 2026-09-02 a trouvé « Revenir à Moi » écrit en dur dans
+ * `app/_erreur/ErreurApplication.tsx`, hors de portée de la garde de `tests/scene-modele.test.ts`
+ * (qui cherche un nom entre guillemets ou entre balises, pas au fil d'une phrase). Un libellé
+ * recopié survit au catalogue qui l'a produit ; celui-ci ne le peut pas.
+ */
+export function nomDeRegion(id: IdRegion): string {
+  return CATALOGUE_REGIONS.find((r) => r.id === id)?.nom ?? "";
+}

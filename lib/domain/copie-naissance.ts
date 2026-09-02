@@ -26,7 +26,7 @@ export const TITRE_SECTION = "Ton heure de naissance";
  */
 export const INTRODUCTION =
   "L’heure inscrite sur ton acte de naissance décide de ton ascendant et de tes maisons. Si celle " +
-  "qui est enregistrée est fausse, tu peux la corriger — autant de fois qu’il le faut. Ton thème " +
+  "qui est enregistrée est fausse, tu peux la corriger, autant de fois qu’il le faut. Ton thème " +
   "sera recalculé à partir de la nouvelle, et l’ancien ne sera pas conservé.";
 
 export const HEURE_ABSENTE =

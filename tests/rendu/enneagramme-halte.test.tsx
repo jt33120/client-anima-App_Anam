@@ -85,14 +85,30 @@ const monterTest = (
   );
 
 describe("[13.8] comprendre avant de commencer", () => {
-  it("explique simplement la méthode, sa limite, puis déplie les neuf repères du corpus", () => {
+  it("explique simplement la méthode, sa limite, et ouvre les neuf repères du corpus dans une feuille", async () => {
+    // ⚠️ LES NEUF TEXTES N'APPARAISSENT QU'À L'OUVERTURE, ET C'EST LE RETOUR DU FONDATEUR
+    // (2026-09-02) : « les tiroirs sont un peu longs. Moins de scroll, plus de pop-up, une app
+    // plus dynamique ». Ce test exigeait les neuf textes SANS clic : c'est exactement la colonne
+    // qu'on lui a demandé de faire disparaître. L'exigence qui reste entière : les neuf textes
+    // sont CEUX du corpus (`reperesPourIntroduction`, FR-054), tous, dans le dialogue, et la
+    // feuille se referme d'Échap en rendant le focus à la porte (`EXPERIENCE.md` ligne 216).
     render(<IntroductionEnneagramme />);
     expect(screen.getByText(/grille de lecture/i)).toBeTruthy();
     expect(screen.getByText(/hypothèse/i)).toBeTruthy();
-    expect(screen.getByText(/Voir les neuf repères/i)).toBeTruthy();
+    const porte = screen.getByRole("button", { name: /Voir les neuf repères/i });
     for (const repere of reperesPourIntroduction()) {
-      expect(screen.getByText(repere.texte)).toBeTruthy();
+      expect(screen.queryByText(repere.texte), "un repère s'empile encore dans la page").toBeNull();
     }
+
+    await userEvent.click(porte);
+    const feuille = screen.getByRole("dialog");
+    for (const repere of reperesPourIntroduction()) {
+      expect(within(feuille).getByText(repere.texte)).toBeTruthy();
+    }
+
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement, "le focus n'est pas revenu à la porte").toBe(porte);
   });
 
   it("une nouvelle passe attend le geste « Commencer » avant de montrer la première question", async () => {

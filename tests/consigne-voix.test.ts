@@ -36,4 +36,12 @@ describe("Story 2.8 — consigne de voix : contrat + invariants non négociables
     expect(c.content).toMatch(/flatt|excuse|rends la main|comment tu le vois/i);
     expect(c.content).toMatch(/trois phrases|3 phrases/i);
   });
+
+  /* Retour du fondateur (2026-09-01) : plus aucun tiret cadratin dans les textes de l'app, la
+     voix vivante comprise. La règle ne peut se prouver ici que par sa présence dans la consigne :
+     aucun modèle n'est appelé dans les tests, et aucun post-traitement ne coupe le flux. */
+  it("bannit le tiret cadratin des réponses vivantes et nomme le remplaçant (retour 2026-09-01)", () => {
+    expect(c.content).toMatch(/jamais de tiret cadratin \(—\)/i);
+    expect(c.content).toMatch(/deux-points/i);
+  });
 });

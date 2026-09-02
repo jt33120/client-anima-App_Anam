@@ -27,13 +27,13 @@ export const TITRE_HALTE = "Réglages";
  */
 export const SECTION_NOM = "Ton nom";
 export const NOM_DESCRIPTION =
-  "Le prénom est celui qu’Anam emploie en te parlant. Le nom complet, lui, ne sert qu’au calcul des nombres — il n’est affiché nulle part et rien ne t’oblige à le donner.";
+  "Le prénom est celui qu’Anam emploie en te parlant. Le nom complet, lui, ne sert qu’au calcul des nombres : il n’est affiché nulle part et rien ne t’oblige à le donner.";
 export const LABEL_PRENOM = "Prénom";
 export const LABEL_NOM_COMPLET = "Nom complet";
 export const AIDE_NOM_COMPLET = "Facultatif. Le laisser vide retire simplement les nombres qui en dépendent.";
 export const ACTION_ENREGISTRER = "Enregistrer";
 export const NOM_ENREGISTRE = "C’est enregistré.";
-export const NOM_VIDE = "Il faut un prénom — même un surnom, même une initiale.";
+export const NOM_VIDE = "Il faut un prénom, même un surnom, même une initiale.";
 export const NOM_TROP_LONG = "C’est trop long pour tenir dans un prénom.";
 export const NOM_ECHEC = "Je n’ai pas réussi à enregistrer. Réessaie dans un moment.";
 
@@ -125,7 +125,7 @@ export const PERMISSION_REFUSEE =
  * pas à elle.
  */
 export const PERMISSION_SANS_REPONSE =
-  "Le navigateur a posé sa question et elle est restée sans réponse — rien n’a été refusé. " +
+  "Le navigateur a posé sa question et elle est restée sans réponse : rien n’a été refusé. " +
   "Le bouton la repose si tu veux ; sinon tout fonctionne pareil.";
 
 /**
@@ -135,7 +135,7 @@ export const PERMISSION_SANS_REPONSE =
  */
 export const INDISPONIBLE =
   "Ce navigateur ne sait pas afficher de notifications. Sur iPhone, il faut d’abord ajouter Anam à " +
-  "l’écran d’accueil. Sans ça, tout fonctionne pareil — simplement, rien ne s’affichera en dehors de " +
+  "l’écran d’accueil. Sans ça, tout fonctionne pareil : simplement, rien ne s’affichera en dehors de " +
   "l’application.";
 
 export const ECHEC = "Ça n’a pas marché. Tu peux réessayer.";
@@ -207,7 +207,7 @@ export const SECTION_SESSION = "Cette session";
  */
 export const DESCRIPTION_SESSION =
   "Sur un appareil que tu partages, c’est ce qui referme ta session. Pour revenir, tu redemanderas " +
-  "un lien — il n’y a pas de mot de passe à retenir.";
+  "un lien : il n’y a pas de mot de passe à retenir.";
 
 /** Le mot que les gens cherchent, pas celui qui décrit le mécanisme. */
 export const SE_DECONNECTER = "Me déconnecter";

@@ -21,10 +21,19 @@ import { resolve, dirname } from "node:path";
 
 const racine = process.cwd();
 
-/** Un asset = son cutout détouré (rembg) + son dossier + sa largeur d'affichage 1x (px CSS). */
+/**
+ * Un asset = son cutout détouré (rembg) + son dossier + sa largeur d'affichage 1x (px CSS).
+ *
+ * `plumer` (défaut : vrai) dissout le bas du matte dans la nuit — juste pour un BUSTE coupé net.
+ * Le seuil est un corps ENTIER en suspension, pied pointé : le plumer effacerait le pied, et la
+ * silhouette complète est ce que le remplissage d'étoiles échantillonne (retour du 2026-08-31).
+ * Source : `public/scene/anam-seuil.png` (peinture entière, RGB) détourée par rembg/isnet puis
+ * recadrée au plus près de la figure — même geste que l'ÉTAPE 1 ci-dessus, modèle isnet-general-use.
+ */
 const SOURCES = [
   { nom: "presence", source: "images/phase-c/anam-presence-cut.png", largeur1x: 220 },
   { nom: "veille", source: "images/phase-c/anam-veille-cut.png", largeur1x: 180 },
+  { nom: "seuil", source: "images/phase-c/anam-seuil-cut.png", largeur1x: 200, plumer: false },
 ];
 
 /** Encodeurs (qualités calibrées pour une peinture douce : nettes mais légères, alpha préservé). */
@@ -39,13 +48,14 @@ const FORMATS = [
  * dans le noir. `dest-in` multiplie l'alpha du matte par celui d'un dégradé vertical → seul le bas
  * fond, le reste (cheveux, visage) garde le matte propre.
  */
-async function plumer(cheminSource, largeur) {
+async function plumer(cheminSource, largeur, actif = true) {
   const { data, info } = await sharp(cheminSource)
     .resize({ width: largeur })
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
+  if (!actif) return sharp(data, { raw: { width: w, height: h, channels: 4 } });
 
   const svg = `<svg width="${w}" height="${h}"><defs><linearGradient id="f" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
@@ -58,7 +68,7 @@ async function plumer(cheminSource, largeur) {
   ]);
 }
 
-async function genererUn({ nom, source, largeur1x }) {
+async function genererUn({ nom, source, largeur1x, plumer: plumage = true }) {
   const cheminSource = resolve(racine, source);
   const dossier = resolve(racine, "public/scene", nom);
   await mkdir(dossier, { recursive: true });
@@ -70,7 +80,7 @@ async function genererUn({ nom, source, largeur1x }) {
 
   let ecrits = 0;
   for (const { suffixe, largeur } of tailles) {
-    const feutre = await plumer(cheminSource, largeur); // matte + bas dissous
+    const feutre = await plumer(cheminSource, largeur, plumage); // matte (+ bas dissous si buste)
     const png = await feutre.png().toBuffer(); // pivot RGBA réutilisé par tous les formats
     for (const { ext, encode } of FORMATS) {
       const sortie = resolve(dossier, `anam-${nom}${suffixe}.${ext}`);
@@ -79,7 +89,7 @@ async function genererUn({ nom, source, largeur1x }) {
       ecrits++;
     }
   }
-  console.log(`✓ ${nom} : ${ecrits} fichiers (détourés + bas plumeux) → public/scene/${nom}/`);
+  console.log(`✓ ${nom} : ${ecrits} fichiers (détourés${plumage ? " + bas plumeux" : ""}) → public/scene/${nom}/`);
 }
 
 for (const asset of SOURCES) {

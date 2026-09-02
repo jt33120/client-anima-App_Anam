@@ -91,7 +91,7 @@ class MoteurArbre {
      * ⚠️ CE QUE LA MESURE DEVRA DIRE, ET QUI N'EST PAS « ÇA MONTE ». La couche est composée sur
      * DEUX régions — le seuil et Anam — et éteinte sur les deux autres (`.arbreEnRetrait` et
      * `.arbreEnRetraitArbre` posent `--imagerie-opacite: 0`). Le mécanisme prédit donc que le SEUIL
-     * ET ANAM montent, et que « Moi » et « Mon arbre » ne bougent pas. Si tout monte uniformément,
+     * ET ANAM montent, et que « Aujourd’hui » et « Mon arbre » ne bougent pas. Si tout monte uniformément,
      * ce n'est pas le prélèvement par trame mais la PRESSION mémoire — un autre mécanisme, qui vaut
      * la même correction. Si rien ne bouge, on remet ces trois lignes telles quelles.
      *

@@ -257,7 +257,12 @@ describe("[5.6/AC9 · FR-088] l'étape 0 vit dans le canevas lunaire", () => {
     const { container } = monter(VIDE);
     const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
     expect(canvas.getAttribute("data-etape-arbre")).toBe("graine");
-    expect(container.querySelector("svg"), "l'ancien dessin de secours est revenu").toBeNull();
+    // ADAPTÉ : le seul SVG admis à l'étape 0 est la graine d'attente superposée au canevas (`GraineAttente`,
+    // crochet `data-graine-attente`) — ce n'est pas un dessin de secours, c'est la graine du même ciel.
+    expect(
+      container.querySelector("svg:not([data-graine-attente])"),
+      "l'ancien dessin de secours est revenu",
+    ).toBeNull();
   });
 
   it("la matière du futur tronc reste marquée en réserve quand l'heure manque, sans changer d'asset", () => {
@@ -277,6 +282,7 @@ describe("[5.6/AC9 · FR-088] l'étape 0 vit dans le canevas lunaire", () => {
     const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
     expect((canvas.getAttribute("aria-label") ?? "").toLowerCase()).not.toContain("incomplet");
     expect(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER })).toBeTruthy();
-    expect(container.querySelector("svg")).toBeNull();
+    // ADAPTÉ : même exclusion que ci-dessus — la graine d'attente (SVG) est légitime à l'étape 0.
+    expect(container.querySelector("svg:not([data-graine-attente])")).toBeNull();
   });
 });

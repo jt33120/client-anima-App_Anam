@@ -8,52 +8,89 @@
  * Règle : globals.css NE FAIT QUE refléter ce module. La garde de parité
  * (tests/tokens-parite.test.ts) échoue si le CSS diverge d'une seule valeur.
  * Les clés de couleur sont le NOM EXACT de la variable CSS (`fond` → `--fond`).
+ *
+ * ══ 2026-09-01 : LA PALETTE « SOFT BALANCE » (retour terrain n° 2, story E5-S1) ═══════════════
+ * Julian, une image de palette à l'appui : « le fond est trop violet et trop sombre, il faut une
+ * interface plus contrastée et lisible, avec le violet et le bleu ciel de la fleur de lotus, des
+ * textures et des dégradés ; utilise la palette fournie ». Six teintes fournies : Ivory #F0EFEA,
+ * Sky #D3DBF0, Gray #B8B5AC, Beige #E0D2C7, Periwinkle #7A90C9, Navy #1C2740.
+ *
+ * Ce qui a été décidé (D5 et D6, sprint-change-proposal-2026-08-31-retours-terrain-2.md) :
+ *  - La nuit RESTE le mode natif : seule sa teinte change, de l'indigo (#0C0A1E) au navy de la
+ *    palette. Un fond Ivory natif aurait été une refonte de doctrine (globals.css, DESIGN.md et
+ *    tests/accessibilite.test.ts refusent tout thème jour), hors de la journée.
+ *  - La palette brute ne tient pas le gate WCAG sur Ivory : Gray 1,78:1, Periwinkle 2,74:1.
+ *    Elle est donc DÉCLINÉE par rôle, et chaque valeur ci-dessous porte son ratio recalculé avec
+ *    ratioContraste() de app/styles/contraste.ts (tests/contraste.test.ts : 18/18 paires en nuit,
+ *    9/9 en clair). Une valeur qui casse une paire rougit ce gate, donc la CI.
+ *  - Sky est à la fois `accent` ET `lueur` : admis parce que la lueur n'est jamais cliquable
+ *    (DESIGN.md §Colors), donc aucune ambiguïté d'action ne naît de la teinte partagée.
+ *  - L'ancien violet survit en `nebuleuse` : un token de DÉCOR (1,13:1 sur fond), jamais sous du
+ *    texte ni sur un contrôle. Il n'est consommé qu'à partir de E5-S2 (halo et couche nébuleuse
+ *    de render/monde.module.css) ; la clé existe dès maintenant pour que la parité la garde.
+ *  - PALETTE_LUNAIRE (render/arbre/MoteurArbreLunaire.ts) reste gelée (D6) : le bois #9A96BE
+ *    tient 5,29:1 sur le navy, on relit à l'écran après déploiement plutôt que de la retoucher.
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Couleurs — mode nuit (mode natif, tokens sans suffixe)
+// Couleurs — mode nuit (mode natif, tokens sans suffixe).
+// Nuit NAVY « Soft Balance » depuis le 2026-09-01. Ratios recalculés (ratioContraste) :
+// texte/fond 12,90 · texte-doux/fond 8,70 · accent/fond 10,72 · sur-accent/accent 10,72 ·
+// bordure-forte/fond 4,71 · bordure-forte/surface-elevee 3,24 (la marge la plus serrée,
+// seuil 3) · arbre-tronc/fond 4,43 · voile fond à 85 % sur image blanche : texte 8,06,
+// texte-doux 5,43 (tests/voile.test.ts, tests/surimpression.test.ts).
 // ─────────────────────────────────────────────────────────────────────────────
 export const couleursNuit = {
-  fond: "#0C0A1E",
-  surface: "#16132F",
-  "surface-elevee": "#201C42",
-  texte: "#EEECF7",
-  "texte-doux": "#ABA6C9",
-  bordure: "#2A2648",
-  "bordure-forte": "#77719C",
-  accent: "#8FC1EF",
-  "accent-doux": "#241F47",
-  "sur-accent": "#0C0A1E",
-  "arbre-tronc": "#6A6690",
-  "arbre-branche": "#9A96BE",
-  "arbre-feuillage": "#8FB6D8",
-  succes: "#86B79E",
-  alerte: "#D0A05C",
-  lueur: "#CDE4F8",
+  fond: "#1C2740", // Navy de la palette : le ciel. Ni noir, ni gris, ni l'indigo d'avant
+  surface: "#26324D", // premier voile de nuit : le navy éclairci d'un cran
+  "surface-elevee": "#33415E", // le navy clair de la palette : second et dernier niveau
+  texte: "#F0EFEA", // Ivory : le blanc de la palette, jamais #FFFFFF (halation sur navy)
+  // Le Gray #B8B5AC de la palette ne tient que 4,52:1 sous le voile du Seuil (fond à 85 % sur une
+  // image blanche) : marge trop juste face à l'anti-crénelage. Éclairci d'un cran vers Ivory.
+  "texte-doux": "#C9C6BD",
+  bordure: "#33415E", // séparateur décoratif = surface-elevee (1,46:1, exempté WCAG 1.4.11)
+  "bordure-forte": "#7A90C9", // Periwinkle : contour des contrôles + anneau de focus (4,71 sur fond)
+  accent: "#D3DBF0", // Sky, le lotus : la couleur de l'ACTION seule (10,72 sur fond)
+  "accent-doux": "#26324D", // aplat de mise en avant discret = surface (porte du texte `texte`)
+  "sur-accent": "#1C2740", // encre navy sur remplissage Sky (10,72:1)
+  "arbre-tronc": "#8C88B0", // écorce lunaire, argent violacé : la trace du violet dans l'UI
+  "arbre-branche": "#A9B8E6", // bois clair, entre Periwinkle et Sky (7,56 sur fond)
+  "arbre-feuillage": "#9CC5E8", // feuillage bleu-lune (8,18 sur fond)
+  succes: "#86B79E", // inchangé : vert-jade éteint, en texte seulement (5,64 sur surface)
+  alerte: "#D0A05C", // inchangé : ambre lunaire, en texte seulement (5,39 sur surface)
+  lueur: "#D3DBF0", // = Sky, comme l'accent : la lueur n'est jamais cliquable, donc admis (D5)
+  // L'ancien violet de la nuit galactique, gardé comme NÉBULEUSE : décor seulement (halo et
+  // dégradé du monde, E5-S2). 1,13:1 sur fond : une nuance, pas une couleur. Jamais sous du texte.
+  nebuleuse: "#2E2A5A",
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Couleurs — mode accessibilité « contraste renforcé / imagerie atténuée ».
 // PAS un thème jour. Mêmes clés/rôles que la nuit ; réaffectées aux var. CSS
 // dans :root[data-a11y="contraste"] et @media (prefers-contrast: more).
+// Depuis le 2026-09-01, c'est ICI que vivent Ivory et Beige : la palette Soft
+// Balance re-tokenisée en clair, chaque teinte foncée jusqu'au seuil (9/9 paires,
+// min 4,83 succes/fond ; texte-doux/surface-elevee 4,75 est la marge de texte la
+// plus serrée). Le type impose la clé `nebuleuse` : en clair, le Beige, décor seul.
 // ─────────────────────────────────────────────────────────────────────────────
 export const couleursClair: Record<keyof typeof couleursNuit, string> = {
-  fond: "#F3F1FB",
-  surface: "#FBFAFE",
-  "surface-elevee": "#FFFFFF",
-  texte: "#1B1836",
-  "texte-doux": "#4C476B",
-  bordure: "#DCD8EE",
-  "bordure-forte": "#565179",
-  accent: "#265F91",
-  "accent-doux": "#E2ECF8",
-  "sur-accent": "#FFFFFF",
-  "arbre-tronc": "#5A5680",
-  "arbre-branche": "#4A4670",
-  "arbre-feuillage": "#3C6C93",
-  succes: "#3B7357",
-  alerte: "#8A5A16",
-  lueur: "#3C6C93",
+  fond: "#F0EFEA", // Ivory (texte navy à 12,90)
+  surface: "#FFFFFF",
+  "surface-elevee": "#D3DBF0", // Sky en aplat (le texte navy y tient à 10,72)
+  texte: "#1C2740", // Navy
+  "texte-doux": "#5F5D57", // le Gray foncé jusqu'à 5,72 sur Ivory (le Gray brut ne fait que 1,78)
+  bordure: "#B8B5AC", // Gray : décoratif, exempté (1,78)
+  "bordure-forte": "#4C63A8", // Periwinkle foncé : 4,99 sur Ivory, 4,15 sur surface-elevee
+  accent: "#41579B", // Periwinkle foncé jusqu'à 5,96 sur Ivory (le brut ne fait que 2,74)
+  "accent-doux": "#D3DBF0", // Sky
+  "sur-accent": "#FFFFFF", // 6,86 sur accent
+  "arbre-tronc": "#4C63A8", // 4,99 sur Ivory
+  "arbre-branche": "#41579B", // 5,96 sur Ivory
+  "arbre-feuillage": "#33415E", // 8,86 sur Ivory
+  succes: "#3B7357", // inchangé, 4,83 sur Ivory (la paire la plus serrée du mode)
+  alerte: "#8A5A16", // inchangé, 5,13 sur Ivory
+  lueur: "#41579B", // = accent, même règle qu'en nuit
+  nebuleuse: "#E0D2C7", // Beige : décor seulement (1,28 sur Ivory), jamais sous du texte
 };
 
 export type CleCouleur = keyof typeof couleursNuit;
