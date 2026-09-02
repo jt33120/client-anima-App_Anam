@@ -1,0 +1,110 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   LA GRAINE QUI N'ATTEND QUE D'ÉCLORE — le souffle du lotus, posé sur la graine de l'étape 0.
+   Le SVG (GraineAttente.tsx) ne porte que la géométrie ; TOUTE l'animation est ici, comme
+   pour LotusAttente.module.css.
+
+   LE PRINCIPE : la graine respire EXACTEMENT comme le lotus d'attente (mêmes bornes d'échelle
+   0,975 → 1,025, même courbe `--courbe-lotus`), et par-dessus ce souffle elle SE SOULÈVE de
+   trois unités puis se repose, sur un cycle deux fois plus long. « Rebondir », a dit le
+   fondateur ; la charte répond `rebond: 'interdit'` (DESIGN.md L139), « rien ne glisse, rien ne
+   rebondit, rien ne pop » (L308), « aucun rebond, aucun ressort, aucun overshoot » (L475) et
+   globals.css L268 : « rien ne rebondit ». On garde le geste, pas le ressort : un soulèvement
+   en sinus, une micro-retombée d'une demi-unité, et c'est tout. Le test borne les valeurs.
+
+   POURQUOI CETTE FEUILLE ET PAS `.canvasLunaire` : tests/arbre-rendu.test.ts L295-296 et
+   tests/rendu/arbre-cycle.test.tsx L92-99 interdisent toute animation sur le canevas et toute
+   boucle dans le moteur. La graine animée est une couche À PART, minuscule (48 × 48), et non le
+   bitmap 1408 × 2503 promu pour rien.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.graine {
+  display: block;
+  width: var(--taille-graine, 48px);
+  height: var(--taille-graine, 48px);
+  overflow: visible;
+  /* Décorative et SUPERPOSÉE au canevas : elle ne doit jamais avaler un tap ni un glisser. Le
+     pan/zoom vit sur `.canevas` (touch-action: none) ; une couche qui intercepte ferait un trou
+     dans le geste exactement à l'endroit où l'œil se pose. */
+  pointer-events: none;
+  /* `currentColor` du SVG = le nacre de la palette gelée (globals.css L29). Le halo et le trait de
+     la coque en héritent ; le mode contraste renforcé le remplace sans qu'on y touche. */
+  color: var(--lueur);
+  /* LA MÊME COURBE QUE LE LOTUS — valeur copiée de LotusAttente.module.css (`.lotus`), le test
+     vérifie la parité. Ses points de contrôle restent dans [0, 1] : aucun overshoot par la
+     courbe elle-même, c'est un aller-retour en sinus. */
+  --courbe-lotus: cubic-bezier(0.42, 0, 0.32, 1);
+  /* LA DURÉE DE LA CHARTE : `--duree-respiration` (globals.css L74, DESIGN.md L137 : 4200 ms),
+     la durée du seul mouvement en boucle du produit (globals.css L285). Le lotus, lui, déclare
+     ses propres cycles (4000 et 5200 ms) : 4200 tient entre les deux — même lenteur. */
+  --cycle: var(--duree-respiration);
+}
+
+/* Les trois teintes de `peindreGraine` (MoteurArbreLunaire.ts L455-475), par leurs tokens
+   (globals.css L24-29) et jamais en hex : lueur au foyer, argent de branche à 28 pour cent,
+   argent du tronc au bord. */
+.teinteLueur { stop-color: var(--lueur); }
+.teinteBranche { stop-color: var(--arbre-branche); }
+.teinteTronc { stop-color: var(--arbre-tronc); }
+
+/* Le trait de la coque : `rgba(205,228,248,0.38)` à 1,4 sur le canevas → currentColor à 0,38,
+   0,7 d'épaisseur à cette échelle (la graine fait 12 × 15,5 ici pour 24 × 31 là-bas). */
+.coque {
+  stroke-opacity: 0.38;
+  stroke-width: 0.7;
+}
+
+/* ── LE SOUFFLE ─────────────────────────────────────────────────────────────── */
+/* Copie conforme de `lotusSouffle` : c'est ce que « même animation que les lotus » veut dire. */
+@keyframes graineSouffle {
+  0%, 100% { transform: scale(0.975); }
+  45% { transform: scale(1.025); }
+}
+/* Le soulèvement : monte de 3, redescend, effleure une demi-unité sous le repos, se pose.
+   Aucune valeur au-delà de ces bornes ; un ressort passerait bien au-delà. */
+@keyframes graineSoulevement {
+  0%, 100% { transform: translateY(0px); }
+  45% { transform: translateY(-3px); }
+  80% { transform: translateY(0.5px); }
+}
+/* Le halo ne change QUE d'opacité : une lueur, pas une forme (même règle que le halo du lotus). */
+@keyframes graineHalo {
+  0%, 100% { opacity: 0.35; }
+  45% { opacity: 0.75; }
+}
+
+/* DEUX ÉLÉMENTS IMBRIQUÉS plutôt qu'`animation-composition: add` sur un seul : iOS 15 ne connaît
+   pas la composition, et un `transform` composé à la main dans une seule @keyframes forcerait à
+   caler les deux cycles l'un sur l'autre. Le soulèvement porte la translation ; le corps, dedans,
+   porte l'échelle. Seuls `transform` et `opacity` s'animent : rien qui déclenche une mise en page.
+   Aucune promotion de couche forcée non plus — le dépôt n'en tolère qu'une (monde.module.css
+   L216-220, sur les étoiles), et une graine seule n'en a pas besoin. */
+.souleve {
+  animation: graineSoulevement calc(var(--cycle) * 2) var(--courbe-lotus) infinite;
+}
+.corps {
+  animation: graineSouffle var(--cycle) var(--courbe-lotus) infinite;
+  /* La graine se DRESSE depuis sa base : l'origine est le milieu du bas de sa propre boîte. */
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.halo {
+  animation: graineHalo var(--cycle) var(--courbe-lotus) infinite;
+}
+
+/* FIXE SOUS prefers-reduced-motion, JAMAIS ABSENTE (même règle que LotusAttente, DESIGN.md L477 :
+   « la respiration du signe s'arrête », et aucune information n'est portée par le seul mouvement).
+   La graine reste posée, à son repos, halo à mi-lueur : qu'elle soit là est le signe. */
+@media (prefers-reduced-motion: reduce) {
+  .souleve,
+  .corps,
+  .halo {
+    animation: none !important;
+  }
+  .souleve,
+  .corps {
+    transform: none;
+  }
+  .halo {
+    opacity: 0.5;
+  }
+}
