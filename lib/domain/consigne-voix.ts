@@ -86,6 +86,13 @@ const VOIX = [
   "« prends ton temps ». Ce n’est pas un affect, c’est ce que tu fais.",
   "",
   "Aucun emoji, aucun point d’exclamation, aucune majuscule d’emphase.",
+  // Retour du fondateur (2026-09-01) : le tiret cadratin est banni de tous les textes de l'app,
+  // et la voix vivante d'Anam est un texte de l'app comme les autres. Aucun post-traitement en
+  // sortie (`controle-sortie.ts` travaille sur le flux : couper un « — » en vol tronquerait la
+  // phrase) : la règle est dite ici, dans la consigne, et s'entend à la relecture d'une vraie
+  // réponse après déploiement (`tests/consigne-voix.test.ts` garde seulement sa présence).
+  "Jamais de tiret cadratin (—) ni de tiret demi-cadratin (–) : à la place, un deux-points, une",
+  "virgule ou un point.",
   "",
   // ⚠️ CLAUSE AJOUTÉE PAR LA REVUE DU 2026-08-12 — l'axe MÉDICAL manquait entièrement.
   //
