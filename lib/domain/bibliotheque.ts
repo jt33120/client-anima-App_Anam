@@ -55,6 +55,18 @@ export interface LigneFait {
   readonly valeur: string;
 }
 
+/**
+ * Un texte écrit par un modèle, indissociable de ce qui le dit (2026-09-02).
+ *
+ * La mention voyage AVEC le texte parce que le produit n'a pas le droit d'afficher l'un sans
+ * l'autre (FR-054, FR-086) : tout ce qu'il montre paraît sous le nom d'une personne réelle, et
+ * seule cette ligne empêche un texte fabriqué à l'instant de passer pour le sien.
+ */
+export interface EcritureModele {
+  readonly texte: string;
+  readonly mention: string;
+}
+
 export interface CarteBibliotheque {
   readonly cle: CleCarte;
   /** Le titre affiché. Source unique — sous `lib/`, donc balayé par le contrôle de voix (2.8). */
@@ -92,6 +104,54 @@ export interface CarteBibliotheque {
    * champ le plus tentant du type pour y écrire « 3 cartes sur 5 ».
    */
   readonly etat: string | null;
+
+  /**
+   * CE QU'UN MODÈLE A ÉCRIT — quatrième registre, ajouté le 2026-09-02 (retour : « il manque
+   * l'horoscope »).
+   *
+   * ══ POURQUOI IL FALLAIT UN QUATRIÈME REGISTRE, ET NON UN `texte` DE PLUS ═══════════════════
+   *
+   * `texte` porte ce qu'ANIMA a écrit, et le champ juste au-dessus existe parce qu'une phrase du
+   * produit glissée dans `texte` paraîtrait sous sa plume. Un texte de MODÈLE tombe exactement sous
+   * la même règle, en plus net : il n'est écrit par personne. Le mettre dans `texte` le rendrait en
+   * `t-anam`, sans mention, sous le nom d'une personne réelle et identifiable (FR-054, FR-086).
+   *
+   * Alors il a son champ, son style de rendu et sa mention, et `texte` reste ce qu'il a toujours
+   * été. `tests/bibliotheque-frontiere.test.ts` refuse qu'un texte de modèle atteigne `texte`.
+   *
+   * `null` = pas de texte de modèle aujourd'hui (pas de consentement, panne, texte refusé par
+   * `verdictHoroscope`, ou carte qui n'en a simplement pas). C'est le cas normal, pas une avarie :
+   * `texte` prend alors le relais, et il est relu.
+   *
+   * ⚠️ LE TEXTE ET SA MENTION SONT UN SEUL OBJET, PAS DEUX CHAMPS. Une mention rangée à part est une
+   * mention qu'un rendu peut oublier, et elle manquera sur l'écran où elle comptait — celui qui
+   * affiche le texte. Ici, on ne peut pas tenir l'un sans l'autre : `ecritureModele.texte` n'existe
+   * jamais sans `ecritureModele.mention`.
+   */
+  readonly ecritureModele: EcritureModele | null;
+}
+
+/**
+ * CE QUE LA CARTE MONTRE, ET DE QUI ÇA VIENT — la règle, écrite une fois.
+ *
+ * Deux surfaces affichent la même carte : la bibliothèque de l'accueil et la halte du socle. Si
+ * chacune décidait dans son JSX qui, du modèle ou du corpus, l'emporte, les deux divergeraient au
+ * premier correctif — et la divergence serait invisible, puisque les deux afficheraient un texte
+ * plausible. La règle vit donc ici, et les deux rendus la lisent.
+ *
+ * L'union est DISCRIMINÉE et non aplatie, pour la même raison que `TexteCorpus` : « écrit par un
+ * modèle » et « écrit par Anima » ne se rendent pas pareil, et un rendu qui ne verrait qu'une
+ * chaîne perdrait la mention obligatoire en chemin.
+ */
+export type TexteMontre =
+  | { readonly origine: "modele"; readonly ecriture: EcritureModele }
+  | { readonly origine: "anima"; readonly texte: TexteCorpus };
+
+export function texteMontre(carte: CarteBibliotheque): TexteMontre {
+  if (carte.ecritureModele !== null) {
+    return { origine: "modele", ecriture: carte.ecritureModele };
+  }
+  return { origine: "anima", texte: carte.texte };
 }
 
 /**

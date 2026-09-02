@@ -9,6 +9,7 @@ const carte = (cle: string, titre: string, texte: string): CarteVue => ({
   faits: [],
   texte: { statut: "ecrit", texte },
   etat: null,
+  ecritureModele: null,
 });
 
 const univers = (avecActionEnneagramme = true): readonly UniversVue[] => [

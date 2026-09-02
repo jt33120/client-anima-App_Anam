@@ -436,8 +436,23 @@ describe("[13.6] la structure résumée du document", () => {
 const HOROSCOPE_ECRIT: HoroscopeVue = {
   titre: "Ton ciel du jour",
   texte: { statut: "ecrit", texte: "Le ciel du jour, tel qu’il est écrit dans le corpus." },
+  ecritureModele: null,
 };
-const HOROSCOPE_NON_ECRIT: HoroscopeVue = { titre: "Ton ciel du jour", texte: { statut: "non_ecrit" } };
+const HOROSCOPE_NON_ECRIT: HoroscopeVue = {
+  titre: "Ton ciel du jour",
+  texte: { statut: "non_ecrit" },
+  ecritureModele: null,
+};
+
+/** Le même jour, mis en mots par un modèle : le texte ET la mention qui dit d'où il vient. */
+const HOROSCOPE_MODELE: HoroscopeVue = {
+  titre: "Ton ciel du jour",
+  texte: { statut: "ecrit", texte: "Le ciel du jour, tel qu’il est écrit dans le corpus." },
+  ecritureModele: {
+    texte: "La Lune du jour marche à trois signes de ton Soleil de naissance, et Vénus vient s’y poser.",
+    mention: "Texte écrit par un modèle, à partir du ciel calculé.",
+  },
+};
 
 const avecCielDuJour = (fiche: FicheSocleVue, horoscope: HoroscopeVue | null): FicheSocleVue => ({
   ...fiche,
@@ -535,6 +550,25 @@ describe("[retour 2026-09-01] l'horoscope d'abord", () => {
     // Mutation-cible : `?? "…"` ou un repli « Le ciel est calme aujourd'hui » : une citation
     // inventée, attribuée à une personne réelle (FR-054/FR-086).
     expect(carte.querySelector(".t-anam, [class*='t-anam']")).toBeNull();
+  });
+
+  it("[LE CŒUR] écrit par un modèle : le texte, sa mention, et JAMAIS la voix d'Anam", () => {
+    // Retour du 2026-09-02 : « génère-le par IA, en ajoutant à côté un petit avertissement ».
+    // Trois choses tiennent ensemble, et c'est leur ensemble qui rend la carte honnête.
+    const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_MODELE), "astrologie");
+    const carte = carteJour(container)!;
+    const paragraphes = [...carte.querySelectorAll("p")];
+
+    expect(paragraphes).toHaveLength(2);
+    expect(paragraphes[0].textContent).toBe(HOROSCOPE_MODELE.ecritureModele!.texte);
+    expect(paragraphes[1].textContent).toBe(HOROSCOPE_MODELE.ecritureModele!.mention);
+
+    // Mutation-cible n° 1 : rendre le texte de modèle en `t-anam`. Il paraîtrait alors sous la
+    // plume d'une personne réelle, et aucune mention ne rattrape un style qui affirme.
+    expect(carte.querySelector(".t-anam, [class*='t-anam']")).toBeNull();
+    // Mutation-cible n° 2 : afficher le texte du modèle ET celui du corpus. Deux textes sous le
+    // même titre, le même jour, dont un seul est mentionné.
+    expect(carte.textContent ?? "").not.toContain("écrit dans le corpus");
   });
 
   it("sans thème (date de naissance absente), aucun « Ton ciel du jour » : la raison suffit", () => {

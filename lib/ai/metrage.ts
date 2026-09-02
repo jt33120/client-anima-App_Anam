@@ -29,7 +29,8 @@ export type OperationIa =
   | "extraction_arc"
   | "restitution_lecture"
   | "bilan_seance"
-  | "synthese_periodique";
+  | "synthese_periodique"
+  | "texte_du_jour";
 
 /** Compteurs techniques rendus par un appel modèle, sans identité ni dimension produit. */
 export interface UsageModeleIa {

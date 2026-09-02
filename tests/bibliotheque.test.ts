@@ -36,6 +36,7 @@ function carte(cle: CleCarte, o: Partial<CarteBibliotheque> = {}): CarteBiblioth
     terme: null,
     faits: [],
     etat: null,
+    ecritureModele: null,
     texte: NON_ECRIT,
     ...o,
   };

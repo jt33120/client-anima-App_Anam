@@ -554,6 +554,19 @@
   color: var(--texte);
 }
 
+/* LA MENTION D'ÉCRITURE PAR UN MODÈLE (2026-09-02).
+
+   Elle est DISCRÈTE ET LISIBLE, ce qui est la seule contrainte réelle : trop en vue, elle abîme un
+   texte qu'on vient lire ; trop pâle, elle ne remplit plus son office et le texte redevient
+   anonyme. `--texte-doux` sur `--surface-elevee` est le couple déjà mesuré par
+   `tests/contraste.test.ts`, donc au-dessus de 4,5:1 dans les deux thèmes : on ne réinvente pas une
+   nuance ici pour « faire plus léger ». */
+.mentionModele {
+  margin: 0;
+  color: var(--texte-doux);
+  font-style: italic;
+}
+
 @media (min-width: 640px) {
   .boutonPrincipal {
     width: auto;

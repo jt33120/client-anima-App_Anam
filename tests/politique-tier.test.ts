@@ -27,6 +27,10 @@ const TIER_ATTENDU: Record<CapaciteIa, TierIa> = {
   // tour suivant. C'est la sortie la plus DURABLE du produit : plus durable qu'une lecture, qu'on
   // relit une fois. Un glissement de mot y devient un acquis que le modèle relit tous les jours.
   compactage: "fort",
+  // 2026-09-02 — le texte du jour est la seule capacité tranchée par le CONTENU de sa charge utile
+  // et non par le risque de paraphrase : elle ne contient aucun mot d'elle (aspects, distance en
+  // signes), et ce qui revient passe par `verdictHoroscope` avant d'être montré.
+  horoscope: "leger",
 };
 
 /**

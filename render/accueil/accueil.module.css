@@ -380,3 +380,11 @@
   color: var(--texte);
   line-height: 1.6;
 }
+
+/* LA MENTION D'ÉCRITURE PAR UN MODÈLE (2026-09-02) — voir `render/socle/socle.module.css`, même
+   règle et même couple de jetons : discrète, mais au-dessus du seuil de contraste mesuré. */
+.mentionModele {
+  margin: 0;
+  color: var(--texte-doux);
+  font-style: italic;
+}

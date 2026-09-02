@@ -66,6 +66,12 @@ const EXCLUS = new Set([
   // modèle à qui l'on demande de résumer ce qu'il comprend de quelqu'un. Sa sortie, elle, n'est pas
   // exclue — et elle n'est de toute façon montrée à personne.
   "lib/domain/consigne-compactage.ts",
+  // Consigne d'écriture du texte du jour (2026-09-02) — MÊME NATURE que les cinq ci-dessus : elle
+  // nomme les interdits pour les refuser (« aucun vocabulaire de santé, de thérapie ni de
+  // diagnostic »). Sa sortie, elle, n'est PAS exclue : elle passe par `verdictHoroscope`, qui
+  // applique `chercherInterdits` À L'EXÉCUTION, avant l'affichage — c'est le seul texte du produit
+  // qui n'a pas de test possible, puisqu'il n'existe qu'au moment où il est montré.
+  "lib/domain/consigne-horoscope.ts",
   "lib/domain/lexique-interdit.ts", // la source des interdits — s'auto-matcherait
 ]);
 
