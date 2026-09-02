@@ -162,7 +162,8 @@ export async function enregistrerHeureEtLieu(
   if (lieu && lieuDejaGrave && lieu.nom !== existant!.lieu_naissance) {
     return {
       statut: "erreur",
-      message: "Ton lieu de naissance est déjà enregistré — il ne se modifie pas.",
+      // Deux-points, pas de tiret cadratin : interdit dans tout texte affiché (retour du 2026-09-01).
+      message: "Ton lieu de naissance est déjà enregistré : il ne se modifie pas.",
     };
   }
 

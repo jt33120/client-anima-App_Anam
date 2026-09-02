@@ -53,3 +53,35 @@ export const OU_TROUVER_SON_HEURE =
   "Ton heure de naissance est écrite sur la copie intégrale de ton acte de naissance — pas sur " +
   "l’extrait simple, ni sur le livret de famille. La mairie de ta commune de naissance la délivre " +
   "gratuitement, sur place ou par internet.";
+
+/**
+ * ── LA BULLE DE L'ÉCRAN, ET POURQUOI ELLE EST COURTE (retour terrain du 2026-09-01) ────────────
+ *
+ * `MESSAGE_SANS_HEURE` est long, et il DOIT l'être : il vit sur la FICHE du socle, à côté du thème,
+ * et c'est là qu'il faut dire ce qui manque, pourquoi, et ce qui reste (FR-050). Mais l'ÉCRAN
+ * `/heure-naissance` affichait à son tour `OU_TROUVER_SON_HEURE` en clair, plus deux aides sous les
+ * champs, plus une confirmation de trois lignes. Julian, en test : « un écran qui saute aux yeux
+ * avec un gros bouton et beaucoup moins de texte. Il faudrait presque qu'Anam arrive avec une
+ * bulle : il manque l'heure de naissance ; une fois qu'on l'a, on accède à l'horoscope. L'app est
+ * beaucoup trop verbeuse. »
+ *
+ * Sur l'écran, la personne est DÉJÀ venue donner son heure : lui réexpliquer ce que l'absence
+ * coûte, c'est la retenir devant le champ. Une phrase suffit : ce qui manque, ce que ça ouvre. Le
+ * « pourquoi » (« je préfère ne pas te l'inventer ») reste porté par l'aveu de la fiche, et le
+ * « où chercher » par `OU_TROUVER_SON_HEURE`, replié sur l'écran derrière `RESUME_OU_TROUVER` :
+ * FR-050 est tenue sans être étalée. Aucune des deux constantes ci-dessus ne change.
+ *
+ * Mêmes règles que le reste du fichier : voix d'Anam (`tests/lexique-voix.test.ts`), aucun futur
+ * adressé (« devient », pas « deviendra » : `tests/socle-incomplet.test.ts`), aucun tiret cadratin
+ * ni demi-cadratin (interdits dans tout texte affiché), aucun compteur ni pourcentage (FR-031).
+ */
+export const BULLE_SANS_HEURE =
+  "Il me manque ton heure de naissance. Avec elle, ton ciel est complet : ascendant, maisons, " +
+  "et ton horoscope devient plus juste.";
+
+/**
+ * Le résumé du `<details>` qui replie `OU_TROUVER_SON_HEURE` sur l'écran. À la première personne de
+ * l'UTILISATRICE, comme la case « Je ne connais pas mon heure. » du même formulaire : c'est elle qui
+ * cherche, pas Anam. Espace simple avant « ? », comme partout dans le produit.
+ */
+export const RESUME_OU_TROUVER = "Où trouver mon heure ?";

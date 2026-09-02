@@ -22,7 +22,9 @@ vi.mock("@/app/heure-naissance/actions", () => ({
 
 const FormulaireHeure = (await import("@/app/heure-naissance/formulaire-heure")).default;
 
-const bouton = () => screen.getByRole("button", { name: /Enregistrer/ }) as HTMLButtonElement;
+// « Enregistrer » est devenu « Compléter mon ciel » (retour terrain du 2026-09-01) : le bouton a
+// changé de mot, pas de raison de se fermer. Les quatre gardes ci-dessous restent les mêmes.
+const bouton = () => screen.getByRole("button", { name: /Compléter mon ciel/ }) as HTMLButtonElement;
 const communeChamp = () => document.getElementById("recherche_lieu") as HTMLInputElement;
 
 beforeEach(() => {

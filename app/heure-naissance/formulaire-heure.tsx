@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useId, useState } from "react";
 import { chercherLieux, enregistrerHeureEtLieu, type EtatHeure } from "./actions";
 import type { LieuNaissance } from "@/lib/astro/lieux";
+import { OU_TROUVER_SON_HEURE, RESUME_OU_TROUVER } from "@/lib/domain/message-sans-heure";
 import s from "./heure-naissance.module.css";
 
 /**
@@ -38,6 +39,35 @@ import s from "./heure-naissance.module.css";
  * ascendant faux POUR TOUJOURS — et un ascendant faux a l'air juste. Le produit sait déjà traiter
  * un geste irréversible : la déclaration de rayonnement demande une confirmation solennelle. Même
  * patron ici, et on le dit AVANT, pas après.
+ *
+ * ── BEAUCOUP MOINS DE TEXTE (retour terrain du 2026-09-01) ─────────────────────────────────────
+ *
+ * Julian, en test : « un écran qui saute aux yeux avec un gros bouton et beaucoup moins de texte.
+ * Si la personne n'a pas l'heure, on laisse passer et on se contente de l'horoscope astral. Il faut
+ * que ça aille plus vite. L'app est beaucoup trop verbeuse. »
+ *
+ * Ce que ce formulaire portait, en plus de ses champs : deux aides de deux lignes sous les champs,
+ * une case de déclaration d'absence en deux phrases, une confirmation en trois lignes, et un bouton
+ * « Enregistrer » de la largeur de son mot. Ce qu'il porte maintenant :
+ *   • le champ de l'heure, et sous lui « Où trouver mon heure ? » REPLIÉ : `OU_TROUVER_SON_HEURE`
+ *     n'a pas disparu (FR-050 exige d'indiquer où chercher), il ne s'étale plus devant celle qui
+ *     n'en a pas besoin. Le champ est DÉCRIT par ce résumé (`aria-describedby`) : un lecteur d'écran
+ *     entend qu'une aide existe, sans l'entendre entière ;
+ *   • la case « Je ne connais pas mon heure. » : UN geste, et on laisse passer. Sa commune suffit
+ *     à Anam pour l'horoscope, elle n'a pas besoin qu'on le lui explique pour cocher ;
+ *   • une aide d'une ligne sous la commune : la seule information que le champ ne dit pas lui-même
+ *     (choisir dans la liste, France) ;
+ *   • la confirmation, réduite au strict nécessaire sans rien retirer de VRAI : la commune ne se
+ *     change plus, l'heure reste corrigeable. C'est exactement ce que 0039 et 0060 font ;
+ *   • le bouton, pleine largeur, qui dit ce qu'il fait plutôt que son verbe technique.
+ *
+ * ── LES HOMONYMES SE DÉPARTAGENT PAR LE DÉPARTEMENT (même retour) ─────────────────────────────
+ *
+ * « Ville de naissance : plusieurs villes (ex. Saint-Denis), comment départager : tu ne montres pas
+ * le département. » Quatre communes s'appellent Saint-Denis, et la liste en montrait quatre lignes
+ * identiques. On affiche `libelle` (« Saint-Denis (93) », `lib/astro/lieux.ts`) dans la liste ET
+ * dans le champ une fois choisie. Ce qui PART reste le `code` seul, et ce que le serveur GRAVE reste
+ * `nom` : la persistance ne change pas, `actions.ts` compare toujours `lieu.nom` à ce qui est écrit.
  */
 
 const initial: EtatHeure = { statut: "saisie" };
@@ -45,7 +75,7 @@ const initial: EtatHeure = { statut: "saisie" };
 export interface DejaGrave {
   /** `HH:MM:SS` déjà enregistrée, ou `null`. */
   readonly heure: string | null;
-  /** Nom de commune déjà enregistré, ou `null`. */
+  /** Nom de commune déjà enregistré (`LieuNaissance.nom`, sans département), ou `null`. */
   readonly lieu: string | null;
 }
 
@@ -72,7 +102,7 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
   const bloque = lieuManquant || (!demanderLieu && !demanderHeure);
   const motifBlocage = lieuManquant
     ? requete.trim().length > 0
-      ? "Choisis ta commune dans la liste qui s’ouvre sous le champ — je ne reconnais pas encore ce que tu as tapé."
+      ? "Choisis ta commune dans la liste qui s’ouvre sous le champ : je ne reconnais pas encore ce que tu as tapé."
       : "Indique ta commune de naissance pour que je puisse enregistrer."
     : bloque
       ? "Tout est déjà enregistré : il n’y a rien à écrire ici."
@@ -128,6 +158,8 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
         <>
           <label htmlFor="heure_naissance" className={s.etiquette}>
             <span className="t-meta">L’heure de ta naissance</span>
+            {/* Décrit par le RÉSUMÉ de l'aide repliée, juste en dessous : « Où trouver mon heure ? »
+                est tout ce qu'un lecteur d'écran a besoin d'entendre en entrant dans le champ. */}
             <input
               id="heure_naissance"
               name="heure_naissance"
@@ -137,13 +169,21 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
               className={s.champ}
               aria-describedby="heure_aide"
             />
-            <span id="heure_aide" className="t-meta">
-              Telle qu’elle est écrite sur ta copie intégrale d’acte de naissance.
-            </span>
           </label>
 
+          {/* FR-050 : où la chercher, PRÉSENT mais REPLIÉ (2026-09-01). Fermé par défaut, et c'est
+              le point : la copie intégrale et la mairie n'ont rien à dire à celle qui a déjà son
+              heure sous les yeux. Même source que la fiche du tronc : un second texte divergerait. */}
+          <details className={s.details}>
+            <summary id="heure_aide" className={`${s.resume} t-meta`}>
+              {RESUME_OU_TROUVER}
+            </summary>
+            <p className={`${s.detailsCorps} t-corps`}>{OU_TROUVER_SON_HEURE}</p>
+          </details>
+
           {/* A2 — l'absence se DÉCLARE. `disabled` sur le champ le vide aussi à l'envoi, ce qui
-              évite la contradiction « case cochée + heure remplie » que le serveur refuserait. */}
+              évite la contradiction « case cochée + heure remplie » que le serveur refuserait.
+              UN geste (2026-09-01) : on laisse passer, sa commune suffit pour l'horoscope. */}
           <label htmlFor="sans_heure" className={s.case}>
             <input
               id="sans_heure"
@@ -154,15 +194,12 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
               checked={sansHeure}
               onChange={(e) => setSansHeure(e.target.checked)}
             />
-            <span className="t-corps">
-              Je ne connais pas mon heure de naissance. Ma commune suffit pour l’instant.
-            </span>
+            <span className="t-corps">Je ne connais pas mon heure.</span>
           </label>
         </>
       ) : (
         <p className="t-meta">
-          Ton heure de naissance est déjà enregistrée. Tu peux la corriger depuis « Ce qu’Anam
-          retient » : <a href="/memoire">/memoire</a>.
+          Ton heure est déjà enregistrée. Tu peux la corriger depuis <a href="/memoire">« Ce qu’Anam retient »</a>.
         </p>
       )}
 
@@ -170,12 +207,14 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
         <>
         <label htmlFor="recherche_lieu" className={s.etiquette}>
           <span className="t-meta">Ta commune de naissance</span>
+          {/* `libelle` dans le champ une fois choisie (« Saint-Denis (93) »), jamais `nom` seul :
+              c'est ce qu'elle a choisi qu'elle relit avant de confirmer un geste irréversible. */}
           <input
             id="recherche_lieu"
             type="text"
             autoComplete="off"
             className={s.champ}
-            value={choisi ? choisi.nom : requete}
+            value={choisi ? choisi.libelle : requete}
             role="combobox"
             aria-expanded={resultats.length > 0}
             aria-controls={idListe}
@@ -186,8 +225,7 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
             }}
           />
           <span id="lieu_aide" className="t-meta">
-            Sans le lieu, l’heure seule ne permet pas de calculer l’ascendant : c’est le lieu qui dit à
-            quel instant « {"07:15"} » correspond. Le référentiel couvre la France.
+            Choisis-la dans la liste. Le référentiel couvre la France.
           </span>
         </label>
 
@@ -198,6 +236,8 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
           <ul id={idListe} className={s.resultats}>
             {resultats.map((l) => (
               <li key={l.code}>
+                {/* `libelle`, pas `nom` (2026-09-01) : deux « Saint-Denis » sont deux lignes
+                    différentes, et c'est le `code` de CELLE-CI qui part avec le clic. */}
                 <button
                   type="button"
                   className={s.resultat}
@@ -206,7 +246,7 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
                     setResultats([]);
                   }}
                 >
-                  {l.nom}
+                  {l.libelle}
                 </button>
               </li>
             ))}
@@ -214,7 +254,7 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
         )}
         </>
       ) : (
-        <p className="t-meta">Ta commune de naissance est déjà enregistrée : {deja.lieu}.</p>
+        <p className="t-meta">Ta commune est déjà enregistrée : {deja.lieu}.</p>
       )}
 
       {/* AC8 — le poids du geste, dit AVANT. Le patron est celui de la confirmation solennelle du
@@ -224,7 +264,10 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
           vrai jusqu'à la migration 0060, qui a ouvert la correction de l'heure (art. 16). Faire
           cocher une case qui affirme une impossibilité levée n'est pas une formalité inoffensive :
           c'est faire renoncer d'avance à un droit. Le LIEU, lui, reste write-once, et c'est
-          exactement ce que la phrase dit maintenant — ni plus, ni moins. */}
+          exactement ce que la phrase dit maintenant — ni plus, ni moins.
+
+          RACCOURCIE le 2026-09-01, sans rien retirer de vrai : les deux faits (commune figée, heure
+          corrigeable) tiennent en une ligne. */}
       <label htmlFor="confirmation" className={s.case}>
         <input
           id="confirmation"
@@ -235,8 +278,7 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
           className={s.checkbox}
         />
         <span className="t-corps">
-          J’ai vérifié. Ma commune de naissance ne pourra plus être changée ; mon heure, elle, restera
-          corrigeable depuis « Ce qu’Anam retient ».
+          J’ai vérifié. Ma commune ne se change plus ; mon heure reste corrigeable.
         </span>
       </label>
 
@@ -247,14 +289,18 @@ export default function FormulaireHeure({ deja }: { deja: DejaGrave }) {
       ) : null}
 
       {/* Le bouton n'ouvre que sur un envoi qui a quelque chose à écrire : la commune si elle
-          manque encore, et une heure OU sa déclaration d'absence si l'heure manque encore. */}
+          manque encore, et une heure OU sa déclaration d'absence si l'heure manque encore.
+
+          LE GROS BOUTON (2026-09-01) : pleine largeur, plus haut, et un libellé qui dit ce que le
+          geste OUVRE (« Compléter mon ciel ») plutôt que ce que la base fait (« Enregistrer »). Il
+          reste fermé exactement dans les mêmes cas, et il dit toujours pourquoi (T18, ci-dessous). */}
       <button
         type="submit"
-        className={s.bouton}
+        className={`${s.bouton} ${s.boutonPrincipal}`}
         disabled={enCours || bloque}
         aria-describedby={motifBlocage ? "motif-blocage-heure" : undefined}
       >
-        <span className="t-bouton">{enCours ? "…" : "Enregistrer"}</span>
+        <span className={`t-bouton ${s.libellePrincipal}`}>{enCours ? "…" : "Compléter mon ciel"}</span>
       </button>
 
       {/* QA tour 1 (T18) — LE MOTIF DU BLOCAGE EST ÉCRIT EN TOUTES LETTRES.
