@@ -155,10 +155,13 @@
 }
 
 /* Le fond du menu déroulant natif est peint par le système : sans ça, du texte clair sur fond clair
-   sur certains navigateurs de bureau. */
+   sur certains navigateurs de bureau. Les deux rôles sont ceux du thème — un TEXTE sur une
+   SURFACE — et non plus `#1b1836` sur `#ffffff`, un couple écrit en dur qui restait indigo sur
+   blanc quel que soit le mode (E5-S2) : en nuit, ivoire sur navy ; en contraste renforcé, navy
+   sur blanc. Un fond reste un fond, un texte reste un texte. */
 .select option {
-  color: #1b1836;
-  background: #ffffff;
+  color: var(--texte);
+  background: var(--surface);
 }
 
 /* Story 6.6 — le lien vers la halte « Mes données ». Discret : c'est une porte, pas une invitation. */

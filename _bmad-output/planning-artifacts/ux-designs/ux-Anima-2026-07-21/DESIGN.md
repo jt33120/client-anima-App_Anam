@@ -565,7 +565,7 @@ Un seul niveau de modale, jamais deux. La fiche de branche n'est pas une modale 
 
 **Grain, pas dégradé numérique gratuit.** Un grain de nuit (fine poussière) est appliqué sur fonds et surfaces à `{components.texture.grain-sombre}` (5 %) — il **tue aussi le banding** des aplats indigo profonds et des voiles, ce qui est ici essentiel. Tuile 180px. On doit le sentir sans le voir. Jamais sous un bloc de texte long.
 
-**Les dégradés autorisés sont ceux qui ont un sens physique** : `{components.voile}` (lisibilité), `{components.lumiere.forme-halo}` (halo lunaire derrière le personnage/lotus), `{components.lumiere.forme-arbre}` (lueur basse sous l'arbre). L'imagerie peinte a une plage libre ; **les dégradés dessinés en CSS restent ≤ 6 % de luminance et reçoivent le grain**. Aucun dégradé décoratif gratuit ailleurs.
+**Les dégradés autorisés sont ceux qui ont un sens physique** : `{components.voile}` (lisibilité), `{components.lumiere.forme-halo}` (halo lunaire derrière le personnage/lotus), `{components.lumiere.forme-arbre}` (lueur basse sous l'arbre). L'imagerie peinte a une plage libre ; **les dégradés dessinés en CSS restent ≤ 6 % de luminance et reçoivent le grain**. Aucun dégradé décoratif gratuit ailleurs. Le ciel du monde (`render/monde.module.css`, `.monde`) est la seule pile de dégradés du produit : des radiaux **statiques** — souffle froid en `accent` (la même teinte que `lueur` en nuit), voile en `surface-elevee`, **nébuleuse et halo en `nebuleuse` mêlée au `fond`** (E5-S2) — sans une couleur écrite en dur, ce que `tests/couleurs-tokenisees.test.ts` garde.
 
 ## Shapes
 

@@ -37,20 +37,36 @@
      écran de téléphone, ça se lit comme une couleur unie avec une tache : rien à parcourir des
      yeux, aucune profondeur, et surtout aucun ENDROIT. Une nuit réelle n'est pas monochrome.
 
-     Quatre couches, du fond vers l'avant, chacune avec un rôle nommé :
-       1. un souffle FROID en bas à droite — l'horizon, ce qui donne le bas et le haut ;
-       2. une nébuleuse TIÈDE en haut à gauche, décentrée : c'est elle qui casse la symétrie et
+     Cinq couches, de l'avant vers le fond (l'ordre d'écriture de `background`), chacune avec un
+     rôle nommé :
+       1. un souffle FROID en bas à droite — l'horizon, ce qui donne le bas et le haut. C'est le
+          bleu ciel du lotus, `--accent` à 14 % : la seule fois où l'accent se pose en décor, et
+          c'est admis parce qu'en nuit il est la même teinte que `--lueur` (D5) ;
+       2. un voile BLEUTÉ en haut à gauche (`--surface-elevee`), décentré : il casse la symétrie et
           empêche l'écran de se lire comme un dégradé de logiciel ;
-       3. le halo d'origine, conservé mais RECULÉ (il servait la lune, il continue) ;
-       4. l'aplat, qui reste `--fond` — la charte l'exige, et rien ici ne le remplace.
+       3. la NÉBULEUSE tiède, décentrée à droite (E5-S2, retour du 2026-09-01 : « avec le violet
+          et le bleu ciel de la fleur de lotus, des textures et des dégradés »). C'est ici, et
+          dans le halo, que l'ancien violet survit : `--nebuleuse`, un jeton de DÉCOR à 1,13:1
+          sur le fond — une nuance, pas une couleur, jamais sous du texte. Un radial STATIQUE :
+          aucune animation, aucun `mix-blend-mode`, aucun `filter` (la liste des interdits est
+          juste dessous) — une couche qui ne bouge pas ne coûte rien par trame ;
+       4. le halo d'origine, conservé mais RECULÉ (il servait la lune, il continue). Il mêle la
+          nébuleuse au fond au lieu de porter un violet écrit à la main ;
+       5. l'aplat, qui reste `--fond` — la charte l'exige, et rien ici ne le remplace.
 
-     ⚠️ AUCUNE COULEUR EN DUR HORS DE CE BLOC, ET AUCUNE SATURATION GRATUITE. Les trois teintes
-     sont des dérivées de la palette (`--fond`, `--lueur`, `--surface-elevee`) mêlées à l'aplat :
-     un violet vif ajouté ici ressortirait sur les cartes, qui se posent dessus. */
+     ⚠️ AUCUNE COULEUR EN DUR, MÊME ICI (E5-S2). Le halo portait `#1a1640`, un indigo écrit à la
+     main : quand la nuit est passée de l'indigo au navy (E5-S1), lui est resté indigo — un jeton
+     qu'on retouche ne peut pas corriger une couleur qu'il ne connaît pas. Toutes les teintes sont
+     désormais des dérivées de la palette (`--accent`, `--surface-elevee`, `--nebuleuse`, `--fond`)
+     mêlées à l'aplat, et `tests/couleurs-tokenisees.test.ts` refuse tout `#…` ou `rgba(` dans
+     cette feuille — et exige que la nébuleuse et le halo consomment `--nebuleuse`, sinon le jeton
+     est mort. Aucune saturation gratuite : un violet vif ajouté ici ressortirait sur les cartes,
+     qui se posent dessus. */
   background:
-    radial-gradient(130% 62% at 88% 98%, color-mix(in srgb, var(--lueur) 16%, transparent) 0%, transparent 62%),
+    radial-gradient(130% 62% at 88% 98%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 62%),
     radial-gradient(80% 48% at 10% 12%, color-mix(in srgb, var(--surface-elevee) 62%, transparent) 0%, transparent 70%),
-    radial-gradient(120% 90% at 50% 8%, #1a1640 0%, var(--fond) 58%),
+    radial-gradient(85% 55% at 76% 30%, color-mix(in srgb, var(--nebuleuse) 72%, transparent) 0%, transparent 66%),
+    radial-gradient(120% 90% at 50% 8%, color-mix(in srgb, var(--nebuleuse) 55%, var(--fond)) 0%, var(--fond) 58%),
     var(--fond);
   isolation: isolate;
 }
@@ -113,8 +129,10 @@
  *   • `.voie` ci-dessous — le flou a été RETIRÉ le 2026-08-20 ; ce qui reste est un dégradé.
  * Aucune autre. Toute nouvelle entrée doit rejoindre cette liste avec son verdict.
  */
-/* Mode accessibilité (-clair) : l'imagerie cède aux aplats — fond plat, ni halo violet
-   codé en dur, ni lune, ni étoiles (cohérent avec --imagerie-opacite: 0). */
+/* Mode accessibilité (-clair) : l'imagerie cède aux aplats — fond plat, ni halo ni nébuleuse
+   (`--nebuleuse` y vaut le Beige : sur Ivory, la nuance deviendrait une tache), ni lune, ni
+   étoiles (cohérent avec --imagerie-opacite: 0). `tests/couleurs-tokenisees.test.ts` garde ces
+   deux blocs à `var(--fond)` seul. */
 :global(:root[data-a11y="contraste"]) .monde {
   background: var(--fond);
 }
@@ -163,14 +181,16 @@
   /* ⚠️ CES VALEURS ONT ÉTÉ DIVISÉES PAR TROIS APRÈS MESURE. La première version montait à 30 % de
      `--lueur` : la bande passait SOUS la colonne de lecture et y posait une tache claire — un fond
      qui gêne le texte est pire qu'un fond ennuyeux. Elle croise maintenant le coin, pas le texte,
-     et elle vaut quelques pour cent une fois floutée. Si on la voit, c'est qu'elle est trop forte. */
+     et elle vaut quelques pour cent une fois floutée. Si on la voit, c'est qu'elle est trop forte.
+     Son cœur portait `#b9c8ee`, un bleu écrit à la main : il est `--lueur` comme ses épaules
+     (E5-S2), à 9 % entre deux arrêts à 12 % — le même profil qu'avant, la teinte en moins. */
   opacity: 0.3;
   background: linear-gradient(
     122deg,
     transparent 18%,
     color-mix(in srgb, var(--lueur) 5%, transparent) 32%,
     color-mix(in srgb, var(--lueur) 12%, transparent) 44%,
-    color-mix(in srgb, #b9c8ee 9%, transparent) 50%,
+    color-mix(in srgb, var(--lueur) 9%, transparent) 50%,
     color-mix(in srgb, var(--lueur) 12%, transparent) 56%,
     color-mix(in srgb, var(--lueur) 5%, transparent) 68%,
     transparent 82%
@@ -184,10 +204,13 @@
   height: 340px;
   margin-left: -170px;
   border-radius: var(--rayon-full);
+  /* Le cœur est la LUEUR, la couronne l'ACCENT. Ils s'écrivaient `rgba(205, 228, 248, .5)` et
+     `rgba(143, 193, 239, .14)` — l'ancienne lueur et l'ancien accent recopiés à la main, si bien
+     que la lune restait bleu-glacier quand la palette passait au Sky (E5-S2). */
   background: radial-gradient(
     circle at 50% 45%,
-    rgba(205, 228, 248, 0.5) 0%,
-    rgba(143, 193, 239, 0.14) 34%,
+    color-mix(in srgb, var(--lueur) 50%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 14%, transparent) 34%,
     transparent 66%
   );
   filter: blur(2px);
@@ -285,7 +308,7 @@
    *
    * On ne retire rien de plus sans mesurer : une variable à la fois, c'est ce qui rend le chiffre
    * lisible. */
-  filter: drop-shadow(0 8px 40px rgba(143, 193, 239, 0.12));
+  filter: drop-shadow(0 8px 40px color-mix(in srgb, var(--lueur) 12%, transparent));
   /* Le retrait derrière l'accueil se FOND, il ne coupe pas — même durée que le fondu de région,
      pour que le passage accueil ↔ arbre reste UN mouvement et non deux. Voir .arbreEnRetrait.
      `top` suit la même durée et la même courbe : l'arbre REDESCEND en s'effaçant, en un seul
@@ -443,12 +466,12 @@
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent calc(var(--esp-4) + var(--cible-tactile)),
-      #000 var(--dissolution-haut)
+      black var(--dissolution-haut)
     );
     mask-image: linear-gradient(
       to bottom,
       transparent calc(var(--esp-4) + var(--cible-tactile)),
-      #000 var(--dissolution-haut)
+      black var(--dissolution-haut)
     );
   }
 }
@@ -618,18 +641,23 @@
      raisonnement en haut, où « Aide » descend jusqu'à `--esp-4 + --cible-tactile`. */
   --dissolution-haut: calc(var(--cible-tactile) + var(--esp-6));
   --dissolution-bas: calc(var(--hauteur-nav) + var(--esp-6));
+  /* `black` = OPAQUE, pas une couleur : un masque ne lit que l'ALPHA de son dégradé (`mask-mode`
+     par défaut), et n'importe quelle teinte opaque y ferait le même travail. Les arrêts portaient
+     `#000`, ce que `tests/couleurs-tokenisees.test.ts` ne sait pas distinguer d'une couleur
+     écrite en dur ; le mot-clé dit ce que le hex taisait, ici et dans le bloc `.panneau` du
+     rail (≥ lg). Aucun jeton ne convient : `var(--fond)` y prétendrait un rôle de couleur. */
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent calc(var(--esp-4) + var(--cible-tactile)),
-    #000 var(--dissolution-haut),
-    #000 calc(100% - var(--dissolution-bas)),
+    black var(--dissolution-haut),
+    black calc(100% - var(--dissolution-bas)),
     transparent calc(100% - var(--hauteur-nav) + var(--esp-2))
   );
   mask-image: linear-gradient(
     to bottom,
     transparent calc(var(--esp-4) + var(--cible-tactile)),
-    #000 var(--dissolution-haut),
-    #000 calc(100% - var(--dissolution-bas)),
+    black var(--dissolution-haut),
+    black calc(100% - var(--dissolution-bas)),
     transparent calc(100% - var(--hauteur-nav) + var(--esp-2))
   );
   /* ⚠️ LA RÉSERVE DE LA BARRE MANQUAIT ICI (QA visuelle du 2026-08-19). `.regionConversation` la
@@ -820,7 +848,9 @@
 }
 .affordance:hover {
   border-color: var(--accent);
-  background: rgba(143, 193, 239, 0.06);
+  /* Le lavis de survol est l'accent à 6 %, et non plus un `rgba(143, 193, 239, .06)` qui restait
+     l'ancien bleu quand l'accent devenait Sky (E5-S2). Même règle dans `reperes` et `guide`. */
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 .affordance:focus-visible {
   outline: 2px solid var(--bordure-forte);

@@ -89,7 +89,8 @@
 }
 .tour:hover {
   border-color: var(--accent);
-  background: rgba(143, 193, 239, 0.06);
+  /* L'accent à 6 %, pas un `rgba(…)` recopié : la teinte suit le jeton (E5-S2). */
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 .tour:focus-visible {
   outline: 2px solid var(--bordure-forte);

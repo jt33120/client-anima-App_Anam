@@ -33,7 +33,10 @@
  */
 .volet {
   position: fixed;
-  background: rgba(6, 5, 18, 0.82);
+  /* Le voile est la NUIT elle-même à 82 % (`--fond`), pas un noir écrit en dur : `rgba(6, 5, 18,
+     .82)` restait l'ancien indigo quand la nuit passait au navy (E5-S2). En contraste renforcé il
+     devient Ivory à 82 % — et le trou reste le seul endroit de l'écran qui garde ses couleurs. */
+  background: color-mix(in srgb, var(--fond) 82%, transparent);
   pointer-events: none;
 }
 .trou {
@@ -118,7 +121,8 @@
 }
 .suivant:hover {
   border-color: var(--accent);
-  background: rgba(143, 193, 239, 0.06);
+  /* L'accent à 6 %, pas un `rgba(…)` recopié : la teinte suit le jeton (E5-S2). */
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 .passer:focus-visible,
 .suivant:focus-visible {

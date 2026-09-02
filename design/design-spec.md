@@ -90,6 +90,9 @@ depuis le retour terrain de Julian du 2026-09-01, palette « Soft Balance » à 
 violet et le bleu ciel de la fleur de lotus, des textures et des dégradés ; utilise la palette
 fournie ». La palette entre dans `app/styles/tokens.ts` (story E5-S1, décision D5 du
 sprint-change-proposal-2026-08-31-retours-terrain-2) : nuit navy native, Sky en accent et en lueur,
-Ivory et Beige réservés au mode contraste renforcé, l’ancien violet gardé en décor (`--nebuleuse`).
+Ivory et Beige réservés au mode contraste renforcé, l’ancien violet gardé en décor (`--nebuleuse`,
+consommé depuis E5-S2 par le halo et la couche nébuleuse du ciel de `render/monde.module.css`, en
+radiaux statiques ; les couleurs en dur de `monde`, `guide`, `reperes` et `reglages` sont passées
+aux jetons, gardé par `tests/couleurs-tokenisees.test.ts`).
 Le mode sombre reste natif : ce n’est toujours pas un nouveau thème, et « pas de thème jour » reste
 un non-but.
