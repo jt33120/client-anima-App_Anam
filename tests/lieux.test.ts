@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { fuseauDeCommune, normaliserLieu } from "@/lib/astro/lieux";
-import { lieuxFrance, IDENTIFIANT_LIEUX_FRANCE } from "@/lib/astro/adapters/lieux-france";
+import { codeDepartement, fuseauDeCommune, libelleLieu, normaliserLieu } from "@/lib/astro/lieux";
+import {
+  lieuxDepuisCatalogue,
+  lieuxFrance,
+  IDENTIFIANT_LIEUX_FRANCE,
+  type CatalogueLieux,
+} from "@/lib/astro/adapters/lieux-france";
 
 /**
  * Story 5.3 (T2) — LE RÉFÉRENTIEL DES LIEUX DE NAISSANCE.
@@ -16,6 +21,15 @@ import { lieuxFrance, IDENTIFIANT_LIEUX_FRANCE } from "@/lib/astro/adapters/lieu
  * D'où le premier bloc : chaque identifiant de la table est confronté à la base de fuseaux de la
  * PLATEFORME (tzdb), et son décalage réel est mesuré à une date de référence. Ce qui serait sinon
  * « de mémoire » devient vérifié par quelque chose qui ne m'appartient pas.
+ *
+ * ══ LES HOMONYMES (retour du fondateur) ═══════════════════════════════════════════════════════════
+ *
+ * « Ville de naissance : plusieurs villes homonymes, comment départager ? Tu ne montres pas le
+ * département (ex. Saint-Denis). » Mesuré sur le référentiel : 1 441 noms partagés, 3 675 communes
+ * concernées. La couche de données répond par un `departement`, un `libelle` « Saint-Denis (93) »
+ * et un classement par population — les blocs « département », « libellé » et « classement »
+ * ci-dessous en sont la preuve, sur des catalogues minuscules d'abord (le classement se lit à l'œil
+ * nu), puis sur le référentiel réel.
  */
 
 const lieux = lieuxFrance();
@@ -106,6 +120,51 @@ describe("[T2/DUR] fuseauDeCommune — chaque identifiant existe VRAIMENT et dé
 });
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
+// Le département — déduit du code INSEE
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[T2] codeDepartement — deux caractères, trois outre-mer, la Corse sans cas particulier", () => {
+  /** `[code INSEE, département attendu]` */
+  const cas: readonly [string, string][] = [
+    ["93066", "93"], // Saint-Denis, Seine-Saint-Denis
+    ["97411", "974"], // Saint-Denis, La Réunion
+    ["2A004", "2A"], // Ajaccio — les lettres sont DÉJÀ dans les deux premiers caractères
+    ["2B033", "2B"], // Bastia
+    ["01001", "01"], // le zéro de tête survit : « 1 » ne désigne aucun département
+    ["98735", "987"], // Papeete — 98x est aussi sur trois caractères, pas seulement 97x
+  ];
+
+  it.each(cas)("%s → %s", (code, attendu) => {
+    expect(codeDepartement(code)).toBe(attendu);
+  });
+
+  it("[LE PIÈGE] l'outre-mer sur DEUX caractères désignerait un département qui n'existe pas", () => {
+    // Mutation-cible : `slice(0, 2)` partout. « 97 » n'est le code d'aucun département — la
+    // Guadeloupe (971) et La Réunion (974) se retrouveraient dans le même tiroir, et le libellé
+    // « Saint-Denis (97) » ne départagerait plus rien.
+    expect(codeDepartement("97411")).not.toBe("97");
+    expect(codeDepartement("97105")).not.toBe(codeDepartement("97411"));
+  });
+});
+
+describe("[T2] libelleLieu — le nom, puis le CODE du département entre parenthèses", () => {
+  it("les deux Saint-Denis que le fondateur ne pouvait pas distinguer", () => {
+    expect(libelleLieu("Saint-Denis", { code: "93", nom: "Seine-Saint-Denis" })).toBe("Saint-Denis (93)");
+    expect(libelleLieu("Saint-Denis", { code: "974", nom: "La Réunion" })).toBe("Saint-Denis (974)");
+  });
+
+  it("la Corse garde sa lettre", () => {
+    expect(libelleLieu("Ajaccio", { code: "2A", nom: "Corse-du-Sud" })).toBe("Ajaccio (2A)");
+  });
+
+  it("[ANTI-VACUITÉ] c'est le CODE qui est montré, pas le nom du département", () => {
+    // Le nom reste disponible (`departement.nom`) pour une ligne secondaire ; le libellé, lui,
+    // doit rester court — « Saint-Denis (Seine-Saint-Denis) » tiendrait mal sur un écran étroit.
+    expect(libelleLieu("Saint-Denis", { code: "93", nom: "Seine-Saint-Denis" })).not.toContain("Seine-Saint-Denis");
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
 // La normalisation
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -130,6 +189,108 @@ describe("[T2] normaliserLieu — les frontières de mots sont EFFACÉES (l'inve
 
   it("les chiffres survivent (Paris 15e, arrondissements)", () => {
     expect(normaliserLieu("Lyon 3e Arrondissement")).toContain("3");
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// Le classement des homonymes — sur des catalogues MINUSCULES, où l'ordre se lit à l'œil nu
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Les catalogues de ce bloc sont SYNTHÉTIQUES : quelques communes, des populations choisies pour
+ * que chaque règle du classement soit la seule à pouvoir expliquer l'ordre obtenu. Les coordonnées
+ * y sont sans importance (aucun ascendant n'en sort) ; seuls comptent le nom, le code et la
+ * population. Le référentiel réel est éprouvé plus bas.
+ */
+const DEPARTEMENTS_DE_TEST: CatalogueLieux["departements"] = [
+  ["11", "Aude"],
+  ["30", "Gard"],
+  ["33", "Gironde"],
+  ["69", "Rhône"],
+  ["93", "Seine-Saint-Denis"],
+  ["974", "La Réunion"],
+];
+
+const catalogue = (communes: CatalogueLieux["communes"]): CatalogueLieux => ({
+  communes,
+  departements: DEPARTEMENTS_DE_TEST,
+});
+
+describe("[LE CŒUR] parPertinence — entre homonymes stricts, la plus PEUPLÉE d'abord", () => {
+  // Les quatre Saint-Denis, avec les populations de la source. Rangés ici par code INSEE, qui est
+  // EXACTEMENT l'ordre que rendait la première version — l'Aude (523 hab.) en tête, La Réunion
+  // (155 634) en dernier. Si le test passe encore avec cet ordre-là, il ne prouve rien.
+  const quatreSaintDenis = catalogue([
+    ["Saint-Denis", "11339", 43.357, 2.2181, 523],
+    ["Saint-Denis", "30247", 44.2359, 4.2475, 296],
+    ["Saint-Denis", "93066", 48.9378, 2.3657, 149077],
+    ["Saint-Denis", "97411", -20.9434, 55.4444, 155634],
+  ]);
+
+  it("974 (155 634) puis 93 (149 077) puis l'Aude (523) puis le Gard (296)", () => {
+    const codes = lieuxDepuisCatalogue(quatreSaintDenis).chercher("Saint-Denis", 10).map((l) => l.code);
+    expect(codes).toEqual(["97411", "93066", "11339", "30247"]);
+    // …et l'ordre des codes seul aurait donné autre chose : c'est bien la population qui classe.
+    expect(codes).not.toEqual([...codes].sort());
+  });
+
+  it("[DÉTERMINISME] à population ÉGALE, le code INSEE départage — quel que soit l'ordre du catalogue", () => {
+    // Sans ce dernier critère, deux communes de même nom et de même population seraient rendues
+    // dans l'ordre du fichier — stable en apparence, jusqu'à la prochaine régénération.
+    const versionA = catalogue([
+      ["Sainte-Colombe", "69204", 45.87, 4.87, 100],
+      ["Sainte-Colombe", "33422", 44.98, -0.02, 100],
+    ]);
+    const versionB = catalogue([
+      ["Sainte-Colombe", "33422", 44.98, -0.02, 100],
+      ["Sainte-Colombe", "69204", 45.87, 4.87, 100],
+    ]);
+    const codes = (c: CatalogueLieux) => lieuxDepuisCatalogue(c).chercher("Sainte-Colombe", 5).map((l) => l.code);
+    expect(codes(versionA)).toEqual(["33422", "69204"]);
+    expect(codes(versionB)).toEqual(codes(versionA));
+  });
+
+  it("[ANTI-VACUITÉ] un composé PLUS PEUPLÉ ne passe pas devant le nom exact", () => {
+    // « Saint-Denis-de-Pile » commence par la saisie, mais c'est un composé : le nom le plus court
+    // reste devant, même avec dix fois plus d'habitants. La population ne départage QU'À nom de
+    // même longueur — sinon « Saint-Denis » (Gard, 296 hab.) disparaîtrait derrière tous ses
+    // composés, et une femme née là devrait faire défiler la liste pour se trouver.
+    const c = catalogue([
+      ["Saint-Denis-de-Pile", "33411", 44.99, -0.2, 999999],
+      ["Saint-Denis", "30247", 44.2359, 4.2475, 296],
+    ]);
+    expect(lieuxDepuisCatalogue(c).chercher("Saint-Denis", 5).map((l) => l.code)).toEqual(["30247", "33411"]);
+  });
+
+  it("[ANTI-VACUITÉ] ce qui COMMENCE par la saisie passe avant ce qui la contient, population ou pas", () => {
+    // « Bordeaux-Saint-Clair » contient « saint » ; « Saint-Denis » commence par. Le groupe
+    // « commence par » prime, quelle que soit la population — le tri par population n'a jamais le
+    // droit de traverser cette frontière.
+    const c = catalogue([
+      ["Bordeaux-Saint-Clair", "33063", 44.86, -0.58, 999999],
+      ["Saint-Denis", "30247", 44.2359, 4.2475, 296],
+    ]);
+    expect(lieuxDepuisCatalogue(c).chercher("saint", 5).map((l) => l.code)).toEqual(["30247", "33063"]);
+  });
+
+  it("chaque lieu rendu porte département, population et libellé COHÉRENTS avec son code", () => {
+    const [reunion, seineSaintDenis] = lieuxDepuisCatalogue(quatreSaintDenis).chercher("Saint-Denis", 2);
+    expect(reunion).toMatchObject({
+      code: "97411",
+      population: 155634,
+      departement: { code: "974", nom: "La Réunion" },
+      libelle: "Saint-Denis (974)",
+      fuseau: "Indian/Reunion",
+    });
+    expect(seineSaintDenis).toMatchObject({
+      code: "93066",
+      population: 149077,
+      departement: { code: "93", nom: "Seine-Saint-Denis" },
+      libelle: "Saint-Denis (93)",
+      fuseau: "Europe/Paris",
+    });
+    // Le nom OFFICIEL, lui, ne change pas : c'est lui qui est gravé aujourd'hui (`lieu_naissance`).
+    expect(reunion.nom).toBe("Saint-Denis");
   });
 });
 
@@ -233,6 +394,62 @@ describe("[T2] lieuxFrance — le référentiel réel", () => {
     expect(lieux.trouverParCode("98901"), "Clipperton").toBeNull();
     // Contre-exemple : un territoire ultramarin AVEC fuseau reste résoluble.
     expect(lieux.trouverParCode("97302")?.fuseau).toBe("America/Cayenne");
+  });
+
+  it("[LE CŒUR] les quatre Saint-Denis du référentiel réel : du plus peuplé au moins peuplé, chacun avec son département", () => {
+    // Le cas du fondateur, sur les données de geo.api.gouv.fr. Les populations exactes bougent à
+    // chaque recensement : on vérifie l'ORDRE et les départements, et que la population décroît.
+    const quatre = lieux.chercher("Saint-Denis", 4);
+    expect(quatre.map((l) => [l.code, l.libelle, l.departement.nom])).toEqual([
+      ["97411", "Saint-Denis (974)", "La Réunion"],
+      ["93066", "Saint-Denis (93)", "Seine-Saint-Denis"],
+      ["11339", "Saint-Denis (11)", "Aude"],
+      ["30247", "Saint-Denis (30)", "Gard"],
+    ]);
+    for (let i = 1; i < quatre.length; i++) {
+      expect(quatre[i - 1].population).toBeGreaterThan(quatre[i].population);
+    }
+    // …et les composés (« Saint-Denis-de-Pile », « Saint-Denis-lès-Bourg »…) viennent APRÈS.
+    expect(lieux.chercher("Saint-Denis", 5)[4].nom).not.toBe("Saint-Denis");
+  });
+
+  it("[DUR] chaque commune proposable porte un département NOMMÉ et un libellé cohérent", () => {
+    // Mutation-cible : un référentiel régénéré sans les collectivités d'outre-mer (l'endpoint
+    // `/departements` ne les liste pas). Papeete, Nouméa ou Saint-Pierre auraient alors un
+    // `departement.nom` vide — et l'adaptateur ne les SAUTE pas (voir `construireIndex`), donc
+    // seul ce test le verrait.
+    const echantillon = [
+      ...lieux.chercher("saint", 20000), // > 2 000 communes, tous départements confondus
+      ...["33063", "2A004", "2B033", "97502", "97701", "97801", "98613", "98735", "98818", "97611"].map(
+        (code) => lieux.trouverParCode(code)!,
+      ),
+    ];
+    expect(echantillon.length).toBeGreaterThan(2000);
+    for (const l of echantillon) {
+      expect(l.departement.code, `${l.code} : code de département`).toBe(codeDepartement(l.code));
+      expect(l.departement.nom, `${l.code} : département sans nom`).not.toBe("");
+      expect(l.libelle, `${l.code} : libellé`).toBe(libelleLieu(l.nom, l.departement));
+      expect(l.population, `${l.code} : population`).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("les départements et collectivités sont NOMMÉS d'après la source, Corse et outre-mer compris", () => {
+    const nom = (code: string) => lieux.trouverParCode(code)?.departement;
+    expect(nom("33063")).toEqual({ code: "33", nom: "Gironde" });
+    expect(nom("2A004")).toEqual({ code: "2A", nom: "Corse-du-Sud" });
+    expect(nom("2B033")).toEqual({ code: "2B", nom: "Haute-Corse" });
+    expect(nom("97411")).toEqual({ code: "974", nom: "La Réunion" });
+    // Ceux que `/departements` ne liste PAS — ils viennent du champ `departement` des communes.
+    expect(nom("97502")).toEqual({ code: "975", nom: "Saint-Pierre-et-Miquelon" });
+    expect(nom("98735")).toEqual({ code: "987", nom: "Polynésie française" });
+    expect(nom("98818")).toEqual({ code: "988", nom: "Nouvelle-Calédonie" });
+  });
+
+  it("la population vient de la source, et une grande ville en a une", () => {
+    // Bordeaux compte ~260 000 habitants. Un `0` partout (champ oublié dans la requête) rendrait le
+    // classement par population inerte — et les quatre Saint-Denis reviendraient dans l'ordre des
+    // codes, sans qu'aucun autre test de ce bloc ne rougisse.
+    expect(lieux.trouverParCode("33063")!.population).toBeGreaterThan(200000);
   });
 
   it("l'identifiant nomme la SOURCE (il entrera dans la traçabilité du lieu choisi)", () => {
