@@ -32,8 +32,10 @@ export const CE_QUE_TU_EMPORTES =
 /** Rien ne se ferme, rien ne se perd : la phrase qui dit que l'export ne coûte rien (AC2). */
 export const RIEN_NE_CHANGE = "Télécharger ne change rien : ton compte, tes branches et tes conversations restent là.";
 
+// « tu peux réessayer », comme ses voisines `EFFACEMENT_ECHEC` et `copie-reglages.ECHEC` : le tiret
+// est parti (retour du fondateur du 2026-09-01) et l’impératif avec lui, rien n’est ordonné.
 export const ECHEC =
-  "Le fichier n’a pas pu être fabriqué. Rien n’a été touché — réessaie dans un moment.";
+  "Le fichier n’a pas pu être fabriqué. Rien n’a été touché : tu peux réessayer dans un moment.";
 
 // ── Le document lui-même ────────────────────────────────────────────────────────────────────────
 
@@ -48,7 +50,7 @@ export const DOCUMENT_PREAMBULE =
 export const DOCUMENT_TITRE_RETRAITS = "Deux choses ne sont pas dans ce fichier, et voici lesquelles :";
 
 export const DOCUMENT_ANNEXE =
-  "Les mêmes données, en format machine, sont dans ce fichier sous l’identifiant « donnees-brutes » — " +
+  "Les mêmes données, en format machine, sont dans ce fichier sous l’identifiant « donnees-brutes » : " +
   "de quoi les reprendre ailleurs sans rien retaper.";
 
 /** Le nom du fichier téléchargé. Sobre : il finira dans un dossier de téléchargements partagé. */
@@ -98,14 +100,14 @@ export function effacementFenetre(jours: number): string {
 }
 
 export const EFFACEMENT_EXPORT_DABORD =
-  "Si tu veux garder une trace, télécharge d’abord — le bouton est juste au-dessus.";
+  "Si tu veux garder une trace, télécharge d’abord : le bouton est juste au-dessus.";
 
 export const EFFACEMENT_CONFIRMATION = "J’ai compris que tout disparaît et que rien ne revient.";
 
 export const ACTION_EFFACER = "Tout effacer";
 
 export const EFFACEMENT_ECHEC =
-  "L’effacement n’a pas abouti. Rien n’a été touché — tu peux recommencer.";
+  "L’effacement n’a pas abouti. Rien n’a été touché : tu peux recommencer.";
 
 export const EFFACEMENT_SANS_CONFIRMATION = "Coche la case pour que l’effacement puisse partir.";
 

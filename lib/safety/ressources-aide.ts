@@ -37,16 +37,16 @@ export interface RessourceAide {
 }
 
 export const RESSOURCES_AIDE: ReadonlyArray<RessourceAide> = [
-  { famille: "suicide", numero: "3114", tel: "3114", aria: "3 1 1 4", service: "Prévention du suicide", desc: "Prévention du suicide — gratuit, à toute heure, tous les jours." },
-  { famille: "urgence_vitale", numero: "15", tel: "15", aria: "1 5", service: "SAMU", desc: "SAMU — urgence vitale immédiate." },
+  { famille: "suicide", numero: "3114", tel: "3114", aria: "3 1 1 4", service: "Prévention du suicide", desc: "Prévention du suicide : gratuit, à toute heure, tous les jours." },
+  { famille: "urgence_vitale", numero: "15", tel: "15", aria: "1 5", service: "SAMU", desc: "SAMU : urgence vitale immédiate." },
   { famille: "urgence_vitale", numero: "112", tel: "112", aria: "1 1 2", service: "Urgence européenne", desc: "Numéro d’urgence européen." },
   // QA tour 1 (T30) : le libellé était « Violences faites aux femmes », qui décrit le sujet mais
   // n’est plus l’appellation du service. Quelqu’un qui cherche à vérifier le numéro, ou qui l’entend
   // nommer ailleurs, doit retrouver le MÊME nom — c’est le seul moyen de savoir qu’on parle du même
   // service. Appellation officielle : arretonslesviolences.gouv.fr.
-  { famille: "violences_femmes", numero: "3919", tel: "3919", aria: "3 9 1 9", service: "Violences Femmes Info", desc: "Violences Femmes Info — anonyme et gratuit." },
+  { famille: "violences_femmes", numero: "3919", tel: "3919", aria: "3 9 1 9", service: "Violences Femmes Info", desc: "Violences Femmes Info : anonyme et gratuit." },
   { famille: "enfance", numero: "119", tel: "119", aria: "1 1 9", service: "Enfance en danger", desc: "Enfance en danger." },
-  { famille: "ecoute", numero: "09 72 39 40 50", tel: "0972394050", aria: "0 9 7 2 3 9 4 0 5 0", service: "SOS Amitié", desc: "SOS Amitié — une écoute, tous les jours." },
+  { famille: "ecoute", numero: "09 72 39 40 50", tel: "0972394050", aria: "0 9 7 2 3 9 4 0 5 0", service: "SOS Amitié", desc: "SOS Amitié : une écoute, tous les jours." },
 ];
 
 /** Ordre d’affichage des familles — le danger vital d’abord (AC3 « en cas de doute, l’urgence prime »). */

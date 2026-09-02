@@ -58,7 +58,7 @@ export default async function PageEntrer({
         </h1>
         {refus === "age" ? (
           <p className="t-anam" role="status">
-            Ce lieu est réservé aux 18 ans ou plus. Reviens quand tu y seras — la
+            Ce lieu est réservé aux 18 ans ou plus. Reviens quand tu y seras : la
             porte restera là.
           </p>
         ) : (
@@ -102,7 +102,7 @@ export default async function PageEntrer({
                   ? "Je vais vérifier ton adresse avant de retirer les anciennes clés d’accès."
                   : passkeysActives()
                     ? "Choisis la clé d’accès de ton appareil, ou reçois un lien et un code par e-mail."
-                    : "Laisse-moi ton adresse. Je t’enverrai un lien — pas de mot de passe à retenir, rien à perdre."}
+                    : "Laisse-moi ton adresse. Je t’enverrai un lien : pas de mot de passe à retenir, rien à perdre."}
               </p>
             )}
             <div className={s.portes}>
@@ -139,7 +139,7 @@ export default async function PageEntrer({
         {process.env.NODE_ENV === "development" && (
           <div style={{ marginTop: "var(--esp-7)" }}>
             <p className="t-meta" style={{ marginBottom: "var(--esp-2)" }}>
-              Dev — accès sans email (n&rsquo;existe pas en production)
+              Dev : accès sans email (n&rsquo;existe pas en production)
             </p>
             <form action={entreeDemo}>
               <button type="submit" className={s.bouton}>

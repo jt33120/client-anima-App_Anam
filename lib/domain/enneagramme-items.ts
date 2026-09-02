@@ -146,9 +146,12 @@ export const MESSAGE_TYPE_SANS_TEXTE =
  *
  * Sans impératif — « fais le test » ferait de l'état une relance (`arbitrage-ouverture.ts`) — et
  * sans futur adressé : c'est le lien à côté qui dit où aller, pas la phrase.
+ *
+ * Et sans tiret cadratin (retour du fondateur du 2026-09-01) : le tiret qui soudait « c'est lui qui
+ * manque » à l'aveu est devenu un point. L'état est dit, puis expliqué, en deux phrases courtes.
  */
 export const MESSAGE_TYPE_ABSENT =
-  "Le test n’a pas encore été passé — c’est lui qui manque, pas le texte : les neuf types sont " +
+  "Le test n’a pas encore été passé. C’est lui qui manque, pas le texte : les neuf types sont " +
   "écrits et t’attendent. Il est court, et tu peux t’arrêter en route.";
 
 /** Où le passer. Constante unique — un test vérifie que la page existe. */

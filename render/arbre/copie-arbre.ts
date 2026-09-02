@@ -29,7 +29,7 @@ export const LIBELLE_ETAT: Record<EtatBranche, string> = {
 };
 
 export const ARIA_CANEVAS = "Ton arbre : chaque branche est une prise de conscience que tu as nommée.";
-export const ARIA_ZONE_ARBRE = "Zone de l’arbre — utilise les flèches pour te déplacer.";
+export const ARIA_ZONE_ARBRE = "Zone de l’arbre : utilise les flèches pour te déplacer.";
 export const VIDE_TITRE = "Rien n’a encore été nommé.";
 export const VIDE_CORPS = "C’est normal, ça vient en parlant.";
 
@@ -55,7 +55,7 @@ export const VIDE_CORPS = "C’est normal, ça vient en parlant.";
  */
 export const VIDE_CE_QU_EST_L_ARBRE = [
   "Le tronc, c’est ton socle : ce qui était déjà là à ta naissance, et qui ne change pas.",
-  "Une branche naît quand quelque chose revient dans tes échanges avec Anam et qu’elle te propose de le nommer — jamais sur l’instant, et jamais sans que tu aies dit oui.",
+  "Une branche naît quand quelque chose revient dans tes échanges avec Anam et qu’elle te propose de le nommer : jamais sur l’instant, et jamais sans que tu aies dit oui.",
   "Ensuite elle vit : elle prend des feuilles à mesure que tu y reviens, et c’est toi, pas Anam, qui décides le jour où elle est en pleine lumière.",
 ] as const;
 
@@ -198,7 +198,7 @@ export const ECHEANCE_LE = (date: string) => `Pour le ${date}.`;
  */
 export const ARIA_TRONC = "Le tronc de ton arbre.";
 /** Honnête sans être une étiquette : il dit CE QUI MANQUE, pas un jugement sur l'état du tronc. */
-export const ARIA_TRONC_A_COMPLETER = "Le tronc de ton arbre — il manque ton heure de naissance.";
+export const ARIA_TRONC_A_COMPLETER = "Le tronc de ton arbre : il manque ton heure de naissance.";
 export const TRONC_TITRE = "Ton heure de naissance";
 /** AC5 : la fiche porte EXACTEMENT ces deux actions, et aucune autre. */
 export const ACTION_AJOUTER_HEURE = "Ajouter mon heure";

@@ -26,7 +26,7 @@ export default function FormulaireNaissance() {
   if (etat.statut === "mineur") {
     return (
       <p className="t-anam" role="status">
-        Ce lieu est réservé aux adultes. Reviens quand tu auras 18 ans — la porte
+        Ce lieu est réservé aux adultes. Reviens quand tu auras 18 ans : la porte
         restera là.
       </p>
     );
@@ -82,7 +82,7 @@ export default function FormulaireNaissance() {
         />
         {/* Le « pourquoi » est dit, et l'optionnalité aussi : rien n'est extorqué par le flou. */}
         <span id="nom_complet_aide" className="t-meta">
-          Facultatif. Il sert à ta numérologie — sans lui, le reste se calcule quand même.
+          Facultatif. Il sert à ta numérologie : sans lui, le reste se calcule quand même.
         </span>
       </label>
       {etat.statut === "erreur" && etat.message ? (

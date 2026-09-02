@@ -29,10 +29,10 @@ const RESSOURCES: ReadonlyArray<{
   service: string;
   desc: string;
 }> = [
-  { numero: "3018", tel: "3018", aria: "3 0 1 8", service: "Violences numériques", desc: "Harcèlement en ligne — gratuit, pour les jeunes, tous les jours." },
-  { numero: "119", tel: "119", aria: "1 1 9", service: "Enfance en danger", desc: "Enfance en danger — à toute heure." },
-  { numero: "0 800 235 236", tel: "0800235236", aria: "0 8 0 0 2 3 5 2 3 6", service: "Fil Santé Jeunes", desc: "Fil Santé Jeunes — anonyme et gratuit." },
-  { numero: "3114", tel: "3114", aria: "3 1 1 4", service: "Souffrance psychique", desc: "Prévention du suicide — gratuit, à toute heure, tous âges." },
+  { numero: "3018", tel: "3018", aria: "3 0 1 8", service: "Violences numériques", desc: "Harcèlement en ligne : gratuit, pour les jeunes, tous les jours." },
+  { numero: "119", tel: "119", aria: "1 1 9", service: "Enfance en danger", desc: "Enfance en danger : à toute heure." },
+  { numero: "0 800 235 236", tel: "0800235236", aria: "0 8 0 0 2 3 5 2 3 6", service: "Fil Santé Jeunes", desc: "Fil Santé Jeunes : anonyme et gratuit." },
+  { numero: "3114", tel: "3114", aria: "3 1 1 4", service: "Souffrance psychique", desc: "Prévention du suicide : gratuit, à toute heure, tous âges." },
 ];
 
 export default async function PageBarriere() {

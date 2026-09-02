@@ -39,7 +39,7 @@ export default function FormulaireEntree({
       <div className={s.form}>
         <p className="t-anam" role="status">
           C&rsquo;est parti{etat.adresse ? <> vers {etat.adresse}</> : null}. Le message contient un
-          lien — il n&rsquo;ouvre que dans ce navigateur-ci — et un code à six chiffres, qui marche
+          lien, qui n&rsquo;ouvre que dans ce navigateur-ci, et un code à six chiffres, qui marche
           depuis n&rsquo;importe où.
         </p>
         {/* ⚠️ L'ADRESSE EST AFFICHÉE, ET CE N'EST PAS DE L'ORNEMENT. L'adresse vérifiée vient d'un

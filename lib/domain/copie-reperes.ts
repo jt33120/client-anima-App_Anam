@@ -47,7 +47,7 @@ export const PLACES: readonly Place[] = Object.freeze([
   {
     nom: "Anam",
     quoi:
-      "La conversation. On lui écrit comme on écrirait à quelqu’un — pas de mots-clés, pas de " +
+      "La conversation. On lui écrit comme on écrirait à quelqu’un : pas de mots-clés, pas de " +
       "questions à cocher. Elle ne prédit rien et ne note personne ; elle écoute, elle rend ce " +
       "qu’elle comprend, et elle le garde d’une fois sur l’autre.",
   },
@@ -55,7 +55,7 @@ export const PLACES: readonly Place[] = Object.freeze([
     nom: "Mon arbre",
     quoi:
       "Ce qui pousse à mesure. Le tronc, c’est ce qui était déjà là à la naissance. Les branches " +
-      "naissent de ce qui revient dans les échanges — jamais sur l’instant, et jamais sans que tu " +
+      "naissent de ce qui revient dans les échanges : jamais sur l’instant, et jamais sans que tu " +
       "l’aies vu venir. Une branche peut être nommée, corrigée, ou déclarée en pleine lumière.",
   },
   {
@@ -77,7 +77,7 @@ export const SECTIONS: readonly Section[] = Object.freeze([
   {
     titre: "Circuler",
     paragraphes: [
-      "Les trois noms sont toujours affichés — en bas sur un téléphone, à gauche sur un écran large. " +
+      "Les trois noms sont toujours affichés, en bas sur un téléphone, à gauche sur un écran large. " +
         "Un nom, un endroit : il n’y a pas de menu caché.",
       // ⚠️ « dimension », plus « place » (2026-09-02, retour du fondateur) : c'est le mot du titre
       // juste au-dessus (« Les trois dimensions »), et un mode d'emploi qui change de mot entre son
@@ -85,7 +85,7 @@ export const SECTIONS: readonly Section[] = Object.freeze([
       "Au doigt, on peut aussi glisser latéralement d’une dimension à l’autre, dans l’ordre où les noms " +
         "sont écrits. Le geste ne mène nulle part que les noms ne mènent déjà : si tu préfères " +
         "toucher, rien ne te manque.",
-      "Sur l’arbre, le doigt déplace l’arbre — c’est son geste à lui. Pour changer de dimension depuis " +
+      "Sur l’arbre, le doigt déplace l’arbre : c’est son geste à lui. Pour changer de dimension depuis " +
         "là, les noms sont toujours là.",
     ],
   },
@@ -95,7 +95,7 @@ export const SECTIONS: readonly Section[] = Object.freeze([
       "Anam est une intelligence artificielle. Ce qu’elle te répond est produit par un modèle, et " +
         "c’est écrit partout où elle parle.",
       "Les textes des cartes, eux, ne sortent pas du modèle. Ce sont pour l’instant des premières " +
-        "versions, en attendant qu’Anima les reprenne à la main — et quelques cartes disent " +
+        "versions, en attendant qu’Anima les reprenne à la main, et quelques cartes disent " +
         "honnêtement qu’elles attendent encore la leur, au lieu d’afficher quelque chose qui aurait " +
         "l’air d’un texte.",
     ],

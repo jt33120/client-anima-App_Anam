@@ -161,7 +161,7 @@ export const PHRASE_INVITATION =
  * cette story) : « tu le verras » deviendrait une petite promesse, là où « il est là » est un fait.
  */
 export const PHRASE_SOCLE_COMPLETE =
-  "Ton heure de naissance est enregistrée. J’ai repris ton thème avec elle — l’ascendant et les " +
+  "Ton heure de naissance est enregistrée. J’ai repris ton thème avec elle : l’ascendant et les " +
   "maisons en font partie maintenant.";
 
 /**

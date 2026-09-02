@@ -145,7 +145,7 @@ export default function PremierPassage({
       {modele.desCartesAttendent && (
         <p className={`t-meta ${classeNote}`}>
           Les textes d&rsquo;ici ne sont pas écrits par Anam. Ce sont des premières versions,
-          en attendant qu&rsquo;Anima les reprenne — et certaines cartes attendent encore la leur.
+          en attendant qu&rsquo;Anima les reprenne, et certaines cartes attendent encore la leur.
         </p>
       )}
     </section>

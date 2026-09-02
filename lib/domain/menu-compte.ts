@@ -167,7 +167,7 @@ export const HORS_MENU: Readonly<Record<string, string>> = Object.freeze({
   "heure-naissance":
     "elle CORRIGE le socle : elle vit sous la halte « Ton socle », au contact du manque qu’elle répare (amendement du 2026-08-25, §1)",
   enneagramme:
-    "même raison que l’heure de naissance — c’est une porte du socle, pas une entrée de compte",
+    "même raison que l’heure de naissance : c’est une porte du socle, pas une entrée de compte",
   psychologie:
     "cet univers se découvre depuis « Aujourd’hui » : le dupliquer dans le menu de compte recréerait le mélange entre navigation quotidienne et administration que les groupes corrigent",
   reperes:

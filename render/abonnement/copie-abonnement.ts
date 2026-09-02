@@ -122,7 +122,7 @@ export const REFUS_VENTE_FERMEE =
  * sauvera pas — ou tairait le geste utile à quelqu'un pour qui il suffit.
  */
 export const REFUS_PAIEMENT_INJOIGNABLE =
-  "Je n’ai pas réussi à ouvrir la page de paiement — notre prestataire n’a pas répondu. Rien n’a été " +
+  "Je n’ai pas réussi à ouvrir la page de paiement : notre prestataire n’a pas répondu. Rien n’a été " +
   "débité. Tu peux réessayer dans un moment.";
 
 /**
@@ -154,7 +154,7 @@ export const REFUS_PAIEMENT_INJOIGNABLE =
  */
 export const REFUS_CONTRAT_CLOS =
   "Ton abonnement est terminé : il n’y a plus rien à résilier ni à reprendre de ce côté-là. Si tu " +
-  "veux revenir, ça se fait plus bas — c’est un nouvel abonnement, pas la reprise de l’ancien.";
+  "veux revenir, ça se fait plus bas : c’est un nouvel abonnement, pas la reprise de l’ancien.";
 
 /**
  * Le refus qui tombe sur un onglet resté ouvert quand l'accès a été OFFERT entre-temps. Il dit
@@ -163,10 +163,12 @@ export const REFUS_CONTRAT_CLOS =
 export const REFUS_RIEN_A_RESILIER =
   "Ton accès est ouvert sans abonnement : il n’y a rien à résilier, et rien n’est prélevé.";
 
+// L’incise « le bouton est plus haut » vivait entre deux tirets cadratins ; elle est devenue un
+// complément entre virgules (retour du fondateur du 2026-09-01 : plus aucun tiret affiché).
 export const REFUS_CONTRAT_OUVERT =
   "Ton abonnement précédent court encore chez notre prestataire de paiement, même s’il ne te donne " +
   "plus accès : je ne peux pas t’en vendre un second par-dessus, tu paierais deux fois. Résilie " +
-  "celui-là d’abord — le bouton est plus haut — puis reprends ici.";
+  "celui-là d’abord, avec le bouton plus haut, puis reprends ici.";
 
 /** La garantie (FR-089) — proposée SEULEMENT quand elle y a droit. Jamais annoncée comme un lot de consolation. */
 export const ACTION_REMBOURSEMENT = "Demander le remboursement";
@@ -182,7 +184,7 @@ export const SUCCES_REMBOURSEMENT = "C’est demandé. Le remboursement arrive s
  * socle : une absence dite vaut mieux qu'une valeur qui a l'air juste.
  */
 export const REMBOURSEMENT_SANS_PAIEMENT =
-  "Ton abonnement est résilié. Mais je n’ai trouvé aucun paiement à te rembourser — je préfère te le dire plutôt que de te laisser attendre.";
+  "Ton abonnement est résilié. Mais je n’ai trouvé aucun paiement à te rembourser, et je préfère te le dire plutôt que de te laisser attendre.";
 /**
  * REFUS : réessayer n'a PAS de sens ici, et le patron `REFUS_RAYONNEMENT` (4.7) s'applique — on ne
  * promet pas « tu peux réessayer » à quelqu'un qui se heurterait au même mur. On ne dit pas non plus
@@ -213,7 +215,7 @@ export const REMBOURSEMENT_CONFIRME =
  * deux fois), et on donne la porte.
  */
 export const REMBOURSEMENT_ECHOUE =
-  "Ta banque a refusé le remboursement — cela arrive quand un compte a été clos ou une carte remplacée. " +
+  "Ta banque a refusé le remboursement : cela arrive quand un compte a été clos ou une carte remplacée. " +
   "Ta demande reste ouverte : écris-moi depuis l’aide et on le refait sur un autre moyen de paiement.";
 
 /** L'arbre ne recule pas — dit une fois, platement, pour retirer la peur du geste (FR-029). */

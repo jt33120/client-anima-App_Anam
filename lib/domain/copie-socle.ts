@@ -164,7 +164,7 @@ export const PORTES_DU_SOCLE: readonly { readonly titre: string; readonly quoi: 
   Object.freeze([
     {
       titre: "Ton heure de naissance",
-      quoi: "Elle complète le ciel — l’ascendant, le milieu du ciel et les maisons en dépendent.",
+      quoi: "Elle complète le ciel : l’ascendant, le milieu du ciel et les maisons en dépendent.",
       url: "/heure-naissance",
     },
     {
@@ -223,7 +223,7 @@ export const CIEL_INDISPONIBLE =
   "Je n’arrive pas à relire ton ciel en ce moment. Il n’est pas perdu ; reviens un peu plus tard.";
 
 export const NAISSANCE_ABSENTE =
-  "Il me manque ta date de naissance — sans elle, il n’y a rien à calculer.";
+  "Il me manque ta date de naissance : sans elle, il n’y a rien à calculer.";
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 // Les raisons, une par une
@@ -238,7 +238,7 @@ export const RAISON_NOMBRE: Readonly<Record<RaisonNombreAbsent, string>> = Objec
   nom_absent:
     "Ce nombre se compte sur les lettres de ton nom de naissance, et tu ne l’as pas donné. C’est facultatif, et rien d’autre n’en dépend.",
   nom_sans_lettre:
-    "Le nom enregistré ne contient aucune lettre à compter — sans doute une saisie qui s’est mal passée.",
+    "Le nom enregistré ne contient aucune lettre à compter, sans doute une saisie qui s’est mal passée.",
   nom_sans_voyelle:
     "Ce nombre se compte sur les voyelles de ton nom, et il n’y en a aucune dans celui qui est enregistré.",
   nom_sans_consonne:
@@ -255,11 +255,11 @@ export const RAISON_ANGLES: Readonly<Record<RaisonSansAngles, string>> = Object.
   fuseau_absent:
     "Il manque le fuseau horaire du lieu de naissance : sans lui, l’heure enregistrée ne désigne pas un instant précis.",
   fuseau_invalide:
-    "Le fuseau horaire enregistré n’est pas reconnu. C’est un défaut de mes données, pas des tiennes — il n’y a rien à refaire de ton côté.",
+    "Le fuseau horaire enregistré n’est pas reconnu. C’est un défaut de mes données, pas des tiennes : il n’y a rien à refaire de ton côté.",
   coordonnees_absentes:
     "Il manque les coordonnées du lieu de naissance, dont l’ascendant dépend autant que de l’heure.",
   latitude_polaire:
-    "Au pôle géographique exact, l’ascendant n’existe pas — ce n’est pas une donnée qui manque, c’est une limite de la notion elle-même.",
+    "Au pôle géographique exact, l’ascendant n’existe pas : ce n’est pas une donnée qui manque, c’est une limite de la notion elle-même.",
 });
 
 /** Les trois raisons pour lesquelles un corps ne figure pas dans le ciel. */

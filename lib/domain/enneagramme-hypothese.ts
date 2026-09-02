@@ -151,7 +151,7 @@ export function requeteHypotheseEnneagramme(messages: MessageIa[]): RequeteIa {
  * reproche (leçon 4.10).
  */
 export const PHRASE_OUVERTURE_HYPOTHESE =
-  "Il y a une chose qui revient souvent dans ce que tu me racontes. Ça me donne une idée — tu veux la voir ?";
+  "Il y a une chose qui revient souvent dans ce que tu me racontes. Ça me donne une idée, tu veux la voir ?";
 
 /**
  * Ce qu'Anam dit À LA HALTE, une fois le type sous les yeux.

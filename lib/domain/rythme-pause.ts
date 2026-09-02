@@ -145,8 +145,12 @@ export function seuilFranchi(mesure: MesureRythme): boolean {
  *
  * Et ce qu'elle fait, qui est le cœur : elle retire la peur de perdre. « rien ne se perd » est
  * l'exact inverse du ressort qu'un produit ordinaire actionnerait ici.
+ *
+ * Deux phrases, sans tiret cadratin (retour du fondateur du 2026-09-01). La salutation d'ouverture
+ * lui est soudée par un deux-points (`ouverture-seance.ts`), et rester à deux phrases laisse de la
+ * marge sous la coupe à trois de `voix-anam.ts`. Le tiret « très IA » a cédé la place à un
+ * deux-points et à une virgule, sans perdre « rien ne se perd », qui est le cœur.
  */
 export const PHRASE_PAUSE =
-  "Tu es venue souvent ces jours-ci. " +
-  "Ce que tu as déposé reste là, et rien ne se perd si tu t’éloignes un moment. " +
-  "Tu peux laisser reposer, ou continuer — les deux se valent.";
+  "Tu es venue souvent ces jours-ci, et ce que tu as déposé reste là : rien ne se perd si tu " +
+  "t’éloignes un moment. Tu peux laisser reposer ou continuer, les deux se valent.";
