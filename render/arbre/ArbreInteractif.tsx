@@ -34,6 +34,7 @@ import {
 } from "@/lib/scene";
 import { construireGeometrieLunaire, CANEVAS } from "./geometrie";
 import ArbreLunaire from "./ArbreLunaire";
+import GraineAttente from "./GraineAttente";
 import EtatVideArbre from "./EtatVideArbre";
 import {
   ARIA_CANEVAS,
@@ -126,6 +127,10 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   const geometrie = useMemo(() => construireGeometrieLunaire(affichees), [affichees]);
   const placees = geometrie.branches;
+  /** L'étape 0 vue par le DESSIN : le même prédicat que `data-etape-arbre="graine"` (ArbreLunaire.tsx) et
+   *  que `contenuEtapeLunaire` dans le moteur. Une seule source de vérité, pour que la graine SVG et la
+   *  graine peinte ne puissent jamais coexister (voir le rendu, sous le canevas). */
+  const etapeGraine = geometrie.branches.length === 0;
   const selectionnee = affichees.find((b) => b.id === p.brancheSelectionnee) ?? null;
 
   // Ce qui décide de la PRÉSENCE du canevas dans le DOM. Déclaré ICI, avant l'effet de mesure, parce que
@@ -438,6 +443,21 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
               troncEnReserve={Boolean(troncIncomplet)}
               ariaLabel={ARIA_CANEVAS}
             />
+
+            {/* LA GRAINE QUI N'ATTEND QUE D'ÉCLORE (retour du fondateur) — à l'étape 0 SEULEMENT.
+                Le SVG animé `GraineAttente` se superpose au canevas, au point exact où le moteur posait
+                sa graine peinte ; le moteur, lui, saute `peindreGraine` sous la MÊME condition
+                (`MoteurArbreLunaire.peindreBase`) — sinon deux graines au même endroit, une qui respire
+                et une figée dessous.
+                ⚠️ DANS `.monde`, à côté du canevas, et nulle part ailleurs. Elle partage ainsi son
+                repère (le portrait mesuré, le pan/zoom) ET son chemin de visibilité : la région
+                inactive (`visibility: hidden`, `inert` — monde.module.css `.region`) l'emporte avec le
+                canevas ; il n'y a aucun second mécanisme à garder, aucun retrait à lui apprendre.
+                Positionnée par une CLASSE (arbre.module.css `.graineAttente`), jamais en `style=` :
+                le composant se garde sans style inline (tests/rendu/graine-attente.test.tsx). Elle se
+                met à l'échelle avec le monde au zoom, comme la graine peinte le faisait dans le bitmap
+                — c'est un objet du dessin, pas une cible tactile. `pointer-events: none` chez elle. */}
+            {etapeGraine && <GraineAttente className={s.graineAttente} />}
 
             {/* Story 5.3 — la cible du TRONC, dans la même couche et le même repère que les accroches.
                 Elle n'existe que s'il manque quelque chose : un tronc complet n'a AUCUNE affordance,

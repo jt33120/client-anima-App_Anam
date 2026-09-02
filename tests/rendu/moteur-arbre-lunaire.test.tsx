@@ -137,8 +137,17 @@ const brancheFeuillaison = (intensite: number): BrancheProjetee => ({
 
 afterEach(() => vi.restoreAllMocks());
 
+/** L'ellipse exacte de `peindreGraine` : centre (704, 1367), 24 × 31, inclinée de −0,18 rad. */
+const ELLIPSE_GRAINE = [CANEVAS.largeur / 2, 1367, 24, 31, -0.18, 0, Math.PI * 2];
+
 describe("moteur Canvas lunaire — exécution réelle des chemins de peinture", () => {
-  it("l'étape 0 compose quatre couches transparentes mais ne peint que la graine", () => {
+  it("l'étape 0 compose quatre couches transparentes et ne peint RIEN — la graine est le SVG superposé", () => {
+    // ADAPTÉ (retour du fondateur : « la graine bouge »). La graine de l'étape 0 n'est plus peinte dans
+    // le bitmap : c'est le SVG animé `GraineAttente`, que `ArbreInteractif` superpose au canevas sous
+    // la même condition (tests/rendu/graine-integree.test.tsx). Une ellipse ici ferait DEUX graines au
+    // même point — une qui respire, une figée dessous. Le canevas de l'étape 0 est donc entièrement
+    // transparent. Le témoin positif — la graine au pied de l'ARBRE reste peinte — vit dans le test
+    // des 60 branches : cette absence n'est pas celle d'un moteur mort.
     const instrumentation = installerContexte();
     const canvas = document.createElement("canvas");
     const moteur = new MoteurArbreLunaire(canvas);
@@ -146,15 +155,8 @@ describe("moteur Canvas lunaire — exécution réelle des chemins de peinture",
     moteur.mettreAJour(construireGeometrieLunaire([]), false);
 
     const [principal, base, bois, feuilles, lueur] = instrumentation.ordre;
-    expect(base.ellipses).toContainEqual([
-      CANEVAS.largeur / 2,
-      1367,
-      24,
-      31,
-      -0.18,
-      0,
-      Math.PI * 2,
-    ]);
+    expect(base.ellipses, "la graine peinte est revenue : il y en aurait deux à l'étape 0").toEqual([]);
+    expect(base.appels.fill ?? 0, "quelque chose est peint sur la couche de base à l'étape 0").toBe(0);
     expect(base.arcs, "l'ombre de contact ferait déjà apparaître l'ancien arbre").toEqual([]);
     expect(base.lineTo, "la charpente ne doit pas apparaître à l'étape graine").toEqual([]);
     expect(bois.lineTo).toEqual([]);
@@ -181,6 +183,10 @@ describe("moteur Canvas lunaire — exécution réelle des chemins de peinture",
     expect(bois.lineTo.length, "le bois lunaire n'a pas été peint").toBeGreaterThan(0);
     expect(feuilles.drawSources.length, "aucune feuille n'a été cuite").toBeGreaterThan(0);
     expect(lueur.arcs.length, "le rayonnement n'a pas été peint").toBeGreaterThan(0);
+    // Témoin de l'étape 0 ci-dessus : dès que l'arbre est là, sa graine au pied reste dans le bitmap
+    // (immobile, elle n'a pas besoin de la couche SVG). Sans ce témoin, « aucune ellipse à l'étape 0 »
+    // serait aussi vrai d'un `peindreGraine` supprimé.
+    expect(base.ellipses, "la graine au pied de l'arbre a disparu du bitmap").toContainEqual(ELLIPSE_GRAINE);
     expect(
       base.gradientsRadiaux.some((gradient) =>
         gradient.stops.some(([, couleur]) => couleur === "rgba(10,9,26,0.22)"),
