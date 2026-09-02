@@ -51,13 +51,15 @@
   padding: var(--esp-5);
   border: 1px solid var(--bordure);
   border-radius: var(--rayon-lg);
-  background: var(--surface);
+  /* Le « papier » des sections, même dégradé statique que les cartes d'Aujourd’hui
+     (retour du fondateur, 2026-09-01 : textures et dégradés, sans couleur en dur). */
+  background: linear-gradient(168deg, var(--surface), color-mix(in srgb, var(--surface-elevee) 40%, var(--surface)));
 }
 
 .sectionCiel {
   background:
     radial-gradient(circle at 50% 12%, color-mix(in srgb, var(--lueur) 10%, transparent), transparent 35%),
-    var(--surface);
+    linear-gradient(168deg, var(--surface), color-mix(in srgb, var(--surface-elevee) 40%, var(--surface)));
 }
 
 .surtitre,

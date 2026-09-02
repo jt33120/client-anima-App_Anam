@@ -302,7 +302,11 @@
   gap: var(--esp-2);
   width: 100%;
   padding: var(--esp-4);
-  background: var(--surface);
+  /* Le « papier » des cartes (retour du fondateur, 2026-09-01 : des textures et des dégradés) :
+     un dégradé STATIQUE de la surface vers la surface élevée, à peine perceptible, qui donne
+     du grain sans une seule couleur en dur ni la moindre animation. `.enAvant` garde sa
+     surface pleine : la carte mise en avant est « devant », pas « en papier ». */
+  background: linear-gradient(168deg, var(--surface), color-mix(in srgb, var(--surface-elevee) 40%, var(--surface)));
   border: 1px solid var(--bordure);
   border-radius: var(--rayon-md);
 }
