@@ -593,10 +593,6 @@ export default function SceneDom({
 
       {/* Fond persistant — la scène est une, seul le premier plan se fond. */}
       <div className={s.ciel} aria-hidden>
-        {/* Le lotus du ciel (2026-09-03) : une forme masquée, peinte par des jetons, immobile. Elle
-            est DANS `.ciel` et donc derrière tout le reste — l'arbre, la lune et les cartes se
-            posent dessus. Voir `render/monde.module.css`. */}
-        <div className={s.lotus} />
         <div className={s.lune} />
       </div>
       {/* La voie lactée — une direction dans le ciel, à la limite du visible. Décor pur : elle

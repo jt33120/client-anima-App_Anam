@@ -24,7 +24,7 @@
   border: 1px solid color-mix(in srgb, var(--bordure-forte) 38%, transparent);
   border-radius: 16px;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
-  box-shadow: 0 24px 80px rgb(0 0 0 / 28%);
+  box-shadow: var(--ombre-devant);
 }
 
 .surtitre,

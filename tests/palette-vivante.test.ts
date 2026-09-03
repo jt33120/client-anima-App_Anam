@@ -13,6 +13,10 @@ import { ratioContraste } from "@/app/styles/contraste";
  *
  * Trois choses en sont sorties, et chacune a un mode d'échec silencieux que ce fichier tient :
  *
+ * (Le lotus de fond, ajouté le matin même, a été retiré l'après-midi : « je ne suis pas fan de la
+ * fleur de lotus en fond ». Sa garde est partie avec lui — une garde sans objet est une garde qui
+ * ment.)
+ *
  *   1. `--aube`, le SECOND TON, chaud. Son danger n'est pas d'être laid, c'est de finir sous du
  *      texte : à 1,4:1 sur le fond, une phrase peinte avec lui serait illisible, et aucune paire
  *      du gate de contraste ne le verrait puisqu'il n'entre dans aucune ;
@@ -59,37 +63,6 @@ describe("[LE CŒUR] le second ton est un décor, et il le reste", () => {
   it("[ANTI-VACUITÉ] il est bel et bien employé, sinon la garde ne garde rien", () => {
     const monde = codeSeul(lire("render/monde.module.css"));
     expect(monde, "le second ton n'est utilisé nulle part dans le ciel").toContain("var(--aube)");
-  });
-});
-
-describe("[LE CŒUR] le lotus du ciel est une forme, et il ne bouge pas", () => {
-  const monde = codeSeul(lire("render/monde.module.css"));
-  // ⚠️ LA BORNE DE FIN SE CHERCHE APRÈS LE DÉBUT. `.etoiles {` apparaît plus haut dans la feuille
-  // (une règle sous média), et un `indexOf` naïf rendait une tranche vide — donc une garde qui
-  // passait sur du néant. C'est le témoin anti-vacuité juste dessous qui l'a dit.
-  const debutLotus = monde.indexOf(".lotus {");
-  const bloc = monde.slice(debutLotus, monde.indexOf(".etoiles {", debutLotus));
-
-  it("[ANTI-VACUITÉ] le bloc du lotus a été trouvé", () => {
-    expect(bloc.length).toBeGreaterThan(200);
-    expect(bloc).toContain("mask-image");
-  });
-
-  it("aucune animation, aucune transition, aucun filtre", () => {
-    for (const interdit of ["animation", "transition", "filter", "mix-blend-mode"]) {
-      expect(
-        new RegExp(`\\b${interdit}\\s*:`).test(bloc),
-        `« ${interdit} » sur le lotus : la scène a une liste de ce qu'elle n'anime jamais`,
-      ).toBe(false);
-    }
-  });
-
-  it("il se peint avec des jetons, jamais avec une teinte écrite à la main", () => {
-    expect(bloc).toMatch(/background:[^;]*var\(--/);
-    // Le refus des `#` et des `rgba(` sur cette feuille vit dans `couleurs-tokenisees.test.ts` ;
-    // ici on exige le POSITIF, sinon un `background: none` passerait ce test.
-    expect(bloc).toContain("var(--lueur)");
-    expect(bloc).toContain("var(--aube)");
   });
 });
 

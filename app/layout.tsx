@@ -1,5 +1,6 @@
 import "./styles/globals.css";
 import type { Metadata, Viewport } from "next";
+import { couleursNuit } from "@/app/styles/tokens";
 import type { ReactNode } from "react";
 import { policeAnam, policeUi } from "./styles/polices";
 import { CouvercleConfidentialite } from "@/render/confidentialite/CouvercleConfidentialite";
@@ -44,7 +45,12 @@ export const viewport: Viewport = {
   // défaut du navigateur, en bordure d'une scène de nuit. C'est `--fond`, et rien d'autre : le mode
   // « contraste renforcé » est un réglage d'accessibilité qui s'active à la main, pas un thème jour
   // — il n'y a donc pas de variante `prefers-color-scheme` à déclarer ici.
-  themeColor: "#1C2740",
+  // ⚠️ LU DANS LE FICHIER DE DESIGN, PLUS RECOPIÉ (2026-09-03 : « toutes les couleurs dans des
+  // fichiers de design qu'il suffit de modifier »). Cette valeur était `#1C2740` écrit à la main,
+  // c'est-à-dire une copie de `--fond` prise le jour de la bascule au navy. Elle serait restée
+  // navy le jour où le fond changerait — et personne ne regarde la barre du système en relisant
+  // une palette. C'est le dernier endroit du produit où une couleur vivait hors des jetons.
+  themeColor: couleursNuit.fond,
 };
 
 // UX-DR-36 : lang="fr" sur le document.

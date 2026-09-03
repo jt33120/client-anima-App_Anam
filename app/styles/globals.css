@@ -64,6 +64,14 @@
   --esp-9: 96px;
   --marge-mobile: 20px;
   --marge-desktop: 48px;
+  /* ══ LES OMBRES PORTÉES (2026-09-03) ══════════════════════════════════════════════════════
+     Deux cartes en portaient une, écrite à la main : `rgb(0 0 0 / 18%)` et `rgb(0 0 0 / 28%)`.
+     Ce n'était pas grave — du noir reste du noir — mais c'était les deux dernières couleurs du
+     produit hors du fichier de design, donc les deux seules qu'une retouche de palette ne pouvait
+     pas atteindre. Deux profondeurs, parce que les deux cartes ne flottent pas à la même hauteur :
+     la page de protection est posée, l'écran d'erreur est devant tout le reste. */
+  --ombre-posee: 0 1.5rem 4rem rgb(0 0 0 / 18%);
+  --ombre-devant: 0 24px 80px rgb(0 0 0 / 28%);
   --respiration: 40px;
   --mesure: 32rem;
   --contenu-max: 40rem;

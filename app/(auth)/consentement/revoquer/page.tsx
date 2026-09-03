@@ -64,11 +64,7 @@ export default async function PageRevoquer({
               <span className="t-bouton">Retirer mon consentement</span>
             </button>
           </form>
-          <Link
-            href="/"
-            className="t-meta"
-            style={{ textAlign: "center", color: "var(--texte-doux)" }}
-          >
+          <Link href="/" className={`t-meta ${s.lienAnnuler}`}>
             Annuler
           </Link>
         </div>

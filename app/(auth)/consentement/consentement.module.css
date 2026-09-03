@@ -168,3 +168,13 @@
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
 }
+
+/* Le lien d'annulation sous les deux boutons de révocation (2026-09-03).
+
+   Il portait un `style={{ textAlign, color }}` en ligne. La couleur était déjà un jeton, donc rien
+   n'était faux à l'écran — mais un style en ligne est un endroit de plus où regarder quand on
+   change le design, et c'était le seul du produit à porter une couleur. */
+.lienAnnuler {
+  text-align: center;
+  color: var(--texte-doux);
+}
