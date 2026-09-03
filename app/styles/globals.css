@@ -44,6 +44,9 @@
   --jour: #D3DBF0;
   --sur-jour: #1C2740;
   --sur-jour-doux: #4C5773;
+  /* LE SECOND TON, CHAUD (2026-09-03) : le Beige de la palette, en décor seul — une lueur basse
+     qui rompt la monochromie du bleu. Jamais sous du texte (1,4:1). */
+  --aube: #E0D2C7;
 
   /* Piles typographiques (les var. de police viennent de next/font/local) */
   --pile-anam: var(--police-anam), "Iowan Old Style", Georgia, serif;
@@ -89,6 +92,10 @@
   --duree-standard: 320ms;
   --duree-longue: 700ms;
   --duree-respiration: 4200ms;
+  /* Le scintillement est PLUS LENT que la respiration (2026-09-03) : une lumière qui pulse au
+     rythme d'un souffle se lit comme une alerte, une lumière qui met sept secondes à s'ouvrir et à
+     se refermer se lit comme une braise. */
+  --duree-scintillement: 7200ms;
   --courbe: cubic-bezier(0.32, 0.08, 0.24, 1);
 
   /* Voile de lisibilité — jamais de texte sur image sans voile (UX-DR-39, DESIGN.md).
@@ -127,6 +134,8 @@
   --jour: #D3DBF0;
   --sur-jour: #1C2740;
   --sur-jour-doux: #4C5773;
+  /* Le second ton, chaud : le Gray de la palette en clair (décor seul). */
+  --aube: #B8B5AC;
   --imagerie-opacite: 0; /* imagerie atténuée : les fonds illustrés cèdent aux aplats */
   color-scheme: light;
 }
@@ -154,6 +163,8 @@
     --jour: #D3DBF0;
     --sur-jour: #1C2740;
     --sur-jour-doux: #4C5773;
+    /* Le second ton, chaud : le Gray de la palette en clair (décor seul). */
+    --aube: #B8B5AC;
     --imagerie-opacite: 0;
     color-scheme: light;
   }
@@ -340,6 +351,63 @@ body {
   animation: respiration var(--duree-respiration) var(--courbe) infinite;
 }
 
+/* ══ LE SCINTILLEMENT (2026-09-03) ═══════════════════════════════════════════════════════════
+
+   Retour de Julian : « du texte qui scintille […] cette palette mais plus magique, vivante ».
+
+   ⚠️ C'EST LE SECOND MOUVEMENT EN BOUCLE DU PRODUIT, ET LE PREMIER DEPUIS LA RESPIRATION. La
+   charte dit « respiration : seul mouvement en boucle » ; l'ouvrir est une décision du fondateur,
+   pas une liberté prise ici.
+
+   ⚠️ MAIS LE TEXTE, LUI, N'EST PAS TOUCHÉ — ET CE N'EST PAS UN DÉTAIL D'IMPLÉMENTATION.
+
+   La première version de ce bloc animait un `text-shadow`. `tests/voile.test.ts` l'a refusée, et
+   il avait raison : sur le seuil, la lisibilité est garantie par une BANDE OPAQUE peinte sous le
+   texte (`.voile-seuil`, 85 % de `--fond`, dont le ratio est calculé), et l'ombre portée est
+   exactement le faux-semblant qui viendrait un jour la remplacer. Un test qui bannit `text-shadow`
+   dans TOUTE la feuille est plus fort qu'un test qui l'autorise « sauf ici » : la seconde forme se
+   contourne en écrivant « ici ».
+
+   Ce qui brille est donc un HALO DERRIÈRE le nom, un pseudo-élément décoratif, et c'est son
+   opacité qui respire. Le texte ne change ni de couleur, ni d'opacité, ni de position : son
+   contraste mesuré vaut à toute seconde ce qu'il vaut à l'arrêt.
+
+   ⚠️ ET CE N'EST PAS UN BALAYAGE. La forme habituelle du scintillement — une bande de lumière qui
+   traverse le mot — attire l'œil à chaque tour. Ici le halo s'ouvre et se referme en sept
+   secondes, sans se déplacer d'un pixel : on le remarque en le regardant, pas en le subissant. */
+@keyframes scintillement {
+  0%,
+  100% {
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* `isolation: isolate` enferme le `z-index: -1` du halo DANS l'élément : il passe derrière la
+   lettre, et jamais derrière le voile de lisibilité qui, lui, doit rester devant l'image. */
+.scintillement {
+  position: relative;
+  isolation: isolate;
+}
+
+.scintillement::after {
+  content: "";
+  position: absolute;
+  inset: -0.5em -0.9em;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: var(--rayon-full);
+  background: radial-gradient(
+    58% 120% at 50% 50%,
+    color-mix(in srgb, var(--lueur) 55%, transparent) 0%,
+    color-mix(in srgb, var(--aube) 22%, transparent) 45%,
+    transparent 72%
+  );
+  animation: scintillement var(--duree-scintillement) var(--courbe) infinite;
+}
+
 /* prefers-reduced-motion : fondus en opacité seule ≤180ms sans dérive ;
    la respiration s'arrête. Aucune information n'est portée par le seul mouvement. */
 @media (prefers-reduced-motion: reduce) {
@@ -349,7 +417,8 @@ body {
     animation-name: anam-fondu;
     animation-duration: var(--duree-courte);
   }
-  .respiration {
+  .respiration,
+  .scintillement::after {
     animation: none;
   }
 }
