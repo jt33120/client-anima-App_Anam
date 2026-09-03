@@ -539,31 +539,53 @@
 
 /* « Ton ciel du jour » : la même carte que l'accueil, posée AVANT la carte natale. La bordure
    forte la distingue des blocs d'information : c'est la première chose à lire, pas une note. */
+/* ══ « TON CIEL DU JOUR » EST BLEU LOTUS, COMME SUR L'ACCUEIL (2026-09-02) ═══════════════════
+
+   Retour de Julian : « ce bleu magique fleur de lotus est utilisé pour les champs d'aujourd'hui,
+   c'est notre code couleur. » C'est la MÊME carte qu'en tête de l'accueil ; la peindre autrement
+   ici casserait le code au moment précis où l'on change d'écran.
+
+   ⚠️ L'ENCRE S'INVERSE DANS CETTE CARTE, ET DANS ELLE SEULE. `.texte` et `.noteCorpus` servent
+   aussi la section des nombres, hors de tout aplat : leurs surcharges sont donc DESCENDANTES de
+   `.carteJour`, jamais posées sur la classe nue. Les deux paires sont mesurées par
+   `tests/contraste.test.ts`. */
 .carteJour {
   display: flex;
   flex-direction: column;
   gap: var(--esp-3);
   padding: var(--esp-4);
-  border: 1px solid var(--bordure-forte);
+  border: 1px solid color-mix(in srgb, var(--sur-jour) 30%, var(--jour));
   border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--surface-elevee) 58%, transparent);
+  background: linear-gradient(168deg, var(--jour), color-mix(in srgb, var(--sur-jour) 5%, var(--jour)));
+  color: var(--sur-jour);
 }
 
 .carteJour h3 {
   margin: 0;
-  color: var(--texte);
+  color: var(--sur-jour);
+}
+
+.carteJour .texte {
+  color: var(--sur-jour);
+}
+
+.carteJour .noteCorpus,
+.carteJour .mentionModele {
+  color: var(--sur-jour-doux);
 }
 
 /* LA MENTION D'ÉCRITURE PAR UN MODÈLE (2026-09-02).
 
    Elle est DISCRÈTE ET LISIBLE, ce qui est la seule contrainte réelle : trop en vue, elle abîme un
    texte qu'on vient lire ; trop pâle, elle ne remplit plus son office et le texte redevient
-   anonyme. `--texte-doux` sur `--surface-elevee` est le couple déjà mesuré par
-   `tests/contraste.test.ts`, donc au-dessus de 4,5:1 dans les deux thèmes : on ne réinvente pas une
-   nuance ici pour « faire plus léger ». */
+   anonyme.
+
+   ⚠️ ELLE NE PORTE PAS SA COULEUR ICI, depuis que la carte du jour est bleu lotus. La règle
+   descendante ci-dessus la lui donne (`--sur-jour-doux`, mesuré). Laisser un `--texte-doux` ici
+   serait une encre du mode sombre en attente sur un aplat clair : elle ne se verrait pas
+   aujourd'hui, puisqu'elle perd en spécificité, et ressortirait au premier déplacement. */
 .mentionModele {
   margin: 0;
-  color: var(--texte-doux);
   font-style: italic;
 }
 

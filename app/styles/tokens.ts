@@ -61,6 +61,24 @@ export const couleursNuit = {
   lueur: "#D3DBF0", // = Sky, comme l'accent : la lueur n'est jamais cliquable, donc admis (D5)
   // L'ancien violet de la nuit galactique, gardé comme NÉBULEUSE : décor seulement (halo et
   // dégradé du monde, E5-S2). 1,13:1 sur fond : une nuance, pas une couleur. Jamais sous du texte.
+  // ══ LE CODE COULEUR DU JOUR (2026-09-02) ═══════════════════════════════════════════════════
+  //
+  // Retour de Julian : « ce bleu magique fleur de lotus est utilisé pour les champs
+  // d'aujourd'hui, c'est notre code couleur. » Les cartes du jour (le ciel, le mantra) sont donc
+  // peintes en Sky, et le reste de l'app ne l'est pas : c'est ce qui fait le code.
+  //
+  // ⚠️ CE N'EST PAS `accent`, MÊME SI LA VALEUR EST LA MÊME AUJOURD'HUI. `accent` est la couleur
+  // de l'ACTION et d'elle seule (DESIGN.md §Colors, et `render/accueil/accueil.module.css` porte
+  // déjà le refus daté de la QA du 2026-08-19). Peindre un aplat avec le jeton de l'action ferait
+  // dériver les deux sens ensemble : le jour où l'action changera de teinte, les cartes du jour
+  // la suivraient sans que personne ne l'ait décidé. Deux rôles, deux jetons.
+  //
+  // ⚠️ ET C'EST POURQUOI `sur-jour` EXISTE. Un aplat clair porte de l'encre foncée : le `texte`
+  // du mode nuit (Ivory) sur du Sky ne ferait que 1,20:1. Toute la copie d'une carte du jour se
+  // peint donc avec ces deux-là, jamais avec `texte` / `texte-doux`.
+  jour: "#D3DBF0", // Sky, le lotus : l'aplat des champs d'aujourd'hui
+  "sur-jour": "#1C2740", // Navy : l'encre sur le lotus (10,72:1)
+  "sur-jour-doux": "#4C5773", // la note en retrait sur le lotus (5,20:1)
   nebuleuse: "#2E2A5A",
 } as const;
 
@@ -91,6 +109,13 @@ export const couleursClair: Record<keyof typeof couleursNuit, string> = {
   alerte: "#8A5A16", // inchangé, 5,13 sur Ivory
   lueur: "#41579B", // = accent, même règle qu'en nuit
   nebuleuse: "#E0D2C7", // Beige : décor seulement (1,28 sur Ivory), jamais sous du texte
+  // Le code couleur du jour ne change pas de mode en mode : c'est un CODE, et un code qui change
+  // de teinte n'en est plus un. Le Sky est déjà l'aplat de `surface-elevee` en clair, donc la
+  // carte du jour s'y distingue par sa TEINTE plutôt que par sa clarté — ce qui est exactement ce
+  // qu'on demande d'un code couleur. L'encre navy, elle, tient ses 10,72:1 dans les deux modes.
+  jour: "#D3DBF0",
+  "sur-jour": "#1C2740",
+  "sur-jour-doux": "#4C5773",
 };
 
 export type CleCouleur = keyof typeof couleursNuit;
