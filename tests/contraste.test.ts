@@ -29,6 +29,11 @@ const pairesNuit: Paire[] = [
   { fg: "sur-accent", bg: "accent", seuil: 4.5 },
   { fg: "texte", bg: "accent-doux", seuil: 4.5 },
   { fg: "texte-doux", bg: "accent-doux", seuil: 4.5 },
+  // LE CODE COULEUR DU JOUR (2026-09-02) — un aplat CLAIR dans un mode sombre, donc le seul
+  // endroit du produit où l'encre s'inverse. Sans ces deux paires, une carte du jour pourrait
+  // partir en `texte` Ivory sur du Sky (1,20:1) sans qu'une seule ligne ne rougisse.
+  { fg: "sur-jour", bg: "jour", seuil: 4.5 }, // 10,72
+  { fg: "sur-jour-doux", bg: "jour", seuil: 4.5 }, // 5,20 : la note en retrait de la carte
   { fg: "succes", bg: "surface", seuil: 4.5 },
   { fg: "alerte", bg: "surface", seuil: 4.5 },
   // Objets graphiques / focus (seuil 3:1) — inclut les marges les plus serrées
@@ -46,6 +51,10 @@ const pairesClair: Paire[] = [
   { fg: "accent", bg: "fond", seuil: 4.5 },
   { fg: "sur-accent", bg: "accent", seuil: 4.5 },
   { fg: "texte", bg: "accent-doux", seuil: 4.5 },
+  // Le code couleur du jour est le MÊME dans les deux modes, et il est mesuré dans les deux :
+  // une paire vérifiée d'un seul côté laisserait passer une retouche de l'autre.
+  { fg: "sur-jour", bg: "jour", seuil: 4.5 },
+  { fg: "sur-jour-doux", bg: "jour", seuil: 4.5 },
   { fg: "succes", bg: "fond", seuil: 4.5 }, // la marge la plus serrée du mode clair (4,83)
   { fg: "alerte", bg: "fond", seuil: 4.5 },
   { fg: "bordure-forte", bg: "fond", seuil: 3 },

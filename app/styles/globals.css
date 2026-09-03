@@ -37,6 +37,13 @@
   /* L'ancien violet, gardé en DÉCOR seulement (1,13:1 sur --fond) : halo et couche
      nébuleuse du monde (E5-S2). Jamais sous du texte, jamais sur un contrôle. */
   --nebuleuse: #2E2A5A;
+  /* LE CODE COULEUR DU JOUR (2026-09-02) : le bleu du lotus pour les champs d'aujourd'hui, et
+     l'encre qui va avec. Deux jetons distincts d'`accent` bien qu'à la même valeur : l'accent est
+     la couleur de l'action seule, et les deux sens ne doivent pas dériver ensemble. Voir
+     `app/styles/tokens.ts`, qui reste la source. */
+  --jour: #D3DBF0;
+  --sur-jour: #1C2740;
+  --sur-jour-doux: #4C5773;
 
   /* Piles typographiques (les var. de police viennent de next/font/local) */
   --pile-anam: var(--police-anam), "Iowan Old Style", Georgia, serif;
@@ -116,6 +123,10 @@
   --alerte: #8A5A16;
   --lueur: #41579B;
   --nebuleuse: #E0D2C7;
+  /* Le code couleur du jour ne change pas d'un mode à l'autre : c'est un code. */
+  --jour: #D3DBF0;
+  --sur-jour: #1C2740;
+  --sur-jour-doux: #4C5773;
   --imagerie-opacite: 0; /* imagerie atténuée : les fonds illustrés cèdent aux aplats */
   color-scheme: light;
 }
@@ -139,6 +150,10 @@
     --alerte: #8A5A16;
     --lueur: #41579B;
     --nebuleuse: #E0D2C7;
+    /* Le code couleur du jour ne change pas d'un mode à l'autre : c'est un code. */
+    --jour: #D3DBF0;
+    --sur-jour: #1C2740;
+    --sur-jour-doux: #4C5773;
     --imagerie-opacite: 0;
     color-scheme: light;
   }

@@ -296,35 +296,53 @@
   display: flex;
 }
 
+/* ══ LES CARTES DU JOUR SONT BLEU LOTUS, ET C'EST UN CODE (2026-09-02) ═══════════════════════
+
+   Retour de Julian : « ce bleu magique fleur de lotus est utilisé pour les champs d'aujourd'hui,
+   c'est notre code couleur. » Les deux cartes de « Ce que le jour propose » (le ciel, le mantra)
+   sont donc les seules surfaces peintes du produit — et c'est ce que le reste, resté navy, rend
+   lisible : un code couleur ne se voit que par ce qu'il exclut.
+
+   ⚠️ L'ENCRE S'INVERSE ICI, ET SEULEMENT ICI. Un aplat clair dans un mode sombre : `--texte`
+   (Ivory) sur du Sky ne ferait que 1,20:1. Toute la copie de ces cartes passe donc par
+   `--sur-jour` / `--sur-jour-doux`, dont `tests/contraste.test.ts` mesure les deux paires.
+
+   ⚠️ ET CE N'EST PAS `--accent`, malgré la même valeur aujourd'hui. Le refus daté juste plus bas
+   (QA du 2026-08-19) tient toujours : l'accent est la couleur de l'action et d'elle seule. Un
+   aplat peint avec le jeton de l'action les ferait dériver ensemble. Deux rôles, deux jetons.
+
+   ⚠️ AUCUN CONTRÔLE NE VIT DANS CES CARTES, et c'est ce qui rend l'aplat sûr : un lien peint en
+   `--accent` (Sky) sur un fond Sky serait invisible. Si une carte du jour doit un jour porter un
+   bouton, il se peint en `--sur-jour`, jamais en accent. */
 .carte {
   display: flex;
   flex-direction: column;
   gap: var(--esp-2);
   width: 100%;
   padding: var(--esp-4);
-  /* Le « papier » des cartes (retour du fondateur, 2026-09-01 : des textures et des dégradés) :
-     un dégradé STATIQUE de la surface vers la surface élevée, à peine perceptible, qui donne
-     du grain sans une seule couleur en dur ni la moindre animation. `.enAvant` garde sa
-     surface pleine : la carte mise en avant est « devant », pas « en papier ». */
-  background: linear-gradient(168deg, var(--surface), color-mix(in srgb, var(--surface-elevee) 40%, var(--surface)));
-  border: 1px solid var(--bordure);
+  /* Le « papier » de la carte (retour du 2026-09-01 : des textures et des dégradés), rejoué dans
+     le bleu : un dégradé STATIQUE du lotus vers un lotus à peine assombri. Le bas du dégradé est
+     mesuré par `tests/carte-du-jour.test.ts` — à 5 % de navy, l'encre douce y tient encore 4,76. */
+  background: linear-gradient(168deg, var(--jour), color-mix(in srgb, var(--sur-jour) 5%, var(--jour)));
+  color: var(--sur-jour);
+  border: 1px solid color-mix(in srgb, var(--sur-jour) 22%, var(--jour));
   border-radius: var(--rayon-md);
 }
 
 .carte h2 {
   margin: 0;
-  color: var(--texte);
+  color: var(--sur-jour);
 }
 
 .carte p {
   margin: 0;
 }
 
-/* La carte du jour : une surface plus haute et un filet d'accent. Rien de clignotant, rien de
-   compté — une carte posée devant, pas une notification. */
+/* La carte mise en avant. Depuis le 2026-09-02, elle ne se distingue plus par sa COULEUR — les
+   deux cartes du jour sont bleu lotus, c'est le code — mais par sa place : plus d'air, un filet
+   plus marqué. Rien de clignotant, rien de compté : une carte posée devant, pas une notification. */
 .enAvant {
-  background: var(--surface-elevee);
-  border-color: var(--bordure-forte);
+  border-color: color-mix(in srgb, var(--sur-jour) 40%, var(--jour));
   padding: var(--esp-5);
   gap: var(--esp-3);
 }
@@ -333,7 +351,7 @@
    d'elle seule — or cette étiquette n'est pas cliquable. La peindre en accent promettait un lien
    inexistant et diluait le seul signal qui désigne ce qu'on peut toucher. */
 .mention {
-  color: var(--texte-doux);
+  color: var(--sur-jour-doux);
   margin: 0;
 }
 
@@ -352,12 +370,12 @@
 }
 
 .fait dt {
-  color: var(--texte-doux);
+  color: var(--sur-jour-doux);
   margin: 0;
 }
 
 .fait dd {
-  color: var(--texte);
+  color: var(--sur-jour);
   margin: 0;
   /* Les chiffres du socle s'alignent : chemin de vie, année personnelle, degrés. */
   font-variant-numeric: tabular-nums;
@@ -365,7 +383,7 @@
 
 /* L'absence de texte d'Anima. Discrète et lisible — ni une alerte, ni un teasing. */
 .nonEcrit {
-  color: var(--texte-doux);
+  color: var(--sur-jour-doux);
   font-style: italic;
 }
 
@@ -377,7 +395,7 @@
    attribuerait à une personne réelle des mots qui ne sont pas d'elle (FR-054/FR-086). */
 .etatProduit {
   margin: 0;
-  color: var(--texte);
+  color: var(--sur-jour);
   line-height: 1.6;
 }
 
@@ -385,6 +403,6 @@
    règle et même couple de jetons : discrète, mais au-dessus du seuil de contraste mesuré. */
 .mentionModele {
   margin: 0;
-  color: var(--texte-doux);
+  color: var(--sur-jour-doux);
   font-style: italic;
 }
