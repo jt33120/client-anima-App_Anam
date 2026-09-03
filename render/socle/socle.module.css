@@ -79,12 +79,6 @@
 .listePositions,
 .listePortes,
 .listeMethode,
-.calcul ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 .grilleApercus,
 .grilleNombres {
   display: grid;
@@ -123,8 +117,7 @@
 
 .porteApercu:focus-visible,
 .reparation:focus-visible,
-.devoilement > summary:focus-visible,
-.calcul > summary:focus-visible {
+.devoilement > summary:focus-visible {
   outline: 2px solid var(--bordure-forte);
   outline-offset: 2px;
 }
@@ -208,6 +201,62 @@
   border-color: var(--bordure-forte);
 }
 
+/* ══ LE SOMMAIRE DE LA LECTURE SYMBOLIQUE (2026-09-03) ═══════════════════════════════════════
+
+   « Le début apparent et « … » pour lire la totalité, mais au moins donne un avant-goût. »
+
+   Le sommaire porte donc deux choses au lieu d'une : le titre, et les premières lignes de la
+   première lecture. La flèche du `.devoilement` reste alignée sur la PREMIÈRE ligne (`align-items:
+   flex-start` ci-dessous) : centrée, elle flotterait au milieu d'un bloc de trois lignes, loin du
+   mot sur lequel on clique. */
+.sommaireLecture {
+  /* ⚠️ UNE GRILLE, ET NON LA RANGÉE HÉRITÉE DE `.devoilement > summary`. Le sommaire porte trois
+     choses : le titre, la marque « + » (un `::after` de la règle de base) et l'aperçu. En rangée,
+     l'aperçu se serait glissé ENTRE le titre et la marque ; en colonne, la marque serait passée
+     sous l'aperçu, à trois lignes du mot sur lequel on clique. Les trois places sont donc dites. */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+}
+
+.sommaireLecture > span:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.sommaireLecture::after {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.sommaireLecture .apercuLecture {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+/* ⚠️ L'APERÇU DISPARAÎT À L'OUVERTURE. Sans cette règle, le début du chemin de vie se lirait deux
+   fois à trois lignes d'intervalle : une fois tronqué dans le sommaire, une fois en entier juste
+   dessous. C'est une vitrine, pas un résumé. */
+.lectureSymbolique[open] .apercuLecture {
+  display: none;
+}
+
+.apercuLecture {
+  color: var(--texte-doux);
+  /* La prose d'un aperçu se lit comme de la prose : la même interlettre et le même interligne que
+     la lecture entière, pour que l'ouverture ne donne pas l'impression de changer de texte. */
+  line-height: 1.6;
+}
+
+/* Les titres de chaque lecture, « plus gros » (retour du 2026-09-03) : ils étaient en `t-meta`,
+   la plus petite graisse du produit, au-dessus de cinq lignes de prose sérif. */
+.titreLecture {
+  margin: 0;
+  color: var(--texte);
+}
+
 .lectureVide,
 .contenuLecture {
   display: flex;
@@ -226,26 +275,13 @@
   margin: 0;
 }
 
-/* La preuve du calcul, en clair sous le nombre (retour du 2026-08-30).
-   Discrète mais JAMAIS repliée : c'est ce qui distingue un résultat vérifiable d'un verdict.
-   `tabular-nums` aligne les chiffres d'une ligne à l'autre de la grille ; `overflow-wrap`
-   protège les chaînes longues d'expression (dix-sept valeurs additionnées) sur mobile. */
-.preuveCalcul {
-  margin: calc(var(--esp-1) * -1) 0 var(--esp-2);
-  color: var(--texte-doux);
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
-.devoilement,
-.calcul {
+.devoilement {
   border: 1px solid var(--bordure);
   border-radius: var(--rayon-md);
   background: color-mix(in srgb, var(--surface-elevee) 45%, transparent);
 }
 
-.devoilement > summary,
-.calcul > summary {
+.devoilement > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -256,31 +292,17 @@
   cursor: pointer;
 }
 
-.devoilement > summary::after,
-.calcul > summary::after {
+.devoilement > summary::after {
   content: "+";
   color: var(--accent);
 }
 
-.devoilement[open] > summary::after,
-.calcul[open] > summary::after {
+.devoilement[open] > summary::after {
   content: "−";
 }
 
 .listeMethode,
-.calcul ul {
-  display: flex;
-  flex-direction: column;
-  gap: var(--esp-2);
-  padding: 0 var(--esp-4) var(--esp-4);
-  color: var(--texte-doux);
-}
-
 .listeMethode li,
-.calcul li {
-  line-height: 1.6;
-}
-
 .entree {
   display: flex;
   flex-direction: column;
@@ -304,10 +326,6 @@
 
 .nombreFort {
   line-height: 1;
-}
-
-.calcul {
-  margin-top: auto;
 }
 
 .manque {

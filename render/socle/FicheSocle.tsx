@@ -153,6 +153,52 @@ function SectionNumerologie({
 
       {nombres.indisponible && <p className={`t-corps ${s.panne}`}>{nombres.indisponible}</p>}
 
+      {/* ══ LA LECTURE SYMBOLIQUE EST REMONTÉE EN TÊTE (2026-09-03) ═══════════════════════════
+
+          « Déplace la lecture symbolique en haut de la page, avec le début apparent et « … » pour
+          lire la totalité, mais au moins donne un avant-goût. »
+
+          Elle vivait tout en bas, derrière un pli qui ne montrait que son titre : il fallait
+          traverser six nombres et leurs preuves pour découvrir qu'il y avait quelque chose à lire,
+          et rien ne le promettait. L'aperçu est ce qui fait la différence entre un titre et une
+          invitation.
+
+          ⚠️ L'APERÇU EST DANS LE `<summary>`, et il disparaît à l'ouverture (CSS). Le laisser
+          visible ferait lire deux fois le même début, à trois lignes d'intervalle. */}
+      {nombres.lecturesSymboliques.length > 0 ? (
+        <details className={`${s.devoilement} ${s.lectureSymbolique}`}>
+          <summary className={s.sommaireLecture}>
+            <span className="t-titre">{copie.titreLectureNumerologie}</span>
+            {nombres.apercuLecture && (
+              <span className={`t-anam ${s.apercuLecture}`}>{nombres.apercuLecture}</span>
+            )}
+          </summary>
+          <div className={s.contenuLecture}>
+            {nombres.lecturesSymboliques.map((lecture) => (
+              <article key={lecture.cle} className={s.lectureEcrite}>
+                {/* L'intitulé arrive du domaine AVEC son nombre — « Chemin de vie (7) » — pour
+                    répondre au texte qui commence par « Ton chemin de vie 7 symbolise… » (retour
+                    du 2026-09-02). Le rendu ne recompose rien : il ne décide pas (AD-7).
+
+                    En `t-titre-sm` depuis le 2026-09-03 (« les titres de la lecture symbolique
+                    plus gros ») : c'était `t-meta`, la plus petite graisse du produit, sur un titre
+                    qui coiffe cinq lignes de prose. */}
+                <h3 className={`t-titre-sm ${s.titreLecture}`}>{lecture.intitule}</h3>
+                <p className={`t-anam ${s.texte}`}>{lecture.texte}</p>
+              </article>
+            ))}
+            {nombres.noteLectureSymbolique && (
+              <p className={`t-meta ${s.noteCorpus}`}>{nombres.noteLectureSymbolique}</p>
+            )}
+          </div>
+        </details>
+      ) : nombres.noteLectureSymbolique ? (
+        <div className={`${s.lectureSymbolique} ${s.lectureVide}`} aria-labelledby="socle-lecture-numerologie">
+          <h3 id="socle-lecture-numerologie" className="t-titre">{copie.titreLectureNumerologie}</h3>
+          <p className={`t-meta ${s.noteCorpus}`}>{nombres.noteLectureSymbolique}</p>
+        </div>
+      ) : null}
+
       {nombres.entrees.length > 0 && (
         <div className={s.blocInformation} aria-labelledby="socle-entrees-numerologie">
           <h3 id="socle-entrees-numerologie" className="t-titre-sm">{copie.titreEntreesNumerologie}</h3>
@@ -169,40 +215,19 @@ function SectionNumerologie({
         </details>
       )}
 
+      {/* ⚠️ PLUS DE PREUVE SOUS CHAQUE NOMBRE (2026-09-03) : « supprime complètement les calculs,
+          on a déjà au début l'explication, pas besoin de tout justifier, ça prend trop de place ».
+
+          Ce qui était là jusqu'ici — la dernière ligne de la trace en clair, plus un « Voir le
+          calcul » replié — remontait d'un retour du 2026-08-30 qui demandait l'inverse. La capture
+          du fondateur montre le prix de ce choix : six cartes de justification à traverser avant
+          d'atteindre la lecture. L'explication n'est pas perdue pour autant, elle est dite UNE
+          fois, plus haut, dans « La méthode de calcul ». */}
       <ul className={s.grilleNombres}>
         {nombres.nombres.map((nombre) => (
           <li key={nombre.cle} className={s.entree}>
             <p className={`t-meta ${s.etiquette}`}>{nombre.intitule}</p>
             <p className={`t-display ${s.nombreFort}`}>{nombre.valeur}</p>
-            {/* ⚠️ LA PREUVE REMONTE AU-DESSUS DU PLI (retour du 2026-08-30 : « numérologie plus
-                concret, moins dans l'interprétation, plus factuel »).
-
-                Elle était DÉJÀ calculée et DÉJÀ affichée — mais derrière un `<details>` fermé. Un
-                nombre seul en `t-display`, avec son calcul replié et la lecture symbolique juste
-                en dessous, se lit comme un VERDICT : la seule chose visible sans geste était la
-                valeur, et la seule chose qu'on avait envie d'ouvrir était l'interprétation.
-                Personne ne clique sur « Voir le calcul » pour vérifier un nombre qu'on lui
-                annonce ; on clique sur ce qui promet de parler de soi.
-
-                La dernière ligne de la trace est celle qui PROUVE le résultat — « Total : 6 + 6 + 1
-                = 13 → 4 », ou « Valeurs : … = 83 → 11 ». Elle passe donc en clair, collée au
-                nombre. Le pas-à-pas complet reste sous le pli : ce qui était caché n'est plus la
-                preuve, c'est son détail.
-
-                ⚠️ LE `<details>` RESTE, ET IL DOIT RESTER. `tests/rendu/fiche-socle.test.tsx`
-                exige un `details[class*='calcul']` dont le texte contient « Voir le calcul » : le
-                supprimer au motif que la preuve est désormais visible ferait rougir la garde. */}
-            {nombre.calcul.length > 0 && (
-              <>
-                <p className={`t-meta ${s.preuveCalcul}`}>{nombre.calcul[nombre.calcul.length - 1]}</p>
-                <details className={s.calcul}>
-                  <summary className="t-meta">Voir le calcul</summary>
-                  <ul>
-                    {nombre.calcul.map((ligne) => <li key={ligne} className="t-meta">{ligne}</li>)}
-                  </ul>
-                </details>
-              </>
-            )}
           </li>
         ))}
       </ul>
@@ -215,30 +240,6 @@ function SectionNumerologie({
         </div>
       ))}
 
-      {nombres.lecturesSymboliques.length > 0 ? (
-        <details className={`${s.devoilement} ${s.lectureSymbolique}`}>
-          <summary className="t-titre-sm">{copie.titreLectureNumerologie}</summary>
-          <div className={s.contenuLecture}>
-            {nombres.lecturesSymboliques.map((lecture) => (
-              <article key={lecture.cle} className={s.lectureEcrite}>
-                {/* L'intitulé arrive du domaine AVEC son nombre — « Chemin de vie (7) » — pour
-                    répondre au texte qui commence par « Ton chemin de vie 7 symbolise… » (retour
-                    du 2026-09-02). Le rendu ne recompose rien : il ne décide pas (AD-7). */}
-                <h3 className={`t-meta ${s.etiquette}`}>{lecture.intitule}</h3>
-                <p className={`t-anam ${s.texte}`}>{lecture.texte}</p>
-              </article>
-            ))}
-            {nombres.noteLectureSymbolique && (
-              <p className={`t-meta ${s.noteCorpus}`}>{nombres.noteLectureSymbolique}</p>
-            )}
-          </div>
-        </details>
-      ) : nombres.noteLectureSymbolique ? (
-        <div className={`${s.lectureSymbolique} ${s.lectureVide}`} aria-labelledby="socle-lecture-numerologie">
-          <h3 id="socle-lecture-numerologie" className="t-titre-sm">{copie.titreLectureNumerologie}</h3>
-          <p className={`t-meta ${s.noteCorpus}`}>{nombres.noteLectureSymbolique}</p>
-        </div>
-      ) : null}
     </section>
   );
 }

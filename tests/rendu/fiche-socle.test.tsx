@@ -127,54 +127,64 @@ describe("[7.5/AC4] le milieu du ciel arrive à l'écran", () => {
   });
 });
 
-describe("[7.5 · 13.9] les six nombres, avec leurs six preuves de calcul", () => {
-  it("[LE CŒUR] six entrées de nombre, et chacune ouvre son calcul", () => {
+describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", () => {
+  /**
+   * ⚠️ CE BLOC MESURE L'INVERSE DE CE QU'IL MESURAIT, ET C'EST UNE DÉCISION DU FONDATEUR.
+   *
+   * Jusqu'au 2026-09-02, trois tests exigeaient la preuve : qu'elle EXISTE (un `<details>` « Voir
+   * le calcul » par nombre), qu'elle soit HORS du pli (la ligne de somme collée au nombre), et
+   * qu'elle soit la vraie dernière ligne de la trace. Ils gardaient le retour du 2026-08-30
+   * (« numérologie plus concret, plus factuel »).
+   *
+   * Le retour du 2026-09-03, capture à l'appui, demande le contraire : « supprime complètement les
+   * calculs, on a déjà au début l'explication, pas besoin de tout justifier, ça prend trop de
+   * place. » Garder les anciens tests aurait figé une décision que leur auteur a retirée ; les
+   * effacer sans rien mettre à la place aurait laissé la preuve revenir sans que rien ne rougisse.
+   * On garde donc la mesure, retournée.
+   */
+  it("[LE CŒUR] six entrées de nombre, et aucune ne porte de calcul", () => {
     const { container } = dessiner(complete, "numerologie");
     const entrees = container.querySelectorAll("li[class*='entree']");
     expect(entrees.length, "six nombres calculés doivent donner six entrées à l'écran").toBe(6);
     for (const e of entrees) {
-      const calcul = e.querySelector("details[class*='calcul']");
-      expect(calcul, "un résultat sans preuve arithmétique n'est pas vérifiable").not.toBeNull();
-      expect(calcul?.textContent ?? "").toContain("Voir le calcul");
+      expect(e.querySelector("details"), "un pli « Voir le calcul » est revenu").toBeNull();
+      expect(e.textContent ?? "", "une preuve arithmétique est revenue sous un nombre").not.toMatch(/→|=/);
     }
   });
 
-  /**
-   * ⚠️ LA PREUVE EST HORS DU PLI, ET C'EST LA MOITIÉ QUI COMPTE (retour du 2026-08-30).
-   *
-   * Le test au-dessus exige qu'un calcul EXISTE. Il était vert quand le calcul vivait entièrement
-   * dans un `<details>` fermé — c'est-à-dire quand la seule chose visible d'un nombre était sa
-   * valeur, juste au-dessus d'une « Lecture symbolique d'Anima » qui, elle, promettait de parler
-   * de soi. « Exister » et « se voir » ne sont pas la même exigence, et le défaut rapporté
-   * (« trop d'interprétation, pas assez de factuel ») vivait exactement dans cet écart.
-   *
-   * On vérifie donc que la ligne qui PROUVE le résultat est rendue HORS du `<details>`.
-   */
-  it("[LE CŒUR] la ligne qui prouve le résultat se lit sans ouvrir quoi que ce soit", () => {
-    const { container } = dessiner(complete, "numerologie");
-    const entrees = container.querySelectorAll("li[class*='entree']");
-    expect(entrees.length).toBe(6);
-    for (const e of entrees) {
-      const replie = e.querySelector("details[class*='calcul']");
-      const horsDuPli = e.querySelector("p[class*='preuveCalcul']");
-      expect(horsDuPli, "la preuve est restée sous le pli — le nombre se lit encore comme un verdict").not.toBeNull();
-      const preuve = horsDuPli?.textContent ?? "";
-      // Une preuve arithmétique porte une flèche de réduction : c'est ce qui la distingue d'une
-      // étiquette. Sans cette assertion, un `<p>` vide ou décoratif rendrait le test vert.
-      expect(preuve, `preuve non arithmétique : « ${preuve} »`).toMatch(/→/);
-      expect(replie, "le pas-à-pas complet doit rester disponible").not.toBeNull();
-      expect(replie?.contains(horsDuPli!), "la preuve est DANS le pli, donc toujours cachée").toBe(false);
-    }
-  });
-
-  it("[ANTI-VACUITÉ] la preuve visible est bien la dernière ligne de la trace, pas un texte inventé", () => {
-    // Sans ce témoin, `<p class="preuveCalcul">→</p>` passerait le test précédent.
+  it("[ANTI-VACUITÉ] les entrées portent bien leur intitulé et leur valeur", () => {
+    // Sans ce témoin, six `<li>` vides passeraient le refus ci-dessus : « aucun calcul » serait
+    // vrai d'une grille qui n'affiche plus rien du tout.
     const { container } = dessiner(complete, "numerologie");
     const premiere = container.querySelector("li[class*='entree']");
-    const preuve = premiere?.querySelector("p[class*='preuveCalcul']")?.textContent ?? "";
-    const lignes = complete.nombres.nombres[0].calcul;
-    expect(lignes.length, "le doublage de test ne porte aucune trace").toBeGreaterThan(0);
-    expect(preuve).toBe(lignes[lignes.length - 1]);
+    expect(premiere?.textContent ?? "").toContain("Chemin de vie");
+    expect(premiere?.querySelector("p[class*='nombreFort']")?.textContent ?? "").not.toBe("");
+  });
+
+  it("la méthode, elle, reste dite une fois en tête de section", () => {
+    // C'est ce qui rend le retrait tenable : l'explication n'est pas perdue, elle n'est plus
+    // recopiée six fois. Si ce pli disparaissait à son tour, les nombres deviendraient des
+    // verdicts sans recours.
+    const { container } = dessiner(complete, "numerologie");
+    expect(container.textContent ?? "").toContain(TITRE_METHODE_NUMEROLOGIE);
+  });
+
+  it("[LE CŒUR · 2026-09-03] la lecture symbolique précède les nombres, et montre son début", () => {
+    // « Déplace la lecture symbolique en haut de la page, avec le début apparent et « … ». »
+    // Elle vivait tout en bas : il fallait traverser six nombres pour découvrir qu'il y avait
+    // quelque chose à lire. L'ordre du DOM EST la story ; sans cette garde, un `flex-direction`
+    // ou un déplacement de bloc le rendrait au bas de la section sans qu'une ligne ne rougisse.
+    const { container } = dessiner(complete, "numerologie");
+    const lecture = container.querySelector("details[class*='lectureSymbolique']");
+    const grille = container.querySelector("ul[class*='grilleNombres']");
+    expect(lecture, "le pli de la lecture symbolique a disparu").not.toBeNull();
+    expect(grille, "la grille des nombres a disparu").not.toBeNull();
+    expect(precede(lecture!, grille!), "la lecture est repassée sous les nombres").toBe(true);
+
+    // Et le pli FERMÉ promet quelque chose : le titre seul n'invite personne à ouvrir.
+    const sommaire = lecture!.querySelector("summary")?.textContent ?? "";
+    expect(sommaire).toContain(TITRE_LECTURE_NUMEROLOGIE);
+    expect(sommaire, "l'avant-goût manque, ou il ne s'achève pas").toContain("…");
   });
 
   it("les six intitulés sont là, pas seulement le chemin de vie", () => {

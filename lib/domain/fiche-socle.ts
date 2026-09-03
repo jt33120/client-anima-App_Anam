@@ -2,12 +2,9 @@ import type { Corps } from "@/lib/astro/port";
 import { CORPS_CLASSIQUES } from "@/lib/astro/port";
 import {
   NOMBRES,
-  tracerNumerologie,
   type EntreesNumerologie,
   type NomNombre,
   type Numerologie,
-  type TraceNombreNumerologique,
-  type TraceReductionNumerologique,
 } from "@/lib/astro/numerologie";
 import { placer, type ThemeNatal } from "@/lib/astro/theme-natal";
 import type { HoroscopeDuJour } from "@/lib/astro/quotidien";
@@ -87,11 +84,17 @@ export interface Reparation {
 }
 
 /** Un nombre et la preuve arithmétique qui permet de le vérifier. */
+/**
+ * Un nombre du socle : son intitulé et sa valeur.
+ *
+ * ⚠️ PLUS DE CHAMP `calcul` DEPUIS LE 2026-09-03. La preuve ligne à ligne a quitté la fiche (voir
+ * le bloc de commentaire plus bas) ; la garder ici « au cas où » aurait laissé la moitié du travail
+ * traverser la frontière pour n'être affichée nulle part.
+ */
 export interface NombreFiche {
   readonly cle: NomNombre;
   readonly intitule: string;
   readonly valeur: string;
-  readonly calcul: readonly string[];
 }
 
 /** Un fait d'entrée ou de méthode : intitulé et valeur, sans interprétation. */
@@ -180,6 +183,12 @@ export interface SectionNombres {
   readonly nombres: readonly NombreFiche[];
   readonly manquants: readonly NombreManquantFiche[];
   readonly lecturesSymboliques: readonly LectureSymboliqueFiche[];
+  /**
+   * L'avant-goût de la PREMIÈRE lecture, ou `null` quand elle tient déjà en entier sous les yeux
+   * (2026-09-03). C'est ce que le pli montre quand il est fermé : sans lui, « Lecture symbolique »
+   * seul ne promet rien, et personne n'ouvre.
+   */
+  readonly apercuLecture: string | null;
   /** Une seule note pour tout le corpus, jamais une répétition sous chaque nombre. */
   readonly noteLectureSymbolique: string | null;
 }
@@ -254,52 +263,60 @@ export interface FicheSocle {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
-// Les nombres — résultat, preuve du calcul, puis lecture symbolique séparée
+// Les nombres — le résultat, puis la lecture symbolique
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-function cheminReduction(trace: TraceReductionNumerologique): string {
-  return trace.etapes.join(" → ");
-}
+/**
+ * ══ LA PREUVE DU CALCUL A ÉTÉ RETIRÉE DE LA FICHE (2026-09-03) ═══════════════════════════════
+ *
+ * Retour de Julian, capture à l'appui : « supprime complètement les calculs, on a déjà au début
+ * l'explication, pas besoin de tout justifier, ça prend trop de place ».
+ *
+ * ⚠️ C'EST UN RETOUR EN ARRIÈRE SUR UNE DÉCISION DE TROIS JOURS, ET IL FAUT LE DIRE. Le 2026-08-30,
+ * le même retour terrain demandait l'inverse (« numérologie plus concret, plus factuel ») et la
+ * dernière ligne de la trace était REMONTÉE au-dessus du pli, collée au nombre. Ce que la capture
+ * du 2026-09-03 montre, c'est le prix de ce choix : six cartes portant chacune sa ligne de somme et
+ * son « Voir le calcul », soit deux écrans de justification avant d'atteindre la lecture.
+ *
+ * Ce qui reste, et qui rend le retrait tenable : « La méthode de calcul » en tête de section dit
+ * les conventions UNE fois (table pythagoricienne, réduction séparée du jour, du mois et de
+ * l'année), et « Les données utilisées » dit sur quoi elles s'appliquent. L'explication est donc
+ * toujours là où le fondateur la situe — au début — mais elle n'est plus recopiée six fois.
+ *
+ * ⚠️ `tracerNumerologie` N'EST PAS SUPPRIMÉE POUR AUTANT (`lib/astro/numerologie.ts`, testée par
+ * `tests/numerologie-trace.test.ts`). Cette décision-ci s'est déjà inversée une fois en trois
+ * jours : la capacité de PROUVER un nombre reste calculable et éprouvée ; c'est son AFFICHAGE qui
+ * part. La remettre demandera une ligne de rendu, pas une story.
+ */
 
-function dernier(trace: TraceReductionNumerologique): number {
-  return trace.etapes.at(-1)!;
-}
+/** Le nombre de signes au-delà duquel l'aperçu de la lecture symbolique coupe. */
+export const APERCU_LECTURE_MAX = 150;
 
-function sommeTrace(termes: readonly number[], trace: TraceReductionNumerologique): string {
-  const reduction = cheminReduction(trace);
-  return `${termes.join(" + ")} = ${reduction}`;
-}
-
-function calculLisible(cle: NomNombre, trace: TraceNombreNumerologique | null): readonly string[] {
-  if (!trace) return Object.freeze([]);
-  if (trace.origine === "date_separee") {
-    return Object.freeze([
-      `Jour : ${cheminReduction(trace.jour)}`,
-      `Mois : ${cheminReduction(trace.mois)}`,
-      `Année : ${cheminReduction(trace.annee)}`,
-      `Total : ${sommeTrace([dernier(trace.jour), dernier(trace.mois), dernier(trace.annee)], trace.total)}`,
-    ]);
-  }
-  if (trace.origine === "jour_naissance") {
-    return Object.freeze([`Jour du mois : ${cheminReduction(trace.total)}`]);
-  }
-  if (trace.origine === "annee_personnelle") {
-    return Object.freeze([
-      `Jour : ${cheminReduction(trace.jour)}`,
-      `Mois : ${cheminReduction(trace.mois)}`,
-      `Année de référence : ${cheminReduction(trace.anneeDeReference)}`,
-      `Total : ${sommeTrace(
-        [dernier(trace.jour), dernier(trace.mois), dernier(trace.anneeDeReference)],
-        trace.total,
-      )}`,
-    ]);
-  }
-  const selection =
-    cle === "intime" ? "Voyelles comptées" : cle === "personnalite" ? "Consonnes comptées" : "Lettres comptées";
-  return Object.freeze([
-    `${selection} : ${trace.lettres}`,
-    `Valeurs : ${sommeTrace(trace.valeurs, trace.total)}`,
-  ]);
+/**
+ * L'AVANT-GOÛT DE LA LECTURE (2026-09-03) — « donne le début apparent et « … » pour lire la
+ * totalité, mais au moins donne un avant-goût ».
+ *
+ * ⚠️ LA COUPE EST FAITE ICI, DANS LE DOMAINE, ET PAS EN CSS. Un `line-clamp` couperait à la
+ * largeur de l'écran : l'aperçu deviendrait une ligne sur mobile et quatre sur un portable, et le
+ * rendu déciderait de ce que la personne lit (AD-7). Une coupe en nombre de signes est la même
+ * pour tout le monde, et elle est mesurable.
+ *
+ * ⚠️ ELLE TOMBE SUR UNE FRONTIÈRE DE MOT. Couper au signe près produit « la recherche du se… »,
+ * qui se lit comme un texte tronqué par accident plutôt que comme une invitation à ouvrir.
+ *
+ * Un texte plus court que la borne n'est pas un aperçu : il rend `null`, et le rendu affiche alors
+ * la lecture entière sans promettre une suite qui n'existe pas.
+ */
+export function apercuDeLecture(texte: string): string | null {
+  const propre = texte.trim();
+  if (propre.length <= APERCU_LECTURE_MAX) return null;
+  const coupe = propre.slice(0, APERCU_LECTURE_MAX);
+  const dernierEspace = coupe.lastIndexOf(" ");
+  // Sans espace dans la fenêtre (un seul mot très long, jamais vu dans le corpus), on garde la
+  // coupe nue plutôt que de rendre une chaîne vide.
+  const jusquAuMot = dernierEspace > 0 ? coupe.slice(0, dernierEspace) : coupe;
+  // La ponctuation traînante avant les points de suspension donnerait « du sens, … ».
+  return `${jusquAuMot.replace(/[\s,;:.!?…]+$/u, "")}…`;
 }
 
 function dateLisible(iso: string): string {
@@ -323,10 +340,10 @@ export function sectionNombres(
       nombres: [],
       manquants: [],
       lecturesSymboliques: [],
+      apercuLecture: null,
       noteLectureSymbolique: null,
     });
   }
-  const trace = entrees ? tracerNumerologie(entrees, numerologie.anneeDeReference) : null;
   const nombres: NombreFiche[] = [];
   const manquants: NombreManquantFiche[] = [];
   const lecturesSymboliques: LectureSymboliqueFiche[] = [];
@@ -336,12 +353,7 @@ export function sectionNombres(
     const intitule = NOMBRE_LIBELLE[cle];
     if (lecture.statut === "calcule") {
       const valeur = String(lecture.valeur);
-      nombres.push({
-        cle,
-        intitule,
-        valeur,
-        calcul: calculLisible(cle, trace?.nombres[cle] ?? null),
-      });
+      nombres.push({ cle, intitule, valeur });
       const texte = lecteurTexte(cle, lecture);
       if (texte?.statut === "ecrit") {
         // Retour du fondateur (2026-09-02) : « rajoute le chiffre à côté de ce à quoi il
@@ -396,6 +408,11 @@ export function sectionNombres(
     nombres: Object.freeze(nombres),
     manquants: Object.freeze(manquants),
     lecturesSymboliques: Object.freeze(lecturesSymboliques),
+    // L'aperçu est celui de la PREMIÈRE lecture, dans l'ordre de `NOMBRES` : le chemin de vie
+    // quand il est écrit. C'est le nombre que tout le monde connaît, et le seul dont l'absence
+    // ferait chercher ailleurs. Prendre « une lecture au hasard » ferait changer la vitrine d'un
+    // rechargement à l'autre, sur une page qui doit se lire comme un socle.
+    apercuLecture: lecturesSymboliques.length > 0 ? apercuDeLecture(lecturesSymboliques[0].texte) : null,
     noteLectureSymbolique,
   });
 }
