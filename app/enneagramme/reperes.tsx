@@ -3,7 +3,7 @@
 import { useCallback, useId, useRef, useState } from "react";
 import type { RepereEnneagramme } from "@/lib/corpus/enneagramme";
 import Feuille from "@/render/Feuille";
-import s from "./enneagramme.module.css";
+import s from "@/render/psychologie/questionnaire.module.css";
 
 /**
  * reperes.tsx : LA PORTE ET LA FEUILLE DES NEUF REPÈRES (retour du fondateur, 2026-09-02).

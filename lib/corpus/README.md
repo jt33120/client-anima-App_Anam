@@ -70,10 +70,12 @@ document faux avait arrêté un travail. C'est pour ça que ce tableau est déso
 | Mantras du jour · `mantra` | 60 | **60** | 5.4 |
 | Horoscope du jour · `horoscope` | 27 | **27** | 5.4 |
 | Ennéagramme · `enneagramme` | 9 | **9** | 5.5 |
+| Big Five · `big-five` | 15 | **15** | — |
+| Human Design · `human-design` | 18 | **18** | — |
 | Ancrages · `ancrages` | 24 | **24** | — |
 | Description des cartes · `description-cartes` | 21 | **0** | 5.7 |
 | Sens des cartes · `sens-cartes` | 21 | **0** | 5.7, ramené de 24 à 21 en 5.10 |
-| **Total** | **231** | **189** | |
+| **Total** | **264** | **222** | |
 
 **Ce qui reste à écrire, et par qui.** Les 42 créneaux non écrits sont les deux corpus du jeu de
 cartes, et ils relèvent d'Anima seule (FR-054, FR-086) : c'est un travail d'ÉCRITURE, pas de code.
@@ -102,9 +104,16 @@ pas à Anima ; les compter dans le total ci-dessus corromprait le seul chiffre q
 porte pré-lancement d'écriture. Le balayage qui les empêche de dériver vers le sens vit dans
 `description-cartes.ts` et se prouve dans `tests/description-cartes.test.ts`.
 
-Chaque corpus est **déclaré complet et écrit à zéro**. Ce n'est pas un travail inachevé, c'est la
-seule forme conforme : les créneaux existent, chacun se rend honnêtement `non_ecrit`, et le jour où
-Anima en écrit un, il suffit de remplacer une entrée.
+Chaque corpus est **déclaré complet**, et les créneaux non écrits se rendent honnêtement
+`non_ecrit`. Là où un texte de départ existe, il vient de `textes-de-base.ts` et n'est **pas signé** :
+Anima reprend la main en remplaçant une entrée, sans toucher au code.
+
+Les deux corpus de 2026-09-03 suivent exactement cette règle. Le **Big Five** croise ses cinq facteurs
+avec trois positions (`bas`, `median`, `haut`) : un facteur sans position n'est pas un résultat, c'est
+le nom d'une échelle, donc le couple est l'unité de sens et ce n'est pas le croisement que la 5.4
+refuse. Le **Human Design** écrit ses cinq types, ses sept autorités et les **six lignes** du profil —
+et pas les douze profils, qui seraient un produit cartésien sur ces mêmes six lignes, et dont la
+complétude dépendrait d'une propriété de mécanique céleste plutôt que d'une décision d'écriture.
 
 Les neuf créneaux d'ennéagramme sont l'axe MINIMAL — un texte par type. Les ailes (18), les instincts
 (27), les flèches (18) et le croisement complet (54) sont des produits cartésiens sur les mêmes neuf

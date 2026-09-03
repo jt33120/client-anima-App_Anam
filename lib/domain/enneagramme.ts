@@ -56,35 +56,24 @@ export function estTypeEnneagramme(v: unknown): v is TypeEnneagramme {
  * Les valeurs sont des ENTIERS ORDONNÉS parce qu'on les additionne. Elles ne s'affichent jamais :
  * l'écran ne montre que des libellés de fréquence, jamais 0, 1, 2, 3.
  */
-export type NiveauReponse = 0 | 1 | 2 | 3;
+// ⚠️ L'ÉCHELLE A ÉTÉ EXTRAITE LE 2026-09-03, ET RIEN N'A CHANGÉ POUR SES LECTEURS.
+//
+// Les six déclarations ci-dessous (le niveau, la valeur, les gardes de type, la réponse appariée
+// par identifiant) ne sont pas propres à l'ennéagramme : ce sont celles de TOUT questionnaire à
+// fréquence du produit. Le Big Five, arrivé le même jour, en avait besoin à l'identique — et une
+// règle recopiée diverge à la première correction, en particulier celle-ci, dont l'en-tête dit
+// qu'un appariement positionnel « survit à toutes les relectures ».
+//
+// Elles vivent donc dans `echelle-likert.ts` et sont RÉEXPORTÉES ici : tous les imports existants
+// (`@/lib/domain/enneagramme`) continuent de fonctionner sans une seule ligne modifiée ailleurs.
+import type { ReponseItem, ValeurReponse } from "./echelle-likert";
 
-/** `null` est une réponse explicite (« Je ne sais pas »), jamais un zéro déguisé. */
-export type ValeurReponse = NiveauReponse | null;
-
-export const NIVEAUX: readonly NiveauReponse[] = Object.freeze([0, 1, 2, 3] as const);
-
-export function estNiveauReponse(v: unknown): v is NiveauReponse {
-  return v === 0 || v === 1 || v === 2 || v === 3;
-}
-
-export function estValeurReponse(v: unknown): v is ValeurReponse {
-  return v === null || estNiveauReponse(v);
-}
-
-/**
- * Une réponse est appariée par IDENTIFIANT, jamais par position (D7).
- *
- * ⚠️ C'est la garde la plus discrète de la story et la plus coûteuse à rater. Un appariement
- * positionnel — « la 3ᵉ réponse va au 3ᵉ item » — survit à toutes les relectures et casse
- * silencieusement le jour où quelqu'un insère, retire ou réordonne une question. Le type rendu
- * serait alors FAUX de façon parfaitement déterministe : invisible aux tests de déterminisme de
- * l'AC1, et invisible à l'écran tant que le corpus est vide, puisque deux textes non écrits sont
- * égaux. Le dépôt a déjà payé la version « miroir qui diverge » (leçon R1-bis).
- */
-export interface ReponseItem {
-  readonly itemId: string;
-  readonly niveau: ValeurReponse;
-}
+export {
+  NIVEAUX,
+  estNiveauReponse,
+  estValeurReponse,
+} from "./echelle-likert";
+export type { NiveauReponse, ValeurReponse, ReponseItem } from "./echelle-likert";
 
 /** Ce qu'un item apporte au calcul : son identité, et le type qu'il pèse. */
 export interface ItemBareme {

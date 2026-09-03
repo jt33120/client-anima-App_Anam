@@ -168,6 +168,14 @@ export const HORS_MENU: Readonly<Record<string, string>> = Object.freeze({
     "elle CORRIGE le socle : elle vit sous la halte « Ton socle », au contact du manque qu’elle répare (amendement du 2026-08-25, §1)",
   enneagramme:
     "même raison que l’heure de naissance : c’est une porte du socle, pas une entrée de compte",
+  // Les deux modules livrés le 2026-09-03 s'atteignent par la halte « Psychologie », qui est
+  // elle-même hors menu pour la raison écrite juste en dessous. Les lister ici les rendrait plus
+  // proéminents que l'univers qui les contient, et le menu de compte redeviendrait un sommaire du
+  // produit — exactement ce que les trois groupes corrigent.
+  "big-five":
+    "même raison que l’ennéagramme : une porte de l’univers Psychologie, pas une entrée de compte",
+  "human-design":
+    "même raison que l’ennéagramme : une porte de l’univers Psychologie, pas une entrée de compte",
   psychologie:
     "cet univers se découvre depuis « Aujourd’hui » : le dupliquer dans le menu de compte recréerait le mélange entre navigation quotidienne et administration que les groupes corrigent",
   reperes:

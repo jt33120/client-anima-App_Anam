@@ -75,7 +75,7 @@ describe("[AD-1/DUR] lib/corpus est une couche PURE", () => {
     // ⚠️ UN COMPTE EXACT, JAMAIS `toBeGreaterThan`. Relâcher cette assertion pour faire passer une
     // story est précisément la façon dont les gardes meurent : un corpus ajouté sans être inscrit
     // ici échapperait à TOUTES les gardes de ce fichier sans que rien ne rougisse.
-    expect(FICHIERS_CORPUS.length, "aucun fichier trouvé dans lib/corpus — garde vide").toBe(8);
+    expect(FICHIERS_CORPUS.length, "aucun fichier trouvé dans lib/corpus — garde vide").toBe(10);
     expect(FICHIERS_CORPUS).toContain("lib/corpus/port.ts");
     // 2026-08-23 — les textes de DÉPART, écrits sur décision de Julian en attendant Anima. Ils
     // vivent ici, donc sous les mêmes gardes que le reste : voix, prédiction, pureté.
@@ -95,6 +95,13 @@ describe("[AD-1/DUR] lib/corpus est une couche PURE", () => {
     // quand même, parce qu'elles doivent subir les MÊMES gardes — voix (2.8), prédiction (FR-053) —
     // et que le port `TexteCorpus` est ce qui empêche un créneau vide de se déguiser en texte.
     expect(FICHIERS_CORPUS).toContain("lib/corpus/description-cartes.ts");
+    // 2026-09-03 — les quinze lectures du Big Five (5 facteurs × 3 positions). ⚠️ Seul corpus dont
+    // la prose peut trahir FR-031 : le calcul ne rend que trois énumérations, mais « autour des
+    // trois quarts » reconstruirait la jauge en mots. Garde séparée, `tests/corpus-big-five.test.ts`.
+    expect(FICHIERS_CORPUS).toContain("lib/corpus/big-five.ts");
+    // 2026-09-03 — les dix-huit textes du Human Design (5 types, 7 autorités, 6 lignes). Le CALCUL
+    // vit dans `lib/astro/human-design.ts` : les deux couches restent pures, de deux natures.
+    expect(FICHIERS_CORPUS).toContain("lib/corpus/human-design.ts");
   });
 
   it("[Story 5.7] le SENS des cartes vit hors de ce dossier, et c'est une décision", () => {

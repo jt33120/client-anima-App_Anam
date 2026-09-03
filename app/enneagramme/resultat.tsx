@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { effacerType, recommencerTest } from "./actions";
-import s from "./enneagramme.module.css";
+import s from "@/render/psychologie/questionnaire.module.css";
 
 /**
  * resultat.tsx — LE TYPE RETENU (Story 5.5, AC1/AC3).

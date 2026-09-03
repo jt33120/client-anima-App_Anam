@@ -16,11 +16,13 @@ import {
 } from "@/lib/domain/enneagramme-items";
 import { conclure, NIVEAUX } from "@/lib/domain/enneagramme";
 import { phraseHypothese } from "@/lib/domain/enneagramme-hypothese";
-import TestCourt from "./test-court";
+import { COPIE_QUESTIONNAIRE_ENNEAGRAMME } from "@/lib/domain/copie-questionnaire";
+import { conclureTest, enregistrerReponses, recommencerTest } from "./actions";
+import QuestionnaireCourt from "@/render/psychologie/QuestionnaireCourt";
 import Hypothese from "./hypothese";
 import Resultat from "./resultat";
 import IntroductionEnneagramme from "./introduction";
-import s from "./enneagramme.module.css";
+import s from "@/render/psychologie/questionnaire.module.css";
 import PiedHalte from "@/render/PiedHalte";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
 import { urlRetourScene } from "@/lib/scene/retour-scene";
@@ -148,7 +150,7 @@ export default async function Page({
           messageSansTexte={MESSAGE_TYPE_SANS_TEXTE}
         />
       ) : (
-        <TestCourt
+        <QuestionnaireCourt
           key={cleTentative}
           items={itemsPourAffichage()}
           // Les libellés descendent du SERVEUR (jamais recopiés dans un module de rendu) :
@@ -159,6 +161,15 @@ export default async function Page({
           nouvelle={cleTentative === "nouvelle"}
           issueInitiale={issueInitiale}
           introduction={<IntroductionEnneagramme />}
+          // ⚠️ LES TROIS GESTES DESCENDENT D'ICI, ils ne sont pas importés par le composant.
+          // `render/` ne peut importer ni `@/app/*` ni `@/lib/domain` (AD-7/AD-10) : passer les
+          // Server Actions en propriétés est ce qui rend cette frontière structurelle.
+          actions={{
+            enregistrer: enregistrerReponses,
+            conclure: conclureTest,
+            recommencer: recommencerTest,
+          }}
+          copie={COPIE_QUESTIONNAIRE_ENNEAGRAMME}
         />
       )}
 

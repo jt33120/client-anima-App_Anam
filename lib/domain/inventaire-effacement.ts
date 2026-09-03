@@ -50,6 +50,8 @@ export const INVENTAIRE_EFFACEMENT: readonly EntreeEffacement[] = [
   { table: "carte_contexte", verdict: "efface", motif: "la carte de contexte — ce qu’Anam avait compris d’elle" },
   { table: "enneagramme_hypothese", verdict: "efface", motif: "les hypothèses de type" },
   { table: "enneagramme_tentative", verdict: "efface", motif: "les réponses au questionnaire" },
+  { table: "big_five", verdict: "efface", motif: "les cinq positions retenues du Big Five" },
+  { table: "big_five_tentative", verdict: "efface", motif: "les réponses au questionnaire du Big Five" },
   { table: "tirage", verdict: "efface", motif: "les tirages, graine comprise" },
   { table: "lecture", verdict: "efface", motif: "les lectures et leurs restitutions" },
   { table: "seance", verdict: "efface", motif: "le déroulé de chacune de ses séances" },

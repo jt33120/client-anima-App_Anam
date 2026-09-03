@@ -288,6 +288,11 @@ describe("[AC5/DUR] `astronomy-engine` n'existe que dans lib/astro/adapters/", (
      *     l'ascendant qu'une heure ferait gagner ou perdre avant de graver quoi que ce soit. Il
      *     l'injecte par le même paramètre par défaut que `depot-theme-natal.ts`, pour la même
      *     raison — un test doit pouvoir doubler le port.
+     *   • `lib/data/lire-human-design.ts` — compose l'éphéméride pour le DESSIN (2026-09-03).
+     *     Septième point, et il ressemble à `corriger-naissance.ts` : il calcule sans rien écrire.
+     *     Le dessin n'a aucune table — il est une fonction de la naissance, comme les nombres du
+     *     socle — donc rien à graver, rien à recenser, rien à effacer. Même paramètre par défaut,
+     *     même raison : un test doit pouvoir doubler le port.
      *
      * Aucun de ces fichiers ne dépend du CONTENU de son adaptateur : tous ne manipulent que
      * les types du port.
@@ -308,6 +313,7 @@ describe("[AC5/DUR] `astronomy-engine` n'existe que dans lib/astro/adapters/", (
       "lib/data/corriger-naissance.ts",
       "lib/data/depot-theme-natal.ts",
       "lib/data/lire-bibliotheque.ts",
+      "lib/data/lire-human-design.ts",
       "lib/data/lire-quotidien.ts",
     ]);
   });

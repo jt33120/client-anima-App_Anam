@@ -67,6 +67,8 @@ export const INVENTAIRE_EXPORT: readonly EntreeInventaire[] = [
   { table: "enneagramme", verdict: "inclus", titre: "Ton ennéagramme", motif: "le type retenu et son origine" },
   { table: "enneagramme_hypothese", verdict: "inclus", titre: "Les hypothèses de type", motif: "ce qu’Anam a supposé avant de savoir" },
   { table: "enneagramme_tentative", verdict: "inclus", titre: "Tes réponses au questionnaire", motif: "les réponses brutes du test" },
+  { table: "big_five", verdict: "inclus", titre: "Tes cinq grands facteurs", motif: "les cinq positions retenues, jamais un score (FR-031)" },
+  { table: "big_five_tentative", verdict: "inclus", titre: "Tes réponses au Big Five", motif: "les réponses brutes de la passe en cours" },
 
   // ── Les lectures ────────────────────────────────────────────────────────────────────────────
   { table: "tirage", verdict: "inclus", titre: "Tes tirages", motif: "la carte, la graine, la taille du jeu — de quoi rejouer le tirage" },
