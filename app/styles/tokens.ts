@@ -80,6 +80,21 @@ export const couleursNuit = {
   "sur-jour": "#1C2740", // Navy : l'encre sur le lotus (10,72:1)
   "sur-jour-doux": "#4C5773", // la note en retrait sur le lotus (5,20:1)
   nebuleuse: "#2E2A5A",
+  // ══ LE SECOND TON, CHAUD (2026-09-03) ═══════════════════════════════════════════════════════
+  //
+  // Retour de Julian : « moins unicouleur, avec plus de contraste ; des dégradés et des motifs ;
+  // cette palette mais plus magique, vivante ». La nuit était bâtie sur une seule famille — navy,
+  // Sky, Periwinkle, plus un violet de décor — et six teintes de bleu ne font pas un contraste :
+  // elles font une monochromie. Il manquait le CHAUD de la palette fournie.
+  //
+  // Le Beige est la seule teinte chaude des six, et il entre ici tel quel, en DÉCOR : une lueur
+  // basse à l'horizon, comme le dernier reste du jour sous une nuit. C'est ce qui donne une
+  // profondeur au ciel — un bleu seul est plat, un bleu avec un chaud a une heure.
+  //
+  // ⚠️ DÉCOR SEULEMENT, comme `nebuleuse`, et pour la même raison : 1,4:1 sur le fond. Jamais sous
+  // du texte, jamais sur un contrôle. `tests/contraste.test.ts` ne le fait entrer dans aucune
+  // paire, et `tests/palette-vivante.test.ts` refuse qu'il apparaisse sous une règle `color:`.
+  aube: "#E0D2C7",
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -109,6 +124,10 @@ export const couleursClair: Record<keyof typeof couleursNuit, string> = {
   alerte: "#8A5A16", // inchangé, 5,13 sur Ivory
   lueur: "#41579B", // = accent, même règle qu'en nuit
   nebuleuse: "#E0D2C7", // Beige : décor seulement (1,28 sur Ivory), jamais sous du texte
+  // En clair, le chaud ne peut pas être le Beige : il EST déjà la nébuleuse, et deux décors de la
+  // même teinte ne font pas deux couches. Le Gray de la palette prend le rôle — la même fonction
+  // (rompre la monochromie par une teinte qui n'est pas bleue), sur un fond Ivory.
+  aube: "#B8B5AC",
   // Le code couleur du jour ne change pas de mode en mode : c'est un CODE, et un code qui change
   // de teinte n'en est plus un. Le Sky est déjà l'aplat de `surface-elevee` en clair, donc la
   // carte du jour s'y distingue par sa TEINTE plutôt que par sa clarté — ce qui est exactement ce

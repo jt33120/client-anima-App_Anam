@@ -118,11 +118,47 @@ describe("[E5-S2] aucune couleur écrite à la main dans les feuilles du monde",
     expect(fautives, `mots-clés de couleur hors masque :\n${fautives.join("\n")}`).toEqual([]);
   });
 
-  it("et les masques emploient bien `black`, pas `#000` : un alpha dit son nom", () => {
+  /**
+   * ⚠️ DEUX SORTES DE MASQUES DEPUIS LE 2026-09-03, ET ELLES NE SE GARDENT PAS PAREIL.
+   *
+   *   • le masque de DISSOLUTION (`linear-gradient(black, transparent)`) : seul son alpha compte,
+   *     et son mot-clé doit se dire, sinon un `#000` y rentrerait et servirait de passe-droit ;
+   *   • le masque de FORME (le lotus du ciel), qui est un SVG en URI `data:`. Il ne porte pas de
+   *     dégradé, donc pas de `black` à exiger — mais il porte un `fill`, et c'est là qu'une teinte
+   *     pourrait se glisser. On exige donc l'inverse : ce contour est NOIR PLEIN (`%23000`), donc
+   *     une silhouette, et la couleur vient du `background` de l'élément, donc de jetons.
+   *
+   * Les confondre relâcherait la garde : accepter n'importe quel masque « parce que c'est un
+   * masque » rouvrirait exactement la porte que cette story a fermée.
+   */
+  it("les masques disent leur nature : un alpha pour les dissolutions, une silhouette pour la forme", () => {
     const monde = codeSeul(lire("render/monde.module.css"));
     const masques = [...monde.matchAll(/(?:-webkit-)?mask-image:[^;]*;/g)].map((m) => m[0]);
-    expect(masques.length, "plus aucun masque de dissolution dans le monde").toBeGreaterThanOrEqual(2);
-    for (const masque of masques) expect(masque).toMatch(/\bblack\b/);
+    expect(masques.length, "plus aucun masque dans le monde").toBeGreaterThanOrEqual(2);
+
+    const dissolutions = masques.filter((m) => m.includes("gradient("));
+    const formes = masques.filter((m) => m.includes("var(--masque-"));
+    expect(dissolutions.length, "les masques de dissolution ont disparu").toBeGreaterThanOrEqual(2);
+    for (const masque of dissolutions) expect(masque).toMatch(/\bblack\b/);
+
+    // Le masque de forme passe par une variable : les deux propriétés (préfixée et standard)
+    // lisent alors la MÊME forme, et deux copies ne peuvent pas diverger.
+    expect(formes.length, "le masque de forme du lotus a disparu").toBe(2);
+    // ⚠️ SUR LA SOURCE BRUTE, pas sur `codeSeul` : celui-ci retire les URI `data:` (c'est
+    // précisément ce qui permet au grain de passer le refus des `#`). Chercher le contour dans le
+    // texte nettoyé revient à le chercher là où il vient d'être effacé.
+    const contour =
+      /--masque-lotus:\s*url\("data:image\/svg\+xml,([^"]*)"\)/.exec(
+        lire("render/monde.module.css"),
+      )?.[1] ?? "";
+    expect(contour, "le contour du lotus est introuvable").not.toBe("");
+    // Une silhouette : du noir plein, et rien d'autre. Un `fill` teinté ici serait une couleur en
+    // dur que la palette ne pourrait plus corriger.
+    expect(contour).toContain("fill='%23000'");
+    expect(
+      [...contour.matchAll(/fill='([^']*)'/g)].map((m) => m[1]),
+      "un remplissage autre que le noir plein dans le contour du lotus",
+    ).toEqual(["%23000"]);
   });
 });
 
