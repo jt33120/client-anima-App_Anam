@@ -30,11 +30,17 @@ export interface ReparationVue {
   readonly url: string;
 }
 
+/**
+ * Un nombre du socle : son intitulé et sa valeur.
+ *
+ * ⚠️ PLUS DE `calcul` DEPUIS LE 2026-09-03 (« supprime complètement les calculs »). La preuve ligne
+ * à ligne ne traverse plus : un champ qui traverse une frontière sans être rendu finit par être
+ * rendu « puisqu'il est là ».
+ */
 export interface NombreVue {
   readonly cle: string;
   readonly intitule: string;
   readonly valeur: string;
-  readonly calcul: readonly string[];
 }
 
 export interface FaitVue {
@@ -109,6 +115,12 @@ export interface SectionNombresVue {
   readonly nombres: readonly NombreVue[];
   readonly manquants: readonly NombreManquantVue[];
   readonly lecturesSymboliques: readonly LectureSymboliqueVue[];
+  /**
+   * L'avant-goût de la première lecture, ou `null` quand elle tient en entier (2026-09-03). Le
+   * rendu ne le fabrique pas : couper un texte, c'est décider de ce qui se lit, et un `line-clamp`
+   * CSS couperait à la largeur de l'écran plutôt qu'au mot (AD-7).
+   */
+  readonly apercuLecture: string | null;
   readonly noteLectureSymbolique: string | null;
 }
 

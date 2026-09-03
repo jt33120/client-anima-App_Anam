@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import {
+  APERCU_LECTURE_MAX,
+  apercuDeLecture,
   ficheSocle,
   sectionNombres,
   sectionCiel,
@@ -99,10 +101,39 @@ describe("[7.5 · 13.9] les six nombres et leur lecture sont deux couches distin
     expect(section.nombres.map((n) => n.cle)).toEqual([...NOMBRES]);
   });
 
-  it("chaque résultat porte sa preuve arithmétique, pas une interprétation", () => {
+  it("[2026-09-03] un nombre ne porte plus que son intitulé et sa valeur", () => {
+    // Retournement assumé du test du 2026-08-30, qui exigeait la preuve arithmétique sur chaque
+    // nombre. « Supprime complètement les calculs » : la trace reste calculable
+    // (`tracerNumerologie`, éprouvée par `tests/numerologie-trace.test.ts`), elle ne traverse plus.
     const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
-    for (const nombre of section.nombres) expect(nombre.calcul.length, nombre.cle).toBeGreaterThan(0);
-    expect(section.nombres.find((nombre) => nombre.cle === "chemin_de_vie")?.calcul.join(" ")).toContain("Total :");
+    expect(section.nombres.length).toBe(NOMBRES.length);
+    for (const nombre of section.nombres) {
+      expect(Object.keys(nombre).sort(), nombre.cle).toEqual(["cle", "intitule", "valeur"]);
+    }
+  });
+
+  it("[2026-09-03] la lecture symbolique donne un avant-goût, coupé au mot", () => {
+    const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
+    const premiere = section.lecturesSymboliques[0];
+    expect(premiere, "le corpus de départ doit fournir au moins une lecture").toBeDefined();
+
+    const apercu = section.apercuLecture!;
+    expect(apercu, "sans aperçu, le pli fermé ne promet rien et personne ne l'ouvre").not.toBeNull();
+    expect(apercu.endsWith("…"), `l'aperçu ne s'achève pas : « ${apercu} »`).toBe(true);
+    // Il commence bien le texte qu'il annonce — un aperçu qui ne serait pas le début serait une
+    // seconde écriture, donc une seconde vérité.
+    expect(premiere.texte.startsWith(apercu.slice(0, -1))).toBe(true);
+    // Coupé au MOT : le dernier signe avant les points de suspension n'est pas une lettre du
+    // milieu d'un mot, sinon on lirait « la recherche du se… ».
+    const suite = premiere.texte.slice(apercu.length - 1);
+    expect(suite.startsWith(" ") || suite === "", `coupe en plein mot : « ${apercu} »`).toBe(true);
+  });
+
+  it("[ANTI-VACUITÉ] un texte court n'a pas d'aperçu, il n'a rien à cacher", () => {
+    // Sans ce cas, `apercuDeLecture` pourrait rendre « … » sur n'importe quoi et les assertions
+    // ci-dessus resteraient vertes.
+    expect(apercuDeLecture("Trois mots courts.")).toBeNull();
+    expect(apercuDeLecture("a".repeat(APERCU_LECTURE_MAX + 10))).toContain("…");
   });
 });
 
