@@ -16,7 +16,7 @@
   background: var(--surface-elevee);
   border: 1px solid var(--bordure);
   border-radius: calc(var(--rayon) * 2);
-  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 18%);
+  box-shadow: var(--ombre-posee);
 }
 
 .carte h1,

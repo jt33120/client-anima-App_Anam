@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { couleursNuit } from "@/app/styles/tokens";
 
 /**
  * manifeste-couleurs.test.ts — LE MANIFESTE PWA DIT LA MÊME COULEUR QUE L'APPLICATION (QA tour 2).
@@ -53,13 +54,23 @@ describe("[QA tour 2] le système peint la même nuit que l'application", () => 
     expect(manifeste.theme_color?.toUpperCase()).toBe(fond);
   });
 
-  it("le document déclare une `themeColor`, et c'est la même", () => {
+  it("le document déclare une `themeColor`, et elle LIT le jeton au lieu de le recopier", () => {
     // ⚠️ MUTATION-CIBLE : la retirer. Le mutant ne casserait rien de visible en développement — la
     // barre du système n'existe qu'installée. C'est un défaut DORMANT, la troisième famille.
+    //
+    // ⚠️ ET LA FORME A CHANGÉ LE 2026-09-03 (« toutes les couleurs dans des fichiers de design
+    // qu'il suffit de modifier »). La valeur était `"#1C2740"` écrite à la main, et ce test
+    // vérifiait qu'elle ÉGALAIT `--fond` : une copie surveillée reste une copie, et la surveillance
+    // ne survit qu'aussi longtemps que le test. Elle est désormais LUE dans `tokens.ts`, donc juste
+    // par construction — et ce qui se garde n'est plus l'égalité, c'est l'absence de copie.
     const layout = lire("app/layout.tsx");
-    const m = layout.match(/themeColor:\s*"(#[0-9A-Fa-f]{6})"/);
-    expect(m, "`viewport.themeColor` doit exister — il n'y en avait aucune").not.toBeNull();
-    expect(m![1].toUpperCase()).toBe(fondDeLApplication());
+    expect(layout, "`viewport.themeColor` doit exister — il n'y en avait aucune").toContain(
+      "themeColor: couleursNuit.fond",
+    );
+    expect(layout, "une couleur écrite à la main est revenue").not.toMatch(/themeColor:\s*"#/);
+    // Le jeton lu est bien celui que la feuille de design déclare : `tokens.ts` et `globals.css`
+    // sont tenus ensemble par `tests/tokens-parite.test.ts`, et cette ligne ferme la boucle.
+    expect(couleursNuit.fond.toUpperCase()).toBe(fondDeLApplication());
   });
 
   it("⚠️ et ce n'est PAS `--surface-elevee` qu'on recopie", () => {
