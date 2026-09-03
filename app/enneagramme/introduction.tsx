@@ -8,7 +8,7 @@ import {
   TITRE_FEUILLE_REPERES,
 } from "@/lib/domain/enneagramme-items";
 import ReperesEnneagramme from "./reperes";
-import s from "./enneagramme.module.css";
+import s from "@/render/psychologie/questionnaire.module.css";
 
 /**
  * Présentation produit ; les neuf explications viennent exclusivement du corpus Anima.

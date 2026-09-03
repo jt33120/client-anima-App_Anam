@@ -92,6 +92,11 @@ export async function semerTout(admin: SupabaseClient, id: string, marqueur: str
   await poser(admin, "enneagramme", { utilisatrice_id: id, type: 5, origine: "test" });
   await poser(admin, "enneagramme_hypothese", { utilisatrice_id: id, type: 4 });
   await poser(admin, "enneagramme_tentative", { utilisatrice_id: id, reponses: { e1a: 2, e1b: 1 } });
+  await poser(admin, "big_five", {
+    utilisatrice_id: id,
+    ouverture: "haut", conscience: "median", extraversion: "bas", agreabilite: "median", stabilite: "haut",
+  });
+  await poser(admin, "big_five_tentative", { utilisatrice_id: id, reponses: { b01: 2, b02: null } });
 
   // ── LA CARTE DE CONTEXTE (0079) — et le seul semis qui ne peut pas porter le marqueur ─────────
   //

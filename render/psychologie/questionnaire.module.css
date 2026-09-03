@@ -1,5 +1,11 @@
 /*
- * enneagramme.module.css — La halte de l'ennéagramme (Story 5.5, T8).
+ * questionnaire.module.css — LA HALTE D'UN QUESTIONNAIRE DE PSYCHOLOGIE.
+ *
+ * Née `app/enneagramme/enneagramme.module.css` (Story 5.5, T8), déplacée ici le 2026-09-03 quand le
+ * Big Five est arrivé avec le même écran. Ce n'est pas une factorisation de confort : deux feuilles
+ * de style pour la même nature d'écran divergent à la première correction, et le retour du fondateur
+ * du 2026-09-02 demandait exactement l'inverse — « toutes les couleurs et le design dans des CSS
+ * qu'il suffit de modifier pour modifier l'ensemble ».
  *
  * Bâtie sur les MÊMES tokens que `/heure-naissance` : c'est la même nature d'écran — une halte qui
  * se pose par-dessus la scène et y renvoie — et deux dessins pour un même rôle donneraient
@@ -7,7 +13,7 @@
  *
  * ⚠️ AUCUN COMPTEUR, AUCUNE BARRE, AUCUN ANNEAU, AUCUN POURCENTAGE (FR-031, DESIGN.md:695). Il n'y a
  * volontairement AUCUNE classe de progression dans ce fichier : ce qui n'existe pas ne se rajoute
- * pas « juste pour aider ». Une jauge transformerait dix-huit questions sur la façon dont on cède en
+ * pas « juste pour aider ». Une jauge transformerait vingt questions sur la façon dont on cède en
  * une performance à terminer.
  */
 
@@ -223,6 +229,75 @@
 /* Le résultat : un TYPE, jamais un nombre de points ni un classement (FR-031). */
 .type {
   text-align: center;
+}
+
+/* ── Le résultat du Big Five : CINQ AXES CÔTE À CÔTE ───────────────────────────────────────────
+   Ils se lisent ENSEMBLE et aucun ne prime : pas de tri, pas de mise en avant, pas de premier de
+   la liste. Un « ton trait dominant » serait faux par construction — le Big Five ne désigne
+   personne, il situe cinq axes indépendants.
+
+   ⚠️ ET TOUJOURS AUCUNE BARRE. `.position` est un MOT (« Plutôt haut »), jamais une largeur : la
+   tentation d'en faire un `width: %` est exactement ce que FR-031 refuse, et elle ne peut même pas
+   se coder ici puisque l'écran n'a jamais reçu de nombre. */
+.axes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+}
+
+.axe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-4);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+}
+
+.axe h2,
+.axe p {
+  margin: 0;
+}
+
+.position {
+  color: var(--texte-doux);
+  text-transform: lowercase;
+}
+
+/* Le dessin de Human Design réutilise `.axes`/`.axe` : quatre rubriques posées à plat, aucune
+   au-dessus des autres. Le profil porte ses deux lignes en retrait, et les centres définis se
+   listent — jamais « 5 sur 9 », qui serait une jauge (FR-031). */
+.ligneProfil {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding-left: var(--esp-4);
+  border-left: 1px solid var(--bordure);
+}
+
+.ligneProfil h3,
+.ligneProfil p {
+  margin: 0;
+}
+
+.centres {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+}
+
+.centres li {
+  padding: var(--esp-1) var(--esp-3);
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-sm);
 }
 
 .bouton {

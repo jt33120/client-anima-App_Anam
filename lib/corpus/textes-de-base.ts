@@ -249,6 +249,68 @@ export const TEXTES_DE_BASE: Readonly<Record<string, string>> = Object.freeze({
   "annee_personnelle:8": "Ton année personnelle 8 est traditionnellement une année de bilan et de pouvoir d’agir. L’argent, la place que tu prends, ce que tu oses demander : tout cela a du poids cette année. Ce qui a été construit se mesure, sans complaisance et sans drame, et la justesse y compte davantage que la réussite.",
   "annee_personnelle:9": "Ton année personnelle 9 est traditionnellement une année de tri et d’achèvement. Quelque chose finit, et ça libère plus que ça n’enlève : ce qui a fait son temps, les liens usés, les décors devenus trop petits. On y range plus qu’on n’entreprend, et le vide qui reste n’est pas une perte.",
 
+  // ── big-five
+  //
+  // ⚠️ AUCUN DE CES QUINZE TEXTES NE PORTE DE CHIFFRE, et c'est FR-031 jusqu'au bout. Le calcul a
+  // beau ne rendre que trois positions, une jauge reviendrait par la prose si un texte disait
+  // « plutôt haute, autour des trois quarts ». Gardé par `tests/corpus-big-five.test.ts`.
+  //
+  // Cinq textes se lisent ENSEMBLE : aucun ne dit « c'est ça, toi », chacun n'est qu'un cinquième
+  // de la lecture. La charpente est celle des 69 lectures numérologiques (retour de Julian du
+  // 2026-08-31) : une phrase factuelle qui nomme l'échelle et sa position, puis une ou deux qui
+  // décrivent la personne, puis le revers possible. Présent, tutoiement, jamais un verdict.
+  "big-five:ouverture:haut": "Une ouverture haute décrit un goût marqué pour ce qui est neuf : des idées, des formes, des manières de faire encore jamais essayées. Tu vois souvent des liens là où d’autres voient des sujets séparés. Le revers possible, c’est de commencer beaucoup et de laisser refroidir ce qui demandait de la durée.",
+  "big-five:ouverture:median": "Une ouverture médiane décrit un équilibre entre le neuf et l’éprouvé. Tu essaies volontiers, sans faire du changement une valeur en soi. Sa difficulté tient au dosage : savoir, dans un moment donné, si tu as envie d’explorer ou de te poser.",
+  "big-five:ouverture:bas": "Une ouverture basse décrit un attachement à ce qui a déjà fait ses preuves. Tu vas au concret, tu te méfies des idées trop larges, et ton entourage sait qu’on peut compter sur ta constance. Le revers possible, c’est de refermer une porte avant d’avoir regardé ce qu’il y avait derrière.",
+
+  "big-five:conscience:haut": "Une application haute décrit de l’ordre, des échéances tenues et des choses menées jusqu’au bout. Tu prépares avant de te lancer, et laisser une tâche en suspens te coûte. Le revers possible, c’est la rigidité : un imprévu pèse lourd quand tout le reste était déjà calé.",
+  "big-five:conscience:median": "Une application médiane décrit une organisation qui s’ajuste au sujet. Tu tiens ce qui compte et tu laisses filer le reste sans en faire une affaire. Sa difficulté tient au tri : reconnaître, quand tout arrive en même temps, ce qui relève vraiment du premier plan.",
+  "big-five:conscience:bas": "Une application basse décrit une façon de fonctionner par élans plutôt que par plans. Tu improvises bien, la préparation t’ennuie vite, et une échéance lointaine pèse peu. Le revers possible, c’est l’accumulation : des choses commencées qui attendent, et qui finissent par occuper de la place.",
+
+  "big-five:extraversion:haut": "Une extraversion haute décrit de l’énergie prise dans le contact. Tu parles volontiers, tu vas vers les gens, et une journée sans personne te laisse un peu vide. Le revers possible, c’est de remplir le silence avant d’avoir écouté ce qui allait s’y dire.",
+  "big-five:extraversion:median": "Une extraversion médiane décrit une aisance dans les deux registres. Tu apprécies la compagnie, et tu la quittes sans regret quand elle a assez duré. Sa difficulté tient au repérage : sentir à temps de quel côté tu penches ce jour-là, puisque les deux te vont.",
+  "big-five:extraversion:bas": "Une extraversion basse décrit de l’énergie qui se recharge au calme. Tu préfères peu de gens longtemps à beaucoup de gens brièvement, et le grand groupe te prend plus qu’il ne te donne. Le revers possible, c’est de laisser passer un lien faute d’avoir fait le premier pas.",
+
+  "big-five:agreabilite:haut": "Un accord haut décrit une attention réelle à ce que vit l’autre : tu cherches d’abord ce que son point de vue a de juste, et l’affrontement direct te coûte. Le revers possible, c’est de céder sur une chose qui comptait pour toi, et de le sentir seulement après coup.",
+  "big-five:agreabilite:median": "Un accord médian décrit une coopération qui garde ses limites. Tu écoutes, tu tiens ta position quand elle est fondée, et tu en changes quand l’argument est meilleur. Sa difficulté tient au réglage : le curseur se repose à neuf à chaque discussion.",
+  "big-five:agreabilite:bas": "Un accord bas décrit une franchise directe et peu de goût pour les détours. Tu dis ce que tu penses, tu tiens ta position, et l’inconfort d’une discussion tendue t’arrête moins que d’autres. Le revers possible, c’est que la forme fasse manquer le fond, même quand tu as raison.",
+
+  "big-five:stabilite:haut": "Une stabilité haute décrit une humeur qui bouge peu sous la pression. Les contrariétés passent, l’imprévu se réorganise, et il est rare que tu repenses le soir à ce qui s’est joué le matin. Le revers possible, c’est de mal mesurer ce que traversent des gens que la même situation secoue davantage.",
+  "big-five:stabilite:median": "Une stabilité médiane décrit des réactions proportionnées aux événements. Certaines choses te secouent, la plupart passent, et l’écart entre les deux se voit surtout avec du recul. Sa difficulté tient au repérage précoce de ce qui appartient au premier groupe.",
+  "big-five:stabilite:bas": "Une stabilité basse décrit une sensibilité vive à ce qui se passe : les choses te touchent fort et se déposent longtemps. Cette même sensibilité te rend perceptible ce que beaucoup ne remarquent pas. Le revers possible, c’est de repasser plusieurs fois une scène pourtant déjà finie.",
+
+  // ── human-design
+  //
+  // Trois familles : les cinq types, les sept autorités, les six lignes du profil. Les douze
+  // profils ne sont PAS écrits, et l'en-tête de `lib/corpus/human-design.ts` dit pourquoi : ce
+  // serait un produit cartésien sur les mêmes six lignes, et sa complétude dépendrait d'une
+  // propriété de mécanique céleste plutôt que d'une décision d'écriture.
+  //
+  // ⚠️ CES TEXTES DISENT « CE QUE LE SYSTÈME DÉCRIT », jamais « ce qui est vrai de toi ». Le Human
+  // Design est une construction symbolique, pas un résultat de mesure, et le produit ne le présente
+  // pas autrement. Charpente des 69 lectures numérologiques : une phrase factuelle, une description
+  // au présent et en tutoiement, puis la difficulté classique de la figure.
+  "human-design:type:generateur": "Le générateur est la figure la plus répandue du système : son centre sacral est défini, ce qui décrit une énergie de travail disponible et qui se renouvelle. Le système te propose de répondre à ce qui se présente plutôt que de tout lancer à froid. Sa difficulté classique est de dire oui à ce qui ne t’attire pas vraiment.",
+  "human-design:type:generateur_manifesteur": "Le générateur manifesteur a le sacral défini et un moteur relié à la gorge : le système y lit une énergie de travail doublée d’une capacité à lancer. Tu mènes souvent plusieurs choses de front, et vite. Sa difficulté classique est de sauter une étape, puis de devoir y revenir.",
+  "human-design:type:manifesteur": "Le manifesteur a un moteur relié à la gorge sans sacral défini : le système y lit une capacité à initier, par à-coups plutôt qu’en continu. Il te propose d’informer les gens que tes décisions touchent, avant d’agir. Sa difficulté classique est la résistance rencontrée quand ça n’a pas été fait.",
+  "human-design:type:projecteur": "Le projecteur n’a ni sacral défini ni moteur relié à la gorge : le système y lit un talent pour voir et guider les autres, avec une énergie qui se dépense plus vite. Il te propose d’attendre la reconnaissance et l’invitation. Sa difficulté classique est l’amertume quand l’invitation tarde.",
+  "human-design:type:reflecteur": "Le réflecteur n’a aucun centre défini, et c’est la figure la plus rare du système : il y lit une personne qui prend l’ambiance autour d’elle plutôt qu’elle n’émet la sienne. Il te propose de laisser passer un cycle lunaire complet avant une décision importante.",
+
+  "human-design:autorite:emotionnelle": "L’autorité émotionnelle vient d’un plexus solaire défini. Le système décrit une clarté qui n’arrive pas sur l’instant : l’élan monte, puis redescend, et la décision se lit mieux une fois la vague passée. Sa difficulté classique est la pression de répondre tout de suite.",
+  "human-design:autorite:sacrale": "L’autorité sacrale vient d’un sacral défini sans plexus solaire. Le système décrit une réponse du corps, immédiate, antérieure aux raisons qu’on lui trouve ensuite. Sa difficulté classique est de la couvrir par un raisonnement, jusqu’à ne plus l’entendre.",
+  "human-design:autorite:splenique": "L’autorité splénique vient d’une rate définie, sans plexus solaire ni sacral. Le système décrit un signal bref, qui ne se répète pas, et qui porte sur la sécurité et le moment juste. Sa difficulté classique est de le laisser filer parce qu’il passe vite.",
+  "human-design:autorite:ego": "L’autorité du cœur vient d’un centre du cœur défini, sans aucun des trois précédents. Le système décrit une décision qui se prend à l’envie réelle et aux moyens engagés, jamais au devoir. Sa difficulté classique est de promettre plus que ce que l’envie soutient.",
+  "human-design:autorite:auto_projetee": "L’autorité auto-projetée vient d’un centre de l’identité défini, sans moteur pour le porter. Le système décrit une clarté qui vient en parlant à voix haute, devant quelqu’un qui écoute sans conseiller. Sa difficulté classique est de décider en silence, dans sa tête.",
+  "human-design:autorite:mentale": "L’autorité mentale concerne les thèmes qui n’ont aucun des centres précédents. Le système n’y décrit pas d’autorité intérieure : la clarté vient du dialogue et de l’environnement choisi, pas d’un signal du corps. Sa difficulté classique est d’attendre de la tête une réponse qui ne s’y trouve pas.",
+  "human-design:autorite:lunaire": "L’autorité lunaire est celle du réflecteur, dont aucun centre n’est défini. Le système décrit une clarté qui demande du temps : un cycle lunaire complet, pendant lequel la même question se repose dans des ambiances différentes. Sa difficulté classique est la pression de trancher vite.",
+
+  "human-design:ligne:1": "La première ligne est celle de l’investigateur. Le système y lit un besoin de fondations : lire, vérifier, savoir sur quoi on marche avant d’avancer. Sa difficulté classique est de repousser le départ tant que le socle paraît incomplet.",
+  "human-design:ligne:2": "La deuxième ligne est celle de l’ermite. Le système y lit un talent qui se déploie au calme, et que les autres viennent chercher sans prévenir. Sa difficulté classique est le tiraillement entre le besoin de retrait et les sollicitations qui arrivent quand même.",
+  "human-design:ligne:3": "La troisième ligne est celle que le système nomme le martyr, et le mot dit l’apprentissage par l’essai : on tente, ça casse, on garde ce qui a tenu. Sa difficulté classique est de lire ces ratés comme des fautes, alors qu’ils sont la méthode elle-même.",
+  "human-design:ligne:4": "La quatrième ligne est celle de l’opportuniste. Le système y lit un fonctionnement par le réseau : ce qui arrive passe par des gens déjà connus, rarement par des inconnus. Sa difficulté classique est de dépendre d’un cercle qu’on n’a pas toujours envie d’entretenir.",
+  "human-design:ligne:5": "La cinquième ligne est celle de l’hérétique. Le système y lit une position où les autres projettent beaucoup et attendent une solution. Sa difficulté classique est l’écart entre ce qu’on espère de toi et ce que tu proposes vraiment.",
+  "human-design:ligne:6": "La sixième ligne est celle du modèle. Le système y lit une trajectoire en trois temps : l’essai, puis un retrait, puis un rôle de repère pour les autres. Sa difficulté classique est l’impatience pendant la période de retrait.",
+
   // ── ancrage
   "ancrage-1:titre": "L’air qui va et vient",
   "ancrage-1:arrivee": "Tu es là, et ça suffit pour commencer. C’est trois ou quatre minutes, pas plus, et tu peux t’arrêter en route à n’importe quel moment, sans rien justifier. Installe-toi comme tu es, et donne-toi quelques instants avant d’aller plus loin.",

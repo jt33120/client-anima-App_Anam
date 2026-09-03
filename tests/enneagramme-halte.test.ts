@@ -24,28 +24,38 @@ const lire = (chemin: string) => readFileSync(resolve(racine, chemin), "utf8");
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 describe("[5.5/D9] le composant du test est REMONTÉ, jamais remis à zéro", () => {
-  const PAGE = "app/enneagramme/page.tsx";
+  /**
+   * ⚠️ LES DEUX HALTES SONT MESURÉES ICI DEPUIS LE 2026-09-03. Le questionnaire est partagé
+   * (`render/psychologie/QuestionnaireCourt.tsx`) : une garde qui n'aurait suivi que l'ennéagramme
+   * aurait laissé le Big Five reproduire, seul, le défaut exact qu'elle existe pour fermer.
+   */
+  const PAGES = ["app/enneagramme/page.tsx", "app/big-five/page.tsx"] as const;
 
-  it("[LE CŒUR] `TestCourt` porte une `key` dérivée de la TENTATIVE", () => {
+  it("[LE CŒUR] `QuestionnaireCourt` porte une `key` dérivée de la TENTATIVE, sur les DEUX haltes", () => {
     // Mutation-cible : retirer la `key`. La scène monte ses trois régions en permanence et
     // `Conversation` n'est jamais démontée ; un `useState` local n'est donc JAMAIS réinitialisé par
     // une navigation. C'est mot pour mot le défaut n° 6 de la revue 4.6 — le champ de renommage qui
     // fuyait d'une branche à l'autre — et « refaire le test » est exactement le geste qui le
     // déclencherait : les réponses de la passe précédente resteraient à l'écran.
-    const source = lire(PAGE);
-    expect(source).toMatch(/<TestCourt\s+key=\{cleTentative\}/);
-    // …et la clé vient bien de l'identifiant de la passe, pas d'une constante.
-    expect(source).toMatch(/const cleTentative =[\s\S]*?tentative\.tentativeId/);
+    for (const page of PAGES) {
+      const source = lire(page);
+      expect(source, page).toMatch(/<QuestionnaireCourt\s+key=\{cleTentative\}/);
+      // …et la clé vient bien de l'identifiant de la passe, pas d'une constante.
+      expect(source, page).toMatch(/const cleTentative =[\s\S]*?tentative\.tentativeId/);
+    }
   });
 
-  it("`localStorage` est BANNI de toute la halte", () => {
+  it("`localStorage` est BANNI des deux haltes et du composant qu'elles partagent", () => {
     // Contamination entre comptes sur un navigateur partagé (`render/arbre/ArbreInteractif.tsx`).
     for (const f of [
       "app/enneagramme/page.tsx",
-      "app/enneagramme/test-court.tsx",
       "app/enneagramme/hypothese.tsx",
       "app/enneagramme/resultat.tsx",
       "app/enneagramme/actions.ts",
+      "app/big-five/page.tsx",
+      "app/big-five/resultat.tsx",
+      "app/big-five/actions.ts",
+      "render/psychologie/QuestionnaireCourt.tsx",
     ]) {
       // ⚠️ On cherche un USAGE (`localStorage.setItem`, `localStorage[…]`), pas le MOT : les
       // commentaires de ces fichiers expliquent justement pourquoi il est banni, et une garde qui

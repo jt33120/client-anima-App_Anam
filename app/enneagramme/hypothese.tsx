@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { accepterHypothese, refuserHypothese } from "./actions";
-import s from "./enneagramme.module.css";
+import s from "@/render/psychologie/questionnaire.module.css";
 
 /**
  * hypothese.tsx — LES TROIS RÉPONSES, D'ÉGALE LISIBILITÉ (Story 5.5, AC2).

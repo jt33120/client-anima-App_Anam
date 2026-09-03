@@ -41,7 +41,13 @@ const push = vi.fn();
 const refresh = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 
-const { default: TestCourt } = await import("@/app/enneagramme/test-court");
+// ⚠️ LE QUESTIONNAIRE A DÉMÉNAGÉ (2026-09-03) : il est partagé avec le Big Five
+// (`render/psychologie/QuestionnaireCourt.tsx`), et ses trois gestes serveur lui DESCENDENT en
+// propriétés au lieu d'être importés. Le mock ci-dessus reste en place — il sert encore aux trois
+// autres composants — et `monterTest` passe les mêmes doubles en propriétés : ce que ce fichier
+// mesure (le verrou, le focus, l'absence de compteur) n'a pas bougé d'une ligne.
+const { default: QuestionnaireCourt } = await import("@/render/psychologie/QuestionnaireCourt");
+const { COPIE_QUESTIONNAIRE_ENNEAGRAMME } = await import("@/lib/domain/copie-questionnaire");
 const { default: IntroductionEnneagramme } = await import("@/app/enneagramme/introduction");
 const { default: Hypothese } = await import("@/app/enneagramme/hypothese");
 const { default: Resultat } = await import("@/app/enneagramme/resultat");
@@ -73,7 +79,7 @@ const monterTest = (
   options: { nouvelle?: boolean; issueInitiale?: "en_cours" | "indetermine" } = {},
 ) =>
   render(
-    <TestCourt
+    <QuestionnaireCourt
       items={AFFICHES}
       libelles={LIBELLES}
       libelleInconnu={LIBELLE_INCONNU}
@@ -81,6 +87,12 @@ const monterTest = (
       nouvelle={options.nouvelle ?? false}
       issueInitiale={options.issueInitiale ?? "en_cours"}
       introduction={<IntroductionEnneagramme />}
+      actions={{
+        enregistrer: (r) => enregistrerReponses(r),
+        conclure: (r) => conclureTest(r),
+        recommencer: () => recommencerTest(),
+      }}
+      copie={COPIE_QUESTIONNAIRE_ENNEAGRAMME}
     />,
   );
 

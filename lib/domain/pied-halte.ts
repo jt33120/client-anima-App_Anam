@@ -36,7 +36,9 @@ export { URL_AIDE, MENTION_IA, URL_TRANSPARENCE };
 export type IdHalte =
   | "abonnement"
   | "ancrages"
+  | "big-five"
   | "enneagramme"
+  | "human-design"
   | "heure-naissance"
   | "lectures"
   | "memoire"
@@ -87,6 +89,24 @@ const MENTION_DUE: Readonly<Record<IdHalte, { readonly mention: boolean; readonl
     enneagramme: {
       mention: true,
       motif: "l’hypothèse de type est formulée par Anam (5.5) ; le texte du type, lui, vient du corpus",
+    },
+    // ⚠️ LES DEUX HALTES DE 2026-09-03 SONT `false`, ET C'EST LE CONTRE-TEST DE LA RÈGLE. Rien
+    // n'y est produit par un modèle : les positions et le thème sont CALCULÉS, et les textes
+    // viennent du corpus. La différence avec l'ennéagramme tient à une seule chose — Anam n'y
+    // formule aucune hypothèse, parce qu'un axe ou un type de dessin ne se devine pas d'une
+    // conversation. Le jour où l'une des deux afficherait une phrase écrite par le modèle, ce
+    // verdict devrait basculer AVANT que la phrase n'apparaisse.
+    "big-five": {
+      mention: false,
+      motif:
+        "les cinq positions sont calculées depuis ses réponses et les textes viennent du corpus " +
+        "d’Anima ; aucun modèle n’écrit sur cette page",
+    },
+    "human-design": {
+      mention: false,
+      motif:
+        "le thème est calculé depuis sa naissance (FR-047) et les textes viennent du corpus " +
+        "d’Anima ; aucun modèle n’écrit sur cette page",
     },
     lectures: {
       mention: true,

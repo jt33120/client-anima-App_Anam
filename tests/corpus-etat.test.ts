@@ -6,6 +6,8 @@ import { CORPUS_NUMEROLOGIE } from "@/lib/corpus/numerologie";
 import { CORPUS_MANTRA } from "@/lib/corpus/mantra";
 import { CORPUS_HOROSCOPE } from "@/lib/corpus/horoscope";
 import { CORPUS_ENNEAGRAMME } from "@/lib/corpus/enneagramme";
+import { CORPUS_BIG_FIVE } from "@/lib/corpus/big-five";
+import { CORPUS_HUMAN_DESIGN } from "@/lib/corpus/human-design";
 import { CORPUS_DESCRIPTION_CARTES } from "@/lib/corpus/description-cartes";
 import { ANCRAGES } from "@/lib/corpus/ancrage";
 import { CORPUS_SENS_CARTES } from "@/lib/lecture/sens-cartes";
@@ -42,6 +44,8 @@ const RECENSES: readonly Corpus[] = [
   CORPUS_MANTRA,
   CORPUS_HOROSCOPE,
   CORPUS_ENNEAGRAMME,
+  CORPUS_BIG_FIVE,
+  CORPUS_HUMAN_DESIGN,
   CORPUS_DESCRIPTION_CARTES,
   ANCRAGES,
   CORPUS_SENS_CARTES,
