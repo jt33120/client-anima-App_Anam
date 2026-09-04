@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { TABLES_EXPORTEES, COLONNES_RETIREES } from "@/lib/domain/inventaire-export";
+import {
+  TABLES_EXPORTEES,
+  COLONNES_RETIREES,
+  estColonneRetiree,
+} from "@/lib/domain/inventaire-export";
 import { semerTout } from "./_semis";
 
 /**
@@ -138,7 +142,13 @@ describe("[6.6] Les deux capacités retirées, et rien d'autre", () => {
     for (const table of TABLES_EXPORTEES) {
       for (const ligne of lignes(exportAlice[table])) {
         for (const colonne of Object.keys(ligne)) {
-          if (COLONNES_RETIREES.includes(colonne)) fuites.push(`${table}.${colonne}`);
+          // ⚠️ LE COUPLE, PAS LE NOM (2026-09-04). `COLONNES_RETIREES` est une vue À PLAT : elle
+          // perd la table. `cle_idempotence` est retirée de `reservation_quota_ia` et d'elle seule,
+          // mais `usage_ia`, `audit_securite` et `remboursement` portent une colonne homonyme, sans
+          // rapport et sans danger — la RPC qui pourrait la rejouer n'est accordée qu'à
+          // `service_role`. Cette garde a dénoncé ces trois-là pendant des semaines : elle voyait
+          // un nom là où il fallait lire une provenance.
+          if (estColonneRetiree(table, colonne)) fuites.push(`${table}.${colonne}`);
         }
       }
     }

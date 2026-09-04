@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { definitionCourante } from "./_sql-courant";
 import {
   COLONNES_RETIREES,
+  estColonneRetiree,
   INVENTAIRE_EXPORT,
   TABLES_EXPORTEES,
 } from "@/lib/domain/inventaire-export";
@@ -204,5 +205,20 @@ describe("[6.6] Les retraits sont déclarés des DEUX côtés, et nulle part ail
       );
     }
     expect(COLONNES_RETIREES.length).toBeGreaterThan(0);
+  });
+
+  it("[LE CŒUR] un retrait vaut POUR SA TABLE, pas pour un nom de colonne", () => {
+    // ⚠️ LE DÉFAUT DU 2026-09-04, EN UNE ASSERTION. `cle_idempotence` est retirée de
+    // `reservation_quota_ia` et d'elle seule ; `usage_ia`, `audit_securite` et `remboursement`
+    // portent une colonne homonyme, sans rapport, qu'aucune personne ne peut rejouer
+    // (`reserver_quota_ia_atomique` n'est accordée qu'à `service_role`). La garde d'export les a
+    // dénoncées pendant six commits parce qu'elle lisait un NOM là où il fallait lire une
+    // provenance.
+    expect(estColonneRetiree("reservation_quota_ia", "cle_idempotence")).toBe(true);
+    for (const table of ["usage_ia", "audit_securite", "remboursement"]) {
+      expect(estColonneRetiree(table, "cle_idempotence"), `${table} n’a rien à retirer`).toBe(false);
+    }
+    // …et une table inconnue ne retire rien plutôt que de lever : l'inventaire décide, pas ce prédicat.
+    expect(estColonneRetiree("table_inexistante", "cle_idempotence")).toBe(false);
   });
 });

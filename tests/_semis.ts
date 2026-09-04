@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { jourCivilParisIso } from "./_dates-paris";
 
 /**
  * _semis.ts — SEMER UNE UTILISATRICE DANS TOUTES LES TABLES QUI LA NOMMENT.
@@ -12,6 +13,32 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * RIEN : « aucune ligne d'autrui » et « plus aucune ligne » sont tous les deux vrais d'une table
  * vide. Chaque `poser` vérifie, et fait échouer le test à la première ligne qui ne s'écrit pas.
  */
+
+/**
+ * LES TABLES QUE CE SEMIS REMPLIT, DÉCLARÉES.
+ *
+ * ⚠️ CETTE LISTE EXISTE PARCE QUE DEUX TABLES ONT MANQUÉ PENDANT DES SEMAINES SANS QUE RIEN NE LE
+ * DISE (2026-09-04). `reservation_quota_ia` (0083) et `ouverture_jour_anam` (0084) étaient
+ * déclarées « incluses » à l'export et servies par la RPC, mais jamais semées : leurs sections
+ * sortaient VIDES, et les deux gardes rougissaient sur un symptôme (« sections vides ») dont
+ * personne ne remontait la cause.
+ *
+ * Un semis ne peut pas se déduire du code : deux de ces tables se remplissent par une RPC, pas par
+ * un `insert`, et aucun balayage ne saurait relier `reserver_quota_ia_atomique` à la table qu'elle
+ * écrit. On DÉCLARE donc, et `tests/export-semis-complet.test.ts` compare cette déclaration à
+ * l'inventaire d'export : une table ajoutée demain et oubliée ici fait rougir la CI tout de suite,
+ * au lieu de sortir vide d'un export pendant six mois.
+ */
+export const TABLES_SEMEES: readonly string[] = Object.freeze([
+  "utilisatrice", "consentement", "entree_journal", "branche", "tirage", "branche_retour",
+  "fait_extrait", "resume_glissant", "synthese", "intention", "signal_reconceptualisation",
+  "theme_natal", "enneagramme", "enneagramme_hypothese", "enneagramme_tentative",
+  "big_five", "big_five_tentative", "carte_contexte", "lecture", "seance", "usage_ia",
+  "reservation_quota_ia", "ouverture_jour_anam", "episode_detresse", "audit_securite",
+  "pause_rythme", "invitation_integration", "notification_envoyee", "abonnement",
+  "remboursement", "information_reconduction", "preference_socle", "preference_courriel",
+  "abonnement_poussee", "art9_temoin", "execution_job",
+]);
 
 export async function poser(
   admin: SupabaseClient,
@@ -128,6 +155,32 @@ export async function semerTout(admin: SupabaseClient, id: string, marqueur: str
     tokens_entree: 10,
     tokens_sortie: 20,
   });
+  // ── LES DEUX REGISTRES QUOTIDIENS, SEMÉS PAR LEURS PROPRES RPC ────────────────────────────────
+  //
+  // ⚠️ PAS UN `insert` DIRECT, ET C'EST LA MÊME RÈGLE QUE `e2e/_entrer.ts` : « une porte qu'on
+  // contourne dans les tests est une porte que personne ne teste ». Ces deux tables ont RÉVOQUÉ
+  // l'écriture à `service_role` exprès — l'écriture nominale doit rester sérialisée par un verrou
+  // consultatif. Leur rendre un `insert` pour la commodité d'un semis ouvrirait le second chemin
+  // d'écriture que 0083 et 0084 ont construit leurs verrous pour empêcher.
+  //
+  // Les deux RPC sont justement accordées à `service_role` : c'est par là que le serveur écrit, et
+  // c'est donc par là que le semis écrit.
+  const { error: eQuota } = await admin.rpc("reserver_quota_ia_atomique", {
+    p_utilisatrice: id,
+    p_cle_idempotence: crypto.randomUUID(),
+    // Une limite large : on sème une admission, on ne teste pas le plafond ici.
+    p_limite: 1000,
+  });
+  if (eQuota) throw new Error(`semis reservation_quota_ia: ${eQuota.message}`);
+
+  // `p_jour` DOIT être le jour civil de Paris, sinon la RPC lève (`jour invalide`). Le coureur de CI
+  // est en UTC : en septembre, après 22 h UTC, la date UTC et la date parisienne diffèrent déjà.
+  const { error: eOuverture } = await admin.rpc("commencer_ouverture_quotidienne_anam", {
+    cible: id,
+    p_jour: jourCivilParisIso(),
+  });
+  if (eOuverture) throw new Error(`semis ouverture_jour_anam: ${eOuverture.message}`);
+
   await poser(admin, "episode_detresse", { utilisatrice_id: id, niveau_max: 2 });
   await poser(admin, "audit_securite", { utilisatrice_id: id, type: "semence", decision: "posee" });
   await poser(admin, "pause_rythme", { utilisatrice_id: id, seances: 6, minutes: 70 });
