@@ -2,10 +2,12 @@ import { describe, it, expect } from "vitest";
 import {
   DUREE_POUSSE_MS,
   DUREE_RETRAIT_MS,
+  FRONT_UNITES,
   PLAFOND_MS,
   SEJOUR_REDUIT_MS,
   etatDuPortail,
   momentDuDepart,
+  partRevelee,
   portailFini,
 } from "@/lib/scene/portail";
 
@@ -89,19 +91,39 @@ describe("[LE CŒUR] la pousse va dans un seul sens, de la graine à la ramure",
     expect(etatDuPortail((DUREE_POUSSE_MS * 3) / 4, DUREE_POUSSE_MS).eveil).toBeGreaterThan(milieu);
   });
 
-  it("[LE CŒUR] la graine et le bois se relaient sans trou", () => {
-    // ⚠️ MUTATION-CIBLE : faire disparaître la graine d'un coup, ou la garder jusqu'au bout. Le
-    // premier cas ouvre le portail sur un moignon de tronc ; le second laisse un caillou au pied
-    // d'un arbre adulte. Ce qu'on veut est UN fondu enchaîné.
-    expect(etatDuPortail(0, DUREE_POUSSE_MS).graine).toBe(1);
-    const finGraine = DUREE_POUSSE_MS * 0.2;
-    expect(etatDuPortail(finGraine, DUREE_POUSSE_MS).graine).toBeCloseTo(0, 6);
-    expect(etatDuPortail(finGraine * 0.5, DUREE_POUSSE_MS).graine).toBeCloseTo(0.5, 2);
-    // Elle ne revient jamais, et elle ne passe jamais sous zéro (une opacité négative se rend
-    // comme 0 mais dit que le calcul a débordé).
-    for (const t of [finGraine, DUREE_POUSSE_MS, DUREE_POUSSE_MS * 4]) {
-      expect(etatDuPortail(t, DUREE_POUSSE_MS).graine).toBe(0);
+  it("[LE CŒUR] la lumière part de la graine PEINTE, pas de rien", () => {
+    // ⚠️ MUTATION-CIBLE : retirer le plancher de `partRevelee`. Le portail s'ouvrirait sur un écran
+    // vide pendant les premières images — l'éveil part de zéro et la courbe est lente au début.
+    // Le plancher est ce qui garantit qu'il y a une GRAINE à regarder dès la première frame.
+    expect(partRevelee(0)).toBeGreaterThan(0);
+    expect(partRevelee(0)).toBeLessThan(0.2);
+  });
+
+  it("[LE CŒUR] la révélation ne recule jamais et va jusqu’au BOUT", () => {
+    // ⚠️ MUTATION-CIBLE : borner la part à 0,95. L'arbre finirait éternellement à quelques pour
+    // cent de lui-même — un défaut qu'on ne voit pas sur un écran de développement, où l'on
+    // regarde le geste et non son dernier pixel.
+    let precedent = -1;
+    for (let eveil = 0; eveil <= 100; eveil += 2) {
+      const part = partRevelee(eveil);
+      expect(part, `la lumière a reculé à ${eveil}`).toBeGreaterThanOrEqual(precedent);
+      precedent = part;
     }
+    expect(partRevelee(100)).toBeCloseTo(1, 10);
+  });
+
+  it("[ANTI-VACUITÉ] la ramure paraît AVANT la fin — la courbe n’est pas linéaire", () => {
+    // Sans ce témoin, une révélation linéaire passerait les deux gardes ci-dessus. Or elle
+    // n'éclaire pleinement la cime qu'à 85 % du geste : mesuré sur la géométrie, la cime est à
+    // 1297 unités de la graine, le coin le plus lointain à 1538, et le front en couvre 300.
+    const CIME = 1297;
+    const RAYON_PLEIN = Math.hypot(704, 1367);
+    const cimeEclaireeA = (part: number) =>
+      part * (RAYON_PLEIN + FRONT_UNITES) - FRONT_UNITES >= CIME;
+    expect(cimeEclaireeA(partRevelee(80)), "la cime n’est pas éclairée à 80 % du geste").toBe(true);
+    // …et le témoin du témoin : à mi-geste elle ne l'est pas encore, sinon la révélation ne
+    // révélerait plus rien dans sa seconde moitié.
+    expect(cimeEclaireeA(partRevelee(50))).toBe(false);
   });
 });
 
@@ -110,7 +132,8 @@ describe("[LE BORD] prefers-reduced-motion : l’arbre est là, entier, immobile
     // Le réglage existe pour supprimer le MOUVEMENT, pas le contenu. On ne montre donc pas une
     // graine figée (ce serait cacher l'image), mais l'arbre à son terme.
     expect(etatDuPortail(0, SEJOUR_REDUIT_MS, true).eveil).toBe(100);
-    expect(etatDuPortail(0, SEJOUR_REDUIT_MS, true).graine).toBe(0);
+    // Et l'arbre est alors ENTIER : la part révélée vaut un, pas « presque un ».
+    expect(partRevelee(etatDuPortail(0, SEJOUR_REDUIT_MS, true).eveil)).toBeCloseTo(1, 10);
   });
 
   it("[LE CŒUR] le portail reste quand même un instant, plutôt que de clignoter", () => {
@@ -135,7 +158,6 @@ describe("[LE BORD] FR-031 — rien de ce que rend ce module ne s’affiche en n
     // finirait par le peindre en barre, et FR-031 ne tiendrait plus qu'à la discipline.
     expect(Object.keys(etatDuPortail(100, DUREE_POUSSE_MS)).sort()).toEqual([
       "eveil",
-      "graine",
       "retrait",
     ]);
   });

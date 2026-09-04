@@ -22,7 +22,7 @@
  * en trois lignes et se casse en silence : il n'existe aucun état visible qui dise « le signal n'est
  * jamais venu ». Le plafond transforme une panne invisible en simple portail un peu long.
  *
- * ══ ET LA POUSSE VA TOUJOURS À SON TERME ═══════════════════════════════════════════════════════
+ * ══ ET LE GESTE VA TOUJOURS À SON TERME ════════════════════════════════════════════════════════
  *
  * Une scène prête en 300 ms ne coupe pas l'arbre à mi-hauteur : le geste se montre en entier ou ne
  * se montre pas. C'est ce que veut dire « portail » plutôt que « spinner » — un spinner s'interrompt
@@ -30,9 +30,9 @@
  *
  * ══ FR-031 : AUCUN NOMBRE NE SORT D'ICI POUR ÊTRE LU ═══════════════════════════════════════════
  *
- * L'éveil est un paramètre de DESSIN (0 → 100, la même échelle que `MoteurArbre.dessiner`), jamais
- * une progression affichable. Le produit n'a ni barre, ni pourcentage, ni « 3 sur 5 » : ce que la
- * personne voit avancer, c'est un arbre qui pousse, et un arbre n'annonce pas où il en est.
+ * L'éveil est un paramètre de DESSIN (0 → 100), jamais une progression affichable. Le produit n'a ni
+ * barre, ni pourcentage, ni « 3 sur 5 » : ce que la personne voit avancer, c'est un arbre qui vient
+ * à la lumière, et un arbre n'annonce pas où il en est.
  */
 
 /**
@@ -68,13 +68,16 @@ export const SEJOUR_REDUIT_MS = 320;
 
 /** Ce que le portail montre à un instant donné. Aucun texte : le sens vit dans la copie. */
 export interface EtatPortail {
-  /** L'éveil de l'arbre, 0 → 100 — l'échelle de `MoteurArbre`. Un paramètre de dessin, jamais un score. */
-  readonly eveil: number;
   /**
-   * L'opacité de la graine, 1 → 0. Elle s'efface exactement pendant que le bois monte : c'est UN
-   * fondu enchaîné, et non deux animations qui se croisent au hasard.
+   * L'éveil de l'arbre, 0 → 100. Un paramètre de dessin, jamais un score.
+   *
+   * ⚠️ CE CHAMP ÉTAIT ACCOMPAGNÉ D'UN `graine` (l'opacité d'un SVG superposé), retiré le
+   * 2026-09-04 avec le changement d'arbre. L'arbre du handoff PORTE SA GRAINE, peinte au pied du
+   * tronc, et c'est elle que la révélation découvre en premier : superposer un second dessin de
+   * graine aurait fait deux graines au même point — le défaut que `MoteurArbreLunaire.peindreBase`
+   * documente déjà pour la halte. Un champ dont plus personne ne se sert est un champ qui ment.
    */
-  readonly graine: number;
+  readonly eveil: number;
   /** Le portail est-il en train de se retirer ? */
   readonly retrait: boolean;
 }
@@ -99,30 +102,59 @@ export function momentDuDepart(sceneListeA: number | null, mouvementReduit = fal
   return Math.min(PLAFOND_MS, Math.max(plancher, sceneListeA));
 }
 
-/**
- * L'état du portail après `ecoule` millisecondes.
- *
- * ⚠️ LA GRAINE S'EFFACE TÔT, ET C'EST VOULU. Elle tient le premier cinquième de la pousse, là où le
- * moteur ne dessine encore qu'une amorce de tronc : sans elle, le portail s'ouvrirait sur un moignon
- * de bois plutôt que sur ce que Julian a demandé, « une graine ». Passé ce seuil, le tronc porte
- * l'image tout seul et la graine deviendrait un caillou posé au pied de l'arbre.
- */
+/** L'état du portail après `ecoule` millisecondes. */
 export function etatDuPortail(
   ecoule: number,
   depart: number,
   mouvementReduit = false,
 ): EtatPortail {
   if (mouvementReduit) {
-    return { eveil: 100, graine: 0, retrait: ecoule >= depart };
+    return { eveil: 100, retrait: ecoule >= depart };
   }
-  const avancement = adouci(ecoule / DUREE_POUSSE_MS);
   return {
-    eveil: avancement * 100,
-    // La graine s'efface sur le premier cinquième, en linéaire : un fondu adouci sur une durée
-    // aussi courte se lit comme un clignotement.
-    graine: Math.min(1, Math.max(0, 1 - ecoule / (DUREE_POUSSE_MS * 0.2))),
+    eveil: adouci(ecoule / DUREE_POUSSE_MS) * 100,
     retrait: ecoule >= depart,
   };
+}
+
+/**
+ * L'épaisseur du front de lumière, en unités du canevas logique du handoff (1408 × 2503).
+ *
+ * Un front NET donnerait un cercle qui grandit — un objet géométrique posé sur un arbre. Trois
+ * cents unités (environ un huitième de la hauteur) suffisent à ce que la lumière se lise comme une
+ * montée de sève et non comme un masque.
+ */
+export const FRONT_UNITES = 300;
+
+/**
+ * Ce qui est déjà révélé à la toute première image.
+ *
+ * ⚠️ SANS CE PLANCHER, LE PORTAIL S'OUVRE SUR DU VIDE. L'éveil part de zéro et sa courbe est lente
+ * au début : pendant les premières images, un voile radial de rayon nul ne montre RIEN. Un dixième
+ * du rayon, c'est exactement la graine PEINTE au pied du tronc et l'amorce du bois — « la graine »
+ * de la demande, et c'est celle de l'arbre lui-même, pas un second dessin posé dessus.
+ */
+export const PLANCHER_REVELE = 0.1;
+
+/**
+ * L'exposant qui étale le geste.
+ *
+ * ⚠️ MESURÉ SUR LA GÉOMÉTRIE, PAS RÉGLÉ À L'ŒIL. La cime est à 1297 unités de la graine et le coin
+ * le plus lointain du canevas à 1538 : une révélation LINÉAIRE n'éclaire donc pleinement le
+ * feuillage qu'à 85 % du geste, et la dernière part ne finit que des coins vides. L'exposant 0,6
+ * ramène ce moment à 77 % — la ramure a le temps de se lire avant que le portail ne parte.
+ */
+export const ETALEMENT = 0.6;
+
+/**
+ * La part du rayon déjà venue à la lumière, pour un éveil de 0 à 100.
+ *
+ * ⚠️ C'EST UN PARAMÈTRE DE DESSIN, PAS UNE PROGRESSION (FR-031). Il ne sort d'ici que pour poser un
+ * dégradé ; rien dans le produit ne l'affiche, ne l'arrondit et ne le compte.
+ */
+export function partRevelee(eveil: number): number {
+  const part = Math.min(1, Math.max(0, eveil / 100));
+  return PLANCHER_REVELE + (1 - PLANCHER_REVELE) * Math.pow(part, ETALEMENT);
 }
 
 /** Le portail a-t-il fini de se retirer ? Au-delà, il n'est plus dans le document. */

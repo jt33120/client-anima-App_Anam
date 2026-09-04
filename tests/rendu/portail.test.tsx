@@ -9,6 +9,7 @@ import {
   NOM_PORTAIL,
 } from "@/lib/domain/copie-portail";
 import { DUREE_POUSSE_MS, DUREE_RETRAIT_MS, PLAFOND_MS } from "@/lib/scene/portail";
+import { MoteurArbreLunaire } from "@/render/arbre/MoteurArbreLunaire";
 
 /**
  * portail.test.tsx — LE PORTAIL, RÉELLEMENT MONTÉ (2026-09-03).
@@ -25,6 +26,63 @@ const lire = (chemin: string) =>
   readFileSync(resolve(process.cwd(), chemin), "utf-8");
 
 const COPIE = { nom: NOM_PORTAIL, attente: ATTENTE_PORTAIL, annonce: ANNONCE_PORTAIL };
+
+/**
+ * Un contexte 2D qui AVALE tout et note les rayons extérieurs des dégradés radiaux.
+ *
+ * ⚠️ jsdom n'implémente pas `getContext("2d")` : sans ce double, le composant sort au premier `if`
+ * et toute garde de peinture serait vide — c'est-à-dire verte pour la mauvaise raison. Il ne simule
+ * rien, il ENREGISTRE, et c'est le seul endroit d'où l'on peut observer que la lumière avance.
+ *
+ * ⚠️ ET IL DOIT SATISFAIRE LE MOTEUR LUNAIRE AUSSI, pas seulement le voile : la cuisson passe par
+ * ce même `getContext`. D'où le `Proxy` — une centaine d'appels de dessin qu'on ne veut ni lister
+ * ni maintenir, et dont aucun ne nous intéresse. Ce qui nous intéresse tient en une ligne :
+ * `createRadialGradient`.
+ */
+function contexteDouble(rayons: number[]): CanvasRenderingContext2D {
+  const proprietes = new Map<string | symbol, unknown>();
+  const neRienFaire = () => undefined;
+  const degrade = { addColorStop: neRienFaire };
+  return new Proxy(
+    {},
+    {
+      get(_cible, cle) {
+        if (cle === "createRadialGradient") {
+          return (...args: number[]) => {
+            // Le rayon EXTÉRIEUR est le sixième argument : c'est le front de lumière.
+            rayons.push(args[5]);
+            return degrade;
+          };
+        }
+        if (cle === "createLinearGradient" || cle === "createPattern") return () => degrade;
+        if (cle === "canvas") return proprietes.get(cle);
+        if (proprietes.has(cle)) return proprietes.get(cle);
+        return neRienFaire;
+      },
+      set(_cible, cle, valeur) {
+        proprietes.set(cle, valeur);
+        return true;
+      },
+    },
+  ) as CanvasRenderingContext2D;
+}
+
+/**
+ * Pose le double sur tous les canevas, et rend le carnet des rayons du VOILE.
+ *
+ * ⚠️ UN CONTEXTE NEUF PAR CANEVAS, ET SEUL LE CANEVAS VISIBLE ENREGISTRE. Le moteur cuit dans
+ * QUATRE couches hors écran avant de composer : leur rendre le même carnet mêlerait leurs dégradés
+ * au nôtre, et la garde mesurerait un bruit au lieu du front de lumière.
+ */
+function poserContexteDouble(): number[] {
+  const rayons: number[] = [];
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(function (
+    this: HTMLCanvasElement,
+  ) {
+    return contexteDouble(this.isConnected ? rayons : []);
+  } as unknown as typeof HTMLCanvasElement.prototype.getContext);
+  return rayons;
+}
 
 /**
  * Le document ne finit JAMAIS de charger.
@@ -218,29 +276,71 @@ describe("[LE CŒUR] ce que le portail montre", () => {
     expect(lire("render/portail/portail.module.css")).not.toContain("text-shadow");
   });
 
-  it("[LE CŒUR] l’arbre POUSSE : le canevas est repeint à des éveils croissants", () => {
-    // ⚠️ MUTATION-CIBLE : passer un éveil constant. L'écran resterait joli et la demande —
-    // « qui passe par les différents stades, de graine à arbre » — serait perdue sans que rien ne
-    // rougisse. On mesure les éveils RÉELLEMENT reçus par le moteur.
-    const eveils: number[] = [];
-    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+  it("[LE CŒUR] la lumière S’OUVRE : le front du voile grandit d’une image à l’autre", async () => {
+    // ⚠️ MUTATION-CIBLE : passer un éveil constant au voile. L'écran resterait joli et la demande —
+    // « qui passe par les différents stades, de graine à arbre scintillant » — serait perdue sans
+    // que rien ne rougisse.
+    //
+    // ⚠️ ET C'EST UNE GARDE DE COMPORTEMENT, PAS DE CÂBLAGE. jsdom ne fournit aucun contexte 2D :
+    // la version précédente lisait donc l'opacité d'un SVG, c'est-à-dire tout sauf la peinture.
+    // Ici on POSE un contexte double qui enregistre les rayons réellement demandés, et on lit la
+    // révélation là où elle se produit.
+    const rayons = poserContexteDouble();
+
     const t = horloge();
-    const { container } = render(<PortailAnam copie={COPIE} />);
-    // Le moteur refuse de peindre sans contexte 2D (jsdom n'en fournit pas) : on lit donc la
-    // progression là où elle est observable, sur l'opacité de la graine, qui descend de 1 à 0.
-    const opacite = () => {
-      const el = container.querySelector<HTMLElement>("[data-portail-anam] div[style]");
-      return el ? Number(el.style.getPropertyValue("--opacite-graine")) : 0;
-    };
-    t.avancer(0);
-    eveils.push(opacite());
-    t.avancer(220);
-    eveils.push(opacite());
-    t.avancer(220);
-    eveils.push(opacite());
-    expect(eveils[0], "la graine n’est pas pleine au départ").toBeCloseTo(1, 2);
-    expect(eveils[1]).toBeLessThan(eveils[0]);
-    expect(eveils[2]).toBeLessThan(eveils[1]);
+    render(<PortailAnam copie={COPIE} />);
+    for (const pas of [0, 300, 300, 300, 300]) t.avancer(pas || 1);
+
+    expect(rayons.length, "aucun voile n’a été posé").toBeGreaterThan(3);
+    for (let i = 1; i < rayons.length; i += 1) {
+      expect(rayons[i], `la lumière a reculé à l’image ${i}`).toBeGreaterThanOrEqual(rayons[i - 1]);
+    }
+    // …et elle a VRAIMENT bougé : monotone est vrai d'une constante.
+    expect(rayons[rayons.length - 1]).toBeGreaterThan(rayons[0] * 1.5);
+  });
+
+  it("[LE CŒUR] l’arbre est CUIT UNE SEULE FOIS — jamais à chaque image", async () => {
+    // ⚠️ MUTATION-CIBLE : déplacer la cuisson dans l'effet de peinture. C'est la première version
+    // écrite le 2026-09-04, et elle a été MESURÉE avant d'être jetée : 66 images coûtaient 7,7 s de
+    // fil principal (90 ms l'image), exactement pendant que la page s'hydrate. Rien ne l'aurait dit
+    // — l'écran est identique, il rame.
+    const rayons = poserContexteDouble();
+    const cuisson = vi.spyOn(MoteurArbreLunaire.prototype, "mettreAJour");
+
+    const t = horloge();
+    render(<PortailAnam copie={COPIE} />);
+    for (const pas of [0, 300, 300, 300, 300]) t.avancer(pas || 1);
+
+    expect(rayons.length, "aucune image n’a été peinte").toBeGreaterThan(3);
+    expect(cuisson, "le moteur lunaire est rappelé à chaque image").toHaveBeenCalledTimes(1);
+  });
+
+  it("[LE CŒUR] c’est l’arbre DU PRODUIT, pas le décor de la scène", () => {
+    // ⚠️ LA GARDE QUI MANQUAIT LE 2026-09-03, ET C'EST UN RETOUR DE JULIAN QUI L'A TROUVÉE :
+    // « c'est pas du tout le bon arbre sur l'écran de chargement, le bon avait des racines et
+    // s'illuminait ». Le dépôt porte deux arbres ; le portail montrait le DÉCOR (`arbre-vivant.tsx`,
+    // un bouquet sans racines ni lumière) au lieu du handoff « Arbre de Vie Lunaire ». Les deux
+    // compilent, les deux dessinent un arbre, et aucune garde ne distinguait l'un de l'autre.
+    const source = lire("render/portail/ArbreQuiPousse.tsx");
+    expect(source, "le portail ne dessine pas l’arbre lunaire").toContain("MoteurArbreLunaire");
+    expect(
+      source.replace(/\/\*[\s\S]*?\*\//g, " "),
+      "le portail est revenu à l’arbre du décor",
+    ).not.toMatch(/from\s+"(\.\.\/arbre-vivant|@\/render\/arbre-vivant)"/);
+  });
+
+  it("la boîte de l’arbre porte les proportions du canevas du handoff", () => {
+    // ⚠️ MUTATION-CIBLE : garder les 1408 × 860 du décor. L'arbre lunaire serait écrasé de moitié,
+    // et ça se lirait comme un choix graphique. Le patron vient de `tests/scene-sans-bords.test.ts`,
+    // qui tient la même promesse pour l'arbre de la scène.
+    const geometrie = lire("render/arbre/geometrie.ts");
+    const attendu = /export const CANEVAS = \{ largeur: (\d+), hauteur: (\d+) \}/.exec(geometrie);
+    expect(attendu, "la forme de `CANEVAS` a changé : la garde ne sait plus quoi comparer").not.toBeNull();
+
+    const css = lire("render/portail/portail.module.css");
+    const bloc = css.split(".arbre {")[1].split("}")[0];
+    expect(bloc).toContain(`--largeur-canevas: ${attendu![1]}`);
+    expect(bloc).toContain(`--hauteur-canevas: ${attendu![2]}`);
   });
 });
 
