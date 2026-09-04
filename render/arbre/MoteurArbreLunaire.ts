@@ -31,7 +31,11 @@ export function contenuEtapeLunaire(nombreBranches: number): {
   return { graine: true, arbre: nombreBranches > 0 };
 }
 
-const DPR_HANDOFF = 0.7;
+/**
+ * L'échelle de rastérisation du handoff : le canevas logique 1408 × 2503 est peint à 0,7 pixel par
+ * unité. C'est le RÉGLAGE DE L'ARBRE RÉEL, celui qu'on peut agrandir au zoom, et il ne bouge pas.
+ */
+export const ECHELLE_HANDOFF = 0.7;
 const composantesHex = (hex: string): readonly [number, number, number] => {
   const valeur = Number.parseInt(hex.slice(1), 16);
   return [(valeur >> 16) & 255, (valeur >> 8) & 255, valeur & 255];
@@ -194,29 +198,43 @@ export class MoteurArbreLunaire {
   private etapePeinte: string | null = null;
   private initialise = false;
   private readonly lumiere = { x: -0.52, y: -0.85 };
+  private readonly echelle: number;
 
-  constructor(canvas: HTMLCanvasElement) {
+  /**
+   * @param echelle pixels par unité du canevas logique. Par défaut celle du handoff.
+   *
+   * ⚠️ PARAMÈTRE AJOUTÉ LE 2026-09-04, POUR UN APPELANT ET UN SEUL : le portail d'entrée. Mesuré
+   * dans Chromium à `Emulation.setCPUThrottlingRate: 4` (un téléphone de milieu de gamme) : une
+   * cuisson en plein rayonnement à l'échelle du handoff coûte **1 814 ms** de fil principal. Le
+   * portail couvre l'hydratation — payer deux secondes de calcul PENDANT elle retarderait
+   * précisément ce qu'il attend. Le portail dessine un arbre de quelques centaines de pixels ; il
+   * n'a aucune raison de payer celui qu'on peut agrandir au zoom.
+   *
+   * L'arbre réel, lui, garde le défaut : cette valeur est celle du prototype validé au pixel près.
+   */
+  constructor(canvas: HTMLCanvasElement, echelle: number = ECHELLE_HANDOFF) {
     this.canvas = canvas;
+    this.echelle = echelle;
   }
 
   private creerCouche(): Couche | null {
     const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(CANEVAS.largeur * DPR_HANDOFF);
-    canvas.height = Math.ceil(CANEVAS.hauteur * DPR_HANDOFF);
+    canvas.width = Math.ceil(CANEVAS.largeur * this.echelle);
+    canvas.height = Math.ceil(CANEVAS.hauteur * this.echelle);
     const contexte = contexte2d(canvas);
     if (!contexte) return null;
-    contexte.scale(DPR_HANDOFF, DPR_HANDOFF);
+    contexte.scale(this.echelle, this.echelle);
     return { canvas, contexte };
   }
 
   private initialiser(): boolean {
     if (this.initialise) return Boolean(this.contexte && this.couches);
     this.initialise = true;
-    this.canvas.width = Math.ceil(CANEVAS.largeur * DPR_HANDOFF);
-    this.canvas.height = Math.ceil(CANEVAS.hauteur * DPR_HANDOFF);
+    this.canvas.width = Math.ceil(CANEVAS.largeur * this.echelle);
+    this.canvas.height = Math.ceil(CANEVAS.hauteur * this.echelle);
     const contexte = contexte2d(this.canvas);
     if (!contexte) return false;
-    contexte.scale(DPR_HANDOFF, DPR_HANDOFF);
+    contexte.scale(this.echelle, this.echelle);
 
     const base = this.creerCouche();
     const wood = this.creerCouche();
@@ -539,13 +557,13 @@ export class MoteurArbreLunaire {
     const largeur = Math.ceil(largeurMax * 2 + marge * 2 + Math.abs(forme.courbe) * longueur);
     const hauteur = Math.ceil(longueur + marge * 2);
     const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(largeur * DPR_HANDOFF);
-    canvas.height = Math.ceil(hauteur * DPR_HANDOFF);
+    canvas.width = Math.ceil(largeur * this.echelle);
+    canvas.height = Math.ceil(hauteur * this.echelle);
     const contexte = contexte2d(canvas);
     const baseX = largeur / 2 - forme.courbe * longueur * 0.5;
     const baseY = hauteur - marge;
     if (!contexte) return { canvas, baseX, baseY, largeur, hauteur };
-    contexte.scale(DPR_HANDOFF, DPR_HANDOFF);
+    contexte.scale(this.echelle, this.echelle);
     const pointeX = largeur / 2 + forme.courbe * longueur * 0.5;
     const pointeY = marge;
     const milieuX = (baseX + pointeX) / 2;

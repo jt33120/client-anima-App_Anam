@@ -59,35 +59,36 @@
 }
 
 /* ── L'ARBRE ──────────────────────────────────────────────────────────────────────────────────
-   ⚠️ LA MÊME GÉOMÉTRIE QUE LE DÉCOR DE LA SCÈNE, ET DÉDUITE DE LA MÊME FAÇON. `arbre-vivant.tsx`
-   dessine dans 1408 × 860 ; la hauteur vaut donc la largeur × 860/1408, jamais un nombre choisi.
-   Poser une hauteur libre ferait sauter l'arbre entre le portail et la scène qui lui succède. */
+   ⚠️ LE CANEVAS DU PRODUIT, PAS CELUI DU DÉCOR (2026-09-04). Le portail montrait l'arbre de
+   `arbre-vivant.tsx` (1408 × 860, un feuillage en bouquet sans racines ni lumière) ; il montre
+   maintenant celui du handoff « Arbre de Vie Lunaire » — `CANEVAS` de `render/arbre/geometrie.ts`,
+   1408 × 2503, un PORTRAIT parce que la moitié basse est l'éventail des racines.
+
+   Ces deux nombres sont la seule copie de `CANEVAS` hors du module de géométrie, et
+   `tests/rendu/portail.test.tsx` les compare à la source : le jour où le handoff bouge, la garde
+   rougit au lieu de laisser un arbre écrasé.
+
+   LA HAUTEUR COMMANDE, ET LA LARGEUR EN DÉCOULE. L'inverse (poser une largeur) donne, sur un
+   téléphone, un arbre de deux écrans de haut qui pousse le nom et le lotus hors du champ. */
 .arbre {
+  --largeur-canevas: 1408;
+  --hauteur-canevas: 2503;
+  /* 58vh laisse de quoi loger le nom, la ligne d'attente et le lotus sous l'arbre sur un téléphone
+     court ; 29rem l'empêche de devenir une affiche sur un grand écran. Mesuré sur une capture en
+     390 × 844 : au-delà, le lotus d'attente sort du champ. */
+  --hauteur-arbre: min(58vh, 29rem);
+  --largeur-arbre: calc(
+    var(--hauteur-arbre) * var(--largeur-canevas) / var(--hauteur-canevas)
+  );
   position: relative;
-  width: min(76vw, 27rem);
-  height: calc(min(76vw, 27rem) * 860 / 1408);
+  width: var(--largeur-arbre);
+  height: var(--hauteur-arbre);
 }
 
 .canevas {
   display: block;
   width: 100%;
-  height: auto;
-}
-
-/* La graine, posée au pied du tronc. `cadrer()` (arbre-vivant.tsx) recadre l'encre après
-   génération en incluant l'ombre au sol, qui descend d'environ 48 unités sous la base : le pied du
-   tronc atterrit donc à quelques pour cent du bas, et ce 6 % est un réglage à l'œil, pas une
-   déduction. Il est tolérant : la graine ne paraît que pendant le premier cinquième de la pousse,
-   au moment où le bois n'est encore qu'une amorce.
-   Son opacité descend du composant par un jeton : la VALEUR est calculée, ce qu'elle fait est
-   décidé ici. */
-.graine {
-  position: absolute;
-  left: 50%;
-  bottom: 6%;
-  transform: translateX(-50%);
-  opacity: var(--opacite-graine, 1);
-  pointer-events: none;
+  height: 100%;
 }
 
 /* ── CE QUI SE LIT SOUS L'ARBRE ────────────────────────────────────────────────────────────────

@@ -39,18 +39,13 @@ interface Crown { cx: number; cy: number; rx: number; ry: number }
 type GenOpts = { curv?: number; taperPow?: number; flare?: boolean; toward?: number; towardK?: number; root?: boolean; kind?: string };
 
 /**
- * ⚠️ EXPORTÉE LE 2026-09-03, POUR UN SECOND CONSOMMATEUR ET UN SEUL : le portail d'entrée
- * (`render/portail/`). Le décor de la scène la garde figée à `NIVEAU_DECOR` ; le portail, lui, fait
- * MONTER l'éveil de 0 à 100 une fois, au lancement.
- *
- * Ce n'est pas une exception à « aucune animation de croissance » (AC10) : cette règle-là vise
- * `MoteurArbreLunaire`, l'arbre RÉEL et adressable, dont la croissance dirait quelque chose de la
- * personne. Ici l'arbre est un DÉCOR muet (AD-7, aucune donnée), et la pousse est une animation
- * FINIE — le même régime que le remplissage d'étoiles du seuil, écrit dans `monde.module.css` :
- * elle s'arrête d'elle-même, ne boucle pas, ne rejoue jamais, et rend son état final tout de suite
- * sous `prefers-reduced-motion`.
+ * ⚠️ EXPORTÉE LE 2026-09-03, PUIS REFERMÉE LE 2026-09-04 : elle n'a plus qu'un consommateur, le
+ * composant du bas de ce fichier. Le second était le portail d'entrée, et c'était une erreur — il
+ * montrait le DÉCOR là où il fallait l'arbre du produit (voir l'en-tête de
+ * `render/portail/ArbreQuiPousse.tsx`). Un `export` sans appelant est une invitation à refaire la
+ * même confusion : il repart avec elle.
  */
-export class MoteurArbre {
+class MoteurArbre {
   private canvas: HTMLCanvasElement;
   private light = { x: -0.5, y: -0.83 };
   private W = 1408;

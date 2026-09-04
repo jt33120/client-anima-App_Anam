@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  DUREE_POUSSE_MS,
-  etatDuPortail,
-  momentDuDepart,
-  portailFini,
-} from "@/lib/scene/portail";
+import { etatDuPortail, momentDuDepart, portailFini } from "@/lib/scene/portail";
 import LotusAttente from "../conversation/LotusAttente";
 import ArbreQuiPousse from "./ArbreQuiPousse";
 import s from "./portail.module.css";
@@ -39,12 +34,12 @@ import s from "./portail.module.css";
  * qui peut lever, se démonter, ou changer de forme. Un signal du navigateur ne se perd pas, et le
  * plafond couvre le cas où il arriverait trop tard de toute façon.
  *
- * ══ LE MOUVEMENT : UNE POUSSE FINIE, PAS UNE BOUCLE ════════════════════════════════════════════
+ * ══ LE MOUVEMENT : UNE LUMIÈRE QUI S'OUVRE, PAS UNE BOUCLE ═════════════════════════════════════
  *
- * La respiration reste le seul mouvement en boucle du produit. La pousse, elle, va dans un sens et
- * s'arrête — le régime déjà écrit pour le remplissage d'étoiles du seuil (`monde.module.css`). Sous
- * `prefers-reduced-motion`, l'arbre paraît d'emblée à son terme, immobile, et le portail s'efface
- * après un battement : on retire le MOUVEMENT, jamais l'image.
+ * La respiration reste le seul mouvement en boucle du produit. La lumière du portail, elle, va dans
+ * un sens et s'arrête — le régime déjà écrit pour le remplissage d'étoiles du seuil
+ * (`monde.module.css`). Sous `prefers-reduced-motion`, l'arbre paraît d'emblée entier et rayonnant,
+ * immobile, et le portail s'efface après un battement : on retire le MOUVEMENT, jamais l'image.
  */
 export default function PortailAnam({
   copie,
@@ -55,7 +50,7 @@ export default function PortailAnam({
     readonly annonce: string;
   };
 }) {
-  const [etat, setEtat] = useState({ eveil: 0, graine: 1, temps: 0, retrait: false });
+  const [etat, setEtat] = useState({ eveil: 0, retrait: false });
   const [parti, setParti] = useState(false);
   /** L'instant où la scène s'est déclarée prête. `null` tant qu'elle ne l'a pas fait — et le
    *  plafond décide alors seul (voir `momentDuDepart`). */
@@ -76,13 +71,13 @@ export default function PortailAnam({
     if (document.readyState === "complete") marquerPrete();
     else window.addEventListener("load", marquerPrete, { once: true });
 
-    // ⚠️ ON NE PEINT PAS À CHAQUE FRAME, ET C'EST DÉLIBÉRÉ. Chaque peinture redessine TOUT le bois
-    // (`drawWood` repasse sur chaque segment dès que l'éveil bouge d'un millième) : à 60 im/s
-    // pendant la pousse, cela fait plus de cent redessins complets, exactement pendant que la page
-    // s'hydrate — le moment le plus chargé de la vie de l'app, sur le téléphone le plus lent.
-    // Trente images par seconde suffisent amplement à une croissance de deux secondes, et divisent
-    // ce travail par deux. La boucle, elle, continue de tourner à la frame : c'est le RENDU qu'on
-    // espace, jamais la mesure du temps.
+    // ⚠️ ON NE PEINT PAS À CHAQUE FRAME, ET C'EST DÉLIBÉRÉ. Trente images par seconde suffisent
+    // amplement à un geste de deux secondes, et divisent par deux le travail fait pendant que la
+    // page s'hydrate — le moment le plus chargé de la vie de l'app, sur le téléphone le plus lent.
+    // La boucle, elle, continue de tourner à la frame : c'est le RENDU qu'on espace, jamais la
+    // mesure du temps. (Depuis le 2026-09-04 chaque image ne coûte qu'un voile posé sur un bitmap
+    // déjà cuit — mesuré à 0 ms en médiane ; l'espacement reste, il ne coûte rien et il protège
+    // des appareils qu'on ne mesure pas.)
     const PAS_MS = 1000 / 30;
     let frame = 0;
     let dernierRendu = -Infinity;
@@ -98,12 +93,7 @@ export default function PortailAnam({
         return;
       }
       dernierRendu = ecoule;
-      setEtat({
-        ...etatDuPortail(ecoule, depart, reduit),
-        // Le balancement du feuillage, en secondes, et FIGÉ sous mouvement réduit : c'est le
-        // « souple » de la demande, et c'est aussi la seule part du dessin qui bouge en continu.
-        temps: reduit ? 0 : Math.min(ecoule, DUREE_POUSSE_MS) / 1000,
-      });
+      setEtat(etatDuPortail(ecoule, depart, reduit));
       frame = requestAnimationFrame(peindre);
     };
     frame = requestAnimationFrame(peindre);
@@ -126,7 +116,7 @@ export default function PortailAnam({
       aria-label={copie.annonce}
     >
       <div className={s.scene}>
-        <ArbreQuiPousse eveil={etat.eveil} graine={etat.graine} temps={etat.temps} />
+        <ArbreQuiPousse eveil={etat.eveil} />
         {/* Le nom porte le scintillement de `globals.css` — le halo derrière la lettre, jamais une
             ombre portée sur le texte (leçon de `tests/voile.test.ts`). */}
         <p className={`${s.nom} t-titre scintillement`}>{copie.nom}</p>
