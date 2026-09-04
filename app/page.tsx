@@ -8,6 +8,12 @@ import { lireThemeNatal } from "@/lib/data/depot-theme-natal";
 import { estPremiumCourante } from "@/lib/data/lire-abonnement";
 import { ephemerideAstronomyEngine } from "@/lib/astro/adapters/astronomy-engine";
 import SceneDom from "@/render/scene-dom";
+import PortailAnam from "@/render/portail/PortailAnam";
+import {
+  ANNONCE_PORTAIL,
+  ATTENTE_PORTAIL,
+  NOM_PORTAIL,
+} from "@/lib/domain/copie-portail";
 import { marquerAnnonceSocleDite } from "@/app/_socle/marquer-annonce";
 import { marquerHypotheseDite } from "@/app/_enneagramme/marquer-hypothese";
 import { marquerSeuilFranchi } from "@/app/_seuil/marquer-franchissement";
@@ -141,7 +147,20 @@ export default async function Page() {
    * cette MÊME ligne persistée. Le client les commet ensemble : aucun doublon ni ordre qui bouge.
    */
   return (
-    <SceneDom
+    <>
+      {/* ⚠️ LE PORTAIL EST SUR LA SCÈNE, PAS DANS LE LAYOUT, ET C'EST UNE DÉCISION.
+          Monté à la racine, il couvrirait AUSSI `/aide` — la page qui doit marcher quand tout le
+          reste est cassé (AD-9, FR-077), et dont `HalteEnAttente` écrit qu'elle ne reçoit aucun
+          écran d'attente parce que « quelqu'un qui ouvre cette page peut être en train d'en avoir
+          besoin tout de suite ; un écran d'attente, si court soit-il, est un écran où il n'y a
+          personne à appeler ». Un portail de marque devant un numéro d'urgence serait la même
+          faute, en plus joli.
+          L'univers d'Anam, c'est la scène : le portail s'ouvre là, et nulle part ailleurs. Les
+          haltes gardent leurs squelettes muets (`render/HalteEnAttente.tsx`). */}
+      <PortailAnam
+        copie={{ nom: NOM_PORTAIL, attente: ATTENTE_PORTAIL, annonce: ANNONCE_PORTAIL }}
+      />
+      <SceneDom
       projection={projection}
       onReclamerOuvertureQuotidienne={reclamerOuvertureDuJour}
       onChargerOuvertureCourante={chargerOuvertureCourante}
@@ -179,6 +198,7 @@ export default async function Page() {
         action: ACTION_SEUIL,
         altAvatar: ALT_AVATAR_SEUIL,
       }}
-    />
+      />
+    </>
   );
 }

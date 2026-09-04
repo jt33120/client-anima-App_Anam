@@ -38,7 +38,19 @@ interface Tuft { canvas: HTMLCanvasElement; R: number }
 interface Crown { cx: number; cy: number; rx: number; ry: number }
 type GenOpts = { curv?: number; taperPow?: number; flare?: boolean; toward?: number; towardK?: number; root?: boolean; kind?: string };
 
-class MoteurArbre {
+/**
+ * ⚠️ EXPORTÉE LE 2026-09-03, POUR UN SECOND CONSOMMATEUR ET UN SEUL : le portail d'entrée
+ * (`render/portail/`). Le décor de la scène la garde figée à `NIVEAU_DECOR` ; le portail, lui, fait
+ * MONTER l'éveil de 0 à 100 une fois, au lancement.
+ *
+ * Ce n'est pas une exception à « aucune animation de croissance » (AC10) : cette règle-là vise
+ * `MoteurArbreLunaire`, l'arbre RÉEL et adressable, dont la croissance dirait quelque chose de la
+ * personne. Ici l'arbre est un DÉCOR muet (AD-7, aucune donnée), et la pousse est une animation
+ * FINIE — le même régime que le remplissage d'étoiles du seuil, écrit dans `monde.module.css` :
+ * elle s'arrête d'elle-même, ne boucle pas, ne rejoue jamais, et rend son état final tout de suite
+ * sous `prefers-reduced-motion`.
+ */
+export class MoteurArbre {
   private canvas: HTMLCanvasElement;
   private light = { x: -0.5, y: -0.83 };
   private W = 1408;
@@ -520,10 +532,18 @@ class MoteurArbre {
    * `tests/arbre-sans-fruit.test.ts` refuse désormais qu'une pomme revienne.
    */
 
-  /** Rendu STATIQUE à un niveau d'éveil (0→100). Une frame, aucun mouvement. */
-  dessiner(eveil: number): void {
+  /**
+   * Rendu d'UNE frame à un niveau d'éveil (0→100).
+   *
+   * `temps` est l'horloge du balancement du feuillage, en secondes. À 0 — le défaut, et le seul
+   * appel du décor depuis 4.6 — l'image est parfaitement immobile. Le portail, lui, la fait avancer
+   * pendant sa pousse : c'est ce qui rend l'arbre « souple » plutôt que raide, et ça s'arrête avec
+   * la pousse. Aucune boucle ne survit à l'appelant : ce moteur ne demande jamais une frame
+   * lui-même (aucun `requestAnimationFrame` ici — c'est l'appelant qui cadence).
+   */
+  dessiner(eveil: number, temps = 0): void {
     if (!this.built || !this.ctx) return;
-    this.draw(clamp(eveil, 0, 100) / 100, 0);
+    this.draw(clamp(eveil, 0, 100) / 100, temps);
   }
 }
 
