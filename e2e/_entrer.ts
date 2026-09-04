@@ -12,6 +12,30 @@ import { adresseNeuve, codeDans, courrielPour, viderLaBoite } from "./_boite-aux
  */
 export type Compte = { readonly adresse: string };
 
+/**
+ * Attendre que le PORTAIL D'ENTRÉE soit parti (2026-09-03).
+ *
+ * ⚠️ POURQUOI CE HELPER EXISTE, ET POURQUOI IL EST ICI PLUTÔT QUE DANS CHAQUE SPEC. Le portail
+ * (`render/portail/`) couvre la scène pendant sa pousse, au lancement et à chaque rafraîchissement.
+ * Il ne prend aucun pointeur — un clic le traverse — mais il CACHE : une capture prise pendant sa
+ * pousse photographie un arbre qui grandit, pas la scène qu'on voulait mesurer.
+ *
+ * Le mettre dans les deux portes d'entrée du dossier `e2e/` plutôt que dans dix-sept specs, c'est
+ * la même règle que partout : un geste que tout le monde doit faire n'est pas un geste qu'on
+ * rappelle à tout le monde.
+ *
+ * Il est SANS EFFET là où le portail n'existe pas — une halte, un écran d'authentification : un
+ * sélecteur jamais attaché est déjà « détaché », et l'attente se résout tout de suite.
+ */
+export async function attendreLePortail(page: Page): Promise<void> {
+  // La borne dépasse le plafond du portail (6 s) plus son fondu (0,7 s) : au-delà, ce n'est plus
+  // une pousse qui traîne, c'est un défaut — et le laisser lever ici le DIT, au lieu de le
+  // transformer en un échec obscur dans la spec appelante.
+  await page
+    .locator("[data-portail-anam]")
+    .waitFor({ state: "detached", timeout: 10_000 });
+}
+
 export async function ouvrirUnCompteNeuf(page: Page): Promise<Compte> {
   const adresse = adresseNeuve("parcours");
   await viderLaBoite();
@@ -38,6 +62,8 @@ export async function ouvrirUnCompteNeuf(page: Page): Promise<Compte> {
   await page.getByRole("button", { name: /je commence/i }).click();
 
   await page.waitForURL((u) => !/\/(naissance|consentement|entrer)/.test(u.pathname));
+  // La scène vient d'apparaître : son portail pousse par-dessus. On le laisse finir.
+  await attendreLePortail(page);
   return { adresse };
 }
 
@@ -54,6 +80,7 @@ export async function ouvrirUnCompteNeuf(page: Page): Promise<Compte> {
  * l'accueil, et ce helper doit servir dans les deux cas.
  */
 export async function entrerDansLaRegion(page: Page, nom: string | RegExp): Promise<void> {
+  await attendreLePortail(page);
   const porte = page.getByRole("button", { name: /commencer/i });
   if (await porte.isVisible().catch(() => false)) await porte.click();
   await passerLeTour(page);

@@ -1,0 +1,122 @@
+/* ══════════════════════════════════════════════════════════════════════════════════════════════
+   portail.module.css — LE PORTAIL D'ENTRÉE VERS L'UNIVERS D'ANAM (2026-09-03)
+
+   Le voile qui couvre le lancement, l'arbre qui pousse dedans, et ce qui se lit sous lui.
+
+   ⚠️ AUCUNE COULEUR EN DUR. Tout vient des jetons (`app/styles/globals.css`), y compris le fond du
+   voile : le portail est la PREMIÈRE image du produit, et une couleur écrite ici serait la première
+   à mentir le jour où la palette bouge. C'est la règle posée le 2026-09-03 (« toutes les couleurs
+   dans des fichiers de design qu'il suffit de modifier »), et `tests/design-centralise.test.ts` la
+   tient.
+
+   ⚠️ AUCUNE BARRE, AUCUN ANNEAU, AUCUN POURCENTAGE (FR-031). Il n'y a volontairement AUCUNE classe
+   de progression dans ce fichier : ce qui n'existe pas ne se rajoute pas « juste pour aider ». Ce
+   qu'on voit avancer est un arbre, et un arbre n'annonce pas où il en est.
+   ══════════════════════════════════════════════════════════════════════════════════════════════ */
+
+.portail {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--esp-6) var(--marge-mobile);
+  background: var(--fond);
+  /* ⚠️ LA PROPRIÉTÉ QUI FAIT QUE CE VOILE NE PEUT PIÉGER PERSONNE. La scène est déjà montée
+     dessous : un doigt posé pendant le portail l'atteint. Un plein écran qui INTERCEPTE, même une
+     seconde, est un plein écran dont il faut prouver qu'il part — ici il n'y a rien à prouver. */
+  pointer-events: none;
+  opacity: 1;
+  visibility: visible;
+  /* ⚠️ `visibility` EST DIFFÉRÉE DE TOUTE LA DURÉE DU FONDU, ET C'EST UN DÉFAUT CORRIGÉ PLUTÔT
+     QU'UNE SUBTILITÉ. La première version posait `visibility: hidden` avec l'opacité : la
+     propriété n'est pas interpolable, elle bascule donc à la première frame — le voile
+     disparaissait d'un coup et la transition d'opacité ne se voyait JAMAIS. Le fondu de sortie
+     était mort-né, et rien ne l'aurait dit : l'écran est correct, juste brutal.
+     `0s linear var(--duree-longue)` la fait basculer à la FIN. Elle sert à ce que rien ne
+     subsiste dans l'arbre d'accessibilité une fois le voile transparent. */
+  transition:
+    opacity var(--duree-longue) var(--courbe),
+    visibility 0s linear var(--duree-longue);
+}
+
+.retrait {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ── LA COMPOSITION ────────────────────────────────────────────────────────────────────────────
+   L'arbre, le nom, la ligne, le signe. Dans cet ordre, et centré : c'est une porte, pas un tableau
+   de bord. Les espacements suivent l'échelle du produit. */
+.scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-4);
+  width: 100%;
+  max-width: var(--mesure);
+  text-align: center;
+}
+
+/* ── L'ARBRE ──────────────────────────────────────────────────────────────────────────────────
+   ⚠️ LA MÊME GÉOMÉTRIE QUE LE DÉCOR DE LA SCÈNE, ET DÉDUITE DE LA MÊME FAÇON. `arbre-vivant.tsx`
+   dessine dans 1408 × 860 ; la hauteur vaut donc la largeur × 860/1408, jamais un nombre choisi.
+   Poser une hauteur libre ferait sauter l'arbre entre le portail et la scène qui lui succède. */
+.arbre {
+  position: relative;
+  width: min(76vw, 27rem);
+  height: calc(min(76vw, 27rem) * 860 / 1408);
+}
+
+.canevas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* La graine, posée au pied du tronc. `cadrer()` (arbre-vivant.tsx) recadre l'encre après
+   génération en incluant l'ombre au sol, qui descend d'environ 48 unités sous la base : le pied du
+   tronc atterrit donc à quelques pour cent du bas, et ce 6 % est un réglage à l'œil, pas une
+   déduction. Il est tolérant : la graine ne paraît que pendant le premier cinquième de la pousse,
+   au moment où le bois n'est encore qu'une amorce.
+   Son opacité descend du composant par un jeton : la VALEUR est calculée, ce qu'elle fait est
+   décidé ici. */
+.graine {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  opacity: var(--opacite-graine, 1);
+  pointer-events: none;
+}
+
+/* ── CE QUI SE LIT SOUS L'ARBRE ────────────────────────────────────────────────────────────────
+   Le nom porte `.scintillement` (globals.css) : un halo derrière la lettre dont l'opacité respire,
+   jamais une ombre portée sur le texte. Le contraste mesuré du nom vaut à toute seconde ce qu'il
+   vaut à l'arrêt — c'est la leçon de `tests/voile.test.ts`, et elle vaut ici aussi. */
+.nom {
+  margin: 0;
+  color: var(--texte);
+}
+
+.attente {
+  margin: 0;
+  color: var(--texte-doux);
+}
+
+.lotus {
+  margin-top: var(--esp-2);
+}
+
+/* ── prefers-reduced-motion ────────────────────────────────────────────────────────────────────
+   L'arbre paraît déjà à son terme (le modèle rend `eveil: 100` dès la première frame) : il n'y a
+   donc rien à neutraliser côté pousse. Ce qui reste à couper, c'est le FONDU du voile — un plein
+   écran qui s'efface en sept dixièmes de seconde est encore du mouvement plein écran. Il part
+   d'un coup. Le lotus et le scintillement s'arrêtent par leurs propres feuilles. */
+@media (prefers-reduced-motion: reduce) {
+  .portail {
+    transition:
+      opacity var(--duree-courte) var(--courbe),
+      visibility 0s linear var(--duree-courte);
+  }
+}
