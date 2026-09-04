@@ -181,8 +181,31 @@ export const TABLES_EXPORTEES: readonly string[] = INVENTAIRE_EXPORT.filter(
   (e) => e.verdict === "inclus",
 ).map((e) => e.table);
 
-/** Toutes les colonnes retirées, à plat. Sert de garde : aucune ne doit apparaître dans un export. */
+/**
+ * Toutes les colonnes retirées, à plat.
+ *
+ * ⚠️ CETTE VUE PERD LA TABLE, ET C'EST UN PIÈGE QUI A MORDU (2026-09-04). Un retrait est déclaré
+ * POUR UNE TABLE — `cle_idempotence` est retirée de `reservation_quota_ia`, et d'elle seule. Or
+ * `usage_ia` (0008), `audit_securite` (0009) et `remboursement` (0038) portent chacune une colonne
+ * du même nom, sans aucun rapport : une clé d'idempotence interne, écrite côté serveur, qu'aucune
+ * personne ne peut rejouer (`reserver_quota_ia_atomique` n'est accordée qu'à `service_role`).
+ *
+ * Une garde qui cherchait le NOM dans toutes les tables voyait donc trois fuites qui n'existaient
+ * pas, et rougissait sur des colonnes parfaitement légitimes. Elle utilise désormais
+ * `estColonneRetiree`, qui compare le COUPLE. Cette vue à plat reste pour ce à quoi elle sert
+ * vraiment : compter les retraits et vérifier que le SQL les annonce tous.
+ */
 export const COLONNES_RETIREES: readonly string[] = INVENTAIRE_EXPORT.flatMap((e) => e.retraits ?? []);
+
+/**
+ * Cette colonne est-elle retirée DE CETTE TABLE ?
+ *
+ * La seule question qui a un sens : un retrait déclaré sur une table ne dit rien d'une colonne
+ * homonyme ailleurs.
+ */
+export function estColonneRetiree(table: string, colonne: string): boolean {
+  return (INVENTAIRE_EXPORT.find((e) => e.table === table)?.retraits ?? []).includes(colonne);
+}
 
 /** Le titre lisible d'une section, ou le nom de table si elle n'est pas encore inventoriée. */
 export function titreDeSection(table: string): string {
