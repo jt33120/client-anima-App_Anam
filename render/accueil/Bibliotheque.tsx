@@ -46,18 +46,10 @@ export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
 
   return (
     <div className={s.bibliotheque}>
-      {/* ⚠️ « CE QUE LE JOUR PROPOSE », PAS « AUJOURD’HUI » (2026-09-02, décision D7). La région
-          entière s'appelle « Aujourd’hui » depuis le retour du fondateur du 2026-09-01
-          (`lib/scene/regions.ts`). Ce h2 disait le même mot, quelques lignes sous le h1 : un lecteur
-          d'écran aurait annoncé deux régions homonymes, et l'œil lu deux titres pour une seule chose.
-          La formule est celle du mode d'emploi (`lib/domain/copie-reperes.ts`) : elle dit ce qu'il y a
-          dessous, sans redire où l'on est. L'id `moi-aujourdhui` reste : un ancrage n'est pas un
-          texte, et le changer casserait des liens pour rien. `tests/rendu/bibliotheque.test.tsx`
-          refuse qu'un second « Aujourd’hui » réapparaisse ici. */}
       <section className={s.quotidien} aria-labelledby="moi-aujourdhui">
         <div className={s.enteteQuotidien}>
           <p className={`t-meta ${s.jour}`}>{date}</p>
-          <h2 id="moi-aujourdhui" className={`t-titre-sm ${s.titreQuotidien}`}>Ce que le jour propose</h2>
+          <h2 id="moi-aujourdhui" className={`t-titre-sm ${s.titreQuotidien}`}>Mon parcours du jour</h2>
         </div>
         <div className={s.cartesQuotidiennes}>
           {ciel && <Carte carte={ciel} enAvant />}
@@ -69,9 +61,8 @@ export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
 
       <section className={s.univers} aria-labelledby="moi-univers">
         <div className={s.enteteUnivers}>
-          <p className={`t-meta ${s.surtitreUnivers}`}>Ce qui te compose</p>
-          <h2 id="moi-univers" className="t-titre">Tes univers</h2>
-          <p className={`t-corps ${s.introUnivers}`}>Ils ne changent pas tous les jours. Ils restent ici, à leur place.</p>
+          <p className={`t-meta ${s.surtitreUnivers}`}>Mon monde intérieur</p>
+          <h2 id="moi-univers" className="t-titre">Mes univers</h2>
         </div>
         <ul className={s.grilleUnivers}>
           {univers.map((univers) => <PorteUnivers key={univers.cle} univers={univers} />)}
@@ -89,7 +80,7 @@ function IndicateurLien() {
 function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
   return (
     <li className={s.itemUnivers}>
-      <article className={s.porteUnivers}>
+      <article className={s.porteUnivers} data-univers={univers.cle}>
         <Link className={s.lienUnivers} href={univers.url}>
           <span className={s.eclat} aria-hidden />
           <span className={s.glyphe}><GlypheUnivers cle={univers.cle} /></span>

@@ -72,9 +72,23 @@ export async function demanderUnCode(page: Page, adresse: string): Promise<void>
  * sélecteur jamais attaché est déjà « détaché », et l'attente se résout tout de suite.
  */
 export async function attendreLePortail(page: Page): Promise<void> {
-  // La borne dépasse le plafond du portail (6 s) plus son fondu (0,7 s) : au-delà, ce n'est plus
-  // une pousse qui traîne, c'est un défaut — et le laisser lever ici le DIT, au lieu de le
-  // transformer en un échec obscur dans la spec appelante.
+  // Depuis RC-B1, le portail ne se réserve que pour un DOCUMENT né directement sur `/`. Après
+  // une navigation cliente depuis `/entrer`, le chemin courant vaut aussi `/`, mais l'entrée de
+  // navigation conserve l'URL de naissance du document et permet de distinguer les deux cas sans
+  // ajouter un délai à tous les comptes neufs.
+  const documentNeSurScene = await page.evaluate(() => {
+    const navigation = performance.getEntriesByType("navigation")[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    return new URL(navigation?.name ?? window.location.href).pathname === "/";
+  });
+  if (!documentNeSurScene) return;
+
+  // Depuis RC-B1, le portail fait partie du HTML initial d'un document froid : la course entre
+  // l'état « détaché » et le premier effet n'existe plus. Il peut en revanche avoir achevé sa pousse
+  // avant que le tunnel rende la main ; attendre un nouveau montage créerait alors un faux échec.
+  // L'état final est la seule synchronisation nécessaire, et reste sans effet sur une navigation
+  // interne où le layout-effect retire le voile avant peinture.
   await page
     .locator("[data-portail-anam]")
     .waitFor({ state: "detached", timeout: 10_000 });

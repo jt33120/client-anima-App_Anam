@@ -50,6 +50,7 @@ import {
 import FicheBranche, { type ResultatGeste } from "./FicheBranche";
 import FicheTronc from "./FicheTronc";
 import VueListe from "./VueListe";
+import ComprendreEvolution from "./ComprendreEvolution";
 import s from "./arbre.module.css";
 
 /** Préférence d'AFFICHAGE seulement (aucune donnée art. 9) → localStorage acceptable. */
@@ -365,6 +366,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
       </p>
 
       <div className={s.barre}>
+        <ComprendreEvolution />
         {/* ⚠️ PAS DE BASCULE SUR UN ARBRE VIDE (retour du 2026-08-20 : « à quoi correspond vue liste
             pour l'arbre ? »). La question n'avait pas de réponse : les deux vues d'un arbre sans
             branche rendent LITTÉRALEMENT le même composant (`EtatVideArbre`, story 3.3), donc le

@@ -272,9 +272,9 @@ describe("[AC5/DUR] `astronomy-engine` n'existe que dans lib/astro/adapters/", (
      * visible en revue plutôt qu'un import de plus.
      *
      *   • `lib/data/depot-theme-natal.ts` — compose l'éphéméride pour le calcul du thème (5.1) ;
-     *   • `app/heure-naissance/actions.ts` — compose le référentiel de LIEUX pour la recherche de
-     *     commune (5.3). Il est dans `app/` et pas dans `lib/data/` parce qu'il n'y a rien à
-     *     stocker : la recherche ne touche aucune table, elle lit un fichier embarqué.
+     *   • `lib/data/lieux-naissance.ts` — compose le référentiel de LIEUX pour la recherche et la
+     *     correction (5.3/RC-E4). Les Server Actions ne connaissent plus l'adaptateur nommé : elles
+     *     passent toutes par cette façade, qui tient l'index embarqué à un seul endroit.
      *   • `lib/data/lire-quotidien.ts` — compose l'éphéméride pour le CIEL DU JOUR (5.4), et la
      *     passe à `lireThemeNatal` pour qu'une seule source serve les deux calculs du chemin.
      *   • `lib/data/lire-bibliotheque.ts` — même raison, un cran plus haut (5.6) : l'accueil lit le
@@ -308,10 +308,10 @@ describe("[AC5/DUR] `astronomy-engine` n'existe que dans lib/astro/adapters/", (
         ),
     );
     expect(referents.sort()).toEqual([
-      "app/heure-naissance/actions.ts",
       "app/page.tsx",
       "lib/data/corriger-naissance.ts",
       "lib/data/depot-theme-natal.ts",
+      "lib/data/lieux-naissance.ts",
       "lib/data/lire-bibliotheque.ts",
       "lib/data/lire-human-design.ts",
       "lib/data/lire-quotidien.ts",

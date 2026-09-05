@@ -109,6 +109,34 @@ export const ACTION_RETOUR_ARBRE = "Revenir à l’arbre";
 export const ACTION_FERMER = "Fermer";
 export const BASCULE_LISTE = "Vue liste";
 export const BASCULE_ARBRE = "Vue arbre";
+export const ACTION_COMPRENDRE_EVOLUTION = "Comprendre mon évolution";
+export const FERMER_COMPRENDRE_EVOLUTION = "Revenir à mon évolution";
+
+export const ETAPES_EVOLUTION = Object.freeze([
+  Object.freeze({
+    titre: "La graine et le tronc",
+    corps:
+      "La graine ouvre le dessin. Le tronc représente ton socle, calculé à partir des données de naissance que tu as choisies de renseigner.",
+  }),
+  Object.freeze({
+    titre: "La naissance d’une branche",
+    corps:
+      "Quand un thème revient dans tes échanges, Anam peut te proposer de le nommer. La branche ne naît que si tu confirmes : elle vient de tes mots et de ton accord.",
+  }),
+  Object.freeze({
+    titre: "La feuillaison",
+    corps:
+      "Une branche s’étoffe lorsque ce thème revient réellement dans la conversation. Les feuilles rendent visible cette continuité, sans la mesurer.",
+  }),
+  Object.freeze({
+    titre: "Le rayonnement",
+    corps:
+      "Une branche entre en pleine lumière seulement lorsque tu déclares que ce qu’elle porte est devenu vrai en toi. Anam ne le déduit pas à ta place.",
+  }),
+]);
+
+export const LEGENDE_EXEMPLE_EVOLUTION =
+  "Exemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.";
 export const ZOOM_PLUS = "Agrandir l’arbre";
 export const ZOOM_MOINS = "Réduire l’arbre";
 export const ECHEC_RENOMMAGE = "Je n’ai pas pu renommer cette branche. Tu peux réessayer.";

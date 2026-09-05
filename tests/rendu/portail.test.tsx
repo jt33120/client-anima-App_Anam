@@ -5,7 +5,6 @@ import { render, act } from "@testing-library/react";
 import PortailAnam from "@/render/portail/PortailAnam";
 import {
   ANNONCE_PORTAIL,
-  ATTENTE_PORTAIL,
   NOM_PORTAIL,
 } from "@/lib/domain/copie-portail";
 import { DUREE_POUSSE_MS, DUREE_RETRAIT_MS, PLAFOND_MS } from "@/lib/scene/portail";
@@ -25,7 +24,7 @@ import { MoteurArbreLunaire } from "@/render/arbre/MoteurArbreLunaire";
 const lire = (chemin: string) =>
   readFileSync(resolve(process.cwd(), chemin), "utf-8");
 
-const COPIE = { nom: NOM_PORTAIL, attente: ATTENTE_PORTAIL, annonce: ANNONCE_PORTAIL };
+const COPIE = { nom: NOM_PORTAIL, annonce: ANNONCE_PORTAIL };
 
 /**
  * Un contexte 2D qui AVALE tout et note les rayons extérieurs des dégradés radiaux.
@@ -250,12 +249,13 @@ describe("[LE CŒUR] il ne piège personne", () => {
 });
 
 describe("[LE CŒUR] ce que le portail montre", () => {
-  it("le nom, la ligne d’attente, et une annonce pour qui n’y voit rien", () => {
+  it("le mot d’accueil, aucun faux temps d’attente, et une annonce pour qui n’y voit rien", () => {
     const t = horloge();
     const { container, getByText } = render(<PortailAnam copie={COPIE} />);
     t.avancer(100);
     expect(getByText(NOM_PORTAIL)).toBeTruthy();
-    expect(getByText(ATTENTE_PORTAIL)).toBeTruthy();
+    expect(container.textContent).not.toContain("Le temps que tout se pose.");
+    expect(container.textContent).not.toMatch(/chronomètre|pourcentage/i);
 
     const portail = container.querySelector("[data-portail-anam]")!;
     // ⚠️ PAS `aria-hidden`, contrairement à `HalteEnAttente` — et la différence est motivée dans

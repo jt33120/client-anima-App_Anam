@@ -202,7 +202,7 @@ test.describe("Le tour guidé", () => {
     expect(
       [...regions].sort(),
       "le tour reste sur un seul écran : il explique au lieu de guider",
-    ).toEqual(["Aujourd’hui", "Anam", "Mon arbre"].sort());
+  ).toEqual(["Aujourd’hui", "Anam", "Mon évolution"].sort());
     await expect(dialogue(page), "le tour ne se termine jamais").toHaveCount(0);
   });
 

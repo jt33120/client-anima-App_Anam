@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import ApparitionAnam, { type Beat } from "./ApparitionAnam";
 import Composeur from "./Composeur";
 import Fil from "./Fil";
@@ -255,6 +255,8 @@ export function fusionnerEntreeDuJour(
 }
 
 export default function Conversation({
+  introduction,
+  champRefExterne,
   onPreparation,
   historique,
   onReclamerOuvertureQuotidienne,
@@ -266,6 +268,10 @@ export default function Conversation({
   regionActive = true,
   onSocleAnnonce,
 }: {
+  /** Copie statique du journal vide, fournie par la page et jamais persistée. */
+  introduction?: string;
+  /** Permet à la scène de focaliser le composeur dans le geste de navigation au pointeur. */
+  champRefExterne?: RefObject<HTMLTextAreaElement | null>;
   onPreparation?: (prepare: boolean) => void;
   /**
    * QA tour 1 (T3) — les tours déjà écrits, lus par le serveur sous JWT. Le fil s'amorce avec eux,
@@ -575,7 +581,8 @@ export default function Conversation({
   const [beat, setBeat] = useState<Beat>("ouverture");
 
   const shell = useRef<HTMLDivElement>(null);
-  const champRef = useRef<HTMLTextAreaElement>(null);
+  const champInterne = useRef<HTMLTextAreaElement>(null);
+  const champRef = champRefExterne ?? champInterne;
   // Historique envoyé PAR tour d'Anam (id → {messages, jeton}) : « Réessayer » rejoue le BON tour, pas
   // le dernier envoi global (revue 2.2). Le `jeton` est l'identité STABLE du tour logique (3.4, AC1) :
   // réutilisé au retry → le métrage et l'allocation résiduelle ne se recomptent pas. Éphémère en session.
@@ -878,6 +885,9 @@ export default function Conversation({
     <div className={s.conversation} ref={shell}>
       <ApparitionAnam beat={beat} />
       <Fil
+        introduction={
+          tours.some((tour) => tour.role === "utilisatrice") ? null : introduction
+        }
         tours={tours}
         annonce={annonce}
         prepare={prepare}

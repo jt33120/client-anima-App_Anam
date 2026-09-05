@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
-import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import sharp from "sharp";
+import { attendreLePortail, ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
 
 /**
  * barre-basse.spec.ts — CE QU'ON LIT DANS LA BARRE NE DÉPEND PAS DE CE QUI PASSE DERRIÈRE
@@ -79,6 +80,26 @@ async function bandeDesLibelles(page: Page) {
   });
 }
 
+/** Écart maximal entre deux captures décodées. WebKit peut réencoder/rastériser d'un niveau un
+ *  sous-pixel quand on retire un masque de composition, même si la peinture reste identique à
+ *  l'œil ; comparer les octets PNG transforme ce bruit (≤ 2/255) en faux défaut. */
+async function ecartMaximalParCanal(a: Buffer, b: Buffer): Promise<number> {
+  const [imageA, imageB] = await Promise.all([
+    sharp(a).raw().toBuffer({ resolveWithObject: true }),
+    sharp(b).raw().toBuffer({ resolveWithObject: true }),
+  ]);
+  expect(imageA.info).toMatchObject({
+    width: imageB.info.width,
+    height: imageB.info.height,
+    channels: imageB.info.channels,
+  });
+  let ecart = 0;
+  for (let i = 0; i < imageA.data.length; i += 1) {
+    ecart = Math.max(ecart, Math.abs(imageA.data[i] - imageB.data[i]));
+  }
+  return ecart;
+}
+
 test.describe("La barre de régions", () => {
   test("[LE CŒUR] ses libellés sont peints à l'identique, quoi qu'on fasse défiler derrière", async ({
     page,
@@ -86,6 +107,7 @@ test.describe("La barre de régions", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
+    await attendreLePortail(page);
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
@@ -136,6 +158,7 @@ test.describe("La barre de régions", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
+    await attendreLePortail(page);
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
     await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
@@ -165,9 +188,9 @@ test.describe("La barre de régions", () => {
     const sans = await page.screenshot({ clip: clip! });
 
     expect(
-      avec.equals(sans),
+      await ecartMaximalParCanal(avec, sans),
       "la dernière carte est altérée par le masque à l'arrêt : la réserve du bas ne suit plus le fondu",
-    ).toBe(true);
+    ).toBeLessThanOrEqual(2);
   });
 
   test("[L'ARBRE VIDE] le seul bouton de l'écran ne passe pas sous la barre", async ({ page }) => {
@@ -179,10 +202,11 @@ test.describe("La barre de régions", () => {
     // la MISE EN PAGE qui était fausse, donc c'est elle qu'on mesure.
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
+    await attendreLePortail(page);
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: "Mon arbre" }).click();
-    await expect(page.getByRole("heading", { name: "Mon arbre", level: 1 })).toBeVisible();
+    await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: "Mon évolution" }).click();
+    await expect(page.getByRole("heading", { name: "Mon évolution", level: 1 })).toBeVisible();
     await page.waitForTimeout(1200);
 
     const chevauche = await page.evaluate(mesureurDeChevauchement);
@@ -195,15 +219,21 @@ test.describe("La barre de régions", () => {
     // depuis un arbre vide, donc exactement ce dont on a besoin le premier jour — sous la ligne
     // de flottaison d'un défilement imbriqué que rien n'annonce. C'est ce que le rognage du
     // dessin sur écran court évite, et sans cette mesure-là il n'était prouvé par rien.
-    const sansGeste = await page.evaluate(() => {
-      const vide = document.querySelector('[class*="_vide"]') as HTMLElement | null;
-      return vide ? vide.scrollHeight - vide.clientHeight : -1;
-    });
-    expect(sansGeste, "l'état vide défile déjà sur un écran ordinaire").toBe(0);
+    // RC-I2 a ajouté l'explication complète dans cet état : le panneau peut désormais défiler,
+    // mais l'unique chemin vers la fiche du tronc reste placé AVANT ce texte long et visible sans
+    // geste. L'ancien invariant `scrollHeight === clientHeight` interdisait précisément ce contenu.
     await expect(
       page.getByRole("button", { name: /heure de naissance/i }),
       "le seul chemin vers la fiche du tronc demande un geste pour être vu",
     ).toBeInViewport();
+
+    // Le panneau peut être plus court que sa copie afin de laisser la graine visible. La fin de
+    // l'explication doit néanmoins rester atteignable dans CE panneau, sans faire glisser toute la
+    // scène derrière la navigation.
+    const finExplication = page.getByText(/^Ensuite elle vit/);
+    await finExplication.scrollIntoViewIfNeeded();
+    await expect(finExplication, "la fin de l'explication de Mon évolution est inaccessible").toBeInViewport();
+    expect(await page.evaluate(mesureurDeChevauchement)).toEqual([]);
   });
 
   test("[L'ARBRE VIDE, ÉCRAN TRÈS COURT] il se compresse au lieu de déborder", async ({ page }) => {
@@ -218,10 +248,11 @@ test.describe("La barre de régions", () => {
     // téléphone, ou zoom 200 %, deux situations réelles. Là, seule la compressibilité sauve.
     await ouvrirUnCompteNeuf(page);
     await page.goto("/");
+    await attendreLePortail(page);
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: "Mon arbre" }).click();
-    await expect(page.getByRole("heading", { name: "Mon arbre", level: 1 })).toBeVisible();
+    await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: "Mon évolution" }).click();
+    await expect(page.getByRole("heading", { name: "Mon évolution", level: 1 })).toBeVisible();
 
     const largeur = page.viewportSize()!.width;
     await page.setViewportSize({ width: largeur, height: 460 });

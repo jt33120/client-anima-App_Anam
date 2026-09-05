@@ -208,7 +208,7 @@ describe("[6.5b/AC3] Une entrée se corrige, elle ne s'efface pas", () => {
     expect(error).not.toBeNull();
     // Le motif PROPRE, pas celui de l'effacement ni celui du consentement : sans cette exigence, un
     // mutant qui supprimerait cette garde serait couvert par une autre, et le test resterait vert.
-    expect(`${error!.message}`).toMatch(/lieu_naissance_write_once/);
+    expect(`${error!.message}`).toMatch(/lieu_naissance_correction_protegee/);
   });
 });
 

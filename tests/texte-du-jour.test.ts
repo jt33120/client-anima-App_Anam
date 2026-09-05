@@ -5,6 +5,7 @@ import type { AiPort, RequeteIa } from "@/lib/ai/port";
 import type { metrerUsageIa } from "@/lib/ai/metrage";
 import { assemblerHoroscope, type CielDuJour, type JourCivil } from "@/lib/astro/quotidien";
 import { placer, type ThemeNatal } from "@/lib/astro/theme-natal";
+import type { DepotTexteDuJour, TexteDuJourFige } from "@/lib/data/depot-texte-du-jour";
 
 /**
  * L'ORCHESTRATION DU TEXTE DU JOUR (2026-09-02).
@@ -149,6 +150,96 @@ describe("[LE CŒUR] le mémo tient la cohérence entre les deux surfaces", () =
   });
 });
 
+describe("[RC-D2] le cache durable partagé garde le premier texte servi", () => {
+  function depotMemoire() {
+    let ligne: TexteDuJourFige | null = null;
+    const depot: DepotTexteDuJour = {
+      lire: vi.fn(async () => ligne),
+      figer: vi.fn(async (candidat) => {
+        ligne ??= candidat;
+        return ligne as TexteDuJourFige;
+      }),
+    };
+    return { depot, lire: depot.lire, figer: depot.figer };
+  }
+
+  it("relit le même texte après perte du mémo de processus, sans nouvel appel au modèle", async () => {
+    const partage = depotMemoire();
+    const premierPort = fauxPort(BON);
+    const premierDeps = deps(premierPort);
+
+    expect(
+      await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, {
+        ...premierDeps.deps,
+        depot: partage.depot,
+      }),
+    ).toBe(BON);
+    expect(partage.figer).toHaveBeenCalledTimes(1);
+
+    viderMemoTexteDuJour();
+    const secondPort = fauxPort("Ce modèle ne doit pas être appelé.");
+    const secondDeps = deps(secondPort);
+    expect(
+      await texteDuJourGenere(supabaseOk, "99999999-8888-7777-6666-555555555555", HOROSCOPE, {
+        ...secondDeps.deps,
+        depot: partage.depot,
+      }),
+    ).toBe(BON);
+    expect(secondPort.completer).not.toHaveBeenCalled();
+
+    const cleLue = vi.mocked(partage.lire).mock.calls.at(-1)?.[0];
+    expect(Object.keys(cleLue ?? {}).sort()).toEqual([
+      "condensatSignature",
+      "jour",
+      "versionEditoriale",
+    ]);
+    expect(JSON.stringify(cleLue)).not.toContain(UTILISATRICE);
+  });
+
+  it("ne ressert pas un texte modèle en cache après révocation du consentement", async () => {
+    const partage = depotMemoire();
+    const port = fauxPort(BON);
+    const d = deps(port);
+    const configuration = { ...d.deps, depot: partage.depot };
+
+    expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, configuration)).toBe(BON);
+    expect(await texteDuJourGenere(supabaseRevoque, UTILISATRICE, HOROSCOPE, configuration)).toBeNull();
+    expect(port.completer).toHaveBeenCalledTimes(1);
+  });
+
+  it("revient au corpus si le premier texte modèle ne peut pas être figé durablement", async () => {
+    const port = fauxPort(BON);
+    const d = deps(port);
+    const depot: DepotTexteDuJour = {
+      lire: vi.fn(async () => null),
+      figer: vi.fn(async () => {
+        throw new Error("cache_indisponible");
+      }),
+    };
+
+    expect(
+      await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, { ...d.deps, depot }),
+    ).toBeNull();
+    expect(port.completer).toHaveBeenCalledTimes(1);
+  });
+
+  it("sert le premier enregistrement retourné par le dépôt même si le modèle propose autre chose", async () => {
+    const partage = depotMemoire();
+    const textePremier = { texte: "Le premier texte servi reste la référence.", provenance: "modele" as const };
+    vi.mocked(partage.figer).mockImplementation(async (candidat) => ({ ...candidat, ...textePremier }));
+
+    const port = fauxPort(BON);
+    const d = deps(port);
+    expect(
+      await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, {
+        ...d.deps,
+        depot: partage.depot,
+      }),
+    ).toBe(textePremier.texte);
+    expect(vi.mocked(partage.figer).mock.calls[0][0].texte).toBe(BON);
+  });
+});
+
 describe("[LE BORD] tous les échecs se ressemblent, vus de la page", () => {
   it("un egress bloqué rend `null` sans appeler le modèle", async () => {
     const port = fauxPort(BON);
@@ -175,13 +266,14 @@ describe("[LE BORD] tous les échecs se ressemblent, vus de la page", () => {
     });
   });
 
-  it("un texte refusé n’est pas mémoïsé : la génération suivante réessaie", async () => {
+  it("un texte refusé fige le repli déjà servi : la génération suivante ne le remplace pas", async () => {
     const mauvais = fauxPort(
       "La Lune marche à trois signes de ton Soleil de naissance, et tu verras que la journée sera plus douce.",
     );
     await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, deps(mauvais).deps);
     const bon = fauxPort(BON);
-    expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, deps(bon).deps)).toBe(BON);
+    expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, deps(bon).deps)).toBeNull();
+    expect(bon.completer).not.toHaveBeenCalled();
   });
 
   it("une panne du port rend `null` et ne jette pas", async () => {
@@ -194,7 +286,7 @@ describe("[LE BORD] tous les échecs se ressemblent, vus de la page", () => {
     expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, quiJette)).toBeNull();
   });
 
-  it("un modèle trop lent ne retient pas la page, et son texte sert au tour suivant", async () => {
+  it("un modèle trop lent ne retient pas la page et ne remplace pas le repli déjà servi", async () => {
     // L'accueil est la page la plus vue du produit, et rien dans `completer()` ne borne son
     // attente : un appel qui pend emporterait la requête entière sur une fonction serverless.
     vi.useFakeTimers();
@@ -206,10 +298,10 @@ describe("[LE BORD] tous les échecs se ressemblent, vus de la page", () => {
       await vi.advanceTimersByTimeAsync(6_000);
       expect(await course, "au délai, la page repart avec le corpus").toBeNull();
 
-      // ⚠️ ET LA GÉNÉRATION N'EST PAS ANNULÉE : quand elle aboutit, elle remplit le mémo.
+      // La génération n'est pas annulée, mais le premier contenu effectivement servi fait foi.
       await vi.advanceTimersByTimeAsync(30_000);
       const port2 = fauxPort("un texte qui ne devrait jamais être demandé, le mémo répond avant.");
-      expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, deps(port2).deps)).toBe(BON);
+      expect(await texteDuJourGenere(supabaseOk, UTILISATRICE, HOROSCOPE, deps(port2).deps)).toBeNull();
       expect(port2.completer).not.toHaveBeenCalled();
     } finally {
       vi.useRealTimers();

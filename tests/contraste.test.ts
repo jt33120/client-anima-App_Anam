@@ -34,6 +34,8 @@ const pairesNuit: Paire[] = [
   // partir en `texte` Ivory sur du Sky (1,20:1) sans qu'une seule ligne ne rougisse.
   { fg: "sur-jour", bg: "jour", seuil: 4.5 }, // 10,72
   { fg: "sur-jour-doux", bg: "jour", seuil: 4.5 }, // 5,20 : la note en retrait de la carte
+  { fg: "sur-papier", bg: "papier", seuil: 4.5 },
+  { fg: "sur-papier-doux", bg: "papier", seuil: 4.5 },
   { fg: "succes", bg: "surface", seuil: 4.5 },
   { fg: "alerte", bg: "surface", seuil: 4.5 },
   // Objets graphiques / focus (seuil 3:1) — inclut les marges les plus serrées
@@ -55,6 +57,8 @@ const pairesClair: Paire[] = [
   // une paire vérifiée d'un seul côté laisserait passer une retouche de l'autre.
   { fg: "sur-jour", bg: "jour", seuil: 4.5 },
   { fg: "sur-jour-doux", bg: "jour", seuil: 4.5 },
+  { fg: "sur-papier", bg: "papier", seuil: 4.5 },
+  { fg: "sur-papier-doux", bg: "papier", seuil: 4.5 },
   { fg: "succes", bg: "fond", seuil: 4.5 }, // la marge la plus serrée du mode clair (4,83)
   { fg: "alerte", bg: "fond", seuil: 4.5 },
   { fg: "bordure-forte", bg: "fond", seuil: 3 },

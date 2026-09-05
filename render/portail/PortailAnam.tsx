@@ -46,7 +46,6 @@ export default function PortailAnam({
 }: {
   readonly copie: {
     readonly nom: string;
-    readonly attente: string;
     readonly annonce: string;
   };
 }) {
@@ -120,10 +119,9 @@ export default function PortailAnam({
         {/* Le nom porte le scintillement de `globals.css` — le halo derrière la lettre, jamais une
             ombre portée sur le texte (leçon de `tests/voile.test.ts`). */}
         <p className={`${s.nom} t-titre scintillement`}>{copie.nom}</p>
-        <p className={`${s.attente} t-corps`}>{copie.attente}</p>
-        {/* Le signe d'attente du produit, à sa plus petite taille : c'est le même lotus que la
-            conversation, pas un tourniquet inventé pour cet écran. */}
-        <LotusAttente taille={28} className={s.lotus} />
+        {/* Le lotus est un emblème, pas un indicateur d'attente. Il reste décoratif pour les
+            technologies d'assistance puisque l'annonce du portail est portée par le voile. */}
+        <LotusAttente taille={52} className={s.lotus} />
       </div>
     </div>
   );

@@ -11,6 +11,7 @@
  */
 
 import { useRouter } from "next/navigation";
+import { flushSync } from "react-dom";
 import {
   useEffect,
   useMemo,
@@ -51,6 +52,8 @@ import s from "./monde.module.css";
 export interface ProprietesSceneRendue {
   /** Domain-projection serveur, en lecture seule (AD-7). Le rendu ne l'écrit jamais. */
   projection: ProjectionScene;
+  /** Phrase statique du journal vide, décidée côté domaine et jamais persistée comme un tour. */
+  accueilAnam?: string;
   /**
    * La première parole quotidienne, réclamée seulement quand la région Anam devient visible.
    * L'action serveur rend la ligne persistée qui fait foi et distingue une panne d'un jour déjà
@@ -155,7 +158,7 @@ export interface CopieSeuil {
 }
 
 /* Étoiles générées côté client APRÈS montage → aucun décalage d'hydratation. */
-function Etoiles() {
+function Etoiles({ anam }: { readonly anam: boolean }) {
   const [monte, setMonte] = useState(false);
   useEffect(() => setMonte(true), []);
 
@@ -172,7 +175,7 @@ function Etoiles() {
 
   if (!monte) return null;
   return (
-    <div className={s.etoiles} aria-hidden>
+    <div className={`${s.etoiles} ${anam ? s.etoilesAnam : ""}`} aria-hidden>
       {etoiles.map((e, i) => (
         <span
           key={i}
@@ -190,6 +193,23 @@ function Etoiles() {
         />
       ))}
     </div>
+  );
+}
+
+/** Filigrane fixe de la seule région Anam. Aucun filtre, aucune animation, aucun second particulaire. */
+function LotusContourAnam() {
+  return (
+    <svg className={s.lotusAnam} viewBox="0 0 320 220" aria-hidden focusable="false">
+      <g fill="none" vectorEffect="non-scaling-stroke">
+        <path d="M160 194C110 159 91 116 108 70c34 18 51 52 52 101" />
+        <path d="M160 194c50-35 69-78 52-124-34 18-51 52-52 101" />
+        <path d="M160 194c-22-49-18-102 0-153 18 51 22 104 0 153" />
+        <path d="M160 194c-65-11-108-46-126-96 48 0 91 28 126 73" />
+        <path d="M160 194c65-11 108-46 126-96-48 0-91 28-126 73" />
+        <path d="M160 194c-79 8-126-11-151-47 54-13 105 1 151 34" />
+        <path d="M160 194c79 8 126-11 151-47-54-13-105 1-151 34" />
+      </g>
+    </svg>
   );
 }
 
@@ -241,6 +261,7 @@ const CORPS: Record<IdRegion, string> = {
 
 export default function SceneDom({
   projection,
+  accueilAnam,
   onReclamerOuvertureQuotidienne,
   onChargerOuvertureCourante,
   onSocleAnnonce,
@@ -276,9 +297,19 @@ export default function SceneDom({
    * — c'est de la politesse envers le réseau. La garde, elle, est en SQL.
    */
   const franchissementSignale = useRef(false);
-  const aller = (cible: IdRegion) => {
+  const composeurAnam = useRef<HTMLTextAreaElement>(null);
+  const focusEntree = useRef<"composeur" | "entete" | null>(null);
+  const aller = (cible: IdRegion, composer = false) => {
     setEchangeExtrait(null);
-    dispatch({ type: "aller", cible });
+    focusEntree.current = composer && cible === "anam" ? "composeur" : "entete";
+    if (composer && cible === "anam") {
+      // `flushSync` rend la région non-inert avant le focus, tout en restant dans le clic/tap : c'est
+      // la seule fenêtre où iOS peut accepter d'ouvrir son clavier logiciel.
+      flushSync(() => dispatch({ type: "aller", cible }));
+      composeurAnam.current?.focus({ preventScroll: true });
+    } else {
+      dispatch({ type: "aller", cible });
+    }
     if (
       cible === "accueil" &&
       premierPassage?.du &&
@@ -550,7 +581,14 @@ export default function SceneDom({
   const regionPrec = useRef<IdRegion>(region);
   useEffect(() => {
     if (regionPrec.current !== region) {
-      entetes.current[region]?.focus();
+      if (region === "anam" && focusEntree.current === "composeur") {
+        const champ = composeurAnam.current;
+        if (champ && !champ.disabled) champ.focus({ preventScroll: true });
+        else entetes.current[region]?.focus();
+      } else {
+        entetes.current[region]?.focus();
+      }
+      focusEntree.current = null;
       regionPrec.current = region;
     }
   }, [region]);
@@ -559,7 +597,7 @@ export default function SceneDom({
 
   return (
     <main
-      className={s.monde}
+      className={`${s.monde} ${tourOuvert ? s.tourOuvert : ""} ${region === "accueil" ? s.accueilActif : ""}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerFin}
@@ -598,7 +636,7 @@ export default function SceneDom({
       {/* La voie lactée — une direction dans le ciel, à la limite du visible. Décor pur : elle
           cède avec le reste de l'imagerie en contraste renforcé (voir `.voie` et le bloc a11y). */}
       <div className={`${s.voie} imagerie`} aria-hidden />
-      <Etoiles />
+      <Etoiles anam={region === "anam"} />
 
       {/* Le DÉCOR de fond (ambiance, aria-hidden) — un arbre calme derrière toute la scène. L'arbre RÉEL et
           adressable (branches, fiche, pan/zoom) vit dans la région « arbre ». AD-7 : décor muet, sans donnée.
@@ -741,6 +779,7 @@ export default function SceneDom({
           >
             {r.id === "anam" ? (
               <>
+                <LotusContourAnam />
                 {/* h1 unique de la vue (cible du focus programmatique) — quiet, la conversation suit. */}
                 <h1
                   className={`t-titre-sm ${s.titreConversation}`}
@@ -754,6 +793,8 @@ export default function SceneDom({
                     L'échange source persisté se SUPERPOSE (AC4), puis le retour redonne le fil intact. */}
                 <div className={echangeExtrait ? s.masque : s.transparent}>
                   <Conversation
+                    introduction={accueilAnam}
+                    champRefExterne={composeurAnam}
                     onPreparation={setAnamPrepare}
                     // La projection ne change qu'après un geste serveur confirmé. Rafraîchir ici,
                     // pendant qu'elle est encore dans le fil, garde la nouvelle branche sans faire
@@ -863,7 +904,7 @@ export default function SceneDom({
               type="button"
               className={s.navLien}
               aria-current={region === r.id ? "location" : undefined}
-              onClick={() => aller(r.id)}
+              onClick={(event) => aller(r.id, r.id === "anam" && event.detail > 0)}
             >
               <span className="t-bouton">{r.nom}</span>
             </button>

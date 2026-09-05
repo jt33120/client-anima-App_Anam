@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { sansCommentaires } from "../_absence";
@@ -22,6 +23,7 @@ import { GROUPES_MENU, LIBELLE_GLYPHE, TITRE_FEUILLE, LIBELLE_FERMER } from "@/l
 import { chercherInterdits } from "@/lib/domain/lexique-interdit";
 import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
 import { REGIONS, type ProjectionScene } from "@/lib/scene";
+import { ACCUEIL_ANAM } from "@/lib/domain/copie-anam";
 
 /**
  * seuil-avatar.test.tsx — LE SEUIL MONTÉ POUR DE VRAI (retour du fondateur, 2026-09-02).
@@ -347,6 +349,22 @@ describe("[LA PORTE] elle s'appelle « commencer », en bas de casse, et franchi
   it("le h1 du seuil reste la cible de focus programmatique (tabIndex −1)", () => {
     monterLaScene();
     expect(sectionSeuil().querySelector("h1")?.getAttribute("tabindex")).toBe("-1");
+  });
+
+  it("[RC-H3] un tap vers Anam focalise le composeur ; l'activation clavier annonce d'abord le titre", async () => {
+    const user = userEvent.setup();
+    monterLaScene({ accueilAnam: ACCUEIL_ANAM });
+    await user.click(screen.getByRole("button", { name: /commencer/i }));
+
+    const navigationRegions = screen.getByRole("navigation", { name: "Régions" });
+    const anam = navigationRegions.querySelector<HTMLButtonElement>("button:nth-of-type(2)")!;
+    expect(anam.textContent).toBe("Anam");
+    await user.click(anam);
+    expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Ton message à Anam" }));
+
+    fireEvent.click(navigationRegions.querySelectorAll("button")[0], { detail: 0 });
+    fireEvent.click(anam, { detail: 0 });
+    expect(document.activeElement).toBe(screen.getByRole("heading", { name: "Anam", level: 1 }));
   });
 });
 

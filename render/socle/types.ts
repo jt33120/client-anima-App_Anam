@@ -51,6 +51,8 @@ export interface FaitVue {
 export interface LectureSymboliqueVue {
   readonly cle: string;
   readonly intitule: string;
+  readonly valeur: string;
+  readonly archetype: string;
   readonly texte: string;
 }
 
@@ -136,6 +138,12 @@ export interface SectionCielVue {
   readonly angles: readonly AngleVue[];
   readonly cuspides: readonly AngleVue[];
   readonly manques: readonly ManqueVue[];
+  readonly reperesPrincipaux: readonly {
+    readonly cle: "soleil" | "ascendant" | "lune";
+    readonly intitule: string;
+    readonly valeur: string;
+    readonly calcule: boolean;
+  }[];
   /** `appel` : la phrase courte de la bulle, en tête ; `aveu` et `ouChercher` : le long, replié dessous. */
   readonly sansHeure: { readonly appel: string; readonly aveu: string; readonly ouChercher: string; readonly reparation: ReparationVue } | null;
   /** `null` = pas de thème, ou pas d'horoscope reçu : le bloc n'existe pas, il n'est pas vide. */

@@ -1,35 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import s from "./memoire.module.css";
-
-/**
- * L'ÎLOT CLIENT DE « TON HEURE DE NAISSANCE » (Story 6.5b — seconde section de `/memoire`).
- *
- * ── AUCUN TEXTE N'EST ÉCRIT ICI ────────────────────────────────────────────────────────────────
- *
- * `render/` est un ADAPTATEUR MUET (AD-7) et n'importe jamais `lib/domain` : la copie descend de la
- * page, y compris les phrases de l'aperçu, qui sont calculées côté serveur. Ce composant ne sait
- * même pas ce qu'est un ascendant.
- *
- * ── DEUX TEMPS, ET C'EST LA STORY ENTIÈRE ──────────────────────────────────────────────────────
- *
- * La correction n'est pas plafonnée (RGPD art. 16 ne s'épuise pas au premier usage). Ce qui la rend
- * sûre n'est donc pas un compteur, c'est le fait qu'elle ne soit JAMAIS AVEUGLE : on demande d'abord
- * l'heure, on montre ce qu'elle change, et on écrit seulement après un second geste.
- *
- * ⚠️ QUI SUPPRIMERAIT L'ÉTAPE D'APERÇU POUR « SIMPLIFIER » retirerait la seule chose qui remplace le
- * plafond. Le formulaire redeviendrait un champ qu'on remplit distraitement — sur la donnée d'où
- * dérive tout le socle.
- */
 
 export interface CopieCorrection {
   readonly titre: string;
   readonly introduction: string;
-  readonly heureAbsente: string;
-  readonly lienAjouter: string;
-  readonly etiquette: string;
-  readonly aide: string;
+  readonly etiquetteDate: string;
+  readonly etiquetteHeure: string;
+  readonly aideHeure: string;
+  readonly etiquetteLieu: string;
+  readonly aideLieu: string;
+  readonly lieuInvalide: string;
+  readonly indisponible: string;
   readonly voir: string;
   readonly confirmer: string;
   readonly renoncer: string;
@@ -38,15 +22,29 @@ export interface CopieCorrection {
   readonly refusRevocation: string | null;
 }
 
-/**
- * Les réponses des deux Server Actions, décrites STRUCTURELLEMENT.
- *
- * ⚠️ `render/` ne peut pas importer les types de `lib/domain` ni de `app/` (AD-7). On les redéclare
- * donc ici, et c'est `tsc` qui vérifie qu'ils coïncident au moment où la page câble les actions —
- * une divergence ne peut pas passer silencieusement.
- */
+export interface LieuCorrectionVue {
+  readonly code: string;
+  readonly libelle: string;
+  readonly departement: { readonly nom: string };
+}
+
+export interface DemandeCorrectionVue {
+  readonly date: string;
+  readonly heure: string;
+  readonly codeLieu: string;
+}
+
+export interface CorrectionConfirmeeVue extends DemandeCorrectionVue {
+  readonly revision: string;
+}
+
 export type ReponseApercu =
-  | { readonly statut: "apercu"; readonly heure: string; readonly phrases: readonly string[] }
+  | {
+      readonly statut: "apercu";
+      readonly correction: CorrectionConfirmeeVue;
+      readonly resume: { readonly date: string; readonly heure: string | null; readonly lieu: string };
+      readonly phrases: readonly string[];
+    }
   | { readonly statut: "erreur"; readonly message: string };
 
 export type ReponseEcriture =
@@ -55,164 +53,263 @@ export type ReponseEcriture =
 
 export default function CorrectionNaissance({
   copie,
+  dateActuelle,
   heureActuelle,
+  lieuActuel,
+  chercherLieux,
   apercevoir,
   confirmer,
 }: {
   readonly copie: CopieCorrection;
-  /** `HH:MM` déjà enregistrée, ou `null` : il n'y a alors rien à corriger. */
+  readonly dateActuelle: string;
   readonly heureActuelle: string | null;
-  readonly apercevoir: (heure: string) => Promise<ReponseApercu>;
-  readonly confirmer: (heure: string) => Promise<ReponseEcriture>;
+  readonly lieuActuel: string | null;
+  readonly chercherLieux: (requete: string) => Promise<readonly LieuCorrectionVue[]>;
+  readonly apercevoir: (demande: DemandeCorrectionVue) => Promise<ReponseApercu>;
+  readonly confirmer: (correction: CorrectionConfirmeeVue) => Promise<ReponseEcriture>;
 }) {
-  const [saisie, setSaisie] = useState("");
-  const [apercu, setApercu] = useState<{ heure: string; phrases: readonly string[] } | null>(null);
+  const router = useRouter();
+  const [date, setDate] = useState(dateActuelle);
+  const [heure, setHeure] = useState(heureActuelle ?? "");
+  const [requeteLieu, setRequeteLieu] = useState("");
+  const [codeLieu, setCodeLieu] = useState("");
+  const [lieux, setLieux] = useState<readonly LieuCorrectionVue[]>([]);
+  const [indexLieuActif, setIndexLieuActif] = useState(-1);
+  const [apercu, setApercu] = useState<Extract<ReponseApercu, { statut: "apercu" }> | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
   const [fait, setFait] = useState(false);
   const [enCours, setEnCours] = useState(false);
 
-  const section = (contenu: React.ReactNode) => (
-    <section className={s.section} aria-labelledby="correction_titre">
-      <h2 id="correction_titre" className={s.titreSection}>
-        {copie.titre}
-      </h2>
-      {contenu}
-    </section>
-  );
-
-  // Rien à corriger : on ne montre pas un champ vide qui n'écrirait nulle part, on renvoie là où
-  // l'ajout se fait (5.3). Une question sans issue est un reproche — la leçon de la 4.10.
-  if (heureActuelle === null) {
-    return section(
-      <>
-        <p className={s.introduction}>{copie.heureAbsente}</p>
-        <a className={s.bouton} href="/heure-naissance">
-          <span className="t-bouton">{copie.lienAjouter}</span>
-        </a>
-      </>,
-    );
-  }
-
-  // Le consentement a été retiré : le thème ne peut plus être regravé, donc corriger ne changerait
-  // rien. Annoncé D'AVANCE, jamais après un envoi — même geste que la section voisine.
-  if (copie.refusRevocation !== null) {
-    return section(<p className={s.refus}>{copie.refusRevocation}</p>);
-  }
-
-  if (fait) {
-    return section(
-      <p className={s.introduction} role="status">
-        {copie.corrige}
-      </p>,
-    );
-  }
-
-  const demanderApercu = async () => {
-    setEnCours(true);
-    setErreur(null);
-    const r = await apercevoir(saisie);
-    setEnCours(false);
-    if (r.statut === "erreur") {
-      setApercu(null);
-      setErreur(r.message);
+  useEffect(() => {
+    if (codeLieu || requeteLieu.trim().length < 2) {
+      setLieux([]);
       return;
     }
-    setApercu({ heure: r.heure, phrases: r.phrases });
+    let ignore = false;
+    const attente = window.setTimeout(() => {
+      void chercherLieux(requeteLieu)
+        .then((resultats) => {
+          if (!ignore) {
+            setLieux(resultats);
+            setIndexLieuActif(-1);
+          }
+        })
+        .catch(() => {
+          if (!ignore) {
+            setLieux([]);
+            setIndexLieuActif(-1);
+            setErreur(copie.indisponible);
+          }
+        });
+    }, 180);
+    return () => {
+      ignore = true;
+      window.clearTimeout(attente);
+    };
+  }, [codeLieu, chercherLieux, requeteLieu]);
+
+  const invaliderApercu = () => {
+    setApercu(null);
+    setErreur(null);
+  };
+
+  const choisirLieu = (lieu: LieuCorrectionVue) => {
+    setCodeLieu(lieu.code);
+    setRequeteLieu(lieu.libelle);
+    setLieux([]);
+    setIndexLieuActif(-1);
+    invaliderApercu();
+  };
+
+  const demanderApercu = async () => {
+    if (requeteLieu.trim() && !codeLieu) {
+      setErreur(copie.lieuInvalide);
+      return;
+    }
+    setEnCours(true);
+    setErreur(null);
+    try {
+      const reponse = await apercevoir({ date, heure, codeLieu });
+      if (reponse.statut === "erreur") {
+        setApercu(null);
+        setErreur(reponse.message);
+        return;
+      }
+      setApercu(reponse);
+    } catch {
+      setApercu(null);
+      setErreur(copie.indisponible);
+    } finally {
+      setEnCours(false);
+    }
   };
 
   const envoyer = async () => {
     if (!apercu) return;
     setEnCours(true);
     setErreur(null);
-    // ⚠️ On envoie l'heure DE L'APERÇU, pas celle du champ. Sans ça, modifier le champ après avoir
-    // regardé l'aperçu ferait écrire une heure dont elle n'a jamais vu les conséquences — c'est-à-dire
-    // exactement le geste aveugle que cette étape existe pour empêcher.
-    const r = await confirmer(apercu.heure);
-    setEnCours(false);
-    if (r.statut === "erreur") {
-      setErreur(r.message);
-      return;
+    try {
+      const reponse = await confirmer(apercu.correction);
+      if (reponse.statut === "erreur") {
+        setErreur(reponse.message);
+        return;
+      }
+      setFait(true);
+      router.push("/socle?univers=astrologie");
+      router.refresh();
+    } catch {
+      setErreur(copie.indisponible);
+    } finally {
+      setEnCours(false);
     }
-    setFait(true);
   };
 
-  return section(
-    <>
-      <p className={s.introduction}>{copie.introduction}</p>
-      {copie.dejaCorrigee !== null && <p className={s.meta}>{copie.dejaCorrigee}</p>}
+  return (
+    <section id="correction-naissance" className={s.section} aria-labelledby="correction_titre">
+      <h2 id="correction_titre" className={s.titreSection}>{copie.titre}</h2>
+      {copie.refusRevocation ? (
+        <p className={s.refus}>{copie.refusRevocation}</p>
+      ) : fait ? (
+        <p className={s.introduction} role="status">{copie.corrige}</p>
+      ) : (
+        <>
+          <p className={s.introduction}>{copie.introduction}</p>
+          {copie.dejaCorrigee ? <p className={s.meta}>{copie.dejaCorrigee}</p> : null}
 
-      <p className={s.meta}>Heure enregistrée : {heureActuelle}</p>
+          <div className={s.champsNaissance}>
+            <label htmlFor="date_corrigee" className={s.etiquette}>
+              <span className="t-meta">{copie.etiquetteDate}</span>
+              <input
+                id="date_corrigee"
+                type="date"
+                className={s.champ}
+                value={date}
+                onChange={(event) => { setDate(event.target.value); invaliderApercu(); }}
+              />
+            </label>
 
-      {/* ⚠️ L'AIDE EST HORS DU `<label>`, ET C'EST UNE CORRECTION D'ACCESSIBILITÉ, PAS UNE MISE EN
-          PAGE. À l'intérieur, elle entre dans le NOM ACCESSIBLE du champ : un lecteur d'écran
-          annoncerait « La bonne heure Telle qu'elle est écrite sur ta copie intégrale… » comme
-          étiquette. Elle est rattachée par `aria-describedby`, qui est fait pour ça. */}
-      <label htmlFor="heure_corrigee" className={s.etiquette}>
-        <span className="t-meta">{copie.etiquette}</span>
-        <input
-          id="heure_corrigee"
-          name="heure_corrigee"
-          type="time"
-          className={s.champ}
-          value={saisie}
-          aria-describedby="heure_corrigee_aide"
-          onChange={(e) => {
-            setSaisie(e.target.value);
-            // Le champ a bougé : l'aperçu affiché ne décrit plus ce qui partirait. On l'efface
-            // plutôt que de le laisser mentir d'un cran.
-            setApercu(null);
-          }}
-        />
-      </label>
-      <span id="heure_corrigee_aide" className={s.meta}>
-        {copie.aide}
-      </span>
+            <label htmlFor="heure_corrigee" className={s.etiquette}>
+              <span className="t-meta">{copie.etiquetteHeure}</span>
+              <input
+                id="heure_corrigee"
+                type="time"
+                className={s.champ}
+                value={heure}
+                aria-describedby="heure_corrigee_aide"
+                onChange={(event) => { setHeure(event.target.value); invaliderApercu(); }}
+              />
+            </label>
+            <span id="heure_corrigee_aide" className={s.meta}>{copie.aideHeure}</span>
 
-      {apercu !== null && (
-        <ul className={s.apercu} role="status">
-          {apercu.phrases.map((p) => (
-            <li key={p} className="t-corps">
-              {p}
-            </li>
-          ))}
-        </ul>
+            <label htmlFor="lieu_corrige" className={s.etiquette}>
+              <span className="t-meta">{copie.etiquetteLieu}</span>
+              <input
+                id="lieu_corrige"
+                type="search"
+                autoComplete="off"
+                className={s.champ}
+                value={requeteLieu}
+                placeholder={lieuActuel ? `Actuel : ${lieuActuel}` : undefined}
+                aria-describedby="lieu_corrige_aide"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-controls="lieu_corrige_suggestions"
+                aria-expanded={lieux.length > 0}
+                aria-activedescendant={
+                  indexLieuActif >= 0 ? `lieu_corrige_option_${indexLieuActif}` : undefined
+                }
+                onKeyDown={(event) => {
+                  if (lieux.length === 0) return;
+                  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    event.preventDefault();
+                    const pas = event.key === "ArrowDown" ? 1 : -1;
+                    setIndexLieuActif((courant) =>
+                      courant < 0
+                        ? pas > 0 ? 0 : lieux.length - 1
+                        : (courant + pas + lieux.length) % lieux.length,
+                    );
+                  } else if (event.key === "Enter" && indexLieuActif >= 0) {
+                    event.preventDefault();
+                    choisirLieu(lieux[indexLieuActif]);
+                  } else if (event.key === "Escape") {
+                    setLieux([]);
+                    setIndexLieuActif(-1);
+                  }
+                }}
+                onChange={(event) => {
+                  setRequeteLieu(event.target.value);
+                  setCodeLieu("");
+                  setIndexLieuActif(-1);
+                  invaliderApercu();
+                }}
+              />
+            </label>
+            <span id="lieu_corrige_aide" className={s.meta}>{copie.aideLieu}</span>
+            {lieux.length > 0 ? (
+              <ul
+                id="lieu_corrige_suggestions"
+                className={s.suggestionsLieu}
+                role="listbox"
+                aria-label="Communes proposées"
+              >
+                {lieux.map((lieu, index) => (
+                  <li key={lieu.code}>
+                    <button
+                      type="button"
+                      id={`lieu_corrige_option_${index}`}
+                      role="option"
+                      aria-selected={index === indexLieuActif}
+                      tabIndex={-1}
+                      onPointerDown={(event) => event.preventDefault()}
+                      onClick={() => choisirLieu(lieu)}
+                    >
+                      <span>{lieu.libelle}</span>
+                      <span className="t-meta">{lieu.departement.nom}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <span className={s.annonceHorsEcran} role="status" aria-live="polite">
+              {lieux.length > 0 ? `${lieux.length} communes proposées.` : ""}
+            </span>
+          </div>
+
+          {apercu ? (
+            <div className={s.apercu} role="status">
+              <p className="t-meta">
+                Après correction : {apercu.resume.date} · {apercu.resume.heure?.slice(0, 5) ?? "heure inconnue"} · {apercu.resume.lieu}
+              </p>
+              <ul>
+                {apercu.phrases.map((phrase) => <li key={phrase} className="t-corps">{phrase}</li>)}
+              </ul>
+            </div>
+          ) : null}
+          {erreur ? <p className={s.refus} role="alert">{erreur}</p> : null}
+
+          <div className={s.actions}>
+            {apercu ? (
+              <>
+                <button type="button" className={s.bouton} disabled={enCours} onClick={envoyer}>
+                  <span className="t-bouton">{enCours ? "…" : copie.confirmer}</span>
+                </button>
+                <button
+                  type="button"
+                  className={s.bouton}
+                  disabled={enCours}
+                  onClick={() => { setApercu(null); setErreur(null); }}
+                >
+                  <span className="t-bouton">{copie.renoncer}</span>
+                </button>
+              </>
+            ) : (
+              <button type="button" className={s.bouton} disabled={enCours || !date} onClick={demanderApercu}>
+                <span className="t-bouton">{enCours ? "…" : copie.voir}</span>
+              </button>
+            )}
+          </div>
+        </>
       )}
-
-      {erreur !== null && (
-        <p className={s.refus} role="alert">
-          {erreur}
-        </p>
-      )}
-
-      <div className={s.actions}>
-        {apercu === null ? (
-          <button
-            type="button"
-            className={s.bouton}
-            disabled={enCours || saisie.trim() === ""}
-            onClick={demanderApercu}
-          >
-            <span className="t-bouton">{enCours ? "…" : copie.voir}</span>
-          </button>
-        ) : (
-          <>
-            <button type="button" className={s.bouton} disabled={enCours} onClick={envoyer}>
-              <span className="t-bouton">{enCours ? "…" : copie.confirmer}</span>
-            </button>
-            <button
-              type="button"
-              className={s.bouton}
-              disabled={enCours}
-              onClick={() => {
-                setApercu(null);
-                setSaisie("");
-              }}
-            >
-              <span className="t-bouton">{copie.renoncer}</span>
-            </button>
-          </>
-        )}
-      </div>
-    </>,
+    </section>
   );
 }

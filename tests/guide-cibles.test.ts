@@ -346,7 +346,7 @@ describe("[fondateur 2026-09-01] le tour tient en cinq étapes d'une ou deux phr
     expect(
       H2_ACCUEIL,
       "l'extracteur ne retrouve plus les <h2> connus de l'accueil : la garde ne mesure rien",
-    ).toEqual(expect.arrayContaining(["Trois dimensions", "Ce que le jour propose"]));
+    ).toEqual(expect.arrayContaining(["Trois dimensions", "Mon parcours du jour"]));
     expect(NOMS_DE_REGION.length, "aucun nom de région lu au catalogue : la garde ne mesure rien").toBeGreaterThan(0);
     const collisions = ETAPES.map((e) => e.titre).filter((t) => TITRES_INTERDITS.includes(t));
     expect(collisions, "un titre d'étape porte le même nom qu'un <h2> de l'accueil ou qu'une région").toEqual([]);

@@ -43,6 +43,62 @@ import {
 export const CARDINAL_ENNEAGRAMME = 9;
 
 /**
+ * Lexique éditorial général. Le nom ouvre la lecture ; le numéro reste un repère secondaire.
+ * Chaque définition décrit un mouvement possible, jamais une identité figée ni un diagnostic.
+ */
+export const LEXIQUE_ENNEAGRAMME = Object.freeze({
+  1: Object.freeze({
+    nom: "Le Juste",
+    definition:
+      "Recherche la cohérence et l’amélioration. Sa rigueur soutient la qualité ; son point de vigilance est une exigence qui peut devenir dure envers soi ou les autres.",
+  }),
+  2: Object.freeze({
+    nom: "L’Aidant",
+    definition:
+      "Se rend disponible et perçoit vite les besoins relationnels. Sa générosité nourrit les liens ; son point de vigilance est d’oublier ou de taire ses propres besoins.",
+  }),
+  3: Object.freeze({
+    nom: "L’Accomplisseur",
+    definition:
+      "Oriente son énergie vers l’action et les résultats. Son adaptabilité fait avancer les projets ; son point de vigilance est de confondre sa valeur avec ce qu’il réussit.",
+  }),
+  4: Object.freeze({
+    nom: "Le Singulier",
+    definition:
+      "Cherche une expression authentique et sensible de l’expérience. Sa profondeur ouvre des nuances ; son point de vigilance est de laisser le manque éclipser ce qui est présent.",
+  }),
+  5: Object.freeze({
+    nom: "L’Observateur",
+    definition:
+      "Prend du recul pour comprendre avant de s’engager. Sa capacité d’analyse apporte de la clarté ; son point de vigilance est de rester à distance quand l’action ou le lien appelle.",
+  }),
+  6: Object.freeze({
+    nom: "Le Loyaliste",
+    definition:
+      "Anticipe les risques et protège ce qui compte. Sa vigilance rend fiable et solidaire ; son point de vigilance est de laisser le doute retarder une décision pourtant mûre.",
+  }),
+  7: Object.freeze({
+    nom: "L’Enthousiaste",
+    definition:
+      "Explore les possibles avec curiosité et élan. Son inventivité ouvre des chemins ; son point de vigilance est de multiplier les options pour éviter une limite ou un inconfort.",
+  }),
+  8: Object.freeze({
+    nom: "Le Protecteur",
+    definition:
+      "Va au contact avec franchise et intensité. Sa force défend les personnes et les causes ; son point de vigilance est de prendre toute la place ou tout le poids sur ses épaules.",
+  }),
+  9: Object.freeze({
+    nom: "Le Médiateur",
+    definition:
+      "Cherche l’accord et sait accueillir plusieurs points de vue. Son calme facilite le lien ; son point de vigilance est d’effacer sa propre priorité pour maintenir la paix.",
+  }),
+} satisfies Record<TypeEnneagramme, { readonly nom: string; readonly definition: string }>);
+
+export function lexiqueDuType(type: TypeEnneagramme) {
+  return LEXIQUE_ENNEAGRAMME[type];
+}
+
+/**
  * La clé d'un créneau : `"enneagramme:4"`.
  *
  * JETTE hors domaine, comme `cleMantra` et `cleNombre`. Une clé fabriquée à partir d'un type
@@ -99,21 +155,22 @@ export function texteDuTypeRetenu(type: TypeEnneagramme): TexteCorpus {
 
 export interface RepereEnneagramme {
   readonly type: TypeEnneagramme;
-  readonly texte: string;
+  readonly nom: string;
+  readonly definition: string;
 }
 
 /**
  * Les repères que l'introduction peut déplier.
  *
- * Aucun résumé n'est composé ici : un créneau non écrit reste absent de la liste. Cette projection
- * rend structurelle la frontière FR-054 — l'écran ne peut expliquer un type qu'avec le texte du
- * corpus Anima déjà présent.
+ * Ces définitions générales viennent du lexique relu et existent indépendamment d'une lecture
+ * personnelle. Un créneau de corpus non écrit ne doit donc jamais faire disparaître l'un des neuf
+ * repères qui aide justement à comprendre le questionnaire.
  */
 export function reperesPourIntroduction(): readonly RepereEnneagramme[] {
   return Object.freeze(
-    TYPES.flatMap((type) => {
-      const texte = texteDuTypeRetenu(type);
-      return texte.statut === "ecrit" ? [Object.freeze({ type, texte: texte.texte })] : [];
+    TYPES.map((type) => {
+      const lexique = lexiqueDuType(type);
+      return Object.freeze({ type, nom: lexique.nom, definition: lexique.definition });
     }),
   );
 }

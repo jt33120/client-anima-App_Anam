@@ -55,7 +55,7 @@ export const CATALOGUE_REGIONS: readonly Region[] = [
   { id: "seuil", nom: "Seuil", destinationDirecte: false },
   { id: "accueil", nom: "Aujourd’hui", destinationDirecte: true },
   { id: "anam", nom: "Anam", destinationDirecte: true },
-  { id: "arbre", nom: "Mon arbre", destinationDirecte: true },
+  { id: "arbre", nom: "Mon évolution", destinationDirecte: true },
 ] as const;
 
 /** Les destinations nommées, dans l’ordre — source de la barre basse et du rail. */

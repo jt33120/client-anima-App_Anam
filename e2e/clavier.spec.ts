@@ -108,6 +108,7 @@ async function traverser(page: Page, plafond = 40, ou = ""): Promise<Arret[]> {
         nom:
           el.getAttribute("name") ||
           el.getAttribute("aria-label") ||
+          el.id ||
           (el.textContent || "").trim().slice(0, 40) ||
           el.getAttribute("href") ||
           "",
@@ -131,7 +132,14 @@ async function traverser(page: Page, plafond = 40, ou = ""): Promise<Arret[]> {
     }
     if (!a) break; // le focus est sorti du document : la traversée a bouclé
     const cle = `${a.balise}|${a.nom}`;
-    if (vus.has(cle)) break; // on a bouclé
+    if (vus.has(cle)) {
+      // Les champs natifs `date` et `time` possèdent plusieurs sous-arrêts clavier dans leur
+      // shadow DOM. `document.activeElement` reste l'input hôte pendant qu'on les traverse : deux
+      // occurrences CONSÉCUTIVES ne signifient donc pas qu'on a bouclé dans la page.
+      const dernier = arrets[arrets.length - 1];
+      if (`${dernier?.balise}|${dernier?.nom}` === cle) continue;
+      break; // on a réellement retrouvé un arrêt plus ancien
+    }
     vus.add(cle);
     arrets.push(a);
   }
@@ -264,7 +272,10 @@ test.describe("La tabulation, avec de vraies frappes", () => {
       const arrets = await traverser(page, 40, chemin);
       const dernier = arrets[arrets.length - 1];
       if (!/aide/i.test(dernier?.nom ?? "")) {
-        fautifs.push(`${chemin} → dernier arrêt : ${dernier?.balise}[${dernier?.nom}]`);
+        fautifs.push(
+          `${chemin} → dernier arrêt : ${dernier?.balise}[${dernier?.nom}] ; parcours : ` +
+            arrets.map((arret) => `${arret.balise}[${arret.nom}]`).join(" → "),
+        );
       }
     }
     expect(fautifs, `« Aide » n'est plus le dernier arrêt :\n${fautifs.join("\n")}`).toEqual([]);
@@ -312,11 +323,19 @@ test("[7.12] la sortie rapide de /aide quitte VRAIMENT le site, et n'y ramène p
   void context;
 });
 
-test("[7.12] l'en-tête de /aide : « Retour » d'abord, la sortie du site ensuite", async ({ page }) => {
+test("[7.12] l'en-tête de /aide : « Retour » d'abord, la sortie du site ensuite", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(
+    browserName === "webkit",
+    "Safari n'inclut pas les liens dans l'ordre de tabulation par défaut : cet ordre y est inobservable.",
+  );
   // Deux contrôles côte à côte disent tous les deux « partir », et sous stress la confusion se
   // reforme. La séparation est de FORME autant que de mot — et l'ordre de tabulation en fait
   // partie : on rencontre d'abord celui qui ramène dans Anima.
   await page.goto("/aide");
+  await attendreLeProduit(page);
   const arrets = await traverser(page, 8);
   const noms = arrets.map((a) => (a.nom ?? "").toLowerCase());
   const iRetour = noms.findIndex((n) => n.includes("retour"));

@@ -100,12 +100,6 @@ const corpusNumerologieVide: FicheSocleVue = {
 const dessiner = (fiche: FicheSocleVue, mode: "tout" | "astrologie" | "numerologie" = "tout") =>
   render(<FicheSocle fiche={fiche} copie={COPIE} mode={mode} />);
 
-/** Le `<details>` « Lecture symbolique d'Anima », reconnu par son résumé — pas par sa position. */
-const pliDeLecture = (container: HTMLElement) =>
-  [...container.querySelectorAll("details")].find((detail) =>
-    (detail.querySelector("summary")?.textContent ?? "").includes(TITRE_LECTURE_NUMEROLOGIE),
-  );
-
 afterEach(cleanup);
 
 describe("[7.5/AC4] le milieu du ciel arrive à l'écran", () => {
@@ -142,13 +136,13 @@ describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", (
    * effacer sans rien mettre à la place aurait laissé la preuve revenir sans que rien ne rougisse.
    * On garde donc la mesure, retournée.
    */
-  it("[LE CŒUR] six entrées de nombre, et aucune ne porte de calcul", () => {
+  it("[LE CŒUR] six unités symboliques, chacune derrière son propre disclosure", () => {
     const { container } = dessiner(complete, "numerologie");
-    const entrees = container.querySelectorAll("li[class*='entree']");
-    expect(entrees.length, "six nombres calculés doivent donner six entrées à l'écran").toBe(6);
-    for (const e of entrees) {
-      expect(e.querySelector("details"), "un pli « Voir le calcul » est revenu").toBeNull();
-      expect(e.textContent ?? "", "une preuve arithmétique est revenue sous un nombre").not.toMatch(/→|=/);
+    const unites = container.querySelectorAll("details[class*='uniteNombre']");
+    expect(unites.length, "six nombres calculés doivent donner six unités à l'écran").toBe(6);
+    for (const unite of unites) {
+      expect(unite.hasAttribute("open")).toBe(false);
+      expect(unite.textContent ?? "", "une preuve arithmétique est revenue sous un nombre").not.toMatch(/→|=/);
     }
   });
 
@@ -156,9 +150,10 @@ describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", (
     // Sans ce témoin, six `<li>` vides passeraient le refus ci-dessus : « aucun calcul » serait
     // vrai d'une grille qui n'affiche plus rien du tout.
     const { container } = dessiner(complete, "numerologie");
-    const premiere = container.querySelector("li[class*='entree']");
+    const premiere = container.querySelector("details[class*='uniteNombre']");
     expect(premiere?.textContent ?? "").toContain("Chemin de vie");
-    expect(premiere?.querySelector("p[class*='nombreFort']")?.textContent ?? "").not.toBe("");
+    expect(premiere?.querySelector("summary")?.textContent ?? "").toMatch(/Chemin de vie · \d+/);
+    expect(premiere?.querySelector("[class*='archetypeNombre']")?.textContent ?? "").not.toBe("");
   });
 
   it("la méthode, elle, reste dite une fois en tête de section", () => {
@@ -169,22 +164,11 @@ describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", (
     expect(container.textContent ?? "").toContain(TITRE_METHODE_NUMEROLOGIE);
   });
 
-  it("[LE CŒUR · 2026-09-03] la lecture symbolique précède les nombres, et montre son début", () => {
-    // « Déplace la lecture symbolique en haut de la page, avec le début apparent et « … ». »
-    // Elle vivait tout en bas : il fallait traverser six nombres pour découvrir qu'il y avait
-    // quelque chose à lire. L'ordre du DOM EST la story ; sans cette garde, un `flex-direction`
-    // ou un déplacement de bloc le rendrait au bas de la section sans qu'une ligne ne rougisse.
+  it("[RC-F1] chaque nombre est le point d'entrée de sa propre lecture", () => {
     const { container } = dessiner(complete, "numerologie");
-    const lecture = container.querySelector("details[class*='lectureSymbolique']");
-    const grille = container.querySelector("ul[class*='grilleNombres']");
-    expect(lecture, "le pli de la lecture symbolique a disparu").not.toBeNull();
-    expect(grille, "la grille des nombres a disparu").not.toBeNull();
-    expect(precede(lecture!, grille!), "la lecture est repassée sous les nombres").toBe(true);
-
-    // Et le pli FERMÉ promet quelque chose : le titre seul n'invite personne à ouvrir.
-    const sommaire = lecture!.querySelector("summary")?.textContent ?? "";
-    expect(sommaire).toContain(TITRE_LECTURE_NUMEROLOGIE);
-    expect(sommaire, "l'avant-goût manque, ou il ne s'achève pas").toContain("…");
+    const unites = [...container.querySelectorAll("details[class*='uniteNombre']")];
+    expect(unites).toHaveLength(6);
+    expect(unites.every((unite) => Boolean(unite.querySelector("summary") && unite.querySelector("p")))).toBe(true);
   });
 
   it("les six intitulés sont là, pas seulement le chemin de vie", () => {
@@ -197,19 +181,23 @@ describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", (
   it("sépare la méthode de la lecture symbolique et ne répète qu'une note de corpus", () => {
     const { container } = dessiner(corpusNumerologieVide, "numerologie");
     expect(container.textContent ?? "").toContain(TITRE_METHODE_NUMEROLOGIE);
-    expect(container.textContent ?? "").toContain(TITRE_LECTURE_NUMEROLOGIE);
+    expect(container.querySelector(`[aria-label="${TITRE_LECTURE_NUMEROLOGIE}"]`)).not.toBeNull();
     expect(container.querySelectorAll("p").length).toBeGreaterThan(0);
     expect((container.textContent ?? "").split(LECTURE_NUMEROLOGIE_NON_ECRITE).length - 1).toBe(1);
+    expect(
+      container.querySelectorAll("ul[class*='grilleNombres'] [class*='nombreFort']"),
+      "un texte éditorial absent ne doit pas faire disparaître une valeur calculée",
+    ).toHaveLength(6);
   });
 
-  it("garde les lectures écrites derrière un seul dévoilement optionnel", () => {
+  it("garde chaque lecture écrite derrière son dévoilement optionnel", () => {
     const { container } = dessiner(complete, "numerologie");
-    const lecture = [...container.querySelectorAll("details")].find((detail) =>
-      (detail.querySelector("summary")?.textContent ?? "").includes(TITRE_LECTURE_NUMEROLOGIE),
-    );
-    expect(lecture).toBeDefined();
-    expect(lecture?.open).toBe(false);
-    expect(lecture?.querySelectorAll("article")).toHaveLength(6);
+    const lectures = [...container.querySelectorAll("details[class*='uniteNombre']")];
+    expect(lectures).toHaveLength(6);
+    for (const lecture of lectures) {
+      expect(lecture.hasAttribute("open")).toBe(false);
+      expect(lecture.querySelectorAll("p[class*='texteNombre']")).toHaveLength(1);
+    }
   });
 
   /**
@@ -218,29 +206,20 @@ describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", (
    * coiffé de « Chemin de vie » au-dessus de « Ton chemin de vie 4 symbolise… » oblige à remonter
    * pour savoir de quel 4 on parle. Le titre et le texte doivent se répondre sans quitter le pli.
    */
-  it("[LE CŒUR] sous le pli, chacun des six articles est coiffé de son nombre — « Chemin de vie (4) »", () => {
+  it("[LE CŒUR] chacun des six sommaires réunit libellé et nombre", () => {
     const { container } = dessiner(complete, "numerologie");
-    const articles = [...(pliDeLecture(container)?.querySelectorAll("article") ?? [])];
-    expect(articles).toHaveLength(6);
-    for (const article of articles) {
-      const titre = article.querySelector("h3")?.textContent ?? "";
-      const decoupe = titre.match(/^(.+) \((\d+)\)$/);
-      expect(decoupe, `intitulé sans nombre : « ${titre} »`).not.toBeNull();
-      // Le nombre du titre est celui de la grille, recalculé depuis la fiche — jamais une valeur
-      // inventée par le rendu. Mutations-cibles : suffixe retiré, ou valeur d'un autre nombre.
-      const nombre = complete.nombres.nombres.find((n) => n.intitule === decoupe![1]);
-      expect(nombre, `« ${decoupe![1]} » ne correspond à aucun nombre de la grille`).toBeDefined();
-      expect(decoupe![2], titre).toBe(nombre!.valeur);
+    const sommaires = [...container.querySelectorAll("details[class*='uniteNombre'] summary")];
+    expect(sommaires).toHaveLength(6);
+    for (const sommaire of sommaires) {
+      const texte = sommaire.textContent ?? "";
+      expect(texte).toMatch(/^\S.* · \d+/);
     }
   });
 
-  it("[ANTI-VACUITÉ] la grille garde son intitulé nu : « (4) » ne se répète pas sous un 4 en grand", () => {
-    // Le retour vise la lecture, pas la grille. Une étiquette « Chemin de vie (4) » au-dessus d'un
-    // 4 en `t-display` dirait deux fois la même chose — et FR-031 lit de travers tout doublon.
+  it("[ANTI-REDONDANCE] l'ancienne grille numérique a disparu", () => {
     const { container } = dessiner(complete, "numerologie");
-    const etiquettes = [...container.querySelectorAll("li[class*='entree'] p[class*='etiquette']")];
-    expect(etiquettes).toHaveLength(6);
-    for (const e of etiquettes) expect(e.textContent ?? "").not.toMatch(/\(/);
+    expect(container.querySelector("ul[class*='grilleNombres']")).toBeNull();
+    expect(container.querySelector("[class*='nombreFort']")).toBeNull();
   });
 
   it("[ANTI-VACUITÉ] sans nom, les lectures restantes portent leur nombre et aucune parenthèse n'est vide", () => {
@@ -248,12 +227,10 @@ describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", (
     // trois nombres de lettres restent des manques DITS (AC2), et les trois de date gardent leur
     // lecture, avec leur nombre.
     const { container } = dessiner(sansHeureNiNom, "numerologie");
-    const titres = [...(pliDeLecture(container)?.querySelectorAll("article h3") ?? [])].map(
-      (h) => h.textContent ?? "",
-    );
+    const titres = [...container.querySelectorAll("details[class*='uniteNombre'] summary")].map((h) => h.textContent ?? "");
     expect(titres.length, "les nombres de date gardent leur lecture").toBeGreaterThan(0);
     expect(titres.length, "les nombres de lettres ne peuvent pas avoir de lecture sans nom").toBeLessThan(6);
-    for (const t of titres) expect(t).toMatch(/^\S.* \(\d+\)$/);
+    for (const t of titres) expect(t).toMatch(/^\S.* · \d+/);
     expect(container.textContent ?? "").not.toMatch(/\(\s*\)|undefined|NaN/);
   });
 });

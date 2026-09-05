@@ -6,7 +6,7 @@ import {
   lireHypotheseEnneagramme,
   lireTentativeEnneagramme,
 } from "@/lib/data/lire-enneagramme";
-import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
+import { lexiqueDuType, texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
 import {
   LIBELLES_NIVEAU,
   LIBELLE_INCONNU,
@@ -131,6 +131,7 @@ export default async function Page({
 
   const texteRetenu =
     type.statut === "calcule" ? texteDuTypeRetenu(type.type) : { statut: "non_ecrit" as const };
+  const lexiqueRetenu = type.statut === "calcule" ? lexiqueDuType(type.type) : null;
 
   return (
     <main className={s.halte}>
@@ -145,6 +146,8 @@ export default async function Page({
       ) : refaire === undefined && type.statut === "calcule" ? (
         <Resultat
           type={type.type}
+          nom={lexiqueRetenu!.nom}
+          definition={lexiqueRetenu!.definition}
           origine={type.origine}
           texte={texteRetenu.statut === "ecrit" ? texteRetenu.texte : null}
           messageSansTexte={MESSAGE_TYPE_SANS_TEXTE}

@@ -257,6 +257,25 @@
   animation: scintille var(--duree-etoile, 4200ms) var(--courbe) infinite;
   animation-delay: var(--retard, 0ms);
 }
+
+/* Dans Anam, le système global change de forme et s'immobilise : pas de seconde couche animée. */
+.etoilesAnam .etoile {
+  width: max(5px, var(--taille-etoile, 5px)) !important;
+  height: max(5px, var(--taille-etoile, 5px)) !important;
+  border-radius: 0;
+  clip-path: polygon(50% 0, 60% 38%, 100% 50%, 60% 62%, 50% 100%, 40% 62%, 0 50%, 40% 38%);
+  animation: none;
+  opacity: 0.42;
+}
+/* Le guide et les cartes papier posent de grandes surfaces au-dessus du ciel : laisser
+   quatre-vingts étoiles se recomposer derrière elles divise la cadence par deux sur un écran
+   120 Hz, sans information supplémentaire. On fige la phase courante et rend les couches
+   temporaires ; elles reprennent leur scintillement dans les régions où le ciel domine. */
+.tourOuvert .etoile,
+.accueilActif .etoile {
+  animation-play-state: paused;
+  will-change: auto;
+}
 .grain {
   position: absolute;
   inset: 0;
@@ -458,13 +477,11 @@
   .region {
     /* ── DÉGAGE LE RAIL LATÉRAL GAUCHE (doublage non-spatial) ────────────────────────────────
        ⚠️ LA RÉSERVE ÉTAIT DE SIX PIXELS TROP COURTE, ET C'EST UNE MESURE QUI L'A DIT. Le rail est
-       large de 134 px (24 px de rembourrage × 2 + le plus long libellé, « L'arbre ») ; la réserve
-       valait `--esp-9 + --esp-6`, soit 128. Le bouton « Vue liste » de la région arbre commençait
-       donc SOUS le rail. Invisible à l'œil — le dégradé du rail y est transparent à 95 % — mais
-       le jour où un libellé s'allonge, où la police grossit, ou où l'on traduit, l'écart cesse
-       d'être invisible. On dégage de dix pixels, et `e2e/barre-basse.spec.ts` mesure la boîte
-       ENTIÈRE du rail, pas la partie qu'on voit : c'est lui qui rougira le jour venu. */
-    padding-left: calc(var(--esp-9) + var(--esp-7));
+       large de 182 px depuis le renommage en « Mon évolution » (24 px de rembourrage × 2 + le
+       libellé) ; l'ancienne réserve de 144 px laissait donc le bouton « Comprendre mon évolution »
+       SOUS le rail. On réserve 192 px, et `e2e/barre-basse.spec.ts` mesure la boîte ENTIÈRE du
+       rail, pas la partie qu'on voit : c'est lui qui rougira au prochain allongement. */
+    padding-left: calc(var(--esp-9) + var(--esp-9));
     padding-right: var(--marge-desktop);
     padding-bottom: var(--esp-8);
   }
@@ -542,6 +559,30 @@
      la scène à 4 im/s (voir l'inventaire plus haut). Un aplat translucide suffit, et il est
      composité. */
   background: transparent;
+}
+
+.lotusAnam {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--hauteur-nav) + var(--esp-6));
+  width: min(78vw, 36rem);
+  height: auto;
+  translate: -50% 0;
+  color: var(--lueur);
+  opacity: 0.075;
+  pointer-events: none;
+}
+
+.lotusAnam g {
+  stroke: currentColor;
+  stroke-width: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .etoilesAnam .etoile {
+    animation: none;
+    will-change: auto;
+  }
 }
 /* h1 de la conversation : discret (cible du focus + hiérarchie), la conversation vient dessous. */
 .titreConversation {
@@ -951,7 +992,7 @@
 @media (min-width: 1024px) {
   .surimpression {
     padding-left: calc(
-      var(--esp-9) + var(--esp-7)
+      var(--esp-9) + var(--esp-9)
     ); /* dégage le rail latéral gauche (voir .region) */
     padding-right: var(--marge-desktop);
   }

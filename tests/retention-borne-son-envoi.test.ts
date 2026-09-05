@@ -38,6 +38,7 @@ function depot(overrides: Record<string, unknown> = {}) {
     trancher: vi.fn(async () => "efface"),
     poserEcheance: vi.fn(async () => undefined),
     purgerJournal: vi.fn(async () => 0),
+    purgerTextesDuJour: vi.fn(async () => 0),
     ...overrides,
   };
 }

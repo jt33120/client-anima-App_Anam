@@ -55,7 +55,7 @@ function ApercuSocle({ fiche, titre }: { readonly fiche: FicheSocleVue; readonly
   return (
     <section className={s.apercu} aria-labelledby="socle-apercu">
       <div className={s.enteteSection}>
-        <p className={`t-meta ${s.surtitre}`}>Ce qui te compose</p>
+        <p className={`t-meta ${s.surtitre}`}>Mon monde intérieur</p>
         <h2 id="socle-apercu" className="t-titre">{titre}</h2>
       </div>
       <ul className={s.grilleApercus}>
@@ -66,6 +66,21 @@ function ApercuSocle({ fiche, titre }: { readonly fiche: FicheSocleVue; readonly
 }
 
 const REPERES_ANGULAIRES = Object.freeze([0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]);
+const ETOILES_CIEL = Object.freeze([
+  [70, 78], [112, 52], [218, 64], [257, 101], [268, 222], [219, 267], [89, 245], [53, 176],
+]);
+const SYMBOLES_CIEL: Readonly<Record<string, string>> = Object.freeze({
+  soleil: "☉",
+  lune: "☽",
+  mercure: "☿",
+  venus: "♀",
+  mars: "♂",
+  jupiter: "♃",
+  saturne: "♄",
+  uranus: "♅",
+  neptune: "♆",
+  pluton: "♇",
+});
 
 function CarteNatale({ ciel }: { readonly ciel: SectionCielVue }) {
   if (!ciel.projection) return null;
@@ -84,6 +99,15 @@ function CarteNatale({ ciel }: { readonly ciel: SectionCielVue }) {
           <circle className={s.anneauFort} cx="160" cy="160" r="128" />
           <circle className={s.anneau} cx="160" cy="160" r="102" />
           <circle className={s.anneauInterieur} cx="160" cy="160" r="52" />
+          <g aria-hidden>
+            {ETOILES_CIEL.map(([x, y]) => (
+              <path
+                key={`${x}-${y}`}
+                className={s.etoileCiel}
+                d={`M${x} ${y - 3}L${x + 1} ${y - 1}L${x + 3} ${y}L${x + 1} ${y + 1}L${x} ${y + 3}L${x - 1} ${y + 1}L${x - 3} ${y}L${x - 1} ${y - 1}Z`}
+              />
+            ))}
+          </g>
           <text className={`t-meta ${s.graduationCiel}`} x="160" y="28" textAnchor="middle">0°</text>
           <text className={`t-meta ${s.graduationCiel}`} x="292" y="164" textAnchor="middle">90°</text>
           <text className={`t-meta ${s.graduationCiel}`} x="160" y="302" textAnchor="middle">180°</text>
@@ -123,7 +147,15 @@ function CarteNatale({ ciel }: { readonly ciel: SectionCielVue }) {
           ))}
           {ciel.positions.map((position) => position.projection && (
             <g key={position.cle} transform={`rotate(${position.projection} 160 160)`}>
-              <circle className={s.pointCiel} cx="160" cy="58" r="5" />
+              <text
+                className={s.corpsCiel}
+                x="160"
+                y="64"
+                textAnchor="middle"
+                transform={`rotate(-${position.projection} 160 58)`}
+              >
+                {SYMBOLES_CIEL[position.cle] ?? "✦"}
+              </text>
             </g>
           ))}
           <circle className={s.coeurCiel} cx="160" cy="160" r="9" />
@@ -144,93 +176,71 @@ function SectionNumerologie({
   readonly nombres: SectionNombresVue;
   readonly copie: ProprietesFicheSocle["copie"];
 }) {
+  const clesAvecLecture = new Set(nombres.lecturesSymboliques.map((lecture) => lecture.cle));
+  const valeursSansLecture = nombres.nombres.filter((nombre) => !clesAvecLecture.has(nombre.cle));
+
   return (
     <section className={`${s.section} ${s.sectionNombres}`} aria-labelledby="socle-nombres">
       <div className={s.enteteSection}>
-        <p className={`t-meta ${s.surtitre}`}>Calcul déterministe</p>
         <h2 id="socle-nombres" className="t-titre">{copie.titreNombres}</h2>
       </div>
 
       {nombres.indisponible && <p className={`t-corps ${s.panne}`}>{nombres.indisponible}</p>}
 
-      {/* ══ LA LECTURE SYMBOLIQUE EST REMONTÉE EN TÊTE (2026-09-03) ═══════════════════════════
-
-          « Déplace la lecture symbolique en haut de la page, avec le début apparent et « … » pour
-          lire la totalité, mais au moins donne un avant-goût. »
-
-          Elle vivait tout en bas, derrière un pli qui ne montrait que son titre : il fallait
-          traverser six nombres et leurs preuves pour découvrir qu'il y avait quelque chose à lire,
-          et rien ne le promettait. L'aperçu est ce qui fait la différence entre un titre et une
-          invitation.
-
-          ⚠️ L'APERÇU EST DANS LE `<summary>`, et il disparaît à l'ouverture (CSS). Le laisser
-          visible ferait lire deux fois le même début, à trois lignes d'intervalle. */}
       {nombres.lecturesSymboliques.length > 0 ? (
-        <details className={`${s.devoilement} ${s.lectureSymbolique}`}>
-          <summary className={s.sommaireLecture}>
-            <span className="t-titre">{copie.titreLectureNumerologie}</span>
-            {nombres.apercuLecture && (
-              <span className={`t-anam ${s.apercuLecture}`}>{nombres.apercuLecture}</span>
-            )}
-          </summary>
-          <div className={s.contenuLecture}>
-            {nombres.lecturesSymboliques.map((lecture) => (
-              <article key={lecture.cle} className={s.lectureEcrite}>
-                {/* L'intitulé arrive du domaine AVEC son nombre — « Chemin de vie (7) » — pour
-                    répondre au texte qui commence par « Ton chemin de vie 7 symbolise… » (retour
-                    du 2026-09-02). Le rendu ne recompose rien : il ne décide pas (AD-7).
-
-                    En `t-titre-sm` depuis le 2026-09-03 (« les titres de la lecture symbolique
-                    plus gros ») : c'était `t-meta`, la plus petite graisse du produit, sur un titre
-                    qui coiffe cinq lignes de prose. */}
-                <h3 className={`t-titre-sm ${s.titreLecture}`}>{lecture.intitule}</h3>
-                <p className={`t-anam ${s.texte}`}>{lecture.texte}</p>
-              </article>
-            ))}
-            {nombres.noteLectureSymbolique && (
-              <p className={`t-meta ${s.noteCorpus}`}>{nombres.noteLectureSymbolique}</p>
-            )}
-          </div>
-        </details>
+        <div className={s.grilleLectures} aria-label={copie.titreLectureNumerologie}>
+          {nombres.lecturesSymboliques.map((lecture) => (
+            <details key={lecture.cle} className={`${s.devoilement} ${s.uniteNombre}`}>
+              <summary>
+                <span className={s.enteteNombre}>
+                  <span className="t-titre-sm">{lecture.intitule} · {lecture.valeur}</span>
+                  <span className={`t-meta ${s.archetypeNombre}`}>{lecture.archetype}</span>
+                </span>
+              </summary>
+              <p className={`t-anam ${s.texteNombre}`}>{lecture.texte}</p>
+            </details>
+          ))}
+          {nombres.noteLectureSymbolique && (
+            <p className={`t-meta ${s.noteCorpus}`}>{nombres.noteLectureSymbolique}</p>
+          )}
+        </div>
       ) : nombres.noteLectureSymbolique ? (
-        <div className={`${s.lectureSymbolique} ${s.lectureVide}`} aria-labelledby="socle-lecture-numerologie">
+        <div
+          className={`${s.lectureSymbolique} ${s.lectureVide}`}
+          aria-label={copie.titreLectureNumerologie}
+        >
           <h3 id="socle-lecture-numerologie" className="t-titre">{copie.titreLectureNumerologie}</h3>
           <p className={`t-meta ${s.noteCorpus}`}>{nombres.noteLectureSymbolique}</p>
         </div>
       ) : null}
 
-      {nombres.entrees.length > 0 && (
-        <div className={s.blocInformation} aria-labelledby="socle-entrees-numerologie">
-          <h3 id="socle-entrees-numerologie" className="t-titre-sm">{copie.titreEntreesNumerologie}</h3>
-          <Faits faits={nombres.entrees} />
-        </div>
+      {valeursSansLecture.length > 0 && (
+        <ul className={s.grilleNombres}>
+          {valeursSansLecture.map((nombre) => (
+            <li key={nombre.cle} className={s.entree}>
+              <p className={`t-meta ${s.etiquette}`}>{nombre.intitule}</p>
+              <p className={`t-display ${s.nombreFort}`}>{nombre.valeur}</p>
+            </li>
+          ))}
+        </ul>
       )}
 
-      {nombres.conventions.length > 0 && (
+      {(nombres.entrees.length > 0 || nombres.conventions.length > 0) && (
         <details className={s.devoilement}>
           <summary className="t-corps">{copie.titreMethodeNumerologie}</summary>
-          <ul className={s.listeMethode}>
-            {nombres.conventions.map((convention) => <li key={convention} className="t-meta">{convention}</li>)}
-          </ul>
+          <div className={s.contenuDevoilement}>
+            {nombres.entrees.length > 0 && (
+              <div aria-labelledby="socle-entrees-numerologie">
+                <h3 id="socle-entrees-numerologie" className="t-titre-sm">{copie.titreEntreesNumerologie}</h3>
+                <Faits faits={nombres.entrees} />
+              </div>
+            )}
+            <ul className={s.listeMethode}>
+              {nombres.conventions.map((convention) => <li key={convention} className="t-meta">{convention}</li>)}
+            </ul>
+          </div>
         </details>
       )}
-
-      {/* ⚠️ PLUS DE PREUVE SOUS CHAQUE NOMBRE (2026-09-03) : « supprime complètement les calculs,
-          on a déjà au début l'explication, pas besoin de tout justifier, ça prend trop de place ».
-
-          Ce qui était là jusqu'ici — la dernière ligne de la trace en clair, plus un « Voir le
-          calcul » replié — remontait d'un retour du 2026-08-30 qui demandait l'inverse. La capture
-          du fondateur montre le prix de ce choix : six cartes de justification à traverser avant
-          d'atteindre la lecture. L'explication n'est pas perdue pour autant, elle est dite UNE
-          fois, plus haut, dans « La méthode de calcul ». */}
-      <ul className={s.grilleNombres}>
-        {nombres.nombres.map((nombre) => (
-          <li key={nombre.cle} className={s.entree}>
-            <p className={`t-meta ${s.etiquette}`}>{nombre.intitule}</p>
-            <p className={`t-display ${s.nombreFort}`}>{nombre.valeur}</p>
-          </li>
-        ))}
-      </ul>
 
       {nombres.manquants.map((manque) => (
         <div key={manque.cle} className={s.manque}>
@@ -358,7 +368,6 @@ function SectionAstrologie({
   return (
     <section className={`${s.section} ${s.sectionCiel}`} aria-labelledby="socle-ciel">
       <div className={s.enteteSection}>
-        <p className={`t-meta ${s.surtitre}`}>Projection de naissance</p>
         <h2 id="socle-ciel" className="t-titre">{copie.titreCiel}</h2>
       </div>
 
@@ -371,6 +380,23 @@ function SectionAstrologie({
       {ciel.sansHeure && <AppelHeure sansHeure={ciel.sansHeure} copie={copie} />}
       {ciel.horoscope && <CielDuJour horoscope={ciel.horoscope} copie={copie} />}
       <CarteNatale ciel={ciel} />
+
+      {ciel.reperesPrincipaux.length > 0 && (
+        <div className={s.reperesPrincipaux} aria-labelledby="socle-reperes-principaux">
+          <h3 id="socle-reperes-principaux" className="t-titre-sm">Tes trois repères</h3>
+          <dl>
+            {ciel.reperesPrincipaux.map((repere) => (
+              <div key={repere.cle} className={s.reperePrincipal}>
+                <dt className="t-meta">{repere.intitule}</dt>
+                <dd className={repere.calcule ? "t-titre-sm" : "t-corps"}>{repere.valeur}</dd>
+              </div>
+            ))}
+          </dl>
+          <Link className={`t-bouton ${s.boutonSecondaire}`} href="/memoire#correction-naissance">
+            Gérer mes données de naissance
+          </Link>
+        </div>
+      )}
 
       {/* ⚠️ TOUT LE TABLEAU D'ÉPHÉMÉRIDES SOUS UN SEUL PLI, FERMÉ (2026-09-01 : « Toggle et cache
           les positions en texte, on s'en fout, mets l'accent sur l'horoscope »). Les positions,

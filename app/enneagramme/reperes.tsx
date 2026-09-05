@@ -79,8 +79,10 @@ export default function ReperesEnneagramme({
             {reperes.map((repere) => (
               <li key={repere.type}>
                 <details className={s.repere} name="repere-enneagramme">
-                  <summary className={`${s.nomRepere} t-bouton`}>Type {repere.type}</summary>
-                  <p className="t-anam">{repere.texte}</p>
+                  <summary className={`${s.nomRepere} t-bouton`}>
+                    {repere.nom} · Type {repere.type}
+                  </summary>
+                  <p className="t-corps">{repere.definition}</p>
                 </details>
               </li>
             ))}

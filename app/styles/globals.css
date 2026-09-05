@@ -44,6 +44,11 @@
   --jour: #D3DBF0;
   --sur-jour: #1C2740;
   --sur-jour-doux: #4C5773;
+  /* Variante B « nuit douce + papier lumineux » (2026-09-05) : une surface locale Ivory dans la
+     nuit, avec ses encres mesurées. Ce n'est ni un thème jour ni le code couleur du quotidien. */
+  --papier: #F0EFEA;
+  --sur-papier: #1C2740;
+  --sur-papier-doux: #5F5D57;
   /* LE SECOND TON, CHAUD (2026-09-03) : le Beige de la palette, en décor seul — une lueur basse
      qui rompt la monochromie du bleu. Jamais sous du texte (1,4:1). */
   --aube: #E0D2C7;
@@ -142,6 +147,9 @@
   --jour: #D3DBF0;
   --sur-jour: #1C2740;
   --sur-jour-doux: #4C5773;
+  --papier: #FFFFFF;
+  --sur-papier: #1C2740;
+  --sur-papier-doux: #5F5D57;
   /* Le second ton, chaud : le Gray de la palette en clair (décor seul). */
   --aube: #B8B5AC;
   --imagerie-opacite: 0; /* imagerie atténuée : les fonds illustrés cèdent aux aplats */
@@ -171,6 +179,9 @@
     --jour: #D3DBF0;
     --sur-jour: #1C2740;
     --sur-jour-doux: #4C5773;
+    --papier: #FFFFFF;
+    --sur-papier: #1C2740;
+    --sur-papier-doux: #5F5D57;
     /* Le second ton, chaud : le Gray de la palette en clair (décor seul). */
     --aube: #B8B5AC;
     --imagerie-opacite: 0;

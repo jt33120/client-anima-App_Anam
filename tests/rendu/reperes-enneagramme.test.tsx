@@ -60,7 +60,7 @@ describe("[fondateur 2026-09-02] avant le clic : une page courte, sans tiroir", 
     expect(reperes.length, "témoin : le corpus fournit bien neuf repères").toBe(9);
     for (const repere of reperes) {
       expect(container.textContent, `le repère du type ${repere.type} s'empile encore`).not.toContain(
-        repere.texte,
+        repere.definition,
       );
     }
     expect(container.querySelectorAll("details").length, "un tiroir subsiste dans la page").toBe(0);
@@ -103,12 +103,12 @@ describe("[fondateur 2026-09-02] après le clic : la feuille, et les neuf textes
     expect(porte.getAttribute("aria-expanded")).toBe("true");
     expect(porte.getAttribute("aria-controls")).toBe(feuille.id);
 
-    // ⚠️ LES NEUF, ET CEUX DU CORPUS (FR-054). Un résumé écrit ici « pour faire plus court dans
-    // une feuille » serait un texte sans auteur qui aurait l'air d'un texte d'Anima.
+    // ⚠️ LES NEUF DÉFINITIONS DU LEXIQUE GÉNÉRAL. Les lectures personnelles du corpus restent
+    // réservées au résultat : cette feuille aide à choisir un repère sans attribuer un type.
     const textes = [...feuille.querySelectorAll("details > p")].map((p) => p.textContent);
-    expect(textes).toEqual(reperesPourIntroduction().map((r) => r.texte));
+    expect(textes).toEqual(reperesPourIntroduction().map((r) => r.definition));
     for (const p of feuille.querySelectorAll("details > p")) {
-      expect(p.className, "un texte de corpus se lit dans la voix d'Anima").toContain("t-anam");
+      expect(p.className, "une définition générale se lit comme le reste de l’interface").toContain("t-corps");
     }
   });
 
@@ -123,8 +123,8 @@ describe("[fondateur 2026-09-02] après le clic : la feuille, et les neuf textes
 
   it("[UN SEUL TEXTE À LA FOIS] neuf `<details>` qui partagent un `name` : l'accordéon exclusif natif", () => {
     // « Moins de scroll » : ouvrir un repère referme le précédent, sans JavaScript, et neuf
-    // résumés fermés tiennent dans la feuille. Les résumés restent « Type 1 » à « Type 9 » : aucun
-    // nom de type n'existe, les nommer relève de la voix d'Anima (FR-086).
+    // résumés fermés tiennent dans la feuille. Le nom éditorial ouvre la lecture ; le numéro reste
+    // un repère secondaire explicite.
     const { container } = monter();
     const { feuille } = ouvrir(container);
     const details = [...feuille.querySelectorAll("details")];
@@ -133,7 +133,7 @@ describe("[fondateur 2026-09-02] après le clic : la feuille, et les neuf textes
     expect(noms.size, "les neuf tiroirs ne partagent pas un `name` unique").toBe(1);
     expect([...noms][0]).toBeTruthy();
     expect(details.map((d) => d.querySelector("summary")?.textContent)).toEqual(
-      reperesPourIntroduction().map((r) => `Type ${r.type}`),
+      reperesPourIntroduction().map((r) => `${r.nom} · Type ${r.type}`),
     );
     for (const d of details) expect(d.hasAttribute("open"), "un repère est ouvert d'office").toBe(false);
   });

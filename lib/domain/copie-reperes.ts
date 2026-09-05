@@ -52,7 +52,7 @@ export const PLACES: readonly Place[] = Object.freeze([
       "qu’elle comprend, et elle le garde d’une fois sur l’autre.",
   },
   {
-    nom: "Mon arbre",
+    nom: "Mon évolution",
     quoi:
       "Ce qui pousse à mesure. Le tronc, c’est ce qui était déjà là à la naissance. Les branches " +
       "naissent de ce qui revient dans les échanges : jamais sur l’instant, et jamais sans que tu " +
@@ -63,7 +63,7 @@ export const PLACES: readonly Place[] = Object.freeze([
     // relu ici à la main puisque ce fichier est exempté de la garde des littéraux.
     nom: "Aujourd’hui",
     quoi:
-      "Ce que le jour propose : quelques cartes, la même chose pour tout le monde ce jour-là. " +
+      "Mon parcours du jour rassemble quelques cartes, les mêmes pour tout le monde ce jour-là. " +
       "Rien n’y est calculé pour te retenir, et il n’y a rien à y rattraper si tu passes un jour.",
   },
 ]);

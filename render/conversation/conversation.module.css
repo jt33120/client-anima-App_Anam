@@ -30,6 +30,17 @@
   scroll-behavior: auto;
 }
 
+.introductionStatique {
+  max-width: var(--mesure);
+  margin: 0;
+  padding: var(--esp-4);
+  border: 1px solid color-mix(in srgb, var(--lueur) 22%, transparent);
+  border-radius: var(--rayon-md);
+  background: color-mix(in srgb, var(--fond) 86%, transparent);
+  color: var(--texte);
+  line-height: 1.65;
+}
+
 /* Frontière du jour dans le fil : une respiration et un filet, jamais une carte ni une bulle. */
 .separateurJour {
   display: grid;

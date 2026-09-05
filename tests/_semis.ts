@@ -35,7 +35,7 @@ export const TABLES_SEMEES: readonly string[] = Object.freeze([
   "theme_natal", "enneagramme", "enneagramme_hypothese", "enneagramme_tentative",
   "big_five", "big_five_tentative", "carte_contexte", "lecture", "seance", "usage_ia",
   "reservation_quota_ia", "ouverture_jour_anam", "episode_detresse", "audit_securite",
-  "pause_rythme", "invitation_integration", "notification_envoyee", "abonnement",
+  "audit_correction_naissance", "pause_rythme", "invitation_integration", "notification_envoyee", "abonnement",
   "remboursement", "information_reconduction", "preference_socle", "preference_courriel",
   "abonnement_poussee", "art9_temoin", "execution_job",
 ]);
@@ -183,6 +183,11 @@ export async function semerTout(admin: SupabaseClient, id: string, marqueur: str
 
   await poser(admin, "episode_detresse", { utilisatrice_id: id, niveau_max: 2 });
   await poser(admin, "audit_securite", { utilisatrice_id: id, type: "semence", decision: "posee" });
+  await poser(admin, "audit_correction_naissance", {
+    utilisatrice_id: id,
+    statut: "corrigee",
+    version_contrat: 1,
+  });
   await poser(admin, "pause_rythme", { utilisatrice_id: id, seances: 6, minutes: 70 });
   await poser(admin, "invitation_integration", { utilisatrice_id: id });
   await poser(admin, "notification_envoyee", {

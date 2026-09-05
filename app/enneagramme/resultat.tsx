@@ -31,11 +31,15 @@ import s from "@/render/psychologie/questionnaire.module.css";
 
 export default function Resultat({
   type,
+  nom,
+  definition,
   origine,
   texte,
   messageSansTexte,
 }: {
   type: number;
+  nom: string;
+  definition: string;
   origine: "test" | "hypothese";
   /** Le texte d'Anima, ou `null` si le créneau n'est pas encore écrit. */
   texte: string | null;
@@ -68,16 +72,29 @@ export default function Resultat({
 
   return (
     <section className={`${s.bloc} fondu-texte`} aria-label="Ton type">
-      <p className={`${s.type} t-titre`}>Type {type}</p>
+      <h2 className={`${s.type} t-titre`}>{nom}</h2>
+      <p className={`${s.repereType} t-meta`}>Type {type}</p>
       <p className="t-corps">
         {origine === "test"
           ? "C’est ce qui ressort de tes réponses."
           : "C’est l’idée d’Anam, que tu as reconnue."}
       </p>
+      <section className={s.definitionGenerale} aria-labelledby="definition-generale">
+        <h3 id="definition-generale" className="t-titre-sm">
+          Définition générale
+        </h3>
+        <p className="t-corps">{definition}</p>
+        <p className={`${s.provenance} t-meta`}>Corpus éditorial Anima</p>
+      </section>
       {/* Le texte d'Anima quand il existe — dans SA voix. Le message d'absence, lui, est du produit :
           `t-corps`, jamais `t-anam`. Confondre les deux ferait parler Anima à sa place. */}
       {texte !== null ? (
-        <p className="t-anam">{texte}</p>
+        <section className={s.lectureCorpus} aria-labelledby="lecture-corpus">
+          <h3 id="lecture-corpus" className="t-titre-sm">
+            Lecture du type
+          </h3>
+          <p className="t-anam">{texte}</p>
+        </section>
       ) : (
         <p className="t-corps">{messageSansTexte}</p>
       )}

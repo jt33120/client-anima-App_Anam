@@ -229,7 +229,7 @@ test.describe("Le seuil", () => {
     await expect(
       page.getByRole("navigation", { name: "Régions" }).getByRole("button"),
       "le doublage non-spatial doit reprendre dès qu'il y a quelque chose à doubler (UX-DR-37)",
-    ).toHaveText(["Aujourd’hui", "Anam", "Mon arbre"]);
+  ).toHaveText(["Aujourd’hui", "Anam", "Mon évolution"]);
   });
 
   test("[UNE FOIS] franchi, le seuil ne se redresse plus devant personne", async ({ page }) => {

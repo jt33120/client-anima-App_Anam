@@ -43,6 +43,7 @@
     "@vitejs/plugin-react": "5.0.0",
     "eslint": "9.39.5",
     "jsdom": "30.0.1",
+    "sharp": "^0.35.4",
     "supabase": "2.115.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.65.0",

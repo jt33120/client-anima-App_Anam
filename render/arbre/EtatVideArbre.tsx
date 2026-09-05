@@ -46,6 +46,10 @@ export default function EtatVideArbre({ direOuNaissentLesBranches, onOuvrirTronc
           Ce composant ne porte que la copie et le chemin nommé vers la fiche du tronc. */}
       <p className={s.videTitre}>{VIDE_TITRE}</p>
       <p className={s.videCorps}>{VIDE_CORPS}</p>
+      {/* Le chemin vers la fiche du tronc reste avant le texte long : sur un téléphone, la personne
+          qui vient précisément compléter son heure n'a pas à faire défiler l'explication pour
+          retrouver l'unique action de cet état. */}
+      {onOuvrirTronc && <BoutonTronc onOuvrir={onOuvrirTronc} />}
 
       {/* ⚠️ CE QU'EST L'ARBRE, ICI ET NULLE PART AILLEURS (retour du 2026-08-23). Cet écran est le
           seul du produit où il n'y a rien à regarder — donc le seul où il y a la place de
@@ -62,7 +66,6 @@ export default function EtatVideArbre({ direOuNaissentLesBranches, onOuvrirTronc
       {/* Un `<p>` nu, dans le flux, sans bouton ni lien ni fermeture : la phrase n'est pas une bannière,
           elle fait partie de l'écran. Rien à cliquer, donc rien à refuser. */}
       {direOuNaissentLesBranches && <p className={s.videCorps}>{VIDE_OU_NAISSENT_LES_BRANCHES}</p>}
-      {onOuvrirTronc && <BoutonTronc onOuvrir={onOuvrirTronc} />}
     </div>
   );
 }

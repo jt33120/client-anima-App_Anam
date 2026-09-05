@@ -27,7 +27,6 @@ import {
   HUMAN_DESIGN_TITRE,
   METHODE_CORPS,
   METHODE_TITRE,
-  PSYCHOLOGIE_INTRO,
   PSYCHOLOGIE_TITRE,
 } from "@/lib/domain/copie-psychologie";
 import { piedPour, MENTION_IA, URL_AIDE, URL_TRANSPARENCE } from "@/lib/domain/pied-halte";
@@ -151,7 +150,6 @@ export default async function Page({
       <RetourScene url={urlRetourScene(await searchParams)} />
       <h1 className={`t-titre ${s.titre}`}>{PSYCHOLOGIE_TITRE}</h1>
       <PsychologieHub
-        introduction={PSYCHOLOGIE_INTRO}
         modules={[enneagramme, bigFive, humanDesign]}
         methode={{ titre: METHODE_TITRE, corps: METHODE_CORPS }}
       />

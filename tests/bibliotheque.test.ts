@@ -271,7 +271,7 @@ describe("[5.6/AC3 · FR-080] mantra ≠ ancrage ≠ lecture, et c'est la NATURE
   });
 
   it("[CONTRÔLE NÉGATIF] un texte qui reste dans son terme ne déclenche rien", () => {
-    expect(chercherConfusionVocabulaire("Le mantra du jour", "mantra")).toEqual([]);
+    expect(chercherConfusionVocabulaire("Mon mantra du jour", "mantra")).toEqual([]);
     expect(chercherConfusionVocabulaire("Un ancrage de trois minutes", "ancrage")).toEqual([]);
   });
 

@@ -5,6 +5,7 @@ import {
   CLES_ENNEAGRAMME,
   CORPUS_ENNEAGRAMME,
   cleEnneagramme,
+  lexiqueDuType,
   reperesPourIntroduction,
   texteDuType,
   texteDuTypeRetenu,
@@ -61,12 +62,12 @@ describe("[5.5/AC1] la forme du corpus", () => {
   });
 });
 
-describe("[13.8] les neuf repères dépliables restent une projection du corpus", () => {
-  it("expose les neuf textes existants sans résumé produit", () => {
+describe("[13.8] les neuf repères dépliables restent une projection du lexique général", () => {
+  it("expose les neuf définitions même si une lecture personnelle manque", () => {
     const reperes = reperesPourIntroduction();
     expect(reperes).toHaveLength(9);
     for (const repere of reperes) {
-      expect(texteDuTypeRetenu(repere.type)).toEqual({ statut: "ecrit", texte: repere.texte });
+      expect(repere).toEqual({ type: repere.type, ...lexiqueDuType(repere.type) });
     }
   });
 });

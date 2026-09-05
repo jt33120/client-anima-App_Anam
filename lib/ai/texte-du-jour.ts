@@ -1,14 +1,25 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { HoroscopeDuJour } from "@/lib/astro/quotidien";
+import {
+  creerDepotTexteDuJour,
+  type CleTexteDuJour,
+  type DepotTexteDuJour,
+  type ProvenanceTexteDuJour,
+  type TexteDuJourFige,
+} from "@/lib/data/depot-texte-du-jour";
+import { texteDuCiel } from "@/lib/domain/cartes-socle";
 import { messagesHoroscope } from "@/lib/domain/consigne-horoscope";
 import {
   cleDeSignature,
+  jourCivilIso,
+  signatureCanonique,
   signatureDuCiel,
   signatureExploitable,
 } from "@/lib/domain/signature-ciel";
 import { verdictHoroscope } from "@/lib/domain/verdict-horoscope";
-import { envoyerSousEgressArt9 } from "./egress-guard";
+import { envoyerSousEgressArt9, verifierDroitsArt9 } from "./egress-guard";
 import { creerAiPort } from "./fabrique";
 import { metrerUsageIa } from "./metrage";
 import type { AiPort } from "./port";
@@ -20,7 +31,7 @@ import type { AiPort } from "./port";
  *
  *   `HoroscopeDuJour` (calculé, 5.4)
  *     → `signatureDuCiel` : ce qui a le droit de sortir, et rien d'autre
- *     → mémo : le même ciel, le même jour ⇒ le même texte, sans deuxième appel
+ *     → cache partagé : le premier texte servi fait foi jusqu'à son expiration
  *     → `envoyerSousEgressArt9` : ZDR prouvé, consentement vivant, barrière de minorité
  *     → `verdictHoroscope` : refusé s'il prédit, s'il soigne, s'il signe
  *     → mesuré dans `usage_ia`, puis rendu.
@@ -44,18 +55,11 @@ import type { AiPort } from "./port";
  * Conséquence assumée : sans consentement art. 9 vivant, pas de texte de modèle. Elle garde le
  * corpus, et ne perd rien de ce qu'elle avait hier.
  *
- * ── LE MÉMO EST PAR INSTANCE, ET LE RÉSIDU EST DIT ─────────────────────────────────────────────
- *
- * Même patron que `cielMemoise` (`lib/data/lire-quotidien.ts`) : une `Map` bornée, vidable, sans
- * table ni migration. Deux instances servent donc deux textes différents pour le même ciel, et un
- * rechargement peut faire changer le texte au cours de la journée.
- *
- * ⚠️ C'EST LE RÉSIDU CONNU DE CETTE STORY, et le remède n'est pas d'agrandir le mémo : c'est une
- * table `texte_du_jour` (jour, signature, texte), sans identifiant d'utilisatrice puisque le texte
- * ne dépend de personne. Elle demande une migration, deux inventaires (effacement, export) et leurs
- * gardes SQL, qui ne tournent pas hors CI ; elle est donc une story à elle seule, pas un ajout
- * discret ici.
+ * Le cache durable ne porte aucune identité. Sa clé est le tuple canonique documenté par RC-D2 ;
+ * la petite Map locale ne sert plus que de cache de lecture dans l'instance courante.
  */
+
+export const VERSION_EDITORIALE_CIEL = "ciel-2026-09-05-v1";
 
 /** Combien de textes le mémo garde. Une journée n'a qu'une poignée de configurations distinctes. */
 const MEMO_TAILLE_MAX = 64;
@@ -97,16 +101,16 @@ async function sousDelai<T>(travail: Promise<T>, delaiMs: number): Promise<T | "
   }
 }
 
-/** `clé de signature → texte accepté`. Jamais de texte refusé : on ne mémorise pas un rebut. */
-const memoTexte = new Map<string, string>();
+/** `clé canonique → premier contenu figé`. */
+const memoTexte = new Map<string, TexteDuJourFige>();
 
 /** Pour les tests, et pour eux seuls — même porte que `viderMemoCiel`. */
 export function viderMemoTexteDuJour(): void {
   memoTexte.clear();
 }
 
-function retenir(cle: string, texte: string): void {
-  memoTexte.set(cle, texte);
+function retenir(cle: string, entree: TexteDuJourFige): void {
+  memoTexte.set(cle, entree);
   while (memoTexte.size > MEMO_TAILLE_MAX) {
     const plusAncienne = memoTexte.keys().next().value;
     if (plusAncienne === undefined) break;
@@ -118,12 +122,32 @@ function retenir(cle: string, texte: string): void {
 export interface DepsTexteDuJour {
   readonly creerPort: () => Promise<AiPort>;
   readonly metrer: (usage: Parameters<typeof metrerUsageIa>[0]) => Promise<void>;
+  /** Absent dans les tests unitaires qui n'éprouvent que la génération locale. */
+  readonly depot?: DepotTexteDuJour;
 }
 
 const DEPS_PAR_DEFAUT: DepsTexteDuJour = {
   creerPort: creerAiPort,
   metrer: metrerUsageIa,
+  depot: creerDepotTexteDuJour(),
 };
+
+function resultatPour(entree: TexteDuJourFige): string | null {
+  return entree.provenance === "modele" ? entree.texte : null;
+}
+
+function cleDurable(horoscope: HoroscopeDuJour, signature: ReturnType<typeof signatureDuCiel>): CleTexteDuJour {
+  return {
+    jour: jourCivilIso(horoscope.jour),
+    condensatSignature: createHash("sha256").update(signatureCanonique(signature)).digest("hex"),
+    versionEditoriale: VERSION_EDITORIALE_CIEL,
+  };
+}
+
+function repliCorpus(horoscope: HoroscopeDuJour): string | null {
+  const repli = texteDuCiel(horoscope);
+  return repli.statut === "ecrit" ? repli.texte : null;
+}
 
 /**
  * Le texte du jour écrit par le modèle, ou `null`.
@@ -145,9 +169,65 @@ export async function texteDuJourGenere(
     // le corpus dit mieux ce jour-là, et il ne coûte rien.
     if (!signatureExploitable(signature)) return null;
 
-    const cle = cleDeSignature(horoscope.jour, signature);
+    const cle = `${cleDeSignature(horoscope.jour, signature)}|version:${VERSION_EDITORIALE_CIEL}`;
+    const durable = cleDurable(horoscope, signature);
     const dejaLa = memoTexte.get(cle);
-    if (dejaLa !== undefined) return dejaLa;
+    if (dejaLa !== undefined) {
+      if (dejaLa.provenance === "modele" && (await verifierDroitsArt9(supabase))) return null;
+      return resultatPour(dejaLa);
+    }
+
+    if (deps.depot) {
+      try {
+        const partage = await deps.depot.lire(durable);
+        if (partage) {
+          if (partage.provenance === "modele" && (await verifierDroitsArt9(supabase))) return null;
+          retenir(cle, partage);
+          return resultatPour(partage);
+        }
+      } catch (e) {
+        console.error("texte du jour : cache illisible", {
+          nom: e instanceof Error ? e.name : "inconnu",
+        });
+      }
+    }
+
+    const figer = async (
+      texte: string | null,
+      provenance: ProvenanceTexteDuJour,
+    ): Promise<TexteDuJourFige | null> => {
+      if (!texte) return null;
+      const candidat: TexteDuJourFige = { ...durable, texte, provenance };
+      if (!deps.depot) {
+        const premier = memoTexte.get(cle);
+        if (premier) return premier;
+        retenir(cle, candidat);
+        return candidat;
+      }
+      try {
+        const premier = await deps.depot.figer(candidat);
+        retenir(cle, premier);
+        return premier;
+      } catch (e) {
+        console.error("texte du jour : cache indisponible", {
+          nom: e instanceof Error ? e.name : "inconnu",
+        });
+        // Sans arbitrage atomique partagé, servir une sortie modèle ferait diverger deux instances
+        // pour la même clé. Le corpus est le seul repli globalement déterministe.
+        if (provenance === "modele") return null;
+        const premier = memoTexte.get(cle) ?? candidat;
+        retenir(cle, premier);
+        return premier;
+      }
+    };
+
+    const servirRepli = async () => resultatPour(
+      (await figer(repliCorpus(horoscope), "corpus")) ?? {
+        ...durable,
+        texte: "",
+        provenance: "corpus",
+      },
+    );
 
     const adaptateur = await deps.creerPort();
     const course = await sousDelai(
@@ -167,7 +247,7 @@ export async function texteDuJourGenere(
         const verdict = verdictHoroscope(envoi.reponse.texte);
         await deps.metrer({
           utilisatriceId,
-          cleIdempotence: `texte_du_jour:${cle}`,
+          cleIdempotence: `texte_du_jour:${durable.jour}:${durable.condensatSignature}:${durable.versionEditoriale}`,
           operation: "texte_du_jour",
           capacite: "horoscope",
           tier: envoi.reponse.tier,
@@ -181,8 +261,8 @@ export async function texteDuJourGenere(
           // Non lu : rien ici n'en dépend, et l'inventer serait pire que l'absence.
           premiumAuMomentAppel: null,
         });
-        if (verdict.accepte) retenir(cle, verdict.texte);
-        return { bloque: false as const, verdict };
+        const fige = verdict.accepte ? await figer(verdict.texte, "modele") : null;
+        return { bloque: false as const, verdict, fige };
       }),
       DELAI_MAX_MS,
     );
@@ -190,26 +270,34 @@ export async function texteDuJourGenere(
     if (course === "delai") {
       // La page n'attend plus ; la génération, elle, continue et remplira le mémo si elle aboutit.
       console.error("texte du jour : délai dépassé", { delaiMs: DELAI_MAX_MS });
-      return null;
+      return servirRepli();
     }
     const envoi = course;
     if (envoi.bloque) {
       // La raison n'est pas du contenu : la journaliser rend la différence entre « pas de clé » et
       // « pas de consentement » lisible, sans jamais dire de qui il s'agit (NFR-022).
       console.error("texte du jour : egress bloqué", { raison: envoi.raison });
-      return null;
+      return servirRepli();
     }
 
     if (!envoi.verdict.accepte) {
       // Le MOTIF, jamais le texte : un texte refusé pour prédiction est du contenu produit sur une
       // personne, et il n'a rien à faire dans un journal d'exploitation.
       console.error("texte du jour : refusé", { motif: envoi.verdict.motif });
-      return null;
+      return servirRepli();
     }
 
-    return envoi.verdict.texte;
+    return envoi.fige ? resultatPour(envoi.fige) : null;
   } catch (e) {
     console.error("texte du jour : exception", { nom: e instanceof Error ? e.name : "inconnu" });
+    try {
+      const signature = signatureDuCiel(horoscope);
+      const durable = cleDurable(horoscope, signature);
+      const texte = repliCorpus(horoscope);
+      if (deps.depot && texte) await deps.depot.figer({ ...durable, texte, provenance: "corpus" });
+    } catch {
+      // Le cache n'est jamais un nouveau chemin de panne pour l'accueil.
+    }
     return null;
   }
 }

@@ -42,7 +42,7 @@ const VUE: BibliothequeVue = {
   jour: { a: 2026, m: 8, j: 14 },
   enAvant: "horoscope",
   cartes: [
-    carte("mantra", "Le mantra du jour", "Remarque ce qui tient."),
+    carte("mantra", "Mon mantra du jour", "Remarque ce qui tient."),
     carte("horoscope", "Ton ciel du jour", "La Lune ralentit le rythme."),
     carte("enneagramme", "Ton ennéagramme", "Ce texte ne doit pas vivre sur Aujourd’hui."),
   ],
@@ -50,13 +50,13 @@ const VUE: BibliothequeVue = {
 };
 
 describe("[Aujourd’hui] le quotidien et les univers ont chacun leur place", () => {
-  it("affiche le ciel et le mantra sous « Ce que le jour propose », mais aucune carte Anam ni profil stable", () => {
+  it("affiche le ciel et le mantra sous « Mon parcours du jour », mais aucune carte Anam ni profil stable", () => {
     render(<Bibliotheque bibliotheque={VUE} />);
 
-    const quotidien = screen.getByRole("region", { name: "Ce que le jour propose" });
+    const quotidien = screen.getByRole("region", { name: "Mon parcours du jour" });
     expect(within(quotidien).getByText("14 août")).toBeTruthy();
     expect(within(quotidien).getByRole("article", { name: "Ton ciel du jour" })).toBeTruthy();
-    expect(within(quotidien).getByRole("article", { name: "Le mantra du jour" })).toBeTruthy();
+    expect(within(quotidien).getByRole("article", { name: "Mon mantra du jour" })).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Anam" })).toBeNull();
     expect(screen.queryByRole("article", { name: "Ton ennéagramme" })).toBeNull();
     expect(screen.queryByText(/elle se manifeste/i)).toBeNull();
@@ -68,7 +68,7 @@ describe("[Aujourd’hui] le quotidien et les univers ont chacun leur place", ()
     // un lecteur d'écran, deux titres pour une seule chose à l'œil. PRÉSENCE D'ABORD : la section
     // existe sous son nouveau nom, sinon les absences ci-dessous seraient vraies sur un composant vide.
     render(<Bibliotheque bibliotheque={VUE} />);
-    expect(screen.getByRole("region", { name: "Ce que le jour propose" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Mon parcours du jour" })).toBeTruthy();
     expect(screen.queryByRole("region", { name: "Aujourd’hui" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Aujourd’hui" })).toBeNull();
     expect(screen.queryByText(/^Aujourd’hui$/)).toBeNull();
@@ -77,7 +77,9 @@ describe("[Aujourd’hui] le quotidien et les univers ont chacun leur place", ()
   it("rend trois portes stables avec des destinations explicites", () => {
     render(<Bibliotheque bibliotheque={VUE} />);
 
-    expect(screen.getByRole("heading", { name: "Tes univers" })).toBeTruthy();
+    expect(screen.getByText("Mon monde intérieur")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Mes univers" })).toBeTruthy();
+    expect(screen.queryByText("Ils ne changent pas tous les jours. Ils restent ici, à leur place.")).toBeNull();
     expect(screen.getByRole("link", { name: /Astrologie/i }).getAttribute("href")).toBe(
       "/socle?univers=astrologie",
     );

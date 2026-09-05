@@ -37,6 +37,7 @@ function depotFactice(over: Partial<DepotRetention> = {}): DepotRetention {
     comptesAEffacer: vi.fn(async () => []),
     trancher: vi.fn(async () => "effacee" as const),
     purgerJournal: vi.fn(async () => 0),
+    purgerTextesDuJour: vi.fn(async () => 0),
     ...over,
   };
 }
@@ -111,14 +112,18 @@ describe("[6.8] L'ordre des trois phases est une décision", () => {
         ordre.push("prevenir");
         return [];
       }),
+      purgerTextesDuJour: vi.fn(async () => {
+        ordre.push("purge_textes_du_jour");
+        return 2;
+      }),
       purgerJournal: vi.fn(async () => {
-        ordre.push("purge");
+        ordre.push("purge_journal");
         return 3;
       }),
     });
     await executerRetention(ctx(), { depot, annoncer: async () => true });
     // Une suppression promise pour le 3 doit avoir lieu le 3 ; un avis qui part demain reste un avis.
-    expect(ordre).toEqual(["echues", "trancher", "prevenir", "purge"]);
+    expect(ordre).toEqual(["echues", "trancher", "prevenir", "purge_textes_du_jour", "purge_journal"]);
   });
 
   it("un compte qui résiste n'empêche pas les échéances suivantes d'être tranchées", async () => {
@@ -159,8 +164,10 @@ describe("[6.8/AC5] Le job rend la main plutôt que de se faire couper", () => {
 
   it("la purge du journal est sautée quand il ne reste rien — c'est la moins urgente", async () => {
     const purgerJournal = vi.fn(async () => 0);
-    const depot = depotFactice({ purgerJournal });
+    const purgerTextesDuJour = vi.fn(async () => 0);
+    const depot = depotFactice({ purgerJournal, purgerTextesDuJour });
     await executerRetention(ctx(RESERVE_RETENTION_MS - 1), { depot, annoncer: async () => true });
+    expect(purgerTextesDuJour).not.toHaveBeenCalled();
     expect(purgerJournal).not.toHaveBeenCalled();
   });
 });

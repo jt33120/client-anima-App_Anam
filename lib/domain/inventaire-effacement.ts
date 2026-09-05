@@ -23,6 +23,8 @@ export type VerdictEffacement =
   | "efface"
   /** Aucune colonne ne rattache la ligne à qui que ce soit. Rien à effacer. */
   | "sans_objet"
+  /** La ligne ne peut exister qu'à l'intérieur d'une transaction et disparaît avant son commit. */
+  | "ephemere"
   /** Survit DÉLIBÉRÉMENT à l'effacement — et ne porte donc rien d'elle. */
   | "survit";
 
@@ -60,6 +62,7 @@ export const INVENTAIRE_EFFACEMENT: readonly EntreeEffacement[] = [
   { table: "ouverture_jour_anam", verdict: "efface", motif: "les jours et la manière dont sa conversation avec Anam a commencé" },
   { table: "episode_detresse", verdict: "efface", motif: "les épisodes de détresse ouverts ou clos" },
   { table: "audit_securite", verdict: "efface", motif: "les classifications de sécurité la concernant" },
+  { table: "audit_correction_naissance", verdict: "efface", motif: "les statuts et horodatages de ses rectifications de naissance" },
   { table: "pause_rythme", verdict: "efface", motif: "les pauses qu’Anam lui a proposées" },
   { table: "invitation_integration", verdict: "efface", motif: "les invitations à intégrer une branche" },
   { table: "notification_envoyee", verdict: "efface", motif: "les notifications qui lui ont été envoyées" },
@@ -77,12 +80,22 @@ export const INVENTAIRE_EFFACEMENT: readonly EntreeEffacement[] = [
       "`cible_id` la nomme, et une trace nominative de traitement reste une donnée la concernant.",
   },
   { table: "art9_temoin", verdict: "efface", motif: "témoin de test, mais rattaché à une utilisatrice : il part comme le reste" },
+  {
+    table: "correction_naissance_autorisee",
+    verdict: "ephemere",
+    motif: "preuve rattachée à son identifiant mais confinée à la transaction de rectification, supprimée avant chaque retour et annulée avec tout rollback",
+  },
 
   // ── Rien à effacer : aucune colonne ne rattache ces lignes à quelqu'un ─────────────────────────
   { table: "environnement", verdict: "sans_objet", motif: "une seule ligne pour tout le déploiement" },
   { table: "probe", verdict: "sans_objet", motif: "témoin d’isolation RLS, sans propriétaire" },
   { table: "evenements_traites", verdict: "sans_objet", motif: "registre d’idempotence clé sur l’évènement du prestataire" },
   { table: "incident_systeme", verdict: "sans_objet", motif: "incidents d’exploitation, sans rattachement à une personne" },
+  {
+    table: "texte_du_jour_stable",
+    verdict: "sans_objet",
+    motif: "cache éditorial partagé sans identité ni donnée brute de naissance",
+  },
 
   // ── Survit, et c'est la raison d'être de la story ──────────────────────────────────────────────
   {

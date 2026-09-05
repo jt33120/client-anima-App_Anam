@@ -19,6 +19,10 @@
   color: var(--texte);
 }
 
+.titreHalte {
+  text-align: center;
+}
+
 .introduction {
   max-width: var(--mesure);
   margin: 0;
@@ -49,17 +53,33 @@
 
 .section {
   padding: var(--esp-5);
-  border: 1px solid var(--bordure);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-lg);
-  /* Le « papier » des sections, même dégradé statique que les cartes d'Aujourd’hui
-     (retour du fondateur, 2026-09-01 : textures et dégradés, sans couleur en dur). */
-  background: linear-gradient(168deg, var(--surface), color-mix(in srgb, var(--surface-elevee) 40%, var(--surface)));
+  background: linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 16%, var(--papier)));
+  color: var(--sur-papier);
+  box-shadow: var(--ombre-posee);
 }
 
 .sectionCiel {
   background:
-    radial-gradient(circle at 50% 12%, color-mix(in srgb, var(--lueur) 10%, transparent), transparent 35%),
-    linear-gradient(168deg, var(--surface), color-mix(in srgb, var(--surface-elevee) 40%, var(--surface)));
+    radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--jour) 55%, transparent), transparent 34%),
+    linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 16%, var(--papier)));
+}
+
+.section :is(h2, h3),
+.section .titreLecture,
+.section .texte,
+.section .raison,
+.section .valeur,
+.section .nombreFort,
+.section .devoilement > summary {
+  color: var(--sur-papier);
+  min-height: var(--cible-tactile);
+}
+
+.section :is(.surtitre, .etiquette, .longitude, .maison, .legendeCiel, .noteCorpus, .panne),
+.section .apercuLecture {
+  color: var(--sur-papier-doux);
 }
 
 .surtitre,
@@ -96,12 +116,13 @@
   gap: var(--esp-4);
   min-height: calc(var(--cible-tactile) * 3);
   padding: var(--esp-5);
-  border: 1px solid var(--bordure);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-lg);
   background:
-    radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--lueur) 10%, transparent), transparent 40%),
-    var(--surface);
-  color: var(--texte);
+    radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--jour) 48%, transparent), transparent 40%),
+    var(--papier);
+  color: var(--sur-papier);
+  box-shadow: var(--ombre-posee);
   text-decoration: none;
   transition:
     border-color var(--duree-courte) var(--courbe),
@@ -122,12 +143,18 @@
   outline-offset: 2px;
 }
 
+.porteApercu:focus-visible,
+.section .reparation:focus-visible,
+.section .devoilement > summary:focus-visible {
+  outline-color: var(--sur-papier);
+}
+
 .glypheApercu {
   display: grid;
   place-items: center;
   width: calc(var(--cible-tactile) + var(--esp-2));
   height: calc(var(--cible-tactile) + var(--esp-2));
-  color: var(--lueur);
+  color: var(--sur-papier);
 }
 
 .glypheApercu svg {
@@ -149,7 +176,7 @@
 }
 
 .titreApercu {
-  color: var(--texte);
+  color: var(--sur-papier);
 }
 
 .actionApercu {
@@ -157,7 +184,7 @@
   align-items: center;
   gap: var(--esp-2);
   min-height: var(--cible-tactile);
-  color: var(--accent);
+  color: var(--sur-papier);
 }
 
 .faits {
@@ -179,11 +206,11 @@
 }
 
 .fait dt {
-  color: var(--texte-doux);
+  color: var(--sur-papier-doux);
 }
 
 .fait dd {
-  color: var(--texte);
+  color: var(--sur-papier);
   text-align: right;
 }
 
@@ -192,9 +219,9 @@
 .sousSection,
 .manque {
   padding: var(--esp-4);
-  border: 1px solid var(--bordure);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--surface-elevee) 58%, transparent);
+  background: color-mix(in srgb, var(--jour) 28%, var(--papier));
 }
 
 .lectureSymbolique {
@@ -276,9 +303,9 @@
 }
 
 .devoilement {
-  border: 1px solid var(--bordure);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 20%, var(--papier));
   border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--surface-elevee) 45%, transparent);
+  background: color-mix(in srgb, var(--jour) 18%, var(--papier));
 }
 
 .devoilement > summary {
@@ -294,7 +321,7 @@
 
 .devoilement > summary::after {
   content: "+";
-  color: var(--accent);
+  color: var(--sur-papier);
 }
 
 .devoilement[open] > summary::after {
@@ -309,11 +336,11 @@
   gap: var(--esp-2);
   min-width: 0;
   padding: var(--esp-4);
-  border: 1px solid var(--bordure);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-md);
   background:
-    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 36%),
-    var(--surface-elevee);
+    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--jour) 50%, transparent), transparent 36%),
+    var(--papier);
 }
 
 .nombreFort,
@@ -357,6 +384,10 @@
   text-underline-offset: 0.25em;
 }
 
+.section .reparation {
+  color: var(--sur-papier);
+}
+
 .figureCiel {
   display: flex;
   flex-direction: column;
@@ -378,6 +409,7 @@
   background:
     radial-gradient(circle, color-mix(in srgb, var(--lueur) 13%, transparent), transparent 28%),
     radial-gradient(circle at 50% 50%, var(--surface-elevee), var(--fond) 72%);
+  box-shadow: inset 0 0 0 var(--esp-1) color-mix(in srgb, var(--lueur) 5%, transparent);
 }
 
 .svgCiel {
@@ -436,6 +468,21 @@
   vector-effect: non-scaling-stroke;
 }
 
+.etoileCiel {
+  fill: var(--lueur);
+  opacity: 0.58;
+}
+
+.corpsCiel {
+  fill: var(--accent);
+  stroke: var(--fond);
+  stroke-width: 0.7;
+  paint-order: stroke;
+  font-family: var(--pile-anam);
+  font-size: 1.05rem;
+  vector-effect: non-scaling-stroke;
+}
+
 .coeurCiel {
   fill: var(--lueur);
   stroke: var(--fond);
@@ -473,6 +520,84 @@
 .position:last-child {
   padding-bottom: 0;
   border-bottom: 0;
+}
+
+.grilleLectures {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-3);
+}
+
+.uniteNombre > summary {
+  align-items: flex-start;
+  min-height: var(--cible-tactile);
+  padding-block: var(--esp-3);
+}
+
+.enteteNombre {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.archetypeNombre {
+  color: var(--sur-papier-doux);
+}
+
+.texteNombre {
+  margin: 0;
+  padding: 0 var(--esp-4) var(--esp-4);
+  color: var(--sur-papier);
+}
+
+.reperesPrincipaux {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 20%, var(--papier));
+  border-radius: var(--rayon-lg);
+  background: color-mix(in srgb, var(--jour) 24%, var(--papier));
+}
+
+.reperesPrincipaux > dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-3);
+  margin: 0;
+}
+
+.reperePrincipal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  min-width: 0;
+  padding: var(--esp-3);
+  border-left: var(--esp-1) solid var(--bordure-forte);
+}
+
+.reperePrincipal dt,
+.reperePrincipal dd {
+  margin: 0;
+  color: var(--sur-papier);
+}
+
+.boutonSecondaire {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-height: var(--cible-tactile);
+  padding: 0 var(--esp-4);
+  border: 1px solid var(--sur-papier);
+  border-radius: var(--rayon);
+  color: var(--sur-papier);
+  text-decoration: none;
+}
+
+.boutonSecondaire:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
 }
 
 .position .valeur,
@@ -619,8 +744,14 @@
   }
 
   .grilleApercus,
-  .grilleNombres {
+  .grilleNombres,
+  .grilleLectures,
+  .reperesPrincipaux > dl {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reperesPrincipaux > dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .itemApercu:nth-child(3):last-child {

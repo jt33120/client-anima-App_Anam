@@ -157,17 +157,83 @@
   gap: 0.4rem;
 }
 
+.champsNaissance {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--esp-2);
+  min-height: var(--cible-tactile);
+}
+
+.suggestionsLieu {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--papier);
+}
+
+.annonceHorsEcran {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.suggestionsLieu button {
+  width: 100%;
+  min-height: var(--cible-tactile);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding: var(--esp-2) var(--esp-3);
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--sur-papier-doux) 20%, transparent);
+  background: transparent;
+  color: var(--sur-papier);
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestionsLieu li:last-child button {
+  min-height: var(--cible-tactile);
+  border-bottom: 0;
+}
+
+.suggestionsLieu button:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: -3px;
+}
+
 /* L'aperçu : ce que la correction changerait, avant qu'elle parte. Un filet à gauche, comme la
    citation de source — c'est du texte RAPPORTÉ (calculé), pas une affirmation de l'écran. */
 .apercu {
-  list-style: none;
   margin: 0;
-  padding: 0 0 0 0.9rem;
+  padding: var(--esp-3) var(--esp-3) var(--esp-3) calc(var(--esp-3) + 0.9rem);
   border-left: 2px solid color-mix(in srgb, var(--texte-doux) 40%, transparent);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   line-height: 1.6;
+}
+
+.apercu p,
+.apercu ul {
+  margin: 0;
+}
+
+.apercu ul {
+  padding-left: var(--esp-5);
 }
 
 /* Réservé même vide : sans hauteur minimale, l'apparition d'un refus pousse le contenu sous le doigt

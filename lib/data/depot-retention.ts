@@ -64,6 +64,8 @@ export interface DepotRetention {
   trancher(utilisatriceId: string, e: EcheancesRetention): Promise<IssueEcheance>;
   /** La rétention du journal de l'ordonnanceur (R1). Rend le nombre de lignes retirées. */
   purgerJournal(jours: number): Promise<number>;
+  /** Les textes du jour dont le TTL fixe est dépassé. */
+  purgerTextesDuJour(): Promise<number>;
 }
 
 export function creerDepotRetention(): DepotRetention {
@@ -132,6 +134,15 @@ export function creerDepotRetention(): DepotRetention {
         "purger_journal",
       );
       if (error) throw new Error(`purger_journal: ${error.code ?? "echec"}`);
+      return typeof data === "number" ? data : 0;
+    },
+
+    async purgerTextesDuJour() {
+      const { data, error } = await borne(
+        supabase.rpc("purger_textes_du_jour_expires"),
+        "purger_textes_du_jour_expires",
+      );
+      if (error) throw new Error(`purger_textes_du_jour_expires: ${error.code ?? "echec"}`);
       return typeof data === "number" ? data : 0;
     },
   };

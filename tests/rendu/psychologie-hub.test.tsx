@@ -36,9 +36,7 @@ const ENNEAGRAMME_A_FAIRE = module({
 });
 
 const monter = (modules: readonly ModuleVue[]) =>
-  render(
-    <PsychologieHub introduction={copie.PSYCHOLOGIE_INTRO} modules={modules} methode={METHODE} />,
-  );
+  render(<PsychologieHub modules={modules} methode={METHODE} />);
 
 describe("[LE CŒUR] chaque module dit son état et porte sa porte", () => {
   it("un module à faire montre son texte et son lien", () => {
@@ -144,6 +142,6 @@ describe("[LE BORD] la section de méthode est toujours là, et n’est pas un m
     const methode = screen.getByRole("heading", { name: copie.METHODE_TITRE }).closest("section");
     expect(methode).toBeTruthy();
     expect(within(methode!).queryByRole("link")).toBeNull();
-    expect(container.textContent).toContain(copie.PSYCHOLOGIE_INTRO);
+    expect(container.textContent).not.toContain(copie.PSYCHOLOGIE_INTRO);
   });
 });

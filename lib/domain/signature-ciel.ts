@@ -129,15 +129,22 @@ function cleTrait(trait: TraitDuCiel): string {
  * pour la lisibilité, toutes les clés changent, le cache se vide en silence et personne ne fait le
  * lien entre un refactor cosmétique et une facture de modèle qui double.
  */
-export function cleDeSignature(jour: JourCivil, signature: SignatureDuCiel): string {
-  const jourCle = `${jour.a}-${String(jour.m).padStart(2, "0")}-${String(jour.j).padStart(2, "0")}`;
+export function jourCivilIso(jour: JourCivil): string {
+  return `${jour.a}-${String(jour.m).padStart(2, "0")}-${String(jour.j).padStart(2, "0")}`;
+}
+
+/** Sérialisation stable de la seule signature minimisée, sans jour ni identité. */
+export function signatureCanonique(signature: SignatureDuCiel): string {
   return [
-    jourCle,
     `lune:${signature.luneDistance ?? "-"}`,
     `dom:${signature.dominante ? cleTrait(signature.dominante) : "-"}`,
     `sec:${signature.secondaires.map(cleTrait).join(",") || "-"}`,
     `chg:${signature.changements.map((c) => `${c.corps}>${c.vers}`).join(",") || "-"}`,
   ].join("|");
+}
+
+export function cleDeSignature(jour: JourCivil, signature: SignatureDuCiel): string {
+  return `${jourCivilIso(jour)}|${signatureCanonique(signature)}`;
 }
 
 /**

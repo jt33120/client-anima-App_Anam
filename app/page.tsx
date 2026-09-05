@@ -8,10 +8,9 @@ import { lireThemeNatal } from "@/lib/data/depot-theme-natal";
 import { estPremiumCourante } from "@/lib/data/lire-abonnement";
 import { ephemerideAstronomyEngine } from "@/lib/astro/adapters/astronomy-engine";
 import SceneDom from "@/render/scene-dom";
-import PortailAnam from "@/render/portail/PortailAnam";
+import PortailAuLancement from "@/render/portail/PortailAuLancement";
 import {
   ANNONCE_PORTAIL,
-  ATTENTE_PORTAIL,
   NOM_PORTAIL,
 } from "@/lib/domain/copie-portail";
 import { marquerAnnonceSocleDite } from "@/app/_socle/marquer-annonce";
@@ -36,6 +35,7 @@ import {
   TITRE_FEUILLE,
   LIBELLE_FERMER,
 } from "@/lib/domain/menu-compte";
+import { ACCUEIL_ANAM } from "@/lib/domain/copie-anam";
 
 /**
  * ⚠️ RENDUE À LA DEMANDE, ET C'EST UNE GARDE (revue adversariale, R5).
@@ -157,11 +157,12 @@ export default async function Page() {
           faute, en plus joli.
           L'univers d'Anam, c'est la scène : le portail s'ouvre là, et nulle part ailleurs. Les
           haltes gardent leurs squelettes muets (`render/HalteEnAttente.tsx`). */}
-      <PortailAnam
-        copie={{ nom: NOM_PORTAIL, attente: ATTENTE_PORTAIL, annonce: ANNONCE_PORTAIL }}
+      <PortailAuLancement
+        copie={{ nom: NOM_PORTAIL, annonce: ANNONCE_PORTAIL }}
       />
       <SceneDom
       projection={projection}
+      accueilAnam={ACCUEIL_ANAM}
       onReclamerOuvertureQuotidienne={reclamerOuvertureDuJour}
       onChargerOuvertureCourante={chargerOuvertureCourante}
       bibliotheque={bibliotheque}

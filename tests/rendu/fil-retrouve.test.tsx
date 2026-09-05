@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Conversation, { fusionnerEntreeDuJour } from "@/render/conversation/Conversation";
+import { ACCUEIL_ANAM } from "@/lib/domain/copie-anam";
 import type {
   ResultatOuvertureDuJour,
   Tour,
@@ -59,6 +60,21 @@ const ouverturePersistante = (
 });
 
 describe("[QA T3] au montage, le fil déjà écrit est LÀ", () => {
+  it("[RC-H1] montre la phrase exacte dans un journal sans tour utilisateur, sans fabriquer de tour", () => {
+    const { container } = render(<Conversation introduction={ACCUEIL_ANAM} />);
+    const introduction = screen.getByText(ACCUEIL_ANAM);
+
+    expect(introduction.getAttribute("data-introduction-anam")).not.toBeNull();
+    expect(container.querySelectorAll("[data-introduction-anam]")).toHaveLength(1);
+    expect(fluxControle.envoyer).not.toHaveBeenCalled();
+  });
+
+  it("[RC-H1] retire l'accueil statique dès qu'un tour utilisateur existe dans le journal", () => {
+    render(<Conversation introduction={ACCUEIL_ANAM} historique={[HISTORIQUE[0]]} />);
+    expect(screen.queryByText(ACCUEIL_ANAM)).toBeNull();
+    expect(screen.getByText(HISTORIQUE[0].texte)).toBeTruthy();
+  });
+
   it("[LE CŒUR] les trois tours paraissent, dans l'ordre reçu", () => {
     // Mutation-cible : ne pas amorcer l'état avec l'historique. C'est l'état d'avant, et il laissait
     // toute la suite verte — le fil vivait entièrement dans l'état local du composant.

@@ -188,7 +188,7 @@ describe("[T7 / AC8/DUR] sans confirmation, rien n'est gravé", () => {
     const sansCase = { heure_naissance: "07:15", code_lieu: "33063" };
     const r = await appeler(sansCase);
     expect(r.statut).toBe("erreur");
-    expect(r.message).toMatch(/ne se modifie pas|une fois/i);
+    expect(r.message).toMatch(/Ce qu’Anam retient|\/memoire/i);
     expect(update).not.toHaveBeenCalled();
   });
 

@@ -8,16 +8,14 @@
 }
 
 .titre,
-.introduction,
 .module h2,
 .corps,
 .etiquette {
   margin: 0;
 }
 
-.introduction {
-  max-width: var(--mesure);
-  color: var(--texte-doux);
+.titre {
+  text-align: center;
 }
 
 .grille {
@@ -40,30 +38,31 @@
   min-height: calc(var(--cible-tactile) * 4);
   padding: var(--esp-5);
   overflow: hidden;
-  border: 1px solid var(--bordure);
+  border: 1px solid color-mix(in srgb, var(--sur-papier-doux) 28%, transparent);
   border-radius: var(--rayon-lg);
   background:
-    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 9%, transparent), transparent 34%),
-    var(--surface);
+    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 12%, transparent), transparent 34%),
+    var(--papier);
+  color: var(--sur-papier);
 }
 
 .moduleActif {
-  border-color: var(--bordure-forte);
+  border-color: color-mix(in srgb, var(--sur-papier-doux) 48%, transparent);
   background:
     radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 15%, transparent), transparent 38%),
-    var(--surface-elevee);
+    var(--papier);
 }
 
 .methode {
-  background: transparent;
+  background: color-mix(in srgb, var(--papier) 88%, transparent);
 }
 
 .etiquette {
-  color: var(--texte-doux);
+  color: var(--sur-papier-doux);
 }
 
 .corps {
-  color: var(--texte-doux);
+  color: var(--sur-papier-doux);
   line-height: 1.65;
 }
 

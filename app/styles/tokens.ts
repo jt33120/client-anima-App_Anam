@@ -79,6 +79,9 @@ export const couleursNuit = {
   jour: "#D3DBF0", // Sky, le lotus : l'aplat des champs d'aujourd'hui
   "sur-jour": "#1C2740", // Navy : l'encre sur le lotus (10,72:1)
   "sur-jour-doux": "#4C5773", // la note en retrait sur le lotus (5,20:1)
+  papier: "#F0EFEA", // Ivory : surface locale de lecture de la variante hybride, jamais fond du monde
+  "sur-papier": "#1C2740", // Navy sur Ivory (12,90:1)
+  "sur-papier-doux": "#5F5D57", // Encre secondaire sur Ivory (5,72:1)
   nebuleuse: "#2E2A5A",
   // ══ LE SECOND TON, CHAUD (2026-09-03) ═══════════════════════════════════════════════════════
   //
@@ -135,6 +138,9 @@ export const couleursClair: Record<keyof typeof couleursNuit, string> = {
   jour: "#D3DBF0",
   "sur-jour": "#1C2740",
   "sur-jour-doux": "#4C5773",
+  papier: "#FFFFFF",
+  "sur-papier": "#1C2740",
+  "sur-papier-doux": "#5F5D57",
 };
 
 export type CleCouleur = keyof typeof couleursNuit;

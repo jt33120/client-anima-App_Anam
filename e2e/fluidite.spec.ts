@@ -65,6 +65,11 @@ const imagesParSeconde = (page: Page) =>
 /** En deçà de cette part de la référence, la scène coûte trop cher par trame. */
 const PART_MINIMALE = 0.6;
 
+/** La garde a été calibrée sur une référence 60 Hz. Sur un écran 120 Hz, certains défilements
+ *  WebKit/Chromium restent synchronisés à 60 Hz sans saccade : les comparer à 120 doublerait le
+ *  plancher et ferait d'une cadence meilleure que la baseline historique une régression. */
+const cadenceMinimale = (reference: number) => Math.min(reference, 60) * PART_MINIMALE;
+
 test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", async ({ page }) => {
   await ouvrirUnCompteNeuf(page);
 
@@ -88,7 +93,7 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
   // rien, la boucle ne mesure RIEN — et une boucle qui ne mesure rien passe au VERT. Le test se
   // serait vidé sans une ligne rouge. On compte donc ce qui a réellement été mesuré, à la fin.
   const mesurees: string[] = [];
-  for (const region of ["Aujourd’hui", "Anam", "Mon arbre"]) {
+  for (const region of ["Aujourd’hui", "Anam", "Mon évolution"]) {
     await barre.getByRole("button", { name: region, exact: true }).click();
     await page.waitForTimeout(1200);
     releves[region] = await imagesParSeconde(page);
@@ -100,7 +105,7 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
   expect(
     mesurees,
     "la boucle n'a pas parcouru les trois régions : le test se serait vidé au lieu d'échouer",
-  ).toEqual(["Aujourd’hui", "Anam", "Mon arbre"]);
+  ).toEqual(["Aujourd’hui", "Anam", "Mon évolution"]);
 
   // ⚠️ ON VÉRIFIE LA PRÉSENCE DES CLÉS, PAS LEUR NOMBRE — ET MA PREMIÈRE VERSION S'EST TROMPÉE
   // (2026-08-26). Elle exigeait `toHaveLength(3)` en oubliant que `releves` est PRÉ-REMPLI avec le
@@ -112,7 +117,7 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
     expect(releves[region], `aucun relevé pour « ${region} »`).toBeGreaterThan(0);
   }
 
-  const trop = Object.entries(releves).filter(([, v]) => v < reference * PART_MINIMALE);
+  const trop = Object.entries(releves).filter(([, v]) => v < cadenceMinimale(reference));
   expect(
     trop.map(([nom, v]) => `${nom} : ${v} im/s`),
     `la scène rame par rapport à un document du même produit (${reference} im/s) :\n` +
@@ -142,7 +147,7 @@ test("[PENDANT LE TOUR AUSSI] l'écran qui apprend le produit ne doit pas saccad
   expect(
     pendant,
     `le tour tourne à ${pendant} im/s contre ${reference} pour un document statique`,
-  ).toBeGreaterThanOrEqual(reference * PART_MINIMALE);
+  ).toBeGreaterThanOrEqual(cadenceMinimale(reference));
 });
 
 /**
@@ -206,7 +211,7 @@ test("[PENDANT UN DÉFILEMENT] un fond ne coûte rien au repos et tout quand la 
   const mesurees: string[] = [];
   // Les deux régions que les Stories 11.2 et 7.10 vont repeindre. « Anam » est hors du cas : son
   // fil a son propre défilement, éprouvé par `conversation-attente.spec.ts`.
-  for (const region of ["Aujourd’hui", "Mon arbre"]) {
+  for (const region of ["Aujourd’hui", "Mon évolution"]) {
     await barre.getByRole("button", { name: region, exact: true }).click();
     await page.waitForTimeout(1000);
     releves[region] = await imagesParSecondePendantDefilement(page);
@@ -216,9 +221,9 @@ test("[PENDANT UN DÉFILEMENT] un fond ne coûte rien au repos et tout quand la 
   expect(
     mesurees,
     "la boucle n'a pas parcouru les deux régions : le test se serait vidé au lieu d'échouer",
-  ).toEqual(["Aujourd’hui", "Mon arbre"]);
+  ).toEqual(["Aujourd’hui", "Mon évolution"]);
 
-  const trop = Object.entries(releves).filter(([, v]) => v < reference * PART_MINIMALE);
+  const trop = Object.entries(releves).filter(([, v]) => v < cadenceMinimale(reference));
   expect(
     trop.map(([nom, v]) => `${nom} : ${v} im/s`),
     `une région rame EN DÉFILANT par rapport à un document du même produit (${reference} im/s) :\n` +

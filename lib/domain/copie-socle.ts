@@ -74,7 +74,7 @@ export const INTRODUCTION =
  * Celle de la numérologie est déplacée MOT POUR MOT : le mode numérologie ne change pas d'aspect.
  */
 export const INTRODUCTION_ASTROLOGIE =
-  "Ton ciel, calculé à partir de ta naissance. Le texte du jour, lui, est écrit par un modèle.";
+  "Ce ciel est calculé à partir de ta date, de ton lieu et de ton heure lorsqu’elle est connue.";
 
 export const INTRODUCTION_NUMEROLOGIE =
   "Tes nombres, calculés à partir de ta naissance et de ton nom. L’année personnelle suit l’année civile indiquée.";

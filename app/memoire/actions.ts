@@ -1,17 +1,27 @@
 "use server";
 
+import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { creerDepotFaits } from "@/lib/data/depot-faits";
 import {
   apercuDeCorrection,
+  apercuDeCorrectionDonnees,
+  ecrireDonneesNaissance,
   ecrireHeureCorrigee,
   lireNaissance,
+  type DonneesNaissanceResolues,
 } from "@/lib/data/corriger-naissance";
 import { validerCorrection } from "@/lib/domain/memoire-retenue";
 import { normaliserHeure } from "@/lib/domain/correction-naissance";
+import { calculerAge } from "@/app/(auth)/naissance/age";
+import {
+  chercherLieuxNaissanceDansReferentiel,
+  trouverLieuNaissanceParCode,
+} from "@/lib/data/lieux-naissance";
 import * as copie from "@/lib/domain/copie-memoire";
 import * as copieNaissance from "@/lib/domain/copie-naissance";
+import { declarerMinorite } from "@/lib/safety/appliquer-barriere";
 
 /**
  * actions.ts — CORRIGER, SUPPRIMER, ANNULER (Story 6.5, T4 ; AC2/AC3).
@@ -34,7 +44,10 @@ import * as copieNaissance from "@/lib/domain/copie-naissance";
 
 export type EtatMemoire = { statut: "ok" } | { statut: "erreur"; message: string };
 
-const REFUS_GENERIQUE: EtatMemoire = { statut: "erreur", message: "Impossible pour le moment." };
+const REFUS_GENERIQUE = {
+  statut: "erreur",
+  message: "Impossible pour le moment.",
+} as const satisfies EtatMemoire;
 
 const MOTIF: Record<"vide" | "trop_longue" | "inchangee", string> = {
   vide: copie.REFUS_VIDE,
@@ -183,6 +196,222 @@ export async function corrigerHeureNaissance(heure: string): Promise<EtatMemoire
   // à la lecture suivante, parce que l'empreinte des entrées a changé. On invalide simplement les
   // écrans qui affichent le socle, pour que « la prochaine ouverture » soit vraiment la prochaine.
   revalidatePath("/memoire");
+  revalidatePath("/");
+  return { statut: "ok" };
+}
+
+export interface DemandeCorrectionNaissance {
+  readonly date: string;
+  readonly heure: string;
+  /** Code INSEE choisi dans la liste ; vide conserve le lieu actuel. */
+  readonly codeLieu: string;
+}
+
+export interface CorrectionNaissanceConfirmee extends DemandeCorrectionNaissance {
+  /** Empreinte de concurrence des anciennes entrées ; aucune donnée brute n'est journalisée. */
+  readonly revision: string;
+}
+
+export type EtatApercuDonnees =
+  | {
+      readonly statut: "apercu";
+      readonly correction: CorrectionNaissanceConfirmee;
+      readonly resume: { readonly date: string; readonly heure: string | null; readonly lieu: string };
+      readonly phrases: readonly string[];
+    }
+  | { readonly statut: "erreur"; readonly message: string };
+
+export interface SuggestionLieuNaissance {
+  readonly code: string;
+  readonly libelle: string;
+  readonly departement: { readonly nom: string };
+}
+
+export async function chercherLieuxNaissance(requete: string): Promise<SuggestionLieuNaissance[]> {
+  const session = await identite();
+  if (!session) return [];
+  return chercherLieuxNaissanceDansReferentiel(requete, 8).map((lieu) => ({
+    code: lieu.code,
+    libelle: lieu.libelle,
+    departement: { nom: lieu.departement.nom },
+  }));
+}
+
+function dateCivileValide(date: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const instant = new Date(`${date}T00:00:00Z`);
+  return !Number.isNaN(instant.getTime()) && instant.toISOString().slice(0, 10) === date;
+}
+
+function revisionNaissance(etat: Awaited<ReturnType<typeof lireNaissance>>): string {
+  if (!etat) return "";
+  return createHash("sha256")
+    .update(
+      [etat.date, etat.heure, etat.lieu, etat.latitude, etat.longitude, etat.fuseau]
+        .map((valeur) => valeur ?? "")
+        .join("|"),
+    )
+    .digest("hex");
+}
+
+async function preparerCorrectionDonnees(
+  session: NonNullable<Awaited<ReturnType<typeof identite>>>,
+  demande: DemandeCorrectionNaissance,
+): Promise<
+  | {
+      readonly ok: true;
+      readonly donnees: DonneesNaissanceResolues;
+      readonly correction: CorrectionNaissanceConfirmee;
+      readonly changements: { readonly date: boolean; readonly heure: boolean; readonly lieu: boolean };
+    }
+  | { readonly ok: false; readonly message: string }
+> {
+  // Une Server Action reste un endpoint : ses types TypeScript ne valident pas la charge utile
+  // reconstruite par React. Un appel forgé reçoit le même refus fermé qu'une panne, jamais un
+  // `trim is not a function` transformé en 500.
+  if (
+    !demande ||
+    typeof demande.date !== "string" ||
+    typeof demande.heure !== "string" ||
+    typeof demande.codeLieu !== "string"
+  ) {
+    return { ok: false, message: REFUS_GENERIQUE.message };
+  }
+  const etat = await lireNaissance(session.supabase, session.id);
+  if (!etat?.date) return { ok: false, message: copieNaissance.DATE_INVALIDE };
+
+  const date = demande.date.trim();
+  if (!dateCivileValide(date)) return { ok: false, message: copieNaissance.DATE_INVALIDE };
+  const age = calculerAge(date);
+  if (!Number.isFinite(age) || age > 130) {
+    return { ok: false, message: copieNaissance.DATE_TROP_ANCIENNE };
+  }
+  if (age < 18) {
+    // Une correction qui révèle une minorité est une détection réelle, pas une simple erreur de
+    // formulaire. La même barrière monotone que l'onboarding est posée et la session est fermée ;
+    // aucune donnée de naissance mineure n'est enregistrée.
+    try {
+      await declarerMinorite(session.id);
+    } catch (e) {
+      console.error("correction naissance : minorité non enregistrée", {
+        nom: e instanceof Error ? e.name : "inconnu",
+      });
+    }
+    await session.supabase.auth.signOut().catch(() => undefined);
+    return { ok: false, message: copieNaissance.DATE_MINEURE };
+  }
+
+  let heure = etat.heure;
+  const heureBrute = demande.heure.trim();
+  if (heureBrute === "") {
+    // Le champ est prérempli quand une heure existe : le vider est donc un geste explicite pour
+    // dire « cette heure est inconnue », pas une omission de formulaire.
+    heure = null;
+  } else if (etat.heure && heureBrute === etat.heure.slice(0, 5)) {
+    // L'UI n'affiche pas les secondes. Si seul le lieu change, préserver la valeur historique
+    // évite de convertir silencieusement 14:30:27 en 14:30:00.
+    heure = etat.heure;
+  } else {
+    const saisie = normaliserHeure(heureBrute, null);
+    if (!saisie.ok) {
+      return { ok: false, message: copieNaissance.messageDeRefus(saisie.refus) };
+    }
+    heure = saisie.heure;
+  }
+
+  const codeLieu = demande.codeLieu.trim();
+  const lieuChoisi = codeLieu ? trouverLieuNaissanceParCode(codeLieu) : null;
+  if (codeLieu && !lieuChoisi) return { ok: false, message: copieNaissance.LIEU_INVALIDE };
+  if (
+    !lieuChoisi &&
+    (!etat.lieu || etat.latitude === null || etat.longitude === null || !etat.fuseau)
+  ) {
+    return { ok: false, message: copieNaissance.LIEU_INVALIDE };
+  }
+
+  const donnees: DonneesNaissanceResolues = lieuChoisi
+    ? {
+        date,
+        heure,
+        lieu: lieuChoisi.nom,
+        latitude: lieuChoisi.latitude,
+        longitude: lieuChoisi.longitude,
+        fuseau: lieuChoisi.fuseau,
+      }
+    : {
+        date,
+        heure,
+        lieu: etat.lieu!,
+        latitude: etat.latitude!,
+        longitude: etat.longitude!,
+        fuseau: etat.fuseau!,
+      };
+  const changements = {
+    date: date !== etat.date,
+    heure: heure !== etat.heure,
+    lieu:
+      donnees.lieu !== etat.lieu ||
+      donnees.latitude !== etat.latitude ||
+      donnees.longitude !== etat.longitude ||
+      donnees.fuseau !== etat.fuseau,
+  };
+  if (!changements.date && !changements.heure && !changements.lieu) {
+    return { ok: false, message: copieNaissance.AUCUN_CHANGEMENT };
+  }
+
+  return {
+    ok: true,
+    donnees,
+    changements,
+    correction: { date, heure: heure ?? "", codeLieu, revision: revisionNaissance(etat) },
+  };
+}
+
+export async function apercevoirCorrectionDonnees(
+  demande: DemandeCorrectionNaissance,
+): Promise<EtatApercuDonnees> {
+  const session = await identite();
+  if (!session) return { statut: "erreur", message: "Impossible pour le moment." };
+  const preparation = await preparerCorrectionDonnees(session, demande);
+  if (!preparation.ok) return { statut: "erreur", message: preparation.message };
+  const apercu = await apercuDeCorrectionDonnees(
+    session.supabase,
+    session.id,
+    preparation.donnees,
+  );
+  if (!apercu) return { statut: "erreur", message: "Impossible pour le moment." };
+  return {
+    statut: "apercu",
+    correction: preparation.correction,
+    resume: {
+      date: preparation.donnees.date,
+      heure: preparation.donnees.heure,
+      lieu: preparation.donnees.lieu,
+    },
+    phrases: copieNaissance.phrasesApercuDonnees(apercu, preparation.changements),
+  };
+}
+
+export async function corrigerDonneesNaissance(
+  correction: CorrectionNaissanceConfirmee,
+): Promise<EtatMemoire> {
+  if (!correction || typeof correction.revision !== "string") return REFUS_GENERIQUE;
+  const session = await identite();
+  if (!session) return REFUS_GENERIQUE;
+  const avant = await lireNaissance(session.supabase, session.id);
+  if (!avant) return REFUS_GENERIQUE;
+  if (revisionNaissance(avant) !== correction.revision) {
+    return { statut: "erreur", message: copieNaissance.DONNEES_MODIFIEES };
+  }
+  const preparation = await preparerCorrectionDonnees(session, correction);
+  if (!preparation.ok) return { statut: "erreur", message: preparation.message };
+  const issue = await ecrireDonneesNaissance(session.id, preparation.donnees, avant);
+  if (issue === "consentement_absent") {
+    return { statut: "erreur", message: copieNaissance.CORRECTION_APRES_REVOCATION };
+  }
+  if (issue !== "corrigee") return REFUS_GENERIQUE;
+  revalidatePath("/memoire");
+  revalidatePath("/socle");
   revalidatePath("/");
   return { statut: "ok" };
 }

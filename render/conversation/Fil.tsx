@@ -64,6 +64,7 @@ import s from "./conversation.module.css";
  */
 
 export default function Fil({
+  introduction,
   tours,
   annonce,
   prepare = false,
@@ -76,6 +77,8 @@ export default function Fil({
   nommage,
   quotaEpuise,
 }: {
+  /** Introduction statique du journal vide. Absente dès qu'un tour utilisateur existe. */
+  introduction?: string | null;
   tours: Tour[];
   annonce: string;
   /** Story 6.9 (QA T13) — Anam prépare : le signe paraît EN BAS DU FIL, là où elle regarde. */
@@ -187,6 +190,11 @@ export default function Fil({
 
   return (
     <div className={s.fil} ref={conteneur}>
+      {introduction ? (
+        <p className={`${s.introductionStatique} t-anam`} data-introduction-anam="">
+          {introduction}
+        </p>
+      ) : null}
       {tours.map((t) => (
         <Fragment key={t.id}>
           {t.separateurAvant && (

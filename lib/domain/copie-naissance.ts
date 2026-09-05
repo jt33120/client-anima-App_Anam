@@ -2,7 +2,7 @@ import { SIGNE_LIBELLE } from "@/lib/domain/cartes-socle";
 import type { ApercuCorrection, RefusHeure } from "@/lib/domain/correction-naissance";
 
 /**
- * copie-naissance.ts — LA COPIE DE « CORRIGER TON HEURE DE NAISSANCE » (Story 6.5b).
+ * copie-naissance.ts — LA COPIE DE « TES DONNÉES DE NAISSANCE » (Story 6.5b, étendue par RC-E4).
  *
  * Seconde section de `/memoire`, et le registre est celui de sa voisine : **c'est le produit qui
  * parle, pas Anam.** On montre à quelqu'un une donnée qui le concerne et on lui propose de la
@@ -16,7 +16,7 @@ import type { ApercuCorrection, RefusHeure } from "@/lib/domain/correction-naiss
  * sans jamais dire combien de fois.
  */
 
-export const TITRE_SECTION = "Ton heure de naissance";
+export const TITRE_SECTION = "Tes données de naissance";
 
 /**
  * ⚠️ CETTE INTRODUCTION EST CONTRAIGNANTE. Elle doit dire les trois choses vraies, et la troisième
@@ -25,9 +25,8 @@ export const TITRE_SECTION = "Ton heure de naissance";
  * horoscope du jour a changé de fond en comble.
  */
 export const INTRODUCTION =
-  "L’heure inscrite sur ton acte de naissance décide de ton ascendant et de tes maisons. Si celle " +
-  "qui est enregistrée est fausse, tu peux la corriger, autant de fois qu’il le faut. Ton thème " +
-  "sera recalculé à partir de la nouvelle, et l’ancien ne sera pas conservé.";
+  "Ta date, ton heure et ton lieu de naissance servent à calculer ton ciel. Tu peux rectifier une " +
+  "donnée inexacte : tu verras les conséquences avant de confirmer, puis ton ciel sera recalculé et l’ancien thème ne sera pas conservé.";
 
 export const HEURE_ABSENTE =
   "Aucune heure n’est enregistrée pour l’instant. Il n’y a donc rien à corriger : il y a à ajouter.";
@@ -36,13 +35,43 @@ export const LIEN_AJOUTER = "Ajouter mon heure de naissance";
 
 export const ETIQUETTE_NOUVELLE_HEURE = "La bonne heure";
 export const AIDE_NOUVELLE_HEURE =
-  "Telle qu’elle est écrite sur ta copie intégrale d’acte de naissance.";
+  "Telle qu’elle est écrite sur ta copie intégrale d’acte de naissance. Efface le champ si l’heure enregistrée est inconnue.";
+export const ACTION_INDISPONIBLE = "Impossible pour le moment. Réessaie.";
 
 export const ACTION_VOIR = "Voir ce que ça change";
-export const ACTION_CONFIRMER = "Corriger mon heure";
+export const ACTION_CONFIRMER = "Corriger mes données";
 export const ACTION_RENONCER = "Renoncer";
 
-export const CORRIGE = "C’est corrigé. Ton thème se recalcule à ta prochaine ouverture d’Anima.";
+export const CORRIGE = "C’est corrigé. Ton ciel a été recalculé depuis tes nouvelles données.";
+
+export const ETIQUETTE_DATE = "Date de naissance";
+export const ETIQUETTE_LIEU = "Commune de naissance";
+export const AIDE_LIEU = "Saisis au moins deux lettres, puis choisis la commune proposée.";
+export const AUCUN_CHANGEMENT = "Aucune donnée n’a changé.";
+export const DATE_INVALIDE = "Entre une date de naissance valide.";
+export const DATE_TROP_ANCIENNE = "Cette date ne semble pas valide.";
+export const DATE_MINEURE = "Cette date ne permet pas d’utiliser Anam, réservé aux personnes majeures.";
+export const LIEU_INVALIDE = "Choisis une commune dans la liste proposée.";
+export const DONNEES_MODIFIEES =
+  "Tes données ont changé depuis l’aperçu. Relis les conséquences avant de confirmer.";
+
+export function phrasesApercuDonnees(
+  apercu: ApercuCorrection,
+  changements: { readonly date: boolean; readonly heure: boolean; readonly lieu: boolean },
+): readonly string[] {
+  const phrases = [...phrasesApercu(apercu)];
+  const noms = [
+    changements.date ? "ta date" : null,
+    changements.heure ? "ton heure" : null,
+    changements.lieu ? "ton lieu" : null,
+  ].filter((nom): nom is string => nom !== null);
+  if (noms.length > 0) {
+    phrases.unshift(
+      `Le changement portera sur ${noms.join(", ")}. Ton Soleil, ta Lune, ton ascendant, tes maisons et les lectures qui en dépendent seront recalculés.`,
+    );
+  }
+  return Object.freeze(phrases);
+}
 
 /**
  * Le refus après révocation.

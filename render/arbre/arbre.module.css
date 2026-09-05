@@ -42,6 +42,78 @@
   gap: var(--esp-2);
 }
 
+.etapesEvolution {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--esp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etapesEvolution li {
+  padding: var(--esp-4);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--surface-elevee);
+}
+
+.etapesEvolution h3,
+.etapesEvolution p {
+  margin: 0;
+}
+
+.etapesEvolution p {
+  margin-top: var(--esp-2);
+  color: var(--texte-doux);
+}
+
+.exempleEvolution {
+  margin: var(--esp-2) 0 0;
+  padding: var(--esp-4);
+  border-radius: var(--rayon-md);
+  background: var(--papier);
+  color: var(--sur-papier);
+}
+
+.exempleEvolution svg {
+  display: block;
+  width: 100%;
+  max-height: 14rem;
+}
+
+.exempleEvolution figcaption {
+  color: var(--sur-papier-doux);
+}
+
+.exempleBois {
+  stroke: currentColor;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.exempleFeuilles {
+  fill: var(--accent);
+}
+
+.exempleRayonnement {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  opacity: 0.4;
+}
+
+.exempleGraine {
+  fill: var(--lueur);
+  stroke: var(--sur-papier-doux);
+}
+
+@media (min-width: 42rem) {
+  .etapesEvolution {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* ── Boutons (≥ 44px, focus visible, jamais l'état par la couleur seule) ── */
 .actionSecondaire,
 .actionPrincipale,
@@ -349,7 +421,10 @@
   top: var(--esp-2);
   left: 50%;
   width: min(calc(100% - 2 * var(--esp-4)), var(--mesure));
-  max-height: 34%;
+  /* 50 % garde la graine entièrement dégagée sur les trois largeurs de référence tout en évitant
+     de couper l'explication au milieu d'une phrase dès l'arrivée. Le bloc reste défilable pour
+     le zoom texte et les écrans très courts. */
+  max-height: 50%;
   transform: translateX(-50%);
   overflow-y: auto;
   overscroll-behavior: contain;

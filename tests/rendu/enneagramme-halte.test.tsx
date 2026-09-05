@@ -97,25 +97,26 @@ const monterTest = (
   );
 
 describe("[13.8] comprendre avant de commencer", () => {
-  it("explique simplement la méthode, sa limite, et ouvre les neuf repères du corpus dans une feuille", async () => {
-    // ⚠️ LES NEUF TEXTES N'APPARAISSENT QU'À L'OUVERTURE, ET C'EST LE RETOUR DU FONDATEUR
+  it("explique simplement la méthode, sa limite, et ouvre les neuf définitions dans une feuille", async () => {
+    // ⚠️ LES NEUF DÉFINITIONS N'APPARAISSENT QU'À L'OUVERTURE, ET C'EST LE RETOUR DU FONDATEUR
     // (2026-09-02) : « les tiroirs sont un peu longs. Moins de scroll, plus de pop-up, une app
-    // plus dynamique ». Ce test exigeait les neuf textes SANS clic : c'est exactement la colonne
-    // qu'on lui a demandé de faire disparaître. L'exigence qui reste entière : les neuf textes
-    // sont CEUX du corpus (`reperesPourIntroduction`, FR-054), tous, dans le dialogue, et la
+    // plus dynamique ». Ce test exigeait les neuf repères SANS clic : c'est exactement la colonne
+    // qu'on lui a demandé de faire disparaître. L'exigence qui reste entière : les neuf noms et
+    // définitions sont CEUX du lexique éditorial, tous, dans le dialogue, et la
     // feuille se referme d'Échap en rendant le focus à la porte (`EXPERIENCE.md` ligne 216).
     render(<IntroductionEnneagramme />);
     expect(screen.getByText(/grille de lecture/i)).toBeTruthy();
     expect(screen.getByText(/hypothèse/i)).toBeTruthy();
     const porte = screen.getByRole("button", { name: /Voir les neuf repères/i });
     for (const repere of reperesPourIntroduction()) {
-      expect(screen.queryByText(repere.texte), "un repère s'empile encore dans la page").toBeNull();
+      expect(screen.queryByText(repere.definition), "un repère s'empile encore dans la page").toBeNull();
     }
 
     await userEvent.click(porte);
     const feuille = screen.getByRole("dialog");
     for (const repere of reperesPourIntroduction()) {
-      expect(within(feuille).getByText(repere.texte)).toBeTruthy();
+      expect(within(feuille).getByText(repere.definition)).toBeTruthy();
+      expect(within(feuille).getByText(new RegExp(`${repere.nom}.*Type ${repere.type}`))).toBeTruthy();
     }
 
     await userEvent.keyboard("{Escape}");
@@ -366,35 +367,41 @@ describe("[5.5/AC2 DUR] accepter, refuser, corriger — strictement à égalité
 
 describe("[5.5/AC1/AC3] le résultat : un type, jamais un score", () => {
   const SANS_TEXTE = "Anima n’a pas encore écrit ce qu’elle voit dans ce type. Son texte se posera ici.";
+  const NOM = "Le Singulier";
+  const DEFINITION = "Une attention portée à l’identité, à la profondeur et à ce qui rend l’expérience unique.";
 
   it("le créneau vide est dit HONNÊTEMENT, dans la voix du produit", () => {
     // `TexteCorpus` n'a que deux états : il n'existe pas de « texte par défaut ». Combler le vide
     // ici fabriquerait un texte sans auteur qui aurait l'air d'un texte d'Anima (FR-054/FR-086).
     const { container } = render(
-      <Resultat type={4} origine="test" texte={null} messageSansTexte={SANS_TEXTE} />,
+      <Resultat type={4} nom={NOM} definition={DEFINITION} origine="test" texte={null} messageSansTexte={SANS_TEXTE} />,
     );
     const phrase = screen.getByText(SANS_TEXTE);
     expect(phrase.className, "voix PRODUIT, jamais `t-anam`").toContain("t-corps");
     expect(container.querySelector(".t-anam"), "Anam ne parle pas sur cet écran").toBeNull();
+    expect(screen.getByRole("heading", { name: NOM })).toBeTruthy();
+    expect(screen.getByText("Type 4")).toBeTruthy();
+    expect(screen.getByText(DEFINITION)).toBeTruthy();
+    expect(screen.getByText("Corpus éditorial Anima")).toBeTruthy();
   });
 
   it("un texte d’Anima, lui, paraît dans SA voix", () => {
     render(
-      <Resultat type={4} origine="test" texte="Un texte d’Anima." messageSansTexte={SANS_TEXTE} />,
+      <Resultat type={4} nom={NOM} definition={DEFINITION} origine="test" texte="Un texte d’Anima." messageSansTexte={SANS_TEXTE} />,
     );
     expect(screen.getByText("Un texte d’Anima.").className).toContain("t-anam");
   });
 
   it("le seul chiffre à l’écran est le TYPE — jamais un total ni un pourcentage", () => {
     const { container } = render(
-      <Resultat type={7} origine="hypothese" texte={null} messageSansTexte={SANS_TEXTE} />,
+      <Resultat type={7} nom="L’Enthousiaste" definition={DEFINITION} origine="hypothese" texte={null} messageSansTexte={SANS_TEXTE} />,
     );
     const chiffres = (container.textContent ?? "").match(/\d+/g) ?? [];
     expect(chiffres).toEqual(["7"]);
   });
 
   it("[AC6] refaire et effacer sont là, visibles, sans confirmation solennelle", async () => {
-    render(<Resultat type={4} origine="test" texte={null} messageSansTexte={SANS_TEXTE} />);
+    render(<Resultat type={4} nom={NOM} definition={DEFINITION} origine="test" texte={null} messageSansTexte={SANS_TEXTE} />);
     await userEvent.click(screen.getByRole("button", { name: /Effacer/i }));
     expect(effacerType).toHaveBeenCalledTimes(1);
   });
@@ -402,7 +409,7 @@ describe("[5.5/AC1/AC3] le résultat : un type, jamais un score", () => {
   it("[LE CŒUR] « Refaire » n’efface PAS son type — il ouvre le test", async () => {
     // Le réflexe serait de repartir d'une page blanche. Il la laisserait SANS TYPE si elle
     // abandonne au huitième énoncé — pour avoir voulu vérifier son résultat.
-    render(<Resultat type={4} origine="test" texte={null} messageSansTexte={SANS_TEXTE} />);
+    render(<Resultat type={4} nom={NOM} definition={DEFINITION} origine="test" texte={null} messageSansTexte={SANS_TEXTE} />);
     await userEvent.click(screen.getByRole("button", { name: /Refaire/i }));
     expect(recommencerTest).toHaveBeenCalledTimes(1);
     expect(effacerType, "son type reste jusqu’à ce qu’un nouveau le remplace").not.toHaveBeenCalled();

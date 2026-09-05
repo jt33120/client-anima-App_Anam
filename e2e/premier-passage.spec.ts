@@ -36,7 +36,7 @@ test("[H4] le lieu se présente une fois, puis plus jamais", async ({ page }) =>
   //  2. la bibliothèque a ses propres `<dt>` (« Chemin de vie », « Soleil »…) — un `getByRole` non
   //     borné en ramassait dix. On borne au repère nommé de la présentation.
   const presentation = page.getByRole("region", { name: "Trois dimensions" });
-  await expect(presentation.getByRole("term")).toHaveText(["Anam", "Mon arbre", "Aujourd’hui"]);
+  await expect(presentation.getByRole("term")).toHaveText(["Anam", "Mon évolution", "Aujourd’hui"]);
   await expect(presentation.getByText(/Le plus simple/), "rien ne dit par quoi commencer").toBeVisible();
 
   // ── 2. La présentation est LUE avant les cartes, et sans avoir à chercher.
@@ -46,7 +46,7 @@ test("[H4] le lieu se présente une fois, puis plus jamais", async ({ page }) =>
   // ── 3. Les trois noms de la présentation sont ceux de la barre : ce qu'on vient de lire est
   //       atteignable tout de suite, et c'est la moitié de « je sais quoi faire ».
   const barre = page.getByRole("navigation", { name: "Régions" });
-  await expect(barre.getByRole("button")).toHaveText(["Aujourd’hui", "Anam", "Mon arbre"]);
+  await expect(barre.getByRole("button")).toHaveText(["Aujourd’hui", "Anam", "Mon évolution"]);
 
   // ── 4. On revient. Le monde s'ouvre DIRECTEMENT sur l'accueil — le seuil ne se redresse plus
   //       (QA manuelle du 2026-08-19 : il était rendu à chaque chargement) — et l'accueil s'est tu.

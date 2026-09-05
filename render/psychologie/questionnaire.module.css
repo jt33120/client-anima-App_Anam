@@ -229,6 +229,36 @@
 /* Le résultat : un TYPE, jamais un nombre de points ni un classement (FR-031). */
 .type {
   text-align: center;
+  margin-bottom: 0;
+}
+
+.repereType {
+  margin: calc(-1 * var(--esp-3)) 0 0;
+  color: var(--texte-doux);
+  text-align: center;
+}
+
+.definitionGenerale,
+.lectureCorpus {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  border: 1px solid color-mix(in srgb, var(--sur-papier-doux) 28%, transparent);
+  border-radius: var(--rayon);
+  background: var(--papier);
+  color: var(--sur-papier);
+}
+
+.definitionGenerale h3,
+.definitionGenerale p,
+.lectureCorpus h3,
+.lectureCorpus p {
+  margin: 0;
+}
+
+.provenance {
+  color: var(--sur-papier-doux);
 }
 
 /* ── Le résultat du Big Five : CINQ AXES CÔTE À CÔTE ───────────────────────────────────────────

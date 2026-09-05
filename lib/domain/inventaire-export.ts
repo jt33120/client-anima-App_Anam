@@ -83,6 +83,12 @@ export const INVENTAIRE_EXPORT: readonly EntreeInventaire[] = [
     motif: "art. 15 : le seul jugement que le produit porte sur elle ne peut pas lui être caché",
   },
   { table: "audit_securite", verdict: "inclus", titre: "Les décisions de sécurité te concernant", motif: "classifications sans art. 9 : niveau, décision, horodatage" },
+  {
+    table: "audit_correction_naissance",
+    verdict: "inclus",
+    titre: "Tes rectifications de naissance",
+    motif: "la date, le statut et la version du geste de rectification, sans conserver les anciennes ni les nouvelles valeurs",
+  },
   { table: "pause_rythme", verdict: "inclus", titre: "Les pauses proposées", motif: "quand Anam a proposé de laisser respirer" },
   { table: "invitation_integration", verdict: "inclus", titre: "Les invitations à intégrer", motif: "les moments où une branche a été rapprochée d’une autre" },
   { table: "notification_envoyee", verdict: "inclus", titre: "Les notifications reçues", motif: "motif et horodatage, jamais le contenu" },
@@ -166,6 +172,16 @@ export const INVENTAIRE_EXPORT: readonly EntreeInventaire[] = [
     motif: "registre d’idempotence Stripe, clé sur l’identifiant d’évènement du prestataire — aucune colonne d’utilisatrice",
   },
   { table: "incident_systeme", verdict: "exclu", motif: "incidents d’exploitation, sans art. 9 et sans rattachement à une personne" },
+  {
+    table: "correction_naissance_autorisee",
+    verdict: "exclu",
+    motif: "preuve transactionnelle éphémère supprimée avant la fin de la rectification, sans renseignement durable sur elle",
+  },
+  {
+    table: "texte_du_jour_stable",
+    verdict: "exclu",
+    motif: "cache éditorial partagé sans identité ni donnée brute de naissance, commun à toutes les personnes de même signature minimisée",
+  },
   {
     table: "effacement",
     verdict: "exclu",

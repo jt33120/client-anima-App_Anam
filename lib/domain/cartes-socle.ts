@@ -115,11 +115,11 @@ export const NOMBRE_LIBELLE: Readonly<Record<NomNombre, string>> = Object.freeze
 // Les cinq constructeurs
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-/** Le mantra du jour — le seul morceau du socle qui ne demande rien à personne (5.4, AC6). */
+/** Mon mantra du jour — le seul morceau du socle qui ne demande rien à personne (5.4, AC6). */
 export function carteMantra(texte: TexteCorpus): CarteBibliotheque {
   return {
     cle: "mantra",
-    titre: "Le mantra du jour",
+    titre: "Mon mantra du jour",
     // Le SEUL terme du glossaire présent dans la bibliothèque de la v1 (FR-080). La 5.9 ajoutera
     // « ancrage » et la 5.8 « lecture » — et chacune héritera de sa nature au lieu de la recopier.
     terme: "mantra",
@@ -186,7 +186,7 @@ export function carteHoroscope(
  * Lune, qui existe toujours. C'est le premier endroit du produit où ce choix se fait : la 5.4
  * produisait les deux clés sans trancher.
  */
-function texteDuCiel(horoscope: HoroscopeDuJour): TexteCorpus {
+export function texteDuCiel(horoscope: HoroscopeDuJour): TexteCorpus {
   return texteConfiguration(horoscope.dominante) ?? texteLuneRelative(horoscope.luneRelative) ?? NON_ECRIT;
 }
 

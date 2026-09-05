@@ -20,8 +20,10 @@
   z-index: 60;
   display: grid;
   place-items: center;
-  padding: var(--esp-6) var(--marge-mobile);
-  background: var(--fond);
+  padding: var(--esp-4) var(--marge-mobile);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--lueur) 12%, transparent), transparent 42%),
+    linear-gradient(to top, color-mix(in srgb, var(--aube) 8%, var(--fond)), var(--fond) 38%);
   /* ⚠️ LA PROPRIÉTÉ QUI FAIT QUE CE VOILE NE PEUT PIÉGER PERSONNE. La scène est déjà montée
      dessous : un doigt posé pendant le portail l'atteint. Un plein écran qui INTERCEPTE, même une
      seconde, est un plein écran dont il faut prouver qu'il part — ici il n'y a rien à prouver. */
@@ -46,15 +48,15 @@
 }
 
 /* ── LA COMPOSITION ────────────────────────────────────────────────────────────────────────────
-   L'arbre, le nom, la ligne, le signe. Dans cet ordre, et centré : c'est une porte, pas un tableau
+   L'arbre, le mot et le lotus. Dans cet ordre, et centrés : c'est une porte, pas un tableau
    de bord. Les espacements suivent l'échelle du produit. */
 .scene {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--esp-4);
+  gap: var(--esp-3);
   width: 100%;
-  max-width: var(--mesure);
+  max-width: calc(var(--mesure) + var(--esp-8));
   text-align: center;
 }
 
@@ -73,10 +75,9 @@
 .arbre {
   --largeur-canevas: 1408;
   --hauteur-canevas: 2503;
-  /* 58vh laisse de quoi loger le nom, la ligne d'attente et le lotus sous l'arbre sur un téléphone
-     court ; 29rem l'empêche de devenir une affiche sur un grand écran. Mesuré sur une capture en
-     390 × 844 : au-delà, le lotus d'attente sort du champ. */
-  --hauteur-arbre: min(58vh, 29rem);
+  /* L'arbre est l'image dominante du portail. `svh` protège la composition quand les barres du
+     navigateur mobile sont visibles ; la règle écran court ci-dessous recompose l'espace. */
+  --hauteur-arbre: min(72svh, 42rem);
   --largeur-arbre: calc(
     var(--hauteur-arbre) * var(--largeur-canevas) / var(--hauteur-canevas)
   );
@@ -100,13 +101,23 @@
   color: var(--texte);
 }
 
-.attente {
-  margin: 0;
-  color: var(--texte-doux);
+.lotus {
+  margin-top: var(--esp-1);
+  color: var(--lueur);
 }
 
-.lotus {
-  margin-top: var(--esp-2);
+@media (max-height: 700px) {
+  .portail {
+    padding-block: var(--esp-2);
+  }
+
+  .scene {
+    gap: var(--esp-2);
+  }
+
+  .arbre {
+    --hauteur-arbre: min(64svh, 28rem);
+  }
 }
 
 /* ── prefers-reduced-motion ────────────────────────────────────────────────────────────────────

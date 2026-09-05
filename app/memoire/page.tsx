@@ -14,9 +14,10 @@ import { urlRetourScene } from "@/lib/scene/retour-scene";
 import RetourScene from "@/render/RetourScene";
 import {
   annulerSuppression,
-  apercevoirCorrection,
+  apercevoirCorrectionDonnees,
   corrigerFait,
-  corrigerHeureNaissance,
+  corrigerDonneesNaissance,
+  chercherLieuxNaissance,
   supprimerFait,
 } from "./actions";
 
@@ -121,17 +122,20 @@ export default async function PageMemoire({
         supprimer={supprimerFait}
         annuler={annulerSuppression}
       />
-      {/* Story 6.5b — l'heure de naissance, dans la MÊME halte : c'est le même geste (rectifier une
-          donnée qui me concerne, art. 16), et lui donner un écran à part obligerait à découvrir une
+      {/* RC-E4 — date, heure et lieu dans la MÊME halte : c'est le même geste (rectifier une donnée
+          qui me concerne, art. 16), et lui donner un écran à part obligerait à découvrir une
           seconde URL pour exercer le même droit. */}
       <CorrectionNaissance
         copie={{
           titre: copieNaissance.TITRE_SECTION,
           introduction: copieNaissance.INTRODUCTION,
-          heureAbsente: copieNaissance.HEURE_ABSENTE,
-          lienAjouter: copieNaissance.LIEN_AJOUTER,
-          etiquette: copieNaissance.ETIQUETTE_NOUVELLE_HEURE,
-          aide: copieNaissance.AIDE_NOUVELLE_HEURE,
+          etiquetteDate: copieNaissance.ETIQUETTE_DATE,
+          etiquetteHeure: copieNaissance.ETIQUETTE_NOUVELLE_HEURE,
+          aideHeure: copieNaissance.AIDE_NOUVELLE_HEURE,
+          indisponible: copieNaissance.ACTION_INDISPONIBLE,
+          etiquetteLieu: copieNaissance.ETIQUETTE_LIEU,
+          aideLieu: copieNaissance.AIDE_LIEU,
+          lieuInvalide: copieNaissance.LIEU_INVALIDE,
           voir: copieNaissance.ACTION_VOIR,
           confirmer: copieNaissance.ACTION_CONFIRMER,
           renoncer: copieNaissance.ACTION_RENONCER,
@@ -144,11 +148,14 @@ export default async function PageMemoire({
           refusRevocation:
             etape === "revoque" ? copieNaissance.CORRECTION_APRES_REVOCATION : null,
         }}
+        dateActuelle={naissance?.date ?? ""}
+        lieuActuel={naissance?.lieu ?? null}
         // `HH:MM:SS` en base, `HH:MM` à l'écran : les secondes d'une heure de naissance n'existent
         // sur aucun acte d'état civil, et les afficher suggérerait une précision qui n'est pas là.
         heureActuelle={naissance?.heure ? naissance.heure.slice(0, 5) : null}
-        apercevoir={apercevoirCorrection}
-        confirmer={corrigerHeureNaissance}
+        chercherLieux={chercherLieuxNaissance}
+        apercevoir={apercevoirCorrectionDonnees}
+        confirmer={corrigerDonneesNaissance}
       />
       {/* Story 6.9 (QA T7) — la porte de secours (FR-077) et, là où elle est due, la mention
           IA (art. 50). Le MODÈLE décide ; ce composant dessine. */}

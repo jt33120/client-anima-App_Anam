@@ -141,12 +141,7 @@ describe("[7.5 · 13.9] les six nombres et leur lecture sont deux couches distin
 // Retour du 2026-09-02 — sous le pli, chaque lecture dit le nombre qu'elle lit
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-describe("[retour 2026-09-02] l'intitulé d'une lecture symbolique porte son nombre : « Chemin de vie (7) »", () => {
-  // POURQUOI : la « Lecture symbolique d'Anima » vit sous un `<details>` fermé, loin de la grille
-  // où le nombre s'affiche en grand. Un article coiffé de « Chemin de vie » au-dessus de « Ton
-  // chemin de vie 4 symbolise… » oblige à remonter pour savoir de quel 4 on parle. Le fondateur
-  // demande le chiffre À CÔTÉ de ce à quoi il correspond — et c'est l'intitulé qui le porte, pas
-  // un champ de plus : la frontière de rendu (`socle-frontiere.test.ts`) ne bouge pas.
+describe("[RC-F1] chaque lecture réunit son nombre, son archétype et son sens", () => {
   const section = sectionNombres(NUM_COMPLETE, null, ENTREES_NUM_COMPLETE);
 
   it("[CONTRÔLE DU CONTRÔLE] le jeu d'essai porte au moins un nombre maître, sinon « (11) » ne serait jamais éprouvé", () => {
@@ -158,37 +153,32 @@ describe("[retour 2026-09-02] l'intitulé d'une lecture symbolique porte son nom
     expect(maitres.length, "le jeu d'essai ne porte aucun nombre maître").toBeGreaterThan(0);
   });
 
-  it("[LE CŒUR] les six intitulés se terminent par la valeur du nombre de même clé, entre parenthèses", () => {
+  it("[LE CŒUR] les six unités portent la valeur du nombre de même clé", () => {
     expect(section.lecturesSymboliques).toHaveLength(6);
     for (const lecture of section.lecturesSymboliques) {
       const nombre = section.nombres.find((n) => n.cle === lecture.cle);
       expect(nombre, `${lecture.cle} : une lecture sans nombre calculé`).toBeDefined();
-      // Recalculé depuis la fiche, jamais codé en dur : changer l'année de référence ou le nom du
-      // jeu d'essai ne doit pas faire mentir cette garde. Mutations-cibles : retirer le suffixe
-      // (« Chemin de vie ») ou y mettre la valeur d'un autre nombre — les deux rougissent ici.
-      expect(lecture.intitule).toBe(`${nombre!.intitule} (${nombre!.valeur})`);
+      expect(lecture.intitule).toBe(nombre!.intitule);
+      expect(lecture.valeur).toBe(nombre!.valeur);
+      expect(lecture.archetype.length).toBeGreaterThan(2);
     }
   });
 
-  it("un nombre maître s'écrit « Expression (11) », jamais « (11/2) » — la réduction est déjà dans le texte", () => {
+  it("un nombre maître reste 11, jamais 11/2", () => {
     // « 11/2 » a la forme d'un compte (FR-031 refuse `\d+/\d+`), et le texte du corpus dit déjà
     // « ce nombre maître se lit aussi comme un 2 ». On n'écrit donc que le nombre conservé.
     for (const lecture of section.lecturesSymboliques) {
       const brut = NUM_COMPLETE.nombres[lecture.cle];
       if (brut.statut !== "calcule" || !brut.maitre) continue;
-      expect(lecture.intitule).toBe(`${section.nombres.find((n) => n.cle === lecture.cle)!.intitule} (${brut.valeur})`);
-      expect(lecture.intitule).not.toMatch(/\//);
+      expect(lecture.valeur).toBe(String(brut.valeur));
+      expect(lecture.valeur).not.toMatch(/\//);
     }
   });
 
-  it("le libellé et le texte se répondent : la première phrase du texte nomme le même nombre", () => {
-    // Le corpus commence chaque lecture par « Ton chemin de vie 7 symbolise… ». Si le nombre du
-    // titre et celui de la phrase divergeaient, la page contredirait sa propre lecture.
+  it("le texte ne répète plus mécaniquement le nombre déjà visible dans son sommaire", () => {
     for (const lecture of section.lecturesSymboliques) {
-      const valeur = lecture.intitule.match(/ \((\d+)\)$/)?.[1];
-      expect(valeur, `intitulé sans nombre : « ${lecture.intitule} »`).toBeDefined();
-      const premierePhrase = lecture.texte.split(/[.!?]/)[0];
-      expect(premierePhrase, lecture.cle).toMatch(new RegExp(`(^|\\D)${valeur}(\\D|$)`));
+      expect(lecture.texte.trim()).not.toMatch(new RegExp(`^${lecture.valeur}\\b`));
+      expect(lecture.texte.length).toBeGreaterThan(20);
     }
   });
 
@@ -201,8 +191,9 @@ describe("[retour 2026-09-02] l'intitulé d'une lecture symbolique porte son nom
     expect(sansNom.lecturesSymboliques.length, "les nombres de date gardent leur lecture").toBeGreaterThan(0);
     for (const lecture of sansNom.lecturesSymboliques) {
       expect(manquants.has(lecture.cle), `${lecture.cle} : une lecture pour un nombre non calculé`).toBe(false);
-      expect(lecture.intitule).toMatch(/^\S.* \(\d+\)$/);
       expect(lecture.intitule).not.toMatch(/\(\s*\)|undefined|null|NaN/);
+      expect(lecture.valeur).toMatch(/^\d+$/);
+      expect(lecture.archetype).not.toBe("");
     }
     for (const manque of sansNom.manquants) {
       expect(manque.intitule, `${manque.cle} : un manque ne porte pas de nombre`).not.toMatch(/\(/);
@@ -656,12 +647,10 @@ describe("[retour 2026-09-01] la nouvelle copie de l'univers Astrologie passe le
   });
 
   it("[LE CŒUR] l'introduction du ciel est COURTE et tutoie", () => {
-    // « L'app est beaucoup trop verbeuse » : la phrase d'avant faisait 128 caractères et nommait
-    // « ton heure » à des comptes qui n'en ont pas. Mutation-cible : la remettre.
-    expect([...INTRODUCTION_ASTROLOGIE].length).toBeLessThan(100);
+    expect([...INTRODUCTION_ASTROLOGIE].length).toBeLessThan(130);
     expect(INTRODUCTION_ASTROLOGIE).toMatch(/(?<![\p{L}’])(?:tu|ton|ta|tes)(?![\p{L}])/iu);
-    expect(INTRODUCTION_ASTROLOGIE).not.toMatch(/heure/i);
-    expect(INTRODUCTION_ASTROLOGIE, "la garantie « pas un modèle » reste").toMatch(/modèle/i);
+    expect(INTRODUCTION_ASTROLOGIE).toMatch(/date.*lieu.*heure/i);
+    expect(INTRODUCTION_ASTROLOGIE).not.toMatch(/modèle/i);
   });
 
   it("[FR-086] « Lecture symbolique » ne signe plus personne, et la note d'état garde Anima", () => {

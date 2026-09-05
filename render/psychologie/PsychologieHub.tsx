@@ -45,17 +45,14 @@ function Porte({ href, children }: { readonly href: string; readonly children: s
 }
 
 export default function PsychologieHub({
-  introduction,
   modules,
   methode,
 }: {
-  readonly introduction: string;
   readonly modules: readonly ModuleVue[];
   readonly methode: { readonly titre: string; readonly corps: string };
 }) {
   return (
     <>
-      <p className={`t-corps ${s.introduction}`}>{introduction}</p>
       <div className={s.grille}>
         {modules.map((module) => (
           <section

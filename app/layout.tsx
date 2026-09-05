@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { policeAnam, policeUi } from "./styles/polices";
 import { CouvercleConfidentialite } from "@/render/confidentialite/CouvercleConfidentialite";
 import { passkeysActives } from "@/lib/auth/verrou-prive";
+import InitialiserDocumentPortail from "@/render/portail/InitialiserDocumentPortail";
 
 // NFR-015 — identité discrète : « Anam » sur TOUTES les routes. Le `template` littéral
 // (sans %s) absorbe tout title enfant en « Anam » ; les pages l'explicitent aussi
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       {/* suppressHydrationWarning : des extensions (Grammarly…) injectent des attributs
           dans <body> avant l'hydratation — mitigation recommandée par Next/React. */}
       <body suppressHydrationWarning>
+        <InitialiserDocumentPortail />
         {children}
         {/* Story 6.2 (AC5) — la vignette du sélecteur de tâches ne montre jamais l'intérieur d'une
             séance. Monté ici, donc sur TOUTES les routes : une halte oubliée serait une halte

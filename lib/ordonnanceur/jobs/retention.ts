@@ -153,10 +153,18 @@ export async function executerRetention(ctx: ContexteJob, deps?: Partial<DepsRet
     }
   }
 
-  // ── 3. LE JOURNAL DE L'ORDONNANCEUR (trouvaille R1 de la revue 6.1a) ─────────────────────────
+  // ── 3. LES DONNÉES TECHNIQUES À TTL FIXE ────────────────────────────────────────────────────
   //
   // En dernier, et hors de toute boucle : c'est la seule phase qui n'engage personne, et la seule
   // qu'on accepte de perdre entièrement quand le budget est consommé.
+  if (reste() >= RESERVE_RETENTION_MS) {
+    try {
+      const retires = await depot.purgerTextesDuJour();
+      if (retires > 0) journaliserExploitation("retention_textes_du_jour_purge", { code: `lignes_${retires}` });
+    } catch (e) {
+      journaliserExploitation("retention_textes_du_jour_echoue", { code: codeDErreur(e) });
+    }
+  }
   if (reste() >= RESERVE_RETENTION_MS) {
     try {
       const retirees = await depot.purgerJournal(echeances.journalJours);

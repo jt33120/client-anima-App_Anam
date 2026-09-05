@@ -2,7 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
-import { lieuxFrance } from "@/lib/astro/adapters/lieux-france";
+import {
+  chercherLieuxNaissanceDansReferentiel,
+  trouverLieuNaissanceParCode,
+} from "@/lib/data/lieux-naissance";
 import type { LieuNaissance } from "@/lib/astro/lieux";
 
 /**
@@ -55,7 +58,7 @@ export async function chercherLieux(requete: string): Promise<LieuNaissance[]> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return [];
-  return [...lieuxFrance().chercher(requete, RESULTATS_MAX)];
+  return [...chercherLieuxNaissanceDansReferentiel(requete, RESULTATS_MAX)];
 }
 
 /**
@@ -145,7 +148,7 @@ export async function enregistrerHeureEtLieu(
   // Le lieu est RE-RÉSOLU côté serveur à partir du seul code : voir l'en-tête.
   // ⚠️ `trouverParCode`, PAS `chercher` : `chercher` interroge le NOM, et aucune commune ne
   // s'appelle « 33063 » — la première version refusait donc toutes les saisies valides.
-  const lieu = code ? lieuxFrance().trouverParCode(code) : null;
+  const lieu = code ? trouverLieuNaissanceParCode(code) : null;
   if (code && !lieu) {
     return {
       statut: "erreur",
@@ -162,8 +165,10 @@ export async function enregistrerHeureEtLieu(
   if (lieu && lieuDejaGrave && lieu.nom !== existant!.lieu_naissance) {
     return {
       statut: "erreur",
-      // Deux-points, pas de tiret cadratin : interdit dans tout texte affiché (retour du 2026-09-01).
-      message: "Ton lieu de naissance est déjà enregistré : il ne se modifie pas.",
+      // Cette halte complète une donnée absente ; une rectification déjà gravée passe par l'aperçu
+      // protégé de la mémoire, qui sait désormais corriger date, heure et lieu ensemble.
+      message:
+        "Ton lieu de naissance est déjà enregistré. Pour le corriger, va sur « Ce qu’Anam retient » (/memoire) : tu verras ce que le changement modifie avant de valider.",
     };
   }
 
@@ -180,7 +185,8 @@ export async function enregistrerHeureEtLieu(
   if (!confirme) {
     return {
       statut: "erreur",
-      message: "Coche la case : ce que tu enregistres ici s’enregistre une fois et ne se modifie pas.",
+      message:
+        "Coche la case pour enregistrer ces informations. Tu pourras ensuite les corriger depuis « Ce qu’Anam retient » (/memoire).",
     };
   }
 

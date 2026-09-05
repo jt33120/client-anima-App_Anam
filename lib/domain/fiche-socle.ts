@@ -111,6 +111,8 @@ export interface FaitFiche {
 export interface LectureSymboliqueFiche {
   readonly cle: NomNombre;
   readonly intitule: string;
+  readonly valeur: string;
+  readonly archetype: string;
   readonly texte: string;
 }
 
@@ -205,6 +207,12 @@ export interface SectionCiel {
   readonly angles: readonly AngleFiche[];
   readonly cuspides: readonly AngleFiche[];
   readonly manques: readonly ManqueFiche[];
+  readonly reperesPrincipaux: readonly {
+    readonly cle: "soleil" | "ascendant" | "lune";
+    readonly intitule: string;
+    readonly valeur: string;
+    readonly calcule: boolean;
+  }[];
   /**
    * L'aveu de FR-050, quand — et seulement quand — son heure réparerait quelque chose. C'est
    * `MESSAGE_SANS_HEURE` et `OU_TROUVER_SON_HEURE`, RÉUTILISÉS : deux vérités concurrentes sur la
@@ -365,7 +373,13 @@ export function sectionNombres(
         // s'écrit « Expression (11) », jamais « (11/2) » : la réduction est déjà dite dans le texte,
         // et « 11/2 » a la forme d'un compte (FR-031). La grille, elle, garde son intitulé nu — y
         // répéter « (7) » sous un 7 en `t-display` serait absurde.
-        lecturesSymboliques.push({ cle, intitule: `${intitule} (${valeur})`, texte: texte.texte });
+        lecturesSymboliques.push({
+          cle,
+          intitule,
+          valeur,
+          archetype: ARCHETYPE_NOMBRE[lecture.valeur],
+          texte: corpsLectureSymbolique(texte.texte, valeur),
+        });
       } else {
         auMoinsUnTexteAbsent = true;
       }
@@ -415,6 +429,31 @@ export function sectionNombres(
     apercuLecture: lecturesSymboliques.length > 0 ? apercuDeLecture(lecturesSymboliques[0].texte) : null,
     noteLectureSymbolique,
   });
+}
+
+const ARCHETYPE_NOMBRE: Readonly<Record<number, string>> = Object.freeze({
+  1: "Élan",
+  2: "Lien",
+  3: "Expression",
+  4: "Construction",
+  5: "Mouvement",
+  6: "Responsabilité",
+  7: "Recherche de sens",
+  8: "Puissance d’agir",
+  9: "Ouverture",
+  11: "Intuition",
+  22: "Vision concrète",
+  33: "Transmission",
+});
+
+/** Retire seulement l'entête déjà porté par le summary ; le corpus restant n'est pas réécrit. */
+function corpsLectureSymbolique(texte: string, valeur: string): string {
+  const prefixes = [
+    new RegExp(`^Ton [^.]{1,80} ${valeur} symbolise\\s+`, "u"),
+    new RegExp(`^Ton année personnelle ${valeur} est traditionnellement\\s+`, "u"),
+  ];
+  const corps = prefixes.reduce((courant, prefixe) => courant.replace(prefixe, ""), texte);
+  return corps.length === 0 ? texte : corps.charAt(0).toLocaleUpperCase("fr-FR") + corps.slice(1);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
@@ -494,6 +533,7 @@ export function sectionCiel(
       angles: [],
       cuspides: [],
       manques: [],
+      reperesPrincipaux: [],
       sansHeure: null,
       // Sans thème, pas de ciel du jour, même si l'appelant en a un sous la main : la page dit déjà
       // pourquoi il n'y a rien (naissance absente ou panne), et un horoscope au-dessus d'un
@@ -556,6 +596,36 @@ export function sectionCiel(
   // ton heure ». Au pôle géographique exact, l'ascendant n'existe pas et aucune heure ne le fera
   // exister — l'inviter à retourner à la mairie serait lui faire porter une limite de la notion.
   const reparableParElle = inventaire.some(reparableParLHeure);
+  const positionPrincipale = (corps: "soleil" | "lune", intitule: string) => {
+    const position = positions.find((p) => p.cle === corps);
+    if (position) return { cle: corps, intitule, valeur: position.valeur, calcule: true } as const;
+    const absence = theme.absents.find((a) => a.corps === corps);
+    const feminin = corps === "lune";
+    return {
+      cle: corps,
+      intitule,
+      valeur:
+        absence?.raison === "signe_ambigu_sans_heure"
+          ? `Indéterminé${feminin ? "e" : ""} sans heure`
+          : "Indisponible avec les données actuelles",
+      calcule: false,
+    } as const;
+  };
+  const ascendant = angles.find((angle) => angle.intitule === "Ascendant");
+  const manqueAngles = inventaire.find((manque) => manque.quoi === "angles");
+  const reperesPrincipaux = Object.freeze([
+    positionPrincipale("soleil", "Soleil"),
+    {
+      cle: "ascendant" as const,
+      intitule: "Ascendant",
+      valeur: ascendant?.valeur ??
+        (manqueAngles && reparableParLHeure(manqueAngles)
+          ? "Indéterminé sans heure"
+          : "Indisponible avec les données actuelles"),
+      calcule: Boolean(ascendant),
+    },
+    positionPrincipale("lune", "Lune"),
+  ]);
 
   return Object.freeze({
     indisponible: null,
@@ -572,6 +642,7 @@ export function sectionCiel(
     angles: Object.freeze(angles),
     cuspides: Object.freeze(cuspides),
     manques: Object.freeze(manques),
+    reperesPrincipaux,
     sansHeure: reparableParElle
       ? Object.freeze({
           appel: BULLE_SANS_HEURE,

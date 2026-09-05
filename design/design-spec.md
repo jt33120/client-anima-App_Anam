@@ -61,14 +61,36 @@ et des bordures — jamais d’un empilement d’effets.
 
 Le glyphe de profil existant est conservé comme asset de navigation déjà établi. Les trois
 portes de la région « Aujourd’hui » emploient une unique famille de glyphes SVG au trait, sans bibliothèque externe
-ni emoji. « Mon arbre » emploie exclusivement le moteur Canvas issu du handoff lunaire canonique :
+ni emoji. « Mon évolution » emploie exclusivement le moteur Canvas issu du handoff lunaire canonique :
 ni PNG de référence, ni ancien arbre SVG alternatif.
 
-## 8. Aujourd’hui, Psychologie et Anam
+## 8. Direction approuvée — nuit douce + papier lumineux
+
+La variante B a été retenue le 2026-09-05 pour le programme de revue clientèle. Elle ne crée pas
+un thème jour : le monde reste une nuit navy continue, mais les contenus structurés prennent place
+sur de grandes surfaces papier Ivory. Ce contraste de matière rend la lecture plus claire sans
+effacer l'identité lunaire.
+
+- Le fond de scène reste `--fond`. Une page ne remplace pas localement le ciel par une couleur
+  claire plein écran.
+- Les cartes de lecture et les disclosures structurants emploient `--papier`, `--sur-papier` et
+  `--sur-papier-doux`. Les aplats Sky du quotidien conservent leur rôle distinct `--jour`.
+- Beige, Sky et Periwinkle structurent bordures, illustrations et accents. Aucun pastel ne porte du
+  texte sans paire de contraste mesurée.
+- Une surface papier a un contour net, un rayon du système et une seule ombre posée. Elle ne reçoit
+  ni flou, ni verre translucide, ni texture qui réduise le contraste.
+- Les composants de référence sont : carte papier, bouton primaire, bouton secondaire, disclosure,
+  conteneur d'illustration et état vide/indisponible. Leurs états focus, contraste renforcé et
+  mouvement réduit font partie de la composition, pas d'une retouche ultérieure.
+- L'arbre domine le portail. Le lotus et les étoiles restent des décors statiques ou calmement
+  bornés ; aucune seconde couche de particules animées ne concurrence la scène.
+
+## 9. Aujourd’hui, Psychologie et Anam
 
 - « Aujourd’hui » (la région d’accueil, nommée « Moi » jusqu’au 2026-09-02) commence par le jour, le
-  ciel et le mantra ; son entête interne dit « Ce que le jour propose », pour ne pas répéter le nom
-  de la région sur le même écran. Un fondu vertical conduit ensuite à trois
+  ciel et le mantra ; son entête interne dit exactement « Mon parcours du jour ». Les cartes portent
+  « Ton ciel du jour » et « Mon mantra du jour ». Un fondu vertical conduit ensuite à « Mon monde
+  intérieur » puis « Mes univers », avec trois
   portes stables : Astrologie, Numérologie et Psychologie. Human Design vit dans Psychologie avec
   l'Ennéagramme et Big Five ; il n'est pas dupliqué comme univers de premier rang.
 - Une porte est une surface locale entière, avec glyphe, intitulé, phrase courte et destination.
@@ -76,12 +98,16 @@ ni PNG de référence, ni ancien arbre SVG alternatif.
 - La halte Psychologie distingue visuellement ce qui est disponible de ce dont la méthode ou le
   moteur reste à valider. Un futur outil n’imite jamais un résultat.
 - Dans Anam, l’arbre persistant s’éteint totalement. Le ciel reste visible, le fil garde ses voiles
-  locaux et un repère « Aujourd’hui » sépare le nouveau jour sans devenir une carte.
+  locaux et un repère « Aujourd’hui » sépare le nouveau jour sans devenir une carte. Quand aucun
+  tour utilisateur n'existe, l'introduction statique est exactement : « Confie ici ce que tu portes
+  en toi. Un espace pour te comprendre, évoluer, te dépasser et révéler la personne que tu es
+  appelée à devenir. » Elle n'est ni persistée ni rejouée comme un message.
 
-## 9. Non-buts
+## 10. Non-buts
 
-Pas de nouveau thème, pas de navigation imbriquée, pas d’animation élaborée et pas de
-déplacement de la sortie rapide hors de `/aide` dans cette tranche.
+Pas de thème jour, pas de navigation imbriquée, pas d’animation élaborée, pas de personnalisation du
+mantra, pas de réflexion Ennéagramme alimentée par la mémoire d'Anam et pas de déplacement de la
+sortie rapide hors de `/aide` dans cette tranche.
 
 Amendement du 2026-09-02 : ce non-but disait aussi « pas de nouvelle palette ». Il ne tient plus
 depuis le retour terrain de Julian du 2026-09-01, palette « Soft Balance » à l’appui (Ivory
@@ -95,4 +121,5 @@ consommé depuis E5-S2 par le halo et la couche nébuleuse du ciel de `render/mo
 radiaux statiques ; les couleurs en dur de `monde`, `guide`, `reperes` et `reglages` sont passées
 aux jetons, gardé par `tests/couleurs-tokenisees.test.ts`).
 Le mode sombre reste natif : ce n’est toujours pas un nouveau thème, et « pas de thème jour » reste
-un non-but.
+un non-but. L'amendement est désormais complété par la décision du 2026-09-05 : Ivory devient une
+surface de lecture native locale (`--papier`), sans devenir le fond du monde.

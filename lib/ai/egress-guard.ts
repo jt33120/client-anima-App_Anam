@@ -30,6 +30,17 @@ export type ResultatEgressFlux =
   | { bloque: false; flux: AsyncIterable<EvenementIa> }
   | { bloque: true; raison: RaisonRefus };
 
+/** Droits vivants requis pour produire OU relire un contenu dérivé art. 9 déjà mis en cache. */
+export async function verifierDroitsArt9(
+  supabase: SupabaseClient,
+): Promise<Extract<RaisonRefus, "consentement" | "minorite"> | null> {
+  const { data: consenti, error: eConsent } = await supabase.rpc("a_consenti_art9");
+  if (eConsent || consenti !== true) return "consentement";
+  const { data: barre, error: eBarre } = await supabase.rpc("est_barre_minorite");
+  if (eBarre || barre === true) return "minorite";
+  return null;
+}
+
 /**
  * Exécute les trois gardes art. 9, dans l'ordre, sur une requête. Retourne la raison de blocage
  * (ou `null` si tout passe). Partagé par les deux variantes d'egress (envoi / flux) → une seule
@@ -43,14 +54,8 @@ async function verifierGardesArt9(
   if (!requete.contientArt9) return null;
   // 1) ZDR de l'adaptateur lié (agnostique au fournisseur, AD-3).
   if (!adaptateur.estZdrProuve()) return "zdr";
-  // 2) Consentement vivant, sous RLS (auth.uid()).
-  const { data: consenti, error: eConsent } = await supabase.rpc("a_consenti_art9");
-  if (eConsent || consenti !== true) return "consentement";
-  // 3) Barrière de minorité (Story 1.9) : un compte suspendu ne doit PLUS aucun échange.
-  //    Fail-safe : une erreur RPC bloque aussi (dernier await avant l'envoi).
-  const { data: barre, error: eBarre } = await supabase.rpc("est_barre_minorite");
-  if (eBarre || barre === true) return "minorite";
-  return null;
+  // 2–3) Consentement vivant puis barrière de minorité, sous RLS (`auth.uid()`).
+  return verifierDroitsArt9(supabase);
 }
 
 export async function envoyerSousEgressArt9(args: {
