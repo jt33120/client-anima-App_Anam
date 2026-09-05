@@ -152,7 +152,16 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
   },
   {
     region: "arbre",
-    cible: "[class*='troncSeul'], [class*='canevas']",
+    /* ⚠️ CETTE ÉTAPE DÉSIGNAIT TOUT L'ÉCRAN, ET C'EST POURQUOI LA BULLE LE RECOUVRAIT (2026-09-05).
+       Le sélecteur lisait `[class*='troncSeul'], [class*='canevas']`. `troncSeul` n'existe NULLE
+       PART dans le produit — et une liste séparée par des virgules n'est PAS un repli ordonné :
+       `document.querySelector` rend le premier élément dans l'ordre du DOCUMENT, pas de la liste.
+       C'était donc toujours `.canevas` — `flex: 1`, 70 à 81 % de la hauteur — qui était désigné.
+       Il ne restait alors pas la place d'une bulle ni dessous ni dessus, et le repli
+       `Math.max(16, …)` de `render/guide/Guide.tsx` la collait en haut : PAR-DESSUS le projecteur.
+       On vise la graine elle-même (`render/arbre/ArbreInteractif.tsx`, `.graineAttente`), qui est
+       ce que le titre et le texte annoncent. Un seul sélecteur, pour qu'il n'y ait rien à départager. */
+    cible: "[class*='graineAttente']",
     titre: "Ta graine",
     /* La seconde phrase est celle du fondateur (« au fur et à mesure que tu as des compréhensions,
        l'arbre grandit et évolue avec toi »), reformulée juste assez pour la grammaire. Elle

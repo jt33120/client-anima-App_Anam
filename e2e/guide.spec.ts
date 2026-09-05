@@ -85,6 +85,7 @@ test.describe("Le tour guidé", () => {
     // barre, dans l'étape qui parle de la barre. Le texte est de la copie : il changera encore.
     await arriverDansLeMonde(page);
     const chevauchements: string[] = [];
+    const designees: string[] = [];
     for (let i = 0; i < 6; i++) {
       const r = await page.evaluate(() => {
         const trou = document.querySelector("[class*='_trou']");
@@ -99,9 +100,22 @@ test.describe("Le tour guidé", () => {
           a.bottom > b.top &&
           a.left < b.right &&
           a.right > b.left;
-        return recouvre ? titre : null;
+        // La hauteur du trou est relevée pour la garde de dégénérescence ci-dessous : un
+        // projecteur qui couvre l'écran entier ne « désigne » plus rien.
+        return { titre, recouvre, part: a.height / window.innerHeight };
       });
-      if (r) chevauchements.push(r);
+      if (r) {
+        designees.push(r.titre);
+        if (r.recouvre) chevauchements.push(r.titre);
+        // ⚠️ UN PROJECTEUR PLEIN ÉCRAN N'EST PAS UNE DÉSIGNATION (posé le 2026-09-05). C'est
+        // exactement l'état d'où venait le défaut : la cible tombait sur `.canevas`, qui occupe
+        // 70 à 81 % de la hauteur, et il ne restait de place pour la bulle NI dessous NI dessus.
+        // Sans cette borne, corriger le chevauchement en agrandissant le trou passerait au vert.
+        expect(
+          r.part,
+          `le projecteur de « ${r.titre} » couvre ${Math.round(r.part * 100)} % de la hauteur : il ne désigne plus, il éclaire tout`,
+        ).toBeLessThan(0.6);
+      }
       const suivant = dialogue(page).getByRole("button", {
         name: /Suivant|J’ai compris/,
       });
@@ -113,6 +127,14 @@ test.describe("Le tour guidé", () => {
       chevauchements,
       `la bulle recouvre ce qu’elle désigne : ${chevauchements.join(", ")}`,
     ).toEqual([]);
+    // ⚠️ ET LA GARDE QUI EMPÊCHE CE TEST DE SE VIDER. « Aucun chevauchement » est AUSSI vrai quand
+    // l'étape ne s'affiche plus : `Guide.tsx` franchit sans bruit une étape dont la cible est
+    // absente. Le correctif du 2026-09-05 change précisément cette cible — si elle se démonte un
+    // jour, on veut une ligne rouge, pas un test vert sur un tour amputé.
+    expect(
+      designees,
+      `le tour n’a pas désigné « Ta graine » : étapes vues = ${designees.join(", ") || "aucune"}`,
+    ).toContain("Ta graine");
   });
 
   test("[IL VOYAGE] « Suivant » emmène dans les autres régions, puis se termine", async ({
@@ -147,7 +169,7 @@ test.describe("Le tour guidé", () => {
     await expect(dialogue(page), "le tour ne se termine jamais").toHaveCount(0);
   });
 
-  test("[IL NE REVIENT PAS SEUL] mais il se refait depuis Repères", async ({
+  test("[IL NE REVIENT PAS SEUL] mais il se refait depuis l’aide", async ({
     page,
   }) => {
     await arriverDansLeMonde(page);
@@ -164,7 +186,20 @@ test.describe("Le tour guidé", () => {
       "une aide qu’on ne peut pas faire taire cesse d’en être une",
     ).toHaveCount(0);
 
-    await page.getByRole("link", { name: "Repères" }).click();
+    // ⚠️ CE TEST CLIQUAIT LE MAUVAIS LIEN PENDANT DES JOURS, ET IL LE FAISAIT SANS BRUIT
+    // (mesuré le 2026-09-05). Il cherchait `getByRole("link", { name: "Repères" })`. Repères a été
+    // replié dans `/aide` le 2026-08-23 : plus aucun lien ne porte ce nom. Mais Playwright compare
+    // par SOUS-CHAÎNE quand on ne dit pas `exact` — et la porte d'univers « Psychologie » porte
+    // pour accroche « Ton ennéagramme et des repères dont la méthode reste visible »
+    // (`lib/domain/univers-moi.ts`). Le locator résolvait donc cette porte, le clic RÉUSSISSAIT, et
+    // le test quittait la scène vers `/psychologie` — d'où l'expiration sur la ligne SUIVANTE, pas
+    // sur celle-ci. C'est aussi pourquoi `tests/e2e-libelles-vivants.test.ts` n'a rien vu : le
+    // libellé existe bel et bien dans le produit, simplement ailleurs.
+    //
+    // On passe donc par la porte de secours PERMANENTE (`render/surimpression.tsx`,
+    // `aria-label="Aide"`, FR-077), et `exact` ferme la classe : plus aucun locator de ce fichier
+    // ne peut se recentrer par accident sur un texte qui contient le mot cherché.
+    await page.getByRole("link", { name: "Aide", exact: true }).click();
     await page.getByRole("link", { name: /Faire le tour/ }).click();
     await page.waitForTimeout(1600);
     await expect(
