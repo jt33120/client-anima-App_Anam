@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { adresseNeuve, codeDans, courrielPour, viderLaBoite } from "./_boite-aux-lettres";
+import { boutonDemanderCode, boutonEntrerAvecCode, champAdresse, champCode } from "./_porte";
 
 /**
  * entree.spec.ts — LA PORTE, TRAVERSÉE COMME UNE PERSONNE LA TRAVERSE
@@ -23,21 +24,21 @@ test.describe("La porte d'entrée", () => {
     await viderLaBoite();
 
     await page.goto("/entrer");
-    await page.getByLabel(/adresse e-mail/i).fill(adresse);
-    await page.getByRole("button", { name: /recevoir mon lien/i }).click();
+    await champAdresse(page).fill(adresse);
+    await boutonDemanderCode(page).click();
 
-    await expect(page.getByLabel(/code reçu/i)).toBeVisible();
+    await expect(champCode(page)).toBeVisible();
 
     // ⚠️ LE GESTE QUI CASSAIT TOUT. Sur un téléphone, on bascule sur son courrier et on revient ;
     // iOS a très souvent rechargé l'onglet entre-temps. `reload()` est exactement ça.
     await page.reload();
 
     await expect(
-      page.getByLabel(/code reçu/i),
+      champCode(page),
       "l'écran de code n'a pas survécu au rechargement — le code reçu est intapable",
     ).toBeVisible();
     await expect(
-      page.getByLabel(/adresse e-mail/i),
+      champAdresse(page),
       "la page est repartie demander une adresse, avec un code déjà en main",
     ).toHaveCount(0);
     // L'adresse visée reste affichée : c'est ce qui permet de voir, AVANT de taper, que le code
@@ -50,13 +51,13 @@ test.describe("La porte d'entrée", () => {
     await viderLaBoite();
 
     await page.goto("/entrer");
-    await page.getByLabel(/adresse e-mail/i).fill(adresse);
-    await page.getByRole("button", { name: /recevoir mon lien/i }).click();
-    await expect(page.getByLabel(/code reçu/i)).toBeVisible();
+    await champAdresse(page).fill(adresse);
+    await boutonDemanderCode(page).click();
+    await expect(champCode(page)).toBeVisible();
 
     const code = codeDans((await courrielPour(adresse)).corps);
-    await page.getByLabel(/code reçu/i).fill(code);
-    await page.getByRole("button", { name: /entrer avec ce code/i }).click();
+    await champCode(page).fill(code);
+    await boutonEntrerAvecCode(page).click();
 
     // Un compte neuf n'a ni date de naissance ni consentement : la machine d'état l'envoie
     // d'abord déclarer son âge. Arriver ailleurs signifierait qu'une porte du tunnel a sauté.
@@ -72,17 +73,17 @@ test.describe("La porte d'entrée", () => {
     await viderLaBoite();
 
     await page.goto("/entrer");
-    await page.getByLabel(/adresse e-mail/i).fill(adresse);
-    await page.getByRole("button", { name: /recevoir mon lien/i }).click();
-    await expect(page.getByLabel(/code reçu/i)).toBeVisible();
+    await champAdresse(page).fill(adresse);
+    await boutonDemanderCode(page).click();
+    await expect(champCode(page)).toBeVisible();
 
     await page.getByRole("button", { name: /recommencer/i }).click();
 
-    await expect(page.getByLabel(/adresse e-mail/i)).toBeVisible();
+    await expect(champAdresse(page)).toBeVisible();
     // Et l'abandon doit TENIR au rechargement : si le cookie survivait, on serait renvoyée sur
     // l'écran de code dont on vient de sortir.
     await page.reload();
-    await expect(page.getByLabel(/adresse e-mail/i)).toBeVisible();
+    await expect(champAdresse(page)).toBeVisible();
   });
 
   test("un code faux ne fait pas perdre l'écran où le retaper", async ({ page }) => {
@@ -90,19 +91,19 @@ test.describe("La porte d'entrée", () => {
     await viderLaBoite();
 
     await page.goto("/entrer");
-    await page.getByLabel(/adresse e-mail/i).fill(adresse);
-    await page.getByRole("button", { name: /recevoir mon lien/i }).click();
-    await expect(page.getByLabel(/code reçu/i)).toBeVisible();
+    await champAdresse(page).fill(adresse);
+    await boutonDemanderCode(page).click();
+    await expect(champCode(page)).toBeVisible();
 
     const vrai = codeDans((await courrielPour(adresse)).corps);
     // Un code VOISIN, pas un code absurde : on éprouve la comparaison, pas la longueur.
     const faux = String((Number(vrai) + 1) % 1_000_000).padStart(vrai.length, "0");
-    await page.getByLabel(/code reçu/i).fill(faux);
-    await page.getByRole("button", { name: /entrer avec ce code/i }).click();
+    await champCode(page).fill(faux);
+    await boutonEntrerAvecCode(page).click();
 
     await expect(page.getByText(/ne correspond pas/i)).toBeVisible();
     await expect(
-      page.getByLabel(/code reçu/i),
+      champCode(page),
       "l'erreur a emporté l'écran : il faudrait redemander un code pour une simple faute de frappe",
     ).toBeVisible();
   });
@@ -112,9 +113,9 @@ test.describe("La porte d'entrée", () => {
     await viderLaBoite();
 
     await page.goto("/entrer");
-    await page.getByLabel(/adresse e-mail/i).fill(adresse);
-    await page.getByRole("button", { name: /recevoir mon lien/i }).click();
-    await expect(page.getByLabel(/code reçu/i)).toBeVisible();
+    await champAdresse(page).fill(adresse);
+    await boutonDemanderCode(page).click();
+    await expect(champCode(page)).toBeVisible();
 
     // « Laisse-moi ton adresse » au-dessus de « c'est parti vers … » ferait dire à l'écran deux
     // choses contraires en même temps.
