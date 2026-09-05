@@ -112,6 +112,28 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: LOCAL_ANON,
       SUPABASE_SECRET_KEY: LOCAL_SERVICE,
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+      /**
+       * ⚠️ LA SURCOUCHE DE `next dev` S'ÉTEINT ICI, ET POUR CETTE SUITE SEULEMENT (2026-09-05).
+       *
+       * Une fois le tunnel réparé, dix-neuf échecs restaient. TROIS n'étaient pas des défauts du
+       * produit mais l'`<nextjs-portal>` de la surcouche :
+       *   · `mobile › fluidite` ×2 — « <nextjs-portal></nextjs-portal> … subtree intercepts
+       *     pointer events » : le portail, POURTANT VIDE, avalait le clic sur la barre de régions ;
+       *   · `bureau › clavier [FR-077]` — « la surcouche de développement de Next a gardé le focus
+       *     sur 1 tabulation(s) ». Le test le dit dans son propre message : « Ce n'est PAS un
+       *     défaut d'accessibilité. »
+       *
+       * Un harnais qui accuse le produit de ses propres artefacts envoie chercher au mauvais
+       * endroit — c'est la même faute que les 45 secondes muettes, en plus sournois.
+       *
+       * ⚠️ ET `devIndicators: false` NE SUFFIT PAS — essayé, mesuré, écarté le même jour. Le
+       * réglage documenté retire l'INDICATEUR, pas le portail : sonde sur `/aide`, un portail
+       * avant, un portail après. C'est ce drapeau-ci qui le retire (1 → 0, corps de page inchangé
+       * à 160 octets près). Il est `NEXT_PRIVATE_*`, donc interne à Next et non garanti : le jour
+       * où il cesse d'agir, les trois mêmes échecs reviendront en nommant le portail, et cette
+       * note dira quoi chercher.
+       */
+      NEXT_PRIVATE_DISABLE_DEV_OVERLAY_UX: "1",
     },
   },
 });
