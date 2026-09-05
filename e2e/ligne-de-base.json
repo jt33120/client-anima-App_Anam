@@ -9,10 +9,8 @@
   "echecs_tolerés": {
     "mobile › e2e/barre-basse.spec.ts": 2,
     "mobile › e2e/fluidite.spec.ts": 2,
-    "mobile › e2e/guide.spec.ts": 1,
     "mobile › e2e/reperes.spec.ts": 3,
     "mobile › e2e/seuil.spec.ts": 1,
-    "bureau › e2e/guide.spec.ts": 1,
     "bureau › e2e/reperes.spec.ts": 3
   },
   "_gains_du_2026-08-26": {
@@ -21,6 +19,11 @@
     "noms de régions triés des deux côtés (Story 7.9)": "mobile › glissement : 1 échec → 0. Le test comparait une liste triée à une liste qui ne l'était pas.",
     "_regle": "Ces trois lignes ont été RETIRÉES de la tolérance : tout nouvel échec y sera désormais signalé comme une régression. C'est le seul sens dans lequel ce fichier bouge."
   },
+  "_gains_du_2026-09-05": {
+    "guide.spec.ts, les deux projets : 1 échec toléré → 0, lignes RETIRÉES": "Deux défauts, l'un dans le produit, l'autre dans le test. PRODUIT : l'étape « Ta graine » visait `[class*='troncSeul'], [class*='canevas']`. `troncSeul` n'existe nulle part, et une liste à virgules n'est PAS un repli ordonné — `querySelector` rend le premier élément dans l'ordre du DOCUMENT. C'était donc toujours `.canevas` (70 à 81 % de la hauteur) qui était désigné : plus de place pour la bulle ni dessous ni dessus, et le repli `Math.max(16, …)` de `Guide.tsx` la collait par-dessus le projecteur. TEST : « [IL NE REVIENT PAS SEUL] » cherchait un lien « Repères », retiré le 2026-08-23. Playwright compare par SOUS-CHAÎNE : l'accroche de la porte « Psychologie » contient « des repères », le locator résolvait cette porte, le clic RÉUSSISSAIT et quittait la scène — d'où l'expiration sur la ligne suivante. On passe désormais par la porte de secours permanente (`aria-label=\"Aide\"`, FR-077) avec `exact`.",
+    "_la_garde_qui_manquait": "`tests/guide-cibles.test.ts` passait `some` sur les alternatives d'un sélecteur : une seule vivante suffisait, et la garde était donc VERTE sur `troncSeul, canevas`. Elle exige `every` depuis le 2026-09-05, vérifié par mutation.",
+    "_et_pourquoi_ces_deux_lignes_partent_MAINTENANT": "Parce que la tolérance a masqué une régression le jour même. Une première version de la nouvelle garde « le projecteur ne couvre pas tout » mesurait la HAUTEUR : au-delà de 1024 px, `nav[aria-label='Régions']` est un rail vertical pleine hauteur, et `bureau › guide.spec.ts` a rougi — mais l'échec a pris la place que l'ancien venait de libérer, et le comparateur n'a rien dit. Une tolérance qu'on n'abaisse pas après l'avoir gagnée devient l'endroit exact où le défaut suivant se cache."
+  },
   "_mesure_des_couches_2026-08-26": {
     "_quoi": "Une sonde temporaire (e2e/_sonde-couches.spec.ts) a éteint chaque couche de la scène à son tour, dans le même passage, chacune avec son témoin. Référence = une halte statique du même produit.",
     "mobile (référence 62 im/s)": "seuil : tel quel 5 | sans étoiles 62 | sans arbre 8 | sans grain 10. « Moi » : tel quel 16 | sans étoiles 62 | sans arbre 7 | sans grain 29.",
@@ -28,6 +31,8 @@
     "_verdict": "LE CHAMP D'ÉTOILES EST LA CAUSE, À LUI SEUL. Le retirer rend TOUTE la vitesse de référence sur les deux appareils — 5 → 62 au seuil sur mobile. Quatre-vingts <span> portant chacun une animation `opacity` infinie coûtent 57 des 62 images par seconde.",
     "_pourquoi_les_autres_colonnes_ne_disent_rien": "« sans arbre » et « sans grain » font parfois BAISSER la mesure : éteindre un élément force une reconstruction de l'arbre de couches que la demi-seconde d'attente ne laisse pas retomber. Seuls les deux écarts francs et reproductibles — les colonnes « sans étoiles » — sont conclusifs.",
     "_ce_que_ça_réexplique": "Le `mix-blend-mode` du grain coûtait cher PARCE QU'il devait relire un écran que les étoiles repeignaient déjà. Le `drop-shadow` de l'arbre a été innocenté parce qu'il n'y était pour rien. Et la réduction du tampon du canevas a donné le contraire de la prédiction écrite : ce n'est pas l'arbre qui coûte, c'est la SURFACE que les étoiles obligent à repeindre — un tampon plus petit rend cette surface moins chère à refaire, y compris là où l'arbre est invisible.",
-    "_reste_à_trancher": "Le remède. Si le défaut est la non-promotion en couches de composition, `will-change: opacity` suffit — aucune étoile perdue, aucun changement visuel. Si quatre-vingts couches promues dépassent le budget du compositeur, il faudra réduire leur nombre. Mesuré par la sonde 2, pas décidé au raisonnement."
+    "_reste_à_trancher": "Le remède. Si le défaut est la non-promotion en couches de composition, `will-change: opacity` suffit — aucune étoile perdue, aucun changement visuel. Si quatre-vingts couches promues dépassent le budget du compositeur, il faudra réduire leur nombre. Mesuré par la sonde 2, pas décidé au raisonnement.",
+    "⚠️_CE_VERDICT_EST_PÉRIMÉ_2026-09-05": "Il porte sur un code qui n'existe plus, et il faut le relire avec ça en tête. (1) `will-change: opacity` A ÉTÉ POSÉ sur les étoiles le 2026-08-26 même (798b829, vérifié ancêtre de HEAD) : la moitié du « reste à trancher » est donc déjà jouée, et personne n'a re-mesuré. (2) Deux animations d'OUVERTURE sont arrivées depuis — le remplissage de l'avatar du seuil (2026-09-02) et le portail plein écran (2026-09-04, 2 200 + 700 ms). (3) `fluidite.spec.ts` était le SEUL fichier de la suite à renaviguer vers `/` sans appeler `attendreLePortail` : les trois relevés rouges étaient exactement les trois fenêtres qui tombaient dans ce transitoire. Corrigé le 2026-09-05.",
+    "_et_la_mesure_a_EMPIRÉ,_ce_qui_est_le_vrai_résultat": "Prédiction posée avant le passage : en attendant le portail, les relevés devaient REMONTER au-dessus du seuil. FAUX. Le seuil est monté (17 → 23) mais les autres régions ont baissé — « Aujourd'hui » 47 → 30, « Anam » 47 → 26, le tour 33 → 27, et en défilant 21 → 15 et 45 → 16. L'explication la plus simple est que le voile plein écran MASQUAIT le coût au lieu de le causer : ce que la suite mesure maintenant est la scène elle-même. Un seul passage ne sépare pas cet effet de la variance du runner — mais dans les deux cas, le champ d'étoiles redevient le sujet, et c'est la sonde 2 qui doit trancher, pas ce fichier."
   }
 }

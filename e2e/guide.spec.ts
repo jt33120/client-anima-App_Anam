@@ -17,6 +17,9 @@ import { ouvrirUnCompteNeuf } from "./_entrer";
 
 const dialogue = (page: Page) => page.getByRole("dialog");
 
+/** La graine de l'étape 0 de l'arbre — même sélecteur que la cible du tour (`copie-guide.ts`). */
+const GRAINE = "[class*='graineAttente']";
+
 /** Le rectangle du trou de projecteur, et celui de l'élément qu'il prétend désigner. */
 const coincidence = (page: Page, selecteurCible: string) =>
   page.evaluate((sel) => {
@@ -86,6 +89,8 @@ test.describe("Le tour guidé", () => {
     await arriverDansLeMonde(page);
     const chevauchements: string[] = [];
     const designees: string[] = [];
+    const tropLarges: string[] = [];
+    let coincidenceGraine: Awaited<ReturnType<typeof coincidence>> = null;
     for (let i = 0; i < 6; i++) {
       const r = await page.evaluate(() => {
         const trou = document.querySelector("[class*='_trou']");
@@ -100,21 +105,21 @@ test.describe("Le tour guidé", () => {
           a.bottom > b.top &&
           a.left < b.right &&
           a.right > b.left;
-        // La hauteur du trou est relevée pour la garde de dégénérescence ci-dessous : un
-        // projecteur qui couvre l'écran entier ne « désigne » plus rien.
-        return { titre, recouvre, part: a.height / window.innerHeight };
+        // L'AIRE du trou, rapportée à celle du cadre — pas sa hauteur. Voir la garde plus bas.
+        return {
+          titre,
+          recouvre,
+          part: (a.width * a.height) / (window.innerWidth * window.innerHeight),
+        };
       });
       if (r) {
         designees.push(r.titre);
         if (r.recouvre) chevauchements.push(r.titre);
-        // ⚠️ UN PROJECTEUR PLEIN ÉCRAN N'EST PAS UNE DÉSIGNATION (posé le 2026-09-05). C'est
-        // exactement l'état d'où venait le défaut : la cible tombait sur `.canevas`, qui occupe
-        // 70 à 81 % de la hauteur, et il ne restait de place pour la bulle NI dessous NI dessus.
-        // Sans cette borne, corriger le chevauchement en agrandissant le trou passerait au vert.
-        expect(
-          r.part,
-          `le projecteur de « ${r.titre} » couvre ${Math.round(r.part * 100)} % de la hauteur : il ne désigne plus, il éclaire tout`,
-        ).toBeLessThan(0.6);
+        if (r.part > 0.6) tropLarges.push(`${r.titre} (${Math.round(r.part * 100)} %)`);
+        // La désignation de la graine est MESURÉE, pas déduite du titre de la bulle : `designees`
+        // ne lit que la copie, et un sélecteur qui viserait un autre élément de l'arbre afficherait
+        // le même titre sans que rien ne rougisse. Même contrôle et même tolérance que « Ta barre ».
+        if (r.titre === "Ta graine") coincidenceGraine = await coincidence(page, GRAINE);
       }
       const suivant = dialogue(page).getByRole("button", {
         name: /Suivant|J’ai compris/,
@@ -135,6 +140,38 @@ test.describe("Le tour guidé", () => {
       designees,
       `le tour n’a pas désigné « Ta graine » : étapes vues = ${designees.join(", ") || "aucune"}`,
     ).toContain("Ta graine");
+
+    // ⚠️ UN PROJECTEUR QUI ÉCLAIRE TOUT NE DÉSIGNE PLUS RIEN — ET C'EST L'AIRE QUI LE DIT, PAS LA
+    // HAUTEUR. Première version de cette garde, le 2026-09-05 : `hauteur / hauteur du cadre`. Elle
+    // a rougi le jour même sur `bureau › Ta barre`, et à raison de sa mesure — au-delà de 1024 px,
+    // `nav[aria-label='Régions']` n'est plus la barre du bas mais un rail VERTICAL qui prend toute
+    // la hauteur (`render/monde.module.css`, et `e2e/barre-basse.spec.ts` mesure déjà
+    // `nav.height > innerHeight * 0.8`). Un rail de 134 px de large sur 900 de haut est une
+    // désignation parfaitement honnête ; mesurée sur un seul axe, elle valait 100 %.
+    //
+    // L'aire sépare les deux sans ambiguïté : le rail bureau et la barre mobile pèsent moins de
+    // 10 % du cadre, la graine moins de 1 %, tandis que `.canevas` — la cible morte qui a causé
+    // tout ceci — en occupait 70 à 81 % sur toute la largeur.
+    //
+    // ⚠️ ET ELLE S'ACCUMULE AU LIEU DE LEVER DANS LA BOUCLE. Posée comme un `expect` à l'intérieur,
+    // elle tuait le test à la deuxième étape : les deux gardes ci-dessus n'étaient alors JAMAIS
+    // évaluées sur bureau, et l'échec se glissait dans la tolérance que l'ancien venait de libérer
+    // — invisible pour le comparateur, qui compte par fichier (`scripts/e2e-ligne-de-base.mjs`).
+    expect(
+      tropLarges,
+      `un projecteur éclaire presque tout le cadre au lieu de désigner : ${tropLarges.join(", ")}`,
+    ).toEqual([]);
+
+    expect(
+      coincidenceGraine,
+      "l’étape « Ta graine » n’a pas trouvé la graine : le projecteur ne coïncide avec rien",
+    ).not.toBeNull();
+    for (const [nom, valeur] of Object.entries(coincidenceGraine!)) {
+      expect(
+        valeur,
+        `le projecteur de « Ta graine » est à côté de la graine (${nom} = ${valeur} px)`,
+      ).toBeLessThanOrEqual(14);
+    }
   });
 
   test("[IL VOYAGE] « Suivant » emmène dans les autres régions, puis se termine", async ({
