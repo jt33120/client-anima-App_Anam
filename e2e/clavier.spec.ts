@@ -57,8 +57,31 @@ type Arret = {
  * c'est-à-dire que le rendu du produit ait eu lieu. Si `<main>` n'arrive jamais, l'attente échoue —
  * et ça, c'en serait un vrai défaut.
  */
+/**
+ * ⚠️ ELLE ATTENDAIT `main`, ET LE SQUELETTE D'ATTENTE EST UN `main` (mesuré le 2026-09-05).
+ *
+ * `/memoire` et `/reglages` sont les DEUX SEULES routes de la boucle ci-dessous à porter un
+ * `loading.tsx` (`/mes-donnees`, `/abonnement` et `/aide` n'en ont pas, et `render/HalteEnAttente.tsx`
+ * écrit pourquoi). Cette frontière rend `<main aria-hidden="true">` avec trois blocs vides et
+ * ZÉRO élément focusable. L'attente était donc satisfaite par le squelette : `traverser` pressait
+ * Tab dans une page sans arrêt, relevait un tableau vide, et DEUX tests concluaient que ces deux
+ * haltes étaient « inatteignables au clavier ». Elles vont parfaitement bien.
+ *
+ * La preuve n'a rien coûté : `playwright.config.ts` garde une capture par échec, et celle du run
+ * 33961544822 montre le squelette — un écran nu avec « Anam » au centre. C'est la troisième fois
+ * que ce fichier accuse le produit d'un défaut du HARNAIS (surcouche de dev le 26/08, routes non
+ * compilées le 26/08, squelette d'attente aujourd'hui) : à chaque fois parce que l'attente cédait
+ * sur quelque chose de plus faible que « le produit est là ».
+ *
+ * `aria-hidden="true"` est le discriminant, et il est sûr : sur les 38 `<main>` de `app/` et
+ * `render/`, `HalteEnAttente` est le SEUL à le porter. Un squelette qui deviendrait visible aux
+ * lecteurs d'écran ferait donc rougir ce test, ce qui est le bon sens de la garde.
+ */
 const attendreLeProduit = (page: Page) =>
-  page.locator("main").first().waitFor({ state: "visible", timeout: 20_000 });
+  page
+    .locator('main:not([aria-hidden="true"])')
+    .first()
+    .waitFor({ state: "visible", timeout: 20_000 });
 
 /**
  * Traverse l'écran à la touche Tab et relève, à CHAQUE arrêt, ce que le navigateur peint vraiment.

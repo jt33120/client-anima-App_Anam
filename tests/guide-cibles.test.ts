@@ -125,8 +125,21 @@ function exigence(part: string): { genre: "classe" | "href" | "balise"; jeton: s
   return { genre: "balise", jeton: part };
 }
 
+/**
+ * ⚠️ `every`, ET NON `some` — CORRIGÉ LE 2026-09-05, APRÈS QUE LE MUTANT A SURVÉCU À CETTE GARDE.
+ *
+ * L'étape « Ta graine » visait `[class*='troncSeul'], [class*='canevas']`. `troncSeul` n'existait
+ * nulle part ; `canevas`, oui. Avec `some`, une seule alternative vivante suffisait : la garde
+ * était VERTE sur un sélecteur à moitié mort, et le tour a désigné tout l'écran pendant des jours.
+ *
+ * Le raisonnement qui rend `every` obligatoire : une liste séparée par des virgules n'est PAS un
+ * repli ordonné. `document.querySelector("a, b")` rend le premier élément dans l'ordre du
+ * DOCUMENT, pas celui de la liste. Une alternative morte ne se contente donc pas d'être inutile —
+ * elle déguise en « on a prévu deux formes » ce qui n'en désigne qu'une, et jamais celle qu'on
+ * croit. Écrire deux alternatives, c'est promettre que les deux existent.
+ */
 function satisfaite(selecteur: string): boolean {
-  return selecteur.split(",").map((x) => x.trim()).some((part) => {
+  return selecteur.split(",").map((x) => x.trim()).every((part) => {
     const { genre, jeton } = exigence(part);
     if (genre === "href") return HREFS.has(jeton);
     if (genre === "classe") return [...CLASSES].some((c) => c.includes(jeton));

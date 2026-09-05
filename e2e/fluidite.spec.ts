@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { ouvrirUnCompteNeuf, passerLeTour, attendreLePortail } from "./_entrer";
 
 /**
  * fluidite.spec.ts — LA SCÈNE NE COÛTE PAS PLUS QU'UN DOCUMENT (mesuré le 2026-08-20)
@@ -24,6 +24,26 @@ import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
  * `conversation-attente.spec.ts`. On mesure donc d'abord une RÉFÉRENCE sur `/aide`, qui est un
  * document statique du même produit, puis on exige que la scène s'en approche. Le rapport, lui, ne
  * dépend d'aucune machine : avec le flou il valait 0,13 ; sans lui, 1,0.
+ *
+ * ══ ON ATTEND LE PORTAIL, ET C'EST CE FICHIER QUI L'OUBLIAIT (2026-09-05) ══════════════════════
+ *
+ * Trois relevés rougissaient sur mobile — seuil à 17 im/s, tour à 33, « Aujourd'hui » en défilant
+ * à 21 — et `e2e/ligne-de-base.json` en accusait le champ d'étoiles, d'après une sonde du
+ * 2026-08-26. Ce verdict portait sur un code qui n'existe plus : `will-change: opacity` a été posé
+ * sur les étoiles le jour même (798b829), PUIS deux animations d'ouverture sont arrivées — le
+ * remplissage de l'avatar du seuil (02/09) et le portail plein écran (04/09, 2 200 + 700 ms).
+ *
+ * ⚠️ ET LES TROIS FENÊTRES QUI ROUGISSAIENT ÉTAIENT EXACTEMENT LES TROIS QUI TOMBAIENT DEDANS.
+ * `PortailAnam` est monté sans condition sur `/` : chaque `page.goto("/")` relance le voile. Or la
+ * protection existe déjà — `_entrer.ts` appelle `attendreLePortail` à la fin de `ouvrirUnCompteNeuf`
+ * et au début de `entrerDansLaRegion`. Ce fichier-ci en sortait : il renavigue vers `/` APRÈS
+ * `ouvrirUnCompteNeuf`, donc hors de la garde que ce helper venait de poser, et trois fois.
+ * Le voile est `pointer-events: none`, donc le clic sur « commencer » n'est même pas retardé : rien
+ * ne signalait qu'on mesurait une animation d'ouverture au lieu de la scène au repos.
+ *
+ * On mesure donc après le portail, comme le reste de la suite. Ce que les relevés diront ensuite est
+ * une VRAIE mesure de la scène — et si elle rougit encore, alors seulement le champ d'étoiles
+ * redevient le sujet.
  */
 
 /** Images par seconde, mesurées sur 1,5 s de `requestAnimationFrame`. */
@@ -55,6 +75,8 @@ test("[LE COÛT PAR TRAME] la scène reste fluide sur chacune de ses régions", 
   expect(reference, "témoin : même un document statique ne tourne pas — la mesure ne dirait rien").toBeGreaterThan(8);
 
   await page.goto("/");
+  // ⚠️ ON ATTEND LE PORTAIL, COMME TOUT LE RESTE DE LA SUITE (posé le 2026-09-05). Voir l'en-tête.
+  await attendreLePortail(page);
   await page.waitForTimeout(1400);
   const releves: Record<string, number> = { seuil: await imagesParSeconde(page) };
 
@@ -111,6 +133,7 @@ test("[PENDANT LE TOUR AUSSI] l'écran qui apprend le produit ne doit pas saccad
   const reference = await imagesParSeconde(page);
 
   await page.goto("/");
+  await attendreLePortail(page); // voir l'en-tête : sans ça, on mesure le voile d'ouverture
   await page.getByRole("button", { name: /commencer/i }).click();
   await page.waitForTimeout(1500);
   await expect(page.getByRole("dialog"), "témoin : le tour n’est pas ouvert").toBeVisible();
@@ -174,6 +197,7 @@ test("[PENDANT UN DÉFILEMENT] un fond ne coûte rien au repos et tout quand la 
   expect(reference, "témoin : la référence elle-même ne tient pas — machine trop chargée").toBeGreaterThan(8);
 
   await page.goto("/");
+  await attendreLePortail(page); // voir l'en-tête : sans ça, on mesure le voile d'ouverture
   await page.getByRole("button", { name: /commencer/i }).click();
   await passerLeTour(page);
   const barre = page.getByRole("navigation", { name: "Régions" });
