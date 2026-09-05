@@ -138,7 +138,8 @@ describe("Story 2.8 — lexique interdit : CONTRÔLE NÉGATIF (épargne le légi
     "Le traitement de tes données est suspendu.", // « traitement » RGPD ≠ traiter
     "© Anima 2026 — tous droits réservés.", // revue 2.8 : glyphe typographique ≠ emoji
     "Marque déposée ™ et ®.", // revue 2.8 : idem
-    "Recevoir mon lien", // libellé UI neutre
+    "Recevoir mon lien", // libellé UI neutre (retiré du produit le 2026-08-28, gardé comme cas)
+    "Me reconnecter par e-mail", // le libellé VIVANT du bouton de /entrer (copie-entree.ts)
     "Ta date de naissance", // libellé UI neutre
     "Prévention du suicide", // libellé d'aide (organisme) — non médical d'Anam
     // ── Story 5.5 — ce que l'extension aux adjectifs cliniques ne doit PAS avaler ──────────────

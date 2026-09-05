@@ -58,6 +58,25 @@ export default defineConfig({
   globalSetup: "./e2e/_garde-de-cible.ts",
   use: {
     baseURL: process.env.ANIMA_URL ?? "http://localhost:3000",
+    /**
+     * ⚠️ LES DEUX BORNES QUI MANQUAIENT, ET QUI ONT COÛTÉ HUIT JOURS (2026-09-05).
+     *
+     * Playwright borne les ASSERTIONS (`expect.timeout` ci-dessus) et laisse les ACTIONS attendre
+     * SANS FIN : `actionTimeout` et `navigationTimeout` valent zéro par défaut. Un `click()` sur un
+     * locator qui ne résout plus rien consomme donc le plafond du TEST (45 s) et ne rend que
+     * « Test timeout of 45000ms exceeded. » — sans sélecteur, sans étape, sans pile.
+     *
+     * C'est exactement ce qui est arrivé : le bouton de `/entrer` renommé le 2026-08-28, quatre-
+     * vingt-dix tests morts, l'étape passée de 14 min à 69 min, et un journal qui n'apprenait rien.
+     * Le contraste était dans le même passage : les deux seuls échecs qui DISAIENT quelque chose
+     * mouraient sur un `expect()`, donc bornés et nommés.
+     *
+     * Dix secondes pour une action, quinze pour une navigation — au-dessus de ce qu'un écran de ce
+     * produit demande, en dessous du plafond du test, pour que la borne qui morde soit toujours la
+     * plus PARLANTE des deux.
+     */
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
     // La preuve, pas le confort : une capture et une trace à chaque échec.
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
@@ -93,6 +112,28 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: LOCAL_ANON,
       SUPABASE_SECRET_KEY: LOCAL_SERVICE,
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+      /**
+       * ⚠️ LA SURCOUCHE DE `next dev` S'ÉTEINT ICI, ET POUR CETTE SUITE SEULEMENT (2026-09-05).
+       *
+       * Une fois le tunnel réparé, dix-neuf échecs restaient. TROIS n'étaient pas des défauts du
+       * produit mais l'`<nextjs-portal>` de la surcouche :
+       *   · `mobile › fluidite` ×2 — « <nextjs-portal></nextjs-portal> … subtree intercepts
+       *     pointer events » : le portail, POURTANT VIDE, avalait le clic sur la barre de régions ;
+       *   · `bureau › clavier [FR-077]` — « la surcouche de développement de Next a gardé le focus
+       *     sur 1 tabulation(s) ». Le test le dit dans son propre message : « Ce n'est PAS un
+       *     défaut d'accessibilité. »
+       *
+       * Un harnais qui accuse le produit de ses propres artefacts envoie chercher au mauvais
+       * endroit — c'est la même faute que les 45 secondes muettes, en plus sournois.
+       *
+       * ⚠️ ET `devIndicators: false` NE SUFFIT PAS — essayé, mesuré, écarté le même jour. Le
+       * réglage documenté retire l'INDICATEUR, pas le portail : sonde sur `/aide`, un portail
+       * avant, un portail après. C'est ce drapeau-ci qui le retire (1 → 0, corps de page inchangé
+       * à 160 octets près). Il est `NEXT_PRIVATE_*`, donc interne à Next et non garanti : le jour
+       * où il cesse d'agir, les trois mêmes échecs reviendront en nommant le portail, et cette
+       * note dira quoi chercher.
+       */
+      NEXT_PRIVATE_DISABLE_DEV_OVERLAY_UX: "1",
     },
   },
 });

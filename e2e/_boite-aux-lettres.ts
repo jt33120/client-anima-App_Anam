@@ -18,9 +18,28 @@ export function adresseNeuve(prefixe: string): string {
   return `e2e-${prefixe}-${Date.now()}-${Math.floor(Math.random() * 1e4)}@exemple.test`;
 }
 
-/** Vide le collecteur. À appeler avant un envoi dont on veut lire la réponse sans ambiguïté. */
+/**
+ * Vide le collecteur. À appeler avant un envoi dont on veut lire la réponse sans ambiguïté.
+ *
+ * ⚠️ BORNÉE, COMME LA GARDE DE CIBLE L'EST DÉJÀ (`_garde-de-cible.ts:43`). C'était le dernier
+ * `fetch` du dossier sans délai ni `catch` — et il est le PREMIER appel de `ouvrirUnCompteNeuf`.
+ * Un collecteur qui accepte la connexion sans jamais répondre aurait donc suspendu tout le tunnel
+ * avant même d'ouvrir une page, en rendant le même « Test timeout » muet que le renommage du
+ * 2026-08-28. Quatre secondes, et on dit lequel des deux services manque.
+ */
 export async function viderLaBoite(): Promise<void> {
-  await fetch(`${MAILPIT}/api/v1/messages`, { method: "DELETE" });
+  try {
+    await fetch(`${MAILPIT}/api/v1/messages`, {
+      method: "DELETE",
+      signal: AbortSignal.timeout(4000),
+    });
+  } catch (e) {
+    throw new Error(
+      `Le collecteur de courriels (Mailpit) ne répond pas (${MAILPIT}).\n` +
+        "Le stack Supabase local doit tourner AVANT la suite : `supabase start`.\n" +
+        `Détail : ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 }
 
 /**

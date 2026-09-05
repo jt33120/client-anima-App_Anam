@@ -3,6 +3,14 @@
 import { useActionState } from "react";
 import { envoyerLien, recommencer, verifierCode, type EtatEntree, type EtatCode } from "./actions";
 import s from "./entrer.module.css";
+import {
+  BOUTON_DEMANDER_CODE,
+  BOUTON_DEMANDER_CODE_EN_COURS,
+  BOUTON_ENTRER_AVEC_CODE,
+  BOUTON_ENTRER_AVEC_CODE_EN_COURS,
+  ETIQUETTE_ADRESSE,
+  ETIQUETTE_CODE,
+} from "@/lib/domain/copie-entree";
 
 const initialCode: EtatCode = {};
 
@@ -48,7 +56,7 @@ export default function FormulaireEntree({
         <form action={actionCode} className={s.form} noValidate>
           <input type="hidden" name="destination" value={destination} />
           <label htmlFor="code" className={s.etiquette}>
-            <span className="t-meta">Le code reçu</span>
+            <span className="t-meta">{ETIQUETTE_CODE}</span>
             {/* `maxLength` à 8 et non 6 : la production a un jour envoyé des codes à HUIT
                 chiffres, et un champ tronqué à six les aurait rendus intapables sans rien
                 afficher. Le serveur décide de la plage ; ce champ ne coupe jamais ce qu'il reçoit. */}
@@ -67,7 +75,7 @@ export default function FormulaireEntree({
           </label>
           {etatCode.message ? <p className={s.erreur}>{etatCode.message}</p> : null}
           <button type="submit" className={s.bouton} disabled={verifEnCours}>
-            <span className="t-bouton">{verifEnCours ? "Vérification…" : "Entrer avec ce code"}</span>
+            <span className="t-bouton">{verifEnCours ? BOUTON_ENTRER_AVEC_CODE_EN_COURS : BOUTON_ENTRER_AVEC_CODE}</span>
           </button>
         </form>
         {/* SORTIR N'EST JAMAIS GARDÉ (AD-9). L'attente vit une heure côté serveur : sans cette
@@ -94,7 +102,7 @@ export default function FormulaireEntree({
       <input type="hidden" name="destination" value={destination} />
       <label htmlFor="email" className={s.etiquette}>
         {/* Étiquette VISIBLE (jamais un placeholder en guise d'étiquette) */}
-        <span className="t-meta">Ton adresse e-mail</span>
+        <span className="t-meta">{ETIQUETTE_ADRESSE}</span>
         <input
           id="email"
           name="email"
@@ -108,7 +116,7 @@ export default function FormulaireEntree({
       </label>
       {etat.message ? <p className={s.erreur}>{etat.message}</p> : null}
       <button type="submit" className={s.bouton} disabled={enCours}>
-        <span className="t-bouton">{enCours ? "Envoi…" : "Me reconnecter par e-mail"}</span>
+        <span className="t-bouton">{enCours ? BOUTON_DEMANDER_CODE_EN_COURS : BOUTON_DEMANDER_CODE}</span>
       </button>
     </form>
   );

@@ -94,8 +94,16 @@ function compterEchecs(json) {
         // TITRES, le journal disait quel test tombait — et il fallait encore relancer la suite, ou
         // télécharger 168 Mo de traces, pour savoir POURQUOI. Le rapport porte le message depuis le
         // début ; c'est ce comparateur qui le jetait, pour la seconde fois.
-        const echec = (t.results ?? []).find((r) => r.error?.message);
-        const brut = echec?.error?.message ?? "";
+        // ⚠️ ON LIT `errors`, PAS SEULEMENT `error` — ET C'EST LA TROISIÈME FOIS QU'ON RÉPARE CE
+        // MAILLON (2026-09-05). `error` vaut `errors[0]`. Pour un test EXPIRÉ, `errors[0]` est
+        // exactement la phrase nue « Test timeout of 45000ms exceeded. » : celle qui n'apprend rien.
+        // Ce qui nomme l'appel resté pendu — le sélecteur, le `Call log` — vit dans les entrées
+        // SUIVANTES du tableau, que ce script jetait. Huit jours de CI rouge n'ont rien dit à
+        // personne pour cette seule raison : la preuve était dans le rapport, à côté de la ligne
+        // qu'on lisait.
+        const echec = (t.results ?? []).find((r) => (r.errors ?? []).length || r.error?.message);
+        const messages = (echec?.errors ?? []).map((e) => e?.message).filter(Boolean);
+        const brut = (messages.length ? messages : [echec?.error?.message ?? ""]).join("\n");
         // Les séquences de couleur du terminal rendent le journal de CI illisible : on les retire.
         // ⚠️ TROIS LIGNES, PAS UNE — ET UN ÉCHEC L'A EXIGÉ le 2026-08-26. Le message « Aide n'est
         // plus le dernier arrêt : » met la LISTE des fautifs sur les lignes suivantes : couper à la
@@ -104,9 +112,12 @@ function compterEchecs(json) {
           .replace(/\u001b\[[0-9;]*m/g, "")
           .split("\n")
           .filter((l) => l.trim().length > 0)
-          .slice(0, 7)
+          // ⚠️ DOUZE LIGNES ET 700 CARACTÈRES, PAS SEPT ET 420. La coupe précédente tranchait le
+          // message pile sur « | Call log: » — c'est-à-dire juste avant ce qu'on cherchait. Un
+          // journal exact qui s'arrête avant la réponse coûte une relance complète de la suite.
+          .slice(0, 12)
           .join(" | ")
-          .slice(0, 420);
+          .slice(0, 700);
         titres.get(cle).push({ titre: [nom, spec.title].filter(Boolean).join(" › "), message });
         total += 1;
       }

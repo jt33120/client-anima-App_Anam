@@ -111,10 +111,19 @@ jobs:
       # test rouge, et la suite en compte 17 attendus depuis le 2026-08-25 (voir
       # `e2e/ligne-de-base.json`). Sans ce drapeau, le travail s'arrêterait avant d'avoir comparé
       # quoi que ce soit — et on ne saurait jamais si le 18ᵉ est arrivé.
+      # ⚠️ `list` EN PLUS DE `json`, ET LE JSON DANS UN FICHIER PAR VARIABLE (2026-09-05).
+      # L'ancienne forme — `--reporter=json > rapport-playwright.json` — envoyait TOUTE la sortie de
+      # Playwright dans le fichier : entre le début et la fin de l'étape, le journal du travail ne
+      # contenait pas UNE ligne pendant 69 minutes. La preuve existait (artefact de traces, 109 Mo),
+      # mais il fallait la télécharger pour lire un nom de sélecteur. Un journal qui oblige à ça ne
+      # rend pas de verdict. `list` écrit dans le journal, `json` va dans le fichier que le
+      # comparateur lit — les deux, chacun à sa place.
       - name: Parcours au navigateur (WebKit + Chromium)
         id: parcours
         continue-on-error: true
-        run: npx playwright test --reporter=json > rapport-playwright.json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: rapport-playwright.json
+        run: npx playwright test --reporter=list,json
 
       # LE VERDICT. Il échoue sur un échec NOUVEAU, jamais sur la ligne de base — et il signale
       # quand un compte peut baisser. Un « main » rouge en permanence détruirait le signal ; un

@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test";
 import { adresseNeuve, codeDans, courrielPour, viderLaBoite } from "./_boite-aux-lettres";
+import { boutonDemanderCode, boutonEntrerAvecCode, champAdresse, champCode } from "./_porte";
 
 /**
  * Ouvrir un compte NEUF et traverser le tunnel — pour que les parcours qui suivent partent d'un
@@ -11,6 +12,49 @@ import { adresseNeuve, codeDans, courrielPour, viderLaBoite } from "./_boite-aux
  * personne ne teste.
  */
 export type Compte = { readonly adresse: string };
+
+/**
+ * Borner une attente ET lui donner un NOM.
+ *
+ * ⚠️ CE PETIT OUTIL EST LA MOITIÉ DU CORRECTIF DU 2026-09-05, et la plus importante. Le libellé
+ * renommé le 2026-08-28 aurait coûté dix secondes et une phrase claire ; il a coûté huit jours de
+ * CI illisible, parce que Playwright ne borne QUE les assertions (`expect: { timeout }`) et laisse
+ * les ACTIONS attendre sans fin tant qu'`actionTimeout` n'est pas posé. Un test qui meurt sur une
+ * action ne rend alors que « Test timeout of 45000ms exceeded. » — sans sélecteur, sans étape.
+ *
+ * `playwright.config.ts` pose désormais cette borne globale. Celle-ci vient PAR-DESSUS, pour les
+ * quatre attentes STRUCTURANTES du tunnel : elle dit lequel des quatre paliers n'a pas été
+ * franchi, ce qu'aucun délai global ne peut dire. Le patron vient d'`attendreLePortail`
+ * ci-dessous, qui l'appliquait déjà seul depuis le 2026-09-03.
+ */
+async function palier<T>(quoi: string, promesse: Promise<T>): Promise<T> {
+  try {
+    return await promesse;
+  } catch (e) {
+    throw new Error(
+      `Le tunnel d'entrée s'est arrêté à « ${quoi} ».\n` +
+        `Détail : ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+}
+
+/**
+ * Demander un code pour cette adresse, et attendre l'écran où le taper.
+ *
+ * ⚠️ EXPORTÉE POUR QU'IL N'Y AIT QU'UNE COPIE DE CE GESTE. `entree.spec.ts` écrivait les mêmes
+ * trois lignes cinq fois ; c'est pour ça que le renommage du 2026-08-28 a cassé SIX endroits au
+ * lieu d'un. Cette spec-là garde ses gestes explicites — la porte est son sujet, un helper les
+ * cacherait — mais elle prend ses locators à la même source (`_porte.ts`).
+ */
+export async function demanderUnCode(page: Page, adresse: string): Promise<void> {
+  await palier("ouvrir /entrer", page.goto("/entrer"));
+  await palier("saisir l'adresse", champAdresse(page).fill(adresse));
+  await palier("cliquer le bouton d'envoi du code", boutonDemanderCode(page).click());
+  await palier(
+    "voir paraître le champ du code",
+    champCode(page).waitFor({ state: "visible", timeout: 15_000 }),
+  );
+}
 
 /**
  * Attendre que le PORTAIL D'ENTRÉE soit parti (2026-09-03).
@@ -40,28 +84,30 @@ export async function ouvrirUnCompteNeuf(page: Page): Promise<Compte> {
   const adresse = adresseNeuve("parcours");
   await viderLaBoite();
 
-  await page.goto("/entrer");
-  await page.getByLabel(/adresse e-mail/i).fill(adresse);
-  await page.getByRole("button", { name: /recevoir mon lien/i }).click();
-  await page.getByLabel(/code reçu/i).waitFor();
+  await demanderUnCode(page, adresse);
 
   const code = codeDans((await courrielPour(adresse)).corps);
-  await page.getByLabel(/code reçu/i).fill(code);
-  await page.getByRole("button", { name: /entrer avec ce code/i }).click();
+  await palier("saisir le code reçu", champCode(page).fill(code));
+  await palier("valider le code", boutonEntrerAvecCode(page).click());
 
   // ── La date de naissance (FR-012 : la majorité s'établit ici, elle ne se déclare pas ailleurs)
-  await page.waitForURL(/\/naissance/);
+  await palier("arriver sur /naissance", page.waitForURL(/\/naissance/, { timeout: 20_000 }));
   await page.locator('input[name="prenom"]').fill("Louise");
   await page.locator('input[name="date_naissance"]').fill("1979-09-08");
   await page.getByRole("button", { name: /continuer|commencer|suivant/i }).click();
 
   // ── Le consentement article 9 — les deux cases, jamais une seule
-  await page.waitForURL(/\/consentement/);
+  await palier("arriver sur /consentement", page.waitForURL(/\/consentement/, { timeout: 20_000 }));
   await page.locator('input[name="art9"]').check();
   await page.locator('input[name="cgu"]').check();
   await page.getByRole("button", { name: /je commence/i }).click();
 
-  await page.waitForURL((u) => !/\/(naissance|consentement|entrer)/.test(u.pathname));
+  await palier(
+    "sortir du tunnel vers la scène",
+    page.waitForURL((u) => !/\/(naissance|consentement|entrer)/.test(u.pathname), {
+      timeout: 20_000,
+    }),
+  );
   // La scène vient d'apparaître : son portail pousse par-dessus. On le laisse finir.
   await attendreLePortail(page);
   return { adresse };

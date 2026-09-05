@@ -260,7 +260,16 @@ test("[7.12] la sortie rapide de /aide quitte VRAIMENT le site, et n'y ramène p
   await page.goto("/aide");
   await expect(page.getByRole("link", { name: /retour/i }), "témoin : la page n'est pas rendue").toBeVisible();
 
-  const bouton = page.getByRole("button", { name: /quitter ce site/i });
+  // ⚠️ LE NOM ACCESSIBLE A CHANGÉ LE 2026-08-26, PAS LE BOUTON. `app/aide/SortieRapide.tsx:74`
+  // porte `aria-label="Sortie rapide : quitter Anima et ouvrir un site neutre"` depuis `60d88da`
+  // (avant : « Quitter ce site et aller sur un site neutre »). Ce test cherchait encore l'ancien
+  // et rougissait depuis — le seul échec du passage qui disait VRAIMENT quelque chose, parce qu'il
+  // meurt sur une assertion et non sur une action.
+  //
+  // ⚠️ ON NE RENOMME PAS LE PRODUIT POUR VERDIR LE TEST : `app/aide/SortieRapide.tsx:20-22` place
+  // toute modification de ce contrôle derrière une revue pré-lancement (professionnel qualifié +
+  // juriste), et `tests/aide-route.test.ts:118` interdit explicitement le retour à « Quitter ».
+  const bouton = page.getByRole("button", { name: /sortie rapide/i });
   await expect(bouton, "la sortie rapide n'est pas là").toBeVisible();
 
   // On reste sur l'onglet : `location.replace` navigue dans le MÊME contexte, et c'est tout
