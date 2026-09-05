@@ -234,14 +234,15 @@ test.describe("Le tour guidé", () => {
     // libellé existe bel et bien dans le produit, simplement ailleurs.
     //
     // On passe donc par la porte de secours PERMANENTE (`render/surimpression.tsx`,
-    // `aria-label="Aide"`, FR-077), et `exact` ferme la classe : plus aucun locator de ce fichier
-    // ne peut se recentrer par accident sur un texte qui contient le mot cherché.
+    // `aria-label="Aide"`, FR-077), avec `exact` — qui ferme le cas de CE locator, pas la classe :
+    // les autres locators de ce fichier comparent toujours par sous-chaîne, et le même accident
+    // peut s'y rejouer. La garde qui fermerait vraiment la classe reste à écrire.
     await page.getByRole("link", { name: "Aide", exact: true }).click();
     await page.getByRole("link", { name: /Faire le tour/ }).click();
     await page.waitForTimeout(1600);
     await expect(
       dialogue(page),
-      "le tour ne se relance pas depuis Repères",
+      "le tour ne se relance pas depuis l’aide",
     ).toBeVisible();
     // ⚠️ ET L'URL EST NETTOYÉE : sans ça, un rechargement — ou un lien partagé — relance le tour
     // indéfiniment.

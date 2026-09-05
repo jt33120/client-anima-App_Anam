@@ -34,9 +34,10 @@ import { ouvrirUnCompteNeuf, passerLeTour, attendreLePortail } from "./_entrer";
  * remplissage de l'avatar du seuil (02/09) et le portail plein écran (04/09, 2 200 + 700 ms).
  *
  * ⚠️ ET LES TROIS FENÊTRES QUI ROUGISSAIENT ÉTAIENT EXACTEMENT LES TROIS QUI TOMBAIENT DEDANS.
- * `PortailAnam` est monté sans condition sur `/` : chaque `page.goto("/")` relance le voile. Or
- * `_entrer.ts` définit `attendreLePortail` et TOUTE la suite l'appelle — `ouvrirUnCompteNeuf` comme
- * `entrerDansLaRegion` — sauf ce fichier, qui renavigue vers `/` trois fois sans jamais l'attendre.
+ * `PortailAnam` est monté sans condition sur `/` : chaque `page.goto("/")` relance le voile. Or la
+ * protection existe déjà — `_entrer.ts` appelle `attendreLePortail` à la fin de `ouvrirUnCompteNeuf`
+ * et au début de `entrerDansLaRegion`. Ce fichier-ci en sortait : il renavigue vers `/` APRÈS
+ * `ouvrirUnCompteNeuf`, donc hors de la garde que ce helper venait de poser, et trois fois.
  * Le voile est `pointer-events: none`, donc le clic sur « commencer » n'est même pas retardé : rien
  * ne signalait qu'on mesurait une animation d'ouverture au lieu de la scène au repos.
  *

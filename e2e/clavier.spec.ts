@@ -73,9 +73,9 @@ type Arret = {
  * compilées le 26/08, squelette d'attente aujourd'hui) : à chaque fois parce que l'attente cédait
  * sur quelque chose de plus faible que « le produit est là ».
  *
- * `aria-hidden="true"` est le discriminant, et il est sûr : `HalteEnAttente` est le SEUL `<main>`
- * du dépôt à le porter — les trente-six autres ne l'ont pas. Un squelette qui deviendrait visible
- * aux lecteurs d'écran ferait donc rougir ce test, ce qui est le bon sens de la garde.
+ * `aria-hidden="true"` est le discriminant, et il est sûr : sur les 38 `<main>` de `app/` et
+ * `render/`, `HalteEnAttente` est le SEUL à le porter. Un squelette qui deviendrait visible aux
+ * lecteurs d'écran ferait donc rougir ce test, ce qui est le bon sens de la garde.
  */
 const attendreLeProduit = (page: Page) =>
   page
