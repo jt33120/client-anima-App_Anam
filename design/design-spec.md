@@ -82,7 +82,7 @@ effacer l'identité lunaire.
 - Les composants de référence sont : carte papier, bouton primaire, bouton secondaire, disclosure,
   conteneur d'illustration et état vide/indisponible. Leurs états focus, contraste renforcé et
   mouvement réduit font partie de la composition, pas d'une retouche ultérieure.
-- L'arbre domine le portail. Le lotus et les étoiles restent des décors statiques ou calmement
+- Le profil de dos d'Anam domine le portail de chargement. Le lotus et les étoiles restent des décors statiques ou calmement
   bornés ; aucune seconde couche de particules animées ne concurrence la scène.
 - À l'étape graine, l'explication de l'arbre est un texte court posé directement sur le ciel, sans
   carte. Une phrase discrète sous la graine marque le point de départ sans créer de progression.

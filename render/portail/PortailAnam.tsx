@@ -2,17 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { etatDuPortail, momentDuDepart, portailFini } from "@/lib/scene/portail";
+import ImageAnam from "../conversation/ImageAnam";
 import LotusAttente from "../conversation/LotusAttente";
-import ArbreQuiPousse from "./ArbreQuiPousse";
 import s from "./portail.module.css";
 
 /**
  * PortailAnam.tsx — LE PORTAIL D'ENTRÉE VERS L'UNIVERS D'ANAM (2026-09-03).
  *
- * Retour de Julian : « au lancement de l'app ou son refresh, un écran de chargement qui est l'arbre
- * que l'on a en asset, qui passe par les différents stades, de graine à arbre scintillant, tout en
- * étant souple et apaisé. En dessous de l'arbre un écran de chargement. Carte blanche pour en faire
- * le portail d'entrée vers l'univers d'Anam. »
+ * Au lancement ou au refresh, le portail montre Anam de dos avant de révéler la scène.
  *
  * ══ TROIS PROPRIÉTÉS, ET ELLES COMPTENT PLUS QUE LE DESSIN ═════════════════════════════════════
  *
@@ -34,12 +31,11 @@ import s from "./portail.module.css";
  * qui peut lever, se démonter, ou changer de forme. Un signal du navigateur ne se perd pas, et le
  * plafond couvre le cas où il arriverait trop tard de toute façon.
  *
- * ══ LE MOUVEMENT : UNE LUMIÈRE QUI S'OUVRE, PAS UNE BOUCLE ═════════════════════════════════════
+ * ══ LE MOUVEMENT : UN FONDU DE SORTIE, PAS UNE BOUCLE ══════════════════════════════════════════
  *
- * La respiration reste le seul mouvement en boucle du produit. La lumière du portail, elle, va dans
- * un sens et s'arrête — le régime déjà écrit pour le remplissage d'étoiles du seuil
- * (`monde.module.css`). Sous `prefers-reduced-motion`, l'arbre paraît d'emblée entier et rayonnant,
- * immobile, et le portail s'efface après un battement : on retire le MOUVEMENT, jamais l'image.
+ * La respiration reste le seul mouvement en boucle du produit. Le portail s'efface dans un sens et
+ * s'arrête. Sous `prefers-reduced-motion`, il part après un battement : on retire le MOUVEMENT,
+ * jamais l'image.
  */
 export default function PortailAnam({
   copie,
@@ -49,7 +45,7 @@ export default function PortailAnam({
     readonly annonce: string;
   };
 }) {
-  const [etat, setEtat] = useState({ eveil: 0, retrait: false });
+  const [retrait, setRetrait] = useState(false);
   const [parti, setParti] = useState(false);
   /** L'instant où la scène s'est déclarée prête. `null` tant qu'elle ne l'a pas fait — et le
    *  plafond décide alors seul (voir `momentDuDepart`). */
@@ -57,8 +53,7 @@ export default function PortailAnam({
 
   useEffect(() => {
     // ⚠️ LU UNE FOIS, AU MONTAGE. Écouter les changements de ce réglage en cours de portail ferait
-    // basculer l'arbre d'un état à l'autre au milieu du geste — un saut, c'est-à-dire ce que le
-    // réglage existe pour éviter.
+    // basculer le portail au milieu du geste — un saut, c'est-à-dire ce que le réglage évite.
     const reduit =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -70,17 +65,11 @@ export default function PortailAnam({
     if (document.readyState === "complete") marquerPrete();
     else window.addEventListener("load", marquerPrete, { once: true });
 
-    // ⚠️ ON NE PEINT PAS À CHAQUE FRAME, ET C'EST DÉLIBÉRÉ. Trente images par seconde suffisent
-    // amplement à un geste de deux secondes, et divisent par deux le travail fait pendant que la
-    // page s'hydrate — le moment le plus chargé de la vie de l'app, sur le téléphone le plus lent.
-    // La boucle, elle, continue de tourner à la frame : c'est le RENDU qu'on espace, jamais la
-    // mesure du temps. (Depuis le 2026-09-04 chaque image ne coûte qu'un voile posé sur un bitmap
-    // déjà cuit — mesuré à 0 ms en médiane ; l'espacement reste, il ne coûte rien et il protège
-    // des appareils qu'on ne mesure pas.)
+    // La boucle mesure le départ à la frame, mais React ne repeint que lorsque le retrait commence.
     const PAS_MS = 1000 / 30;
     let frame = 0;
     let dernierRendu = -Infinity;
-    const peindre = () => {
+    const suivre = () => {
       const ecoule = performance.now() - depart0;
       const depart = momentDuDepart(scenePreteRef.current, reduit);
       if (portailFini(ecoule, depart)) {
@@ -88,14 +77,14 @@ export default function PortailAnam({
         return; // ⚠️ AUCUNE NOUVELLE FRAME N'EST DEMANDÉE : la boucle s'éteint d'elle-même.
       }
       if (ecoule - dernierRendu < PAS_MS) {
-        frame = requestAnimationFrame(peindre);
+        frame = requestAnimationFrame(suivre);
         return;
       }
       dernierRendu = ecoule;
-      setEtat(etatDuPortail(ecoule, depart, reduit));
-      frame = requestAnimationFrame(peindre);
+      setRetrait(etatDuPortail(ecoule, depart, reduit).retrait);
+      frame = requestAnimationFrame(suivre);
     };
-    frame = requestAnimationFrame(peindre);
+    frame = requestAnimationFrame(suivre);
 
     return () => {
       cancelAnimationFrame(frame);
@@ -107,7 +96,7 @@ export default function PortailAnam({
 
   return (
     <div
-      className={`${s.portail} ${etat.retrait ? s.retrait : ""}`}
+      className={`${s.portail} ${retrait ? s.retrait : ""}`}
       data-portail-anam=""
       // `role="status"` + `aria-live="polite"` : une annonce, une fois, sans voler le focus.
       role="status"
@@ -115,7 +104,9 @@ export default function PortailAnam({
       aria-label={copie.annonce}
     >
       <div className={s.scene}>
-        <ArbreQuiPousse eveil={etat.eveil} />
+        <div aria-hidden="true">
+          <ImageAnam format="veille" alt="" chargement="eager" className={s.portrait} />
+        </div>
         {/* Le nom porte le scintillement de `globals.css` — le halo derrière la lettre, jamais une
             ombre portée sur le texte (leçon de `tests/voile.test.ts`). */}
         <p className={`${s.nom} t-titre scintillement`}>{copie.nom}</p>
