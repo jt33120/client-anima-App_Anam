@@ -246,7 +246,9 @@
   padding: var(--esp-4);
   border: 1px solid color-mix(in srgb, var(--sur-papier-doux) 28%, transparent);
   border-radius: var(--rayon);
-  background: var(--papier);
+  background:
+    var(--texture-papier),
+    var(--papier);
   color: var(--sur-papier);
 }
 

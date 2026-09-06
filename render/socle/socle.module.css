@@ -55,13 +55,16 @@
   padding: var(--esp-5);
   border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-lg);
-  background: linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 16%, var(--papier)));
+  background:
+    var(--texture-papier),
+    linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 16%, var(--papier)));
   color: var(--sur-papier);
   box-shadow: var(--ombre-posee);
 }
 
 .sectionCiel {
   background:
+    var(--texture-papier),
     radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--jour) 55%, transparent), transparent 34%),
     linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 16%, var(--papier)));
 }
@@ -119,6 +122,7 @@
   border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-lg);
   background:
+    var(--texture-papier),
     radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--jour) 48%, transparent), transparent 40%),
     var(--papier);
   color: var(--sur-papier);
@@ -221,7 +225,9 @@
   padding: var(--esp-4);
   border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--jour) 28%, var(--papier));
+  background:
+    var(--texture-papier),
+    color-mix(in srgb, var(--jour) 28%, var(--papier));
 }
 
 .lectureSymbolique {
@@ -305,7 +311,9 @@
 .devoilement {
   border: 1px solid color-mix(in srgb, var(--sur-papier) 20%, var(--papier));
   border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--jour) 18%, var(--papier));
+  background:
+    var(--texture-papier),
+    color-mix(in srgb, var(--jour) 18%, var(--papier));
 }
 
 .devoilement > summary {
@@ -339,6 +347,7 @@
   border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
   border-radius: var(--rayon-md);
   background:
+    var(--texture-papier),
     radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--jour) 50%, transparent), transparent 36%),
     var(--papier);
 }
@@ -557,7 +566,9 @@
   padding: var(--esp-5);
   border: 1px solid color-mix(in srgb, var(--sur-papier) 20%, var(--papier));
   border-radius: var(--rayon-lg);
-  background: color-mix(in srgb, var(--jour) 24%, var(--papier));
+  background:
+    var(--texture-papier),
+    color-mix(in srgb, var(--jour) 24%, var(--papier));
 }
 
 .reperesPrincipaux > dl {

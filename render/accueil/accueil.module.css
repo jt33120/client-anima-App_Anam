@@ -119,6 +119,7 @@
   border: 1px solid var(--bordure);
   border-radius: var(--rayon-lg);
   background:
+    var(--texture-papier),
     radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--jour) 44%, transparent), transparent 42%),
     linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 18%, var(--papier)));
   color: var(--sur-papier);

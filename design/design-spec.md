@@ -77,8 +77,9 @@ effacer l'identité lunaire.
   `--sur-papier-doux`. Les aplats Sky du quotidien conservent leur rôle distinct `--jour`.
 - Beige, Sky et Periwinkle structurent bordures, illustrations et accents. Aucun pastel ne porte du
   texte sans paire de contraste mesurée.
-- Une surface papier a un contour net, un rayon du système et une seule ombre posée. Elle ne reçoit
-  ni flou, ni verre translucide, ni texture qui réduise le contraste.
+- Une surface papier a un contour net, un rayon du système, une seule ombre posée et un grain
+  fibreux discret commun qui évoque un papier ancien. Elle ne reçoit ni flou, ni verre translucide,
+  ni texture assez forte pour réduire le contraste.
 - Les composants de référence sont : carte papier, bouton primaire, bouton secondaire, disclosure,
   conteneur d'illustration et état vide/indisponible. Leurs états focus, contraste renforcé et
   mouvement réduit font partie de la composition, pas d'une retouche ultérieure.

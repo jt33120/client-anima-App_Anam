@@ -41,6 +41,7 @@
   border: 1px solid color-mix(in srgb, var(--sur-papier-doux) 28%, transparent);
   border-radius: var(--rayon-lg);
   background:
+    var(--texture-papier),
     radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 12%, transparent), transparent 34%),
     var(--papier);
   color: var(--sur-papier);
@@ -49,12 +50,15 @@
 .moduleActif {
   border-color: color-mix(in srgb, var(--sur-papier-doux) 48%, transparent);
   background:
+    var(--texture-papier),
     radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 15%, transparent), transparent 38%),
     var(--papier);
 }
 
 .methode {
-  background: color-mix(in srgb, var(--papier) 88%, transparent);
+  background:
+    var(--texture-papier),
+    color-mix(in srgb, var(--papier) 88%, transparent);
 }
 
 .etiquette {

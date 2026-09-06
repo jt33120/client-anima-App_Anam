@@ -49,6 +49,12 @@
   --papier: #F0EFEA;
   --sur-papier: #1C2740;
   --sur-papier-doux: #5F5D57;
+  /* Grain fibreux commun à toutes les surfaces papier. La tuile reste transparente : elle nuance
+     l'Ivory sans voiler l'encre ni transformer le fond de l'application en thème clair. */
+  --texture-papier:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.48' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='0.08' filter='url(%23p)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 12% 8%, color-mix(in srgb, var(--aube) 26%, transparent), transparent 38%),
+    radial-gradient(ellipse at 88% 92%, color-mix(in srgb, var(--aube) 18%, transparent), transparent 44%);
   /* LE SECOND TON, CHAUD (2026-09-03) : le Beige de la palette, en décor seul — une lueur basse
      qui rompt la monochromie du bleu. Jamais sous du texte (1,4:1). */
   --aube: #E0D2C7;
