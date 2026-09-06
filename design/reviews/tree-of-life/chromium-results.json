@@ -1,0 +1,5190 @@
+{
+  "generatedAt": "2026-09-06T21:02:34.449Z",
+  "before": {
+    "render/arbre/MoteurArbreLunaire.ts": "1b0905c84964f1b2d0a2d2b9555b2463886252f7ba86d270bf1d98317ea9df98",
+    "render/arbre/geometrie.ts": "ed22f29897f6a0bd8eba5e90248aeb78dd58e15dca4c52322f298a7bbcc22171",
+    "render/arbre/ArbreLunaire.tsx": "48412afd6e507bb63d5a4870ef91a81f8a6e79f6735627eddc971219998c3af2",
+    "render/arbre/ArbreInteractif.tsx": "0c6bf0f33ada4334968ad443bb8c85f132c977c1f84881590cc28ca324587195",
+    "render/arbre/ComprendreEvolution.tsx": "04fbbc15b5a098509b6b9e387d17f480602f3e0fb8f5057d510f1d55fa848d5f",
+    "render/arbre/GraineAttente.tsx": "0194e1f01756d4c059d550df5133f73d7c03f0bb05ed3984253c3eede9b9ab88",
+    "render/arbre/arbre.module.css": "b371a380781ff96c825ede10ed50566a7c8116e82036dddf36a2449168b82490",
+    "render/monde.module.css": "fb7dc524acc433b7312b1a02bfb821a25990b2a9e022e58ebe731cfeedf8257e"
+  },
+  "after": {
+    "render/arbre/MoteurArbreLunaire.ts": "1b0905c84964f1b2d0a2d2b9555b2463886252f7ba86d270bf1d98317ea9df98",
+    "render/arbre/geometrie.ts": "ed22f29897f6a0bd8eba5e90248aeb78dd58e15dca4c52322f298a7bbcc22171",
+    "render/arbre/ArbreLunaire.tsx": "48412afd6e507bb63d5a4870ef91a81f8a6e79f6735627eddc971219998c3af2",
+    "render/arbre/ArbreInteractif.tsx": "0c6bf0f33ada4334968ad443bb8c85f132c977c1f84881590cc28ca324587195",
+    "render/arbre/ComprendreEvolution.tsx": "04fbbc15b5a098509b6b9e387d17f480602f3e0fb8f5057d510f1d55fa848d5f",
+    "render/arbre/GraineAttente.tsx": "0194e1f01756d4c059d550df5133f73d7c03f0bb05ed3984253c3eede9b9ab88",
+    "render/arbre/arbre.module.css": "b371a380781ff96c825ede10ed50566a7c8116e82036dddf36a2449168b82490",
+    "render/monde.module.css": "fb7dc524acc433b7312b1a02bfb821a25990b2a9e022e58ebe731cfeedf8257e"
+  },
+  "sourceChanged": [],
+  "fatalError": null,
+  "results": [
+    {
+      "width": 390,
+      "tree": "seed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-seed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "birth",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-birth-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "leaf-low",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-leaf-low-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "leaf-high",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-leaf-high-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "leaf-full",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-leaf-full-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "radiant",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-radiant-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "dense",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-dense-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 24,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 21",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 22",
+          "bounds": {
+            "x": 141.359375,
+            "y": 426.9375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 23",
+          "bounds": {
+            "x": 199.5625,
+            "y": 404.828125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 109.859375,
+            "y": 407.765625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Accueillir le changement · 24",
+          "bounds": {
+            "x": 219.546875,
+            "y": 424.859375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix",
+          "bounds": {
+            "x": 130.625,
+            "y": 439.46875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place",
+          "bounds": {
+            "x": 221.609375,
+            "y": 426.8125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Écouter mes besoins",
+          "bounds": {
+            "x": 141.015625,
+            "y": 401.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer",
+          "bounds": {
+            "x": 214.21875,
+            "y": 370.640625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement",
+          "bounds": {
+            "x": 150,
+            "y": 442.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance · 9",
+          "bounds": {
+            "x": 197.703125,
+            "y": 443.46875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 10",
+          "bounds": {
+            "x": 182.390625,
+            "y": 411.390625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non · 11",
+          "bounds": {
+            "x": 209.640625,
+            "y": 384.5625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix · 12",
+          "bounds": {
+            "x": 170.28125,
+            "y": 381.109375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 13",
+          "bounds": {
+            "x": 137.625,
+            "y": 385.359375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 14",
+          "bounds": {
+            "x": 177.484375,
+            "y": 378.296875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 15",
+          "bounds": {
+            "x": 169.625,
+            "y": 407.640625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement · 16",
+          "bounds": {
+            "x": 146.109375,
+            "y": 396.75,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Me faire confiance · 17",
+          "bounds": {
+            "x": 147.90625,
+            "y": 409.25,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 18",
+          "bounds": {
+            "x": 205.796875,
+            "y": 394.078125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non · 19",
+          "bounds": {
+            "x": 170.21875,
+            "y": 373.734375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Habiter mes choix · 20",
+          "bounds": {
+            "x": 172.5,
+            "y": 414.96875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "error",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-error-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": null,
+      "canvas": null,
+      "bitmap": null,
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nJe n’arrive pas à afficher ton arbre pour l’instant.\n\nIl est là. Réessaie dans un moment.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "reserved",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-reserved-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "leaf-full",
+      "variant": "dense-leaves",
+      "treeBranches": 24,
+      "reducedMotion": "reduce",
+      "filename": "tree-390-leaf-full-dense-leaves.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 24,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 21",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 22",
+          "bounds": {
+            "x": 141.359375,
+            "y": 426.9375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 23",
+          "bounds": {
+            "x": 199.5625,
+            "y": 404.828125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 109.859375,
+            "y": 407.765625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Accueillir le changement · 24",
+          "bounds": {
+            "x": 219.546875,
+            "y": 424.859375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix",
+          "bounds": {
+            "x": 130.625,
+            "y": 439.46875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place",
+          "bounds": {
+            "x": 221.609375,
+            "y": 426.8125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Écouter mes besoins",
+          "bounds": {
+            "x": 141.015625,
+            "y": 401.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer",
+          "bounds": {
+            "x": 214.21875,
+            "y": 370.640625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement",
+          "bounds": {
+            "x": 150,
+            "y": 442.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance · 9",
+          "bounds": {
+            "x": 197.703125,
+            "y": 443.46875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 10",
+          "bounds": {
+            "x": 182.390625,
+            "y": 411.390625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non · 11",
+          "bounds": {
+            "x": 209.640625,
+            "y": 384.5625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix · 12",
+          "bounds": {
+            "x": 170.28125,
+            "y": 381.109375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 13",
+          "bounds": {
+            "x": 137.625,
+            "y": 385.359375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 14",
+          "bounds": {
+            "x": 177.484375,
+            "y": 378.296875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 15",
+          "bounds": {
+            "x": 169.625,
+            "y": 407.640625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement · 16",
+          "bounds": {
+            "x": 146.109375,
+            "y": 396.75,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Me faire confiance · 17",
+          "bounds": {
+            "x": 147.90625,
+            "y": 409.25,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 18",
+          "bounds": {
+            "x": 205.796875,
+            "y": 394.078125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non · 19",
+          "bounds": {
+            "x": 170.21875,
+            "y": 373.734375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Habiter mes choix · 20",
+          "bounds": {
+            "x": 172.5,
+            "y": 414.96875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "dense",
+      "variant": "list",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-dense-list.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": null,
+      "canvas": null,
+      "bitmap": null,
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue arbre\n\nMe faire confiance\n\n1 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme\n\n2 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non\n\n3 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix\n\n4 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place\n\n5 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins\n\n6 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer\n\n7 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement\n\n8 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nMe faire confiance · 9\n\n9 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme · 10\n\n10 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non · 11\n\n11 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix · 12\n\n12 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place · 13\n\n13 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins · 14\n\n14 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer · 15\n\n15 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement · 16\n\n16 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nMe faire confiance · 17\n\n17 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme · 18\n\n18 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non · 19\n\n19 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix · 20\n\n20 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place · 21\n\n1 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins · 22\n\n2 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer · 23\n\n3 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement · 24\n\n4 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "paper",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-paper.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "radiant",
+      "variant": "paper",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-radiant-paper.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "radiant",
+      "variant": "detail",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-radiant-detail.png",
+      "errors": [],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/anam/plan"
+        }
+      ],
+      "focusRestored": true,
+      "exploration": null,
+      "zoom": null,
+      "drag": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "after": "matrix(1, 0, 0, 1, 24, 28)",
+        "ficheVisible": false,
+        "passed": true
+      },
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+\n\nMe faire confiance\n\n1 août 2026\n\nEn pleine lumière depuis le 1 septembre 2026, parce que tu l’as dit.\n\nNée de ce moment :\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nCentrer sur cette branche\nPlan d’étapes\n\nRien encore.\n\n×",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "seed",
+      "variant": "stored-list",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-seed-stored-list.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "contrast",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-contrast.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "radiant",
+      "variant": "contrast",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-radiant-contrast.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "seed",
+      "variant": "motion",
+      "reducedMotion": "no-preference",
+      "filename": "tree-390-seed-motion.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "radiant",
+      "variant": "motion",
+      "reducedMotion": "no-preference",
+      "filename": "tree-390-radiant-motion.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "zoom",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-zoom.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlarged": "matrix(1.2, 0, 0, 1.2, 0, 0)",
+        "restored": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlargedTargets": [
+          {
+            "width": 44.00001525878906,
+            "height": 44
+          },
+          {
+            "width": 43.99999237060547,
+            "height": 44
+          },
+          {
+            "width": 44.00001525878906,
+            "height": 44
+          }
+        ],
+        "restoredTargets": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "passed": true
+      },
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-0",
+      "halte": "Graine",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-0.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Graine"
+        ],
+        "illustration": "Un exemple d’arbre : Graine",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "P",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-0-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa graine et le tronc\n\nLa graine ouvre le dessin. Le tronc représente ton socle, calculé à partir des données de naissance que tu as choisies de renseigner.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-1",
+      "halte": "Premier élan",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-1.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Premier élan"
+        ],
+        "illustration": "Un exemple d’arbre : Premier élan",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "P",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-1-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa naissance d’une branche\n\nQuand un thème revient dans tes échanges, Anam peut te proposer de le nommer. La branche ne naît que si tu confirmes : elle vient de tes mots et de ton accord.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-2",
+      "halte": "Feuillaison",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-2.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Feuillaison"
+        ],
+        "illustration": "Un exemple d’arbre : Feuillaison",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "P",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-2-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa feuillaison\n\nUne branche s’étoffe lorsque ce thème revient réellement dans la conversation. Les feuilles rendent visible cette continuité, sans la mesurer.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-3",
+      "halte": "Pleine lumière",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-3.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Pleine lumière"
+        ],
+        "illustration": "Un exemple d’arbre : Pleine lumière",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "P",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "P",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-3-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLe rayonnement\n\nUne branche entre en pleine lumière seulement lorsque tu déclares que ce qu’elle porte est devenu vrai en toi. Anam ne le déduit pas à ta place.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "seed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-seed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "birth",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-birth-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "leaf-low",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-leaf-low-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "leaf-high",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-leaf-high-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "leaf-full",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-leaf-full-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "radiant",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-radiant-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "dense",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-dense-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 24,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 21",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 22",
+          "bounds": {
+            "x": 320.921875,
+            "y": 496.0625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 23",
+          "bounds": {
+            "x": 395.984375,
+            "y": 467.546875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 280.296875,
+            "y": 471.34375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Accueillir le changement · 24",
+          "bounds": {
+            "x": 421.75,
+            "y": 493.375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix",
+          "bounds": {
+            "x": 307.078125,
+            "y": 512.21875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Prendre ma place",
+          "bounds": {
+            "x": 424.390625,
+            "y": 495.90625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Écouter mes besoins",
+          "bounds": {
+            "x": 320.46875,
+            "y": 462.75,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer",
+          "bounds": {
+            "x": 414.875,
+            "y": 423.484375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement",
+          "bounds": {
+            "x": 332.0625,
+            "y": 516.328125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance · 9",
+          "bounds": {
+            "x": 393.578125,
+            "y": 517.375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 10",
+          "bounds": {
+            "x": 373.8125,
+            "y": 476.015625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non · 11",
+          "bounds": {
+            "x": 408.96875,
+            "y": 441.421875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix · 12",
+          "bounds": {
+            "x": 358.21875,
+            "y": 436.96875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 13",
+          "bounds": {
+            "x": 316.09375,
+            "y": 442.453125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 14",
+          "bounds": {
+            "x": 367.515625,
+            "y": 433.328125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 15",
+          "bounds": {
+            "x": 357.375,
+            "y": 471.171875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement · 16",
+          "bounds": {
+            "x": 327.046875,
+            "y": 457.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Me faire confiance · 17",
+          "bounds": {
+            "x": 329.359375,
+            "y": 473.265625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 18",
+          "bounds": {
+            "x": 404.015625,
+            "y": 453.6875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non · 19",
+          "bounds": {
+            "x": 358.140625,
+            "y": 427.453125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Habiter mes choix · 20",
+          "bounds": {
+            "x": 361.0625,
+            "y": 480.640625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "error",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-error-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": null,
+      "canvas": null,
+      "bitmap": null,
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nJe n’arrive pas à afficher ton arbre pour l’instant.\n\nIl est là. Réessaie dans un moment.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "reserved",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-reserved-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "leaf-full",
+      "variant": "dense-leaves",
+      "treeBranches": 24,
+      "reducedMotion": "reduce",
+      "filename": "tree-768-leaf-full-dense-leaves.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 24,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 21",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 22",
+          "bounds": {
+            "x": 320.921875,
+            "y": 496.0625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 23",
+          "bounds": {
+            "x": 395.984375,
+            "y": 467.546875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 280.296875,
+            "y": 471.34375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Accueillir le changement · 24",
+          "bounds": {
+            "x": 421.75,
+            "y": 493.375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix",
+          "bounds": {
+            "x": 307.078125,
+            "y": 512.21875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Prendre ma place",
+          "bounds": {
+            "x": 424.390625,
+            "y": 495.90625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Écouter mes besoins",
+          "bounds": {
+            "x": 320.46875,
+            "y": 462.75,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer",
+          "bounds": {
+            "x": 414.875,
+            "y": 423.484375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement",
+          "bounds": {
+            "x": 332.0625,
+            "y": 516.328125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance · 9",
+          "bounds": {
+            "x": 393.578125,
+            "y": 517.375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 10",
+          "bounds": {
+            "x": 373.8125,
+            "y": 476.015625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non · 11",
+          "bounds": {
+            "x": 408.96875,
+            "y": 441.421875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix · 12",
+          "bounds": {
+            "x": 358.21875,
+            "y": 436.96875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 13",
+          "bounds": {
+            "x": 316.09375,
+            "y": 442.453125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 14",
+          "bounds": {
+            "x": 367.515625,
+            "y": 433.328125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 15",
+          "bounds": {
+            "x": 357.375,
+            "y": 471.171875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement · 16",
+          "bounds": {
+            "x": 327.046875,
+            "y": 457.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Me faire confiance · 17",
+          "bounds": {
+            "x": 329.359375,
+            "y": 473.265625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 18",
+          "bounds": {
+            "x": 404.015625,
+            "y": 453.6875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non · 19",
+          "bounds": {
+            "x": 358.140625,
+            "y": 427.453125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Habiter mes choix · 20",
+          "bounds": {
+            "x": 361.0625,
+            "y": 480.640625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "dense",
+      "variant": "list",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-dense-list.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": null,
+      "canvas": null,
+      "bitmap": null,
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue arbre\n\nMe faire confiance\n\n1 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme\n\n2 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non\n\n3 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix\n\n4 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place\n\n5 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins\n\n6 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer\n\n7 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement\n\n8 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nMe faire confiance · 9\n\n9 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme · 10\n\n10 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non · 11\n\n11 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix · 12\n\n12 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place · 13\n\n13 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins · 14\n\n14 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer · 15\n\n15 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement · 16\n\n16 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nMe faire confiance · 17\n\n17 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme · 18\n\n18 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non · 19\n\n19 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix · 20\n\n20 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place · 21\n\n1 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins · 22\n\n2 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer · 23\n\n3 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement · 24\n\n4 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "paper",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-paper.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "radiant",
+      "variant": "paper",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-radiant-paper.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "radiant",
+      "variant": "detail",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-radiant-detail.png",
+      "errors": [],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/anam/plan"
+        }
+      ],
+      "focusRestored": true,
+      "exploration": null,
+      "zoom": null,
+      "drag": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "after": "matrix(1, 0, 0, 1, 24, 28)",
+        "ficheVisible": false,
+        "passed": true
+      },
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+\n\nMe faire confiance\n\n1 août 2026\n\nEn pleine lumière depuis le 1 septembre 2026, parce que tu l’as dit.\n\nNée de ce moment :\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nCentrer sur cette branche\nPlan d’étapes\n\nRien encore.\n\n×",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "seed",
+      "variant": "stored-list",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-seed-stored-list.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "contrast",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-contrast.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "radiant",
+      "variant": "contrast",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-radiant-contrast.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "seed",
+      "variant": "motion",
+      "reducedMotion": "no-preference",
+      "filename": "tree-768-seed-motion.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "radiant",
+      "variant": "motion",
+      "reducedMotion": "no-preference",
+      "filename": "tree-768-radiant-motion.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "zoom",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-zoom.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlarged": "matrix(1.2, 0, 0, 1.2, 0, 0)",
+        "restored": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlargedTargets": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "restoredTargets": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "passed": true
+      },
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "explore-0",
+      "halte": "Graine",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-explore-0.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Graine"
+        ],
+        "illustration": "Un exemple d’arbre : Graine",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-768-mixed-explore-0-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa graine et le tronc\n\nLa graine ouvre le dessin. Le tronc représente ton socle, calculé à partir des données de naissance que tu as choisies de renseigner.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "explore-1",
+      "halte": "Premier élan",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-explore-1.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Premier élan"
+        ],
+        "illustration": "Un exemple d’arbre : Premier élan",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-768-mixed-explore-1-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa naissance d’une branche\n\nQuand un thème revient dans tes échanges, Anam peut te proposer de le nommer. La branche ne naît que si tu confirmes : elle vient de tes mots et de ton accord.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "explore-2",
+      "halte": "Feuillaison",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-explore-2.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Feuillaison"
+        ],
+        "illustration": "Un exemple d’arbre : Feuillaison",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-768-mixed-explore-2-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa feuillaison\n\nUne branche s’étoffe lorsque ce thème revient réellement dans la conversation. Les feuilles rendent visible cette continuité, sans la mesurer.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 768,
+      "tree": "mixed",
+      "variant": "explore-3",
+      "halte": "Pleine lumière",
+      "reducedMotion": "reduce",
+      "filename": "tree-768-mixed-explore-3.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Pleine lumière"
+        ],
+        "illustration": "Un exemple d’arbre : Pleine lumière",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-768-mixed-explore-3-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 189.5625,
+        "y": 210.1875,
+        "width": 390.84375,
+        "height": 694.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 355.703125,
+            "y": 425.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 298.953125,
+            "y": 454.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 427.03125,
+            "y": 419.140625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLe rayonnement\n\nUne branche entre en pleine lumière seulement lorsque tu déclares que ce qu’elle porte est devenu vrai en toi. Anam ne le déduit pas à ta place.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "seed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-seed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "birth",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-birth-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "leaf-low",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-leaf-low-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "leaf-high",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-leaf-high-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "leaf-full",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-leaf-full-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "radiant",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-radiant-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "dense",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-dense-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 24,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 21",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 22",
+          "bounds": {
+            "x": 774.015625,
+            "y": 533.328125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 23",
+          "bounds": {
+            "x": 854.25,
+            "y": 502.84375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 730.59375,
+            "y": 506.90625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Accueillir le changement · 24",
+          "bounds": {
+            "x": 881.8125,
+            "y": 530.453125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix",
+          "bounds": {
+            "x": 759.203125,
+            "y": 550.609375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Prendre ma place",
+          "bounds": {
+            "x": 884.640625,
+            "y": 533.15625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Écouter mes besoins",
+          "bounds": {
+            "x": 773.53125,
+            "y": 497.71875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer",
+          "bounds": {
+            "x": 874.453125,
+            "y": 455.734375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement",
+          "bounds": {
+            "x": 785.921875,
+            "y": 555,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance · 9",
+          "bounds": {
+            "x": 851.6875,
+            "y": 556.125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 10",
+          "bounds": {
+            "x": 830.5625,
+            "y": 511.890625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non · 11",
+          "bounds": {
+            "x": 868.140625,
+            "y": 474.921875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix · 12",
+          "bounds": {
+            "x": 813.890625,
+            "y": 470.15625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 13",
+          "bounds": {
+            "x": 768.859375,
+            "y": 476.015625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 14",
+          "bounds": {
+            "x": 823.828125,
+            "y": 466.265625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 15",
+          "bounds": {
+            "x": 812.984375,
+            "y": 506.71875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement · 16",
+          "bounds": {
+            "x": 780.5625,
+            "y": 491.71875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Me faire confiance · 17",
+          "bounds": {
+            "x": 783.03125,
+            "y": 508.953125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 18",
+          "bounds": {
+            "x": 862.84375,
+            "y": 488.03125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non · 19",
+          "bounds": {
+            "x": 813.8125,
+            "y": 459.984375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Habiter mes choix · 20",
+          "bounds": {
+            "x": 816.9375,
+            "y": 516.84375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "error",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-error-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": null,
+      "canvas": null,
+      "bitmap": null,
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nJe n’arrive pas à afficher ton arbre pour l’instant.\n\nIl est là. Réessaie dans un moment.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "reserved",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-reserved-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "leaf-full",
+      "variant": "dense-leaves",
+      "treeBranches": 24,
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-leaf-full-dense-leaves.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 24,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 21",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 22",
+          "bounds": {
+            "x": 774.015625,
+            "y": 533.328125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 23",
+          "bounds": {
+            "x": 854.25,
+            "y": 502.84375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 730.59375,
+            "y": 506.90625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Accueillir le changement · 24",
+          "bounds": {
+            "x": 881.8125,
+            "y": 530.453125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix",
+          "bounds": {
+            "x": 759.203125,
+            "y": 550.609375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Prendre ma place",
+          "bounds": {
+            "x": 884.640625,
+            "y": 533.15625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Écouter mes besoins",
+          "bounds": {
+            "x": 773.53125,
+            "y": 497.71875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer",
+          "bounds": {
+            "x": 874.453125,
+            "y": 455.734375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement",
+          "bounds": {
+            "x": 785.921875,
+            "y": 555,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance · 9",
+          "bounds": {
+            "x": 851.6875,
+            "y": 556.125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 10",
+          "bounds": {
+            "x": 830.5625,
+            "y": 511.890625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non · 11",
+          "bounds": {
+            "x": 868.140625,
+            "y": 474.921875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Habiter mes choix · 12",
+          "bounds": {
+            "x": 813.890625,
+            "y": 470.15625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Prendre ma place · 13",
+          "bounds": {
+            "x": 768.859375,
+            "y": 476.015625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Écouter mes besoins · 14",
+          "bounds": {
+            "x": 823.828125,
+            "y": 466.265625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Créer sans me comparer · 15",
+          "bounds": {
+            "x": 812.984375,
+            "y": 506.71875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Accueillir le changement · 16",
+          "bounds": {
+            "x": 780.5625,
+            "y": 491.71875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Me faire confiance · 17",
+          "bounds": {
+            "x": 783.03125,
+            "y": 508.953125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme · 18",
+          "bounds": {
+            "x": 862.84375,
+            "y": 488.03125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non · 19",
+          "bounds": {
+            "x": 813.8125,
+            "y": 459.984375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Habiter mes choix · 20",
+          "bounds": {
+            "x": 816.9375,
+            "y": 516.84375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "dense",
+      "variant": "list",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-dense-list.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": null,
+      "canvas": null,
+      "bitmap": null,
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue arbre\n\nMe faire confiance\n\n1 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme\n\n2 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non\n\n3 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix\n\n4 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place\n\n5 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins\n\n6 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer\n\n7 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement\n\n8 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nMe faire confiance · 9\n\n9 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme · 10\n\n10 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non · 11\n\n11 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix · 12\n\n12 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place · 13\n\n13 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins · 14\n\n14 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer · 15\n\n15 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement · 16\n\n16 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nMe faire confiance · 17\n\n17 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nTrouver mon rythme · 18\n\n18 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nOser dire non · 19\n\n19 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nHabiter mes choix · 20\n\n20 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nPrendre ma place · 21\n\n1 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nÉcouter mes besoins · 22\n\n2 août 2026 · État : naissance\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nCréer sans me comparer · 23\n\n3 août 2026 · État : feuillaison\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes\n\nAccueillir le changement · 24\n\n4 août 2026 · État : rayonnement\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nPlan d’étapes",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "paper",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-paper.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "radiant",
+      "variant": "paper",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-radiant-paper.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "radiant",
+      "variant": "detail",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-radiant-detail.png",
+      "errors": [],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/anam/plan"
+        }
+      ],
+      "focusRestored": true,
+      "exploration": null,
+      "zoom": null,
+      "drag": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "after": "matrix(1, 0, 0, 1, 24, 28)",
+        "ficheVisible": false,
+        "passed": true
+      },
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+\n\nMe faire confiance\n\n1 août 2026\n\nEn pleine lumière depuis le 1 septembre 2026, parce que tu l’as dit.\n\nNée de ce moment :\n\nJe souhaite avancer à mon rythme, en faisant une place à ce qui compte pour moi.\nVoir dans la conversation\nRenommer\nCentrer sur cette branche\nPlan d’étapes\n\nRien encore.\n\n×",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "seed",
+      "variant": "stored-list",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-seed-stored-list.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "contrast",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-contrast.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "radiant",
+      "variant": "contrast",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-radiant-contrast.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "seed",
+      "variant": "motion",
+      "reducedMotion": "no-preference",
+      "filename": "tree-1440-seed-motion.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "radiant",
+      "variant": "motion",
+      "reducedMotion": "no-preference",
+      "filename": "tree-1440-radiant-motion.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 1,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "zoom",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-zoom.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlarged": "matrix(1.2, 0, 0, 1.2, 0, 0)",
+        "restored": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlargedTargets": [
+          {
+            "width": 44,
+            "height": 44.000030517578125
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44.000030517578125
+          }
+        ],
+        "restoredTargets": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "passed": true
+      },
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-0",
+      "halte": "Graine",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-0.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Graine"
+        ],
+        "illustration": "Un exemple d’arbre : Graine",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-0-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa graine et le tronc\n\nLa graine ouvre le dessin. Le tronc représente ton socle, calculé à partir des données de naissance que tu as choisies de renseigner.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-1",
+      "halte": "Premier élan",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-1.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Premier élan"
+        ],
+        "illustration": "Un exemple d’arbre : Premier élan",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-1-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa naissance d’une branche\n\nQuand un thème revient dans tes échanges, Anam peut te proposer de le nommer. La branche ne naît que si tu confirmes : elle vient de tes mots et de ton accord.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-2",
+      "halte": "Feuillaison",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-2.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Feuillaison"
+        ],
+        "illustration": "Un exemple d’arbre : Feuillaison",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-2-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLa feuillaison\n\nUne branche s’étoffe lorsque ce thème revient réellement dans la conversation. Les feuilles rendent visible cette continuité, sans la mesurer.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-3",
+      "halte": "Pleine lumière",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-3.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": [
+          "Pleine lumière"
+        ],
+        "illustration": "Un exemple d’arbre : Pleine lumière",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-3-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration\nExemple du langage visuel de l’arbre. Ton évolution reste ouverte : cette illustration ne préfigure pas ce que ton arbre devrait devenir.\nGraine\nPremier élan\nFeuillaison\nPleine lumière\nLe rayonnement\n\nUne branche entre en pleine lumière seulement lorsque tu déclares que ce qu’elle porte est devenu vrai en toi. Anam ne le déduit pas à ta place.\n\nVue liste\n−\n+",
+      "viewportOverflow": false
+    }
+  ]
+}

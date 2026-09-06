@@ -50,7 +50,12 @@ describe("[RC-I2] comprendre Mon évolution", () => {
 
     await user.click(ouverture);
     const dialogue = screen.getByRole("dialog", { name: ACTION_COMPRENDRE_EVOLUTION });
-    for (const etape of ETAPES_EVOLUTION) {
+    const haltes = ["Graine", "Premier élan", "Feuillaison", "Pleine lumière"];
+    for (const [index, etape] of ETAPES_EVOLUTION.entries()) {
+      const halte = within(dialogue).getByRole("button", { name: haltes[index] });
+      await user.click(halte);
+      expect(halte.getAttribute("aria-pressed")).toBe("true");
+      expect(within(dialogue).getAllByRole("button", { pressed: true })).toHaveLength(1);
       expect(within(dialogue).getByRole("heading", { name: etape.titre })).toBeTruthy();
       expect(within(dialogue).getByText(etape.corps)).toBeTruthy();
     }

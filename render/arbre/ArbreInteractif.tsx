@@ -60,7 +60,7 @@ const CLE_VUE = "anima:arbre:vueListe";
 const GLISSER_MIN_PX = 8;
 const PAS_CLAVIER_PX = 40;
 /** Cible DOM du tronc lunaire, posée sur sa matière au-dessus du sol. */
-const CENTRE_TRONC = { x: 704, y: 1240 } as const;
+const CENTRE_TRONC = { x: 704, y: 1570 } as const;
 
 export interface ProprietesArbreInteractif {
   projection: ProjectionScene;
@@ -130,7 +130,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   const geometrie = useMemo(() => construireGeometrieLunaire(affichees), [affichees]);
   const placees = geometrie.branches;
   /** L'étape 0 vue par le DESSIN : le même prédicat que `data-etape-arbre="graine"` (ArbreLunaire.tsx) et
-   *  que `contenuEtapeLunaire` dans le moteur. Une seule source de vérité, pour que la graine SVG et la
+   *  que `contenuEtapeLunaire` dans le moteur. Une seule source de vérité, pour que la graine botanique et la
    *  graine peinte ne puissent jamais coexister (voir le rendu, sous le canevas). */
   const etapeGraine = geometrie.branches.length === 0;
   const selectionnee = affichees.find((b) => b.id === p.brancheSelectionnee) ?? null;
@@ -206,6 +206,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   // ── Pan / pincement, avec SEUIL de glisser ──
   const pointeurs = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const captures = useRef<Map<number, Element>>(new Map());
   const depart = useRef<{ x: number; y: number; pan: { x: number; y: number } } | null>(null);
   const pincement = useRef<{ dist: number; zoom: number } | null>(null);
   const aGlisse = useRef(false);
@@ -218,7 +219,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
    */
   const horsCanevas = (cible: EventTarget | null) => {
     if (!(cible instanceof Element)) return false;
-    if (cible.closest("[data-couche-fiche], [data-couche-vide]")) return true;
+    if (cible.closest("[data-couche-fiche], [data-couche-vide], [data-commandes-arbre]")) return true;
     const el = cible as HTMLElement;
     return el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable === true;
   };
@@ -228,7 +229,11 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     // Capture du pointeur : sans elle, un bouton relâché HORS du canevas n'émet jamais `pointerup`,
     // `depart` restait armé et l'arbre suivait le curseur sans bouton pressé (re-revue).
     try {
-      e.currentTarget.setPointerCapture(e.pointerId);
+      // Keep the eventual click on its branch button. Capturing on the canvas retargets
+      // real pointer clicks to the ancestor, so the branch would only open by keyboard.
+      const cible = e.target instanceof Element ? e.target.closest("button") ?? e.currentTarget : e.currentTarget;
+      cible.setPointerCapture(e.pointerId);
+      captures.current.set(e.pointerId, cible);
     } catch {
       /* certains navigateurs refusent la capture sur un pointeur déjà relâché : le pan reste utilisable */
     }
@@ -267,10 +272,11 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   const onPointerUp = (e: React.PointerEvent) => {
     try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
+      captures.current.get(e.pointerId)?.releasePointerCapture(e.pointerId);
     } catch {
       /* déjà relâchée */
     }
+    captures.current.delete(e.pointerId);
     pointeurs.current.delete(e.pointerId);
     if (pointeurs.current.size < 2) pincement.current = null;
     if (pointeurs.current.size === 0) depart.current = null;
@@ -378,22 +384,13 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             a ici aucun contenu spatial à doubler. Le seul chemin de l'écran — la fiche du tronc —
             vit dans l'état vide lui-même, et `tests/rendu/tronc-incomplet.test.tsx` le vérifie dans
             les trois états dès qu'une branche existe. */}
-        {!vide && (
+        {!vide && !indisponible && (
           /* `aria-pressed` retiré : combiné à un libellé qui bascule, il annonçait l'inverse de la réalité. */
           <button type="button" className={s.actionSecondaire} onClick={basculer}>
             {vueListe ? BASCULE_ARBRE : BASCULE_LISTE}
           </button>
         )}
-        {!vueListe && !vide && !indisponible && (
-          <div className={s.zoomBoutons}>
-            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1 / 1.2)} aria-label={ZOOM_MOINS}>
-              <span aria-hidden>−</span>
-            </button>
-            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1.2)} aria-label={ZOOM_PLUS}>
-              <span aria-hidden>+</span>
-            </button>
-          </div>
-        )}
+
       </div>
 
       {indisponible ? (
@@ -431,6 +428,16 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
+        {!vueListe && !vide && !indisponible && (
+          <div className={s.zoomBoutons} data-commandes-arbre>
+            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1 / 1.2)} aria-label={ZOOM_MOINS}>
+              <span aria-hidden>−</span>
+            </button>
+            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1.2)} aria-label={ZOOM_PLUS}>
+              <span aria-hidden>+</span>
+            </button>
+          </div>
+        )}
           <div
             className={`${s.monde} ${selectionnee ? s.mondeEstompe : ""}`}
             style={{
@@ -448,7 +455,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             />
 
             {/* LA GRAINE QUI N'ATTEND QUE D'ÉCLORE (retour du fondateur) — à l'étape 0 SEULEMENT.
-                Le SVG animé `GraineAttente` se superpose au canevas, au point exact où le moteur posait
+                La graine botanique animée `GraineAttente` se superpose au canevas, au point exact où le moteur posait
                 sa graine peinte ; le moteur, lui, saute `peindreGraine` sous la MÊME condition
                 (`MoteurArbreLunaire.peindreBase`) — sinon deux graines au même endroit, une qui respire
                 et une figée dessous.

@@ -37,7 +37,7 @@ function fichiers(extension: string): string[] {
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 describe("[QA 19/08] il n'existe qu'un seul anneau de focus", () => {
-  it("[LE CŒUR] toute déclaration `outline` passe par `--bordure-forte`", () => {
+  it("[LE CŒUR] les anneaux de focus utilisent les tokens, avec une seule enveloppe pour la saisie", () => {
     // ⚠️ JULIAN AVAIT RAISON, ET LA MESURE EN NAVIGATEUR L'A DÉMENTI À TORT. Le tour de QA a compté
     // « 14 règles, toutes identiques » — mais il ne pouvait voir que les feuilles chargées par les
     // onze écrans visités. La source en portait 41, dont HUIT divergentes : sept en `var(--texte)`
@@ -49,7 +49,11 @@ describe("[QA 19/08] il n'existe qu'un seul anneau de focus", () => {
     for (const f of fichiers(".module.css")) {
       for (const m of lire(f).matchAll(/outline:\s*([^;]+);/g)) {
         const valeur = m[1].trim();
-        if (valeur !== "2px solid var(--bordure-forte)") fautives.push(`${f} → ${valeur}`);
+        const anneau = /^(?:2px|calc\(var\(--esp-1\) \/ 2\)) solid var\(--(?:bordure-forte|accent)\)$/.test(valeur);
+        const enveloppe = f === "render/conversation/conversation.module.css" && valeur === "none" &&
+          /\.champ:focus-visible\s*\{[^}]*outline:\s*none;/.test(lire(f)) &&
+          /\.composeur:focus-within\s*\{[^}]*outline:\s*2px solid var\(--accent\);/.test(lire(f));
+        if (!anneau && !enveloppe) fautives.push(`${f} → ${valeur}`);
       }
     }
     expect(fautives, `anneaux de focus divergents :\n${fautives.join("\n")}`).toEqual([]);

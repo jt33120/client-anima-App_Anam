@@ -1,6 +1,6 @@
 /*
  * arbre.module.css — L'arbre de vie (région « arbre »), sa fiche, sa vue liste, et l'échange source.
- * The lunar drawing keeps its original palette inside a plum garden. Reading surfaces use the
+ * The botanical drawing lives inside a celestial garden. Reading surfaces use the
  * shared carnet tokens; focus, gestures, and scroll containers keep their existing behavior.
  */
 
@@ -30,10 +30,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--esp-3);
+  gap: var(--esp-2);
   flex: none;
   flex-wrap: wrap;
-  background: var(--carnet-sauge);
+  background: var(--surface);
   border: 1px solid var(--bordure);
   border-radius: var(--carnet-rayon);
   padding: var(--esp-2);
@@ -42,80 +42,6 @@
 .zoomBoutons {
   display: flex;
   gap: var(--esp-2);
-}
-
-.etapesEvolution {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--esp-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.etapesEvolution li {
-  padding: var(--esp-4);
-  border: 1px solid var(--bordure);
-  border-radius: var(--rayon);
-  background: var(--surface-elevee);
-}
-
-.etapesEvolution h3,
-.etapesEvolution p {
-  margin: 0;
-}
-
-.etapesEvolution p {
-  margin-top: var(--esp-2);
-  color: var(--texte-doux);
-}
-
-.exempleEvolution {
-  margin: var(--esp-2) 0 0;
-  padding: var(--esp-4);
-  border-radius: var(--rayon-md);
-  background:
-    var(--texture-papier),
-    var(--papier);
-  color: var(--sur-papier);
-}
-
-.exempleEvolution svg {
-  display: block;
-  width: 100%;
-  max-height: 14rem;
-}
-
-.exempleEvolution figcaption {
-  color: var(--sur-papier-doux);
-}
-
-.exempleBois {
-  stroke: currentColor;
-  stroke-width: 8;
-  stroke-linecap: round;
-}
-
-.exempleFeuilles {
-  fill: var(--accent);
-}
-
-.exempleRayonnement {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
-  opacity: 0.4;
-}
-
-.exempleGraine {
-  fill: var(--lueur);
-  stroke: var(--sur-papier-doux);
-}
-
-@media (min-width: 42rem) {
-  .etapesEvolution {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 /* ── Boutons (≥ 44px, focus visible, jamais l'état par la couleur seule) ── */
@@ -168,7 +94,7 @@
   overflow: hidden;
   border: 1px solid var(--bordure);
   border-radius: var(--carnet-rayon-lg);
-  background: var(--carnet-jardin);
+  background: var(--arbre-fond-etoile);
   touch-action: none; /* le pan/zoom est géré par les gestes, pas le navigateur */
 }
 .canevas:focus-visible {
@@ -192,9 +118,9 @@
   background: transparent;
 }
 /* ── LA GRAINE QUI N'ATTEND QUE D'ÉCLORE (étape 0) ──────────────────────────────────────────────
-   Le SVG `GraineAttente` (render/arbre/GraineAttente.tsx), posé SUR le canevas, dans le repère de
+   Le sprite botanique `GraineAttente` (render/arbre/GraineAttente.tsx), posé SUR le canevas, dans le repère de
    `.monde` — celui de `.cibleTronc` et des accroches : `left` = CENTRE_ARBRE.x / CANEVAS.largeur
-   (704 / 1408), `top` = (CENTRE_ARBRE.solY + 7) / CANEVAS.hauteur (1367 / 2503), soit le centre
+   (704 / 1408), `top` = (CENTRE_ARBRE.solY + 7) / CANEVAS.hauteur (1767 / 2503), soit le centre
    exact de l'ellipse que `peindreGraine` posait dans le bitmap (le test compare aux constantes de
    geometrie.ts). `--taille-graine` fait rendre la boîte de 48 unités à 48 px : les « 3 px » du
    soulèvement (graine-attente.module.css) sont alors 3 px à l'écran au zoom 1. Pas de
@@ -209,14 +135,14 @@
 .graineAttente {
   position: absolute;
   left: 50%;
-  top: 54.61%;
+  top: 70.60%;
   transform: translate(-50%, -50%);
-  --taille-graine: 48px;
+  --taille-graine: var(--arbre-graine-taille);
 }
 .canevas .graineMessage {
   position: absolute;
   left: 50%;
-  top: calc(54.61% + var(--esp-7));
+  top: calc(70.60% + var(--arbre-graine-taille) / 2);
   width: min(calc(100% - 2 * var(--esp-5)), var(--mesure));
   margin: 0;
   transform: translateX(-50%);
@@ -440,10 +366,8 @@
   top: var(--esp-2);
   left: 50%;
   width: min(calc(100% - 2 * var(--esp-4)), var(--mesure));
-  /* 50 % garde la graine entièrement dégagée sur les trois largeurs de référence tout en évitant
-     de couper l'explication au milieu d'une phrase dès l'arrivée. Le bloc reste défilable pour
-     le zoom texte et les écrans très courts. */
-  max-height: 50%;
+  /* Reserve the seed's full image box below the introduction. Short viewports still scroll. */
+  max-height: calc(70% - var(--arbre-graine-taille) / 2 - var(--esp-4));
   transform: translateX(-50%);
   overflow-y: auto;
   border-radius: var(--carnet-rayon);
@@ -533,6 +457,65 @@
     background: transparent;
   }
 }
+
+.canevas::before, .apercuJardin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--texture-papier);
+  opacity: var(--arbre-ciel-opacite);
+}
+.explorationEvolution { display: grid; gap: var(--esp-4); }
+.explorationEvolution .explorationAnnotation {
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--pile-manuscrite);
+  font-size: var(--arbre-annotation);
+  text-align: center;
+}
+.exempleEvolution { margin: 0; display: grid; gap: var(--esp-3); }
+.exempleEvolution figcaption { color: var(--texte-doux); line-height: 1.5; }
+.apercuJardin {
+  position: relative;
+  height: var(--arbre-apercu-hauteur);
+  overflow: hidden;
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  background: var(--arbre-fond-etoile);
+}
+.apercuPortrait {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 1408 / 2503;
+  margin: auto;
+}
+.apercuGraine {
+  position: absolute;
+  left: 50%; top: 70.60%;
+  transform: translate(-50%, -50%);
+}
+.mentionExemple {
+  position: absolute; left: var(--esp-4); top: var(--esp-3);
+  color: var(--carnet-jardin-encre);
+  font-family: var(--pile-ui); font-size: var(--arbre-commande-taille);
+}
+.haltesEvolution { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--esp-1); }
+.halteEvolution {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--esp-1); min-height: var(--cible-tactile); padding: var(--esp-2) var(--esp-1);
+  border: 1px solid var(--bordure); border-radius: var(--rayon-md);
+  color: var(--texte-doux); background: var(--surface); font-family: var(--pile-ui);
+  font-size: var(--arbre-commande-taille); cursor: pointer;
+}
+.halteEvolution[aria-pressed="true"] { background: var(--carnet-lavande); color: var(--texte); border-color: var(--accent); }
+.halteEvolution:focus-visible { outline: 2px solid var(--bordure-forte); outline-offset: 3px; }
+.halteRepere { width: var(--esp-2); height: var(--esp-2); border: 1px solid var(--accent); border-radius: var(--rayon-full); }
+.halteEvolution[aria-pressed="true"] .halteRepere { background: var(--accent); }
+.detailEvolution { padding: var(--esp-4); border-left: 2px solid var(--accent); background: var(--surface); border-radius: var(--rayon-md); }
+.detailEvolution h3 { margin: 0 0 var(--esp-2); }
+.detailEvolution p { margin: 0; color: var(--texte-doux); }
+
 @media (prefers-reduced-motion: reduce) {
   /* Immédiat : le filet accent reste, le fond disparaît d'emblée (aucun estompe animé). */
   .surligne {
@@ -638,8 +621,25 @@
 }
 
 .zoomBoutons {
-  margin-left: auto;
+  position: absolute;
+  z-index: 3;
+  right: var(--esp-3);
+  bottom: var(--esp-3);
+  padding: var(--esp-1);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-full);
+  background: var(--carnet-jardin);
 }
+.zoomBoutons .zoomBouton {
+  color: var(--carnet-jardin-encre);
+  background: transparent;
+}
+.barre .actionSecondaire {
+  font-size: var(--arbre-commande-taille);
+  border-color: transparent;
+}
+.barre .actionSecondaire:first-child { flex: 1; text-align: left; }
+
 
 .actionSecondaire:hover,
 .zoomBouton:hover {
@@ -659,4 +659,19 @@
     top: var(--esp-4);
     max-width: calc(var(--mesure) - var(--esp-7));
   }
+}
+
+/* The garden keeps its own nocturnal ink in both reading themes. */
+.zoomBoutons .zoomBouton:hover { background: var(--arbre-ciel-brume); }
+.canevas .accroche:focus-visible {
+  outline-color: var(--carnet-jardin-encre);
+  box-shadow: 0 0 0 4px var(--carnet-jardin);
+}
+:global(:root[data-a11y="contraste"]) .canevas,
+:global(:root[data-a11y="contraste"]) .apercuJardin { background: var(--carnet-jardin); }
+:global(:root[data-a11y="contraste"]) .canevas::before,
+:global(:root[data-a11y="contraste"]) .apercuJardin::before { background: none; }
+@media (prefers-contrast: more) {
+  .canevas, .apercuJardin { background: var(--carnet-jardin); }
+  .canevas::before, .apercuJardin::before { background: none; }
 }

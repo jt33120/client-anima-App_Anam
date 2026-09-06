@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import SceneDom from "@/render/scene-dom";
 import FicheSocle, { type ProprietesFicheSocle } from "@/render/socle/FicheSocle";
@@ -19,10 +20,22 @@ import "@/app/styles/carnet-tokens.css";
 import "@/app/styles/carnet.css";
 import halte from "@/render/socle/socle.module.css";
 import "./preview.css";
+import { treeProjectionFor } from "./tree-fixtures";
 
 // Local synthetic fixtures only. This harness has no session, backend or database client.
 const params = new URLSearchParams(window.location.search);
 const state = params.get("state") ?? "real";
+if (params.has("tree")) {
+  localStorage.setItem("anima:arbre:vueListe", params.get("treeView") === "list" ? "1" : "0");
+}
+function RequestedTree() {
+  useEffect(() => {
+    if (!params.has("tree")) return;
+    const buttons = document.querySelectorAll<HTMLButtonElement>('nav[aria-label="Régions"] button');
+    [...buttons].find((button) => button.textContent?.trim() === "Mon évolution")?.click();
+  }, []);
+  return null;
+}
 const long = state === "dense";
 const card = (cle: string, titre: string, texte: string): CarteVue => ({
   cle, titre, faits: [], texte: { statut: "ecrit", texte }, etat: null, ecritureModele: null,
@@ -76,11 +89,7 @@ const texteSocle: ProprietesFicheSocle["copie"] = {
 const scene = <SceneDom
   jourAccueil={daily.jour}
   bibliotheque={state === "error" ? null : daily}
-  projection={{ tronc: { present: true }, branches: state === "empty" ? [] : [
-    { id: "fixture-1", etat: "feuillaison", intensite: 0.65, extraitSourceId: "fixture-a", nom: "Me faire confiance", dateNaissance: "2026-08-02", extraitContenu: "Je veux apprendre à me faire confiance." },
-    { id: "fixture-2", etat: "naissance", intensite: 0, extraitSourceId: "fixture-b", nom: "Trouver mon rythme", dateNaissance: "2026-08-24" },
-    { id: "fixture-3", etat: "rayonnement", intensite: 1, extraitSourceId: "fixture-c", nom: "Oser dire non", dateNaissance: "2026-07-03", dateRayonnement: "2026-08-30" },
-  ] }}
+  projection={treeProjectionFor(params)}
   seuilDejaFranchi={params.get("view") !== "seuil"}
   accueilAnam="Confie ici ce que tu portes en toi. Un espace pour te comprendre, évoluer, te dépasser et révéler la personne que tu es appelée à devenir."
   historique={state === "empty" ? [] : [
@@ -94,5 +103,6 @@ const isSocle = window.location.pathname === "/socle";
 const mode = params.get("univers") === "numerologie" ? "numerologie" : "astrologie";
 createRoot(document.getElementById("root")!).render(<>
   <ThemeCarnetDocument />
+  <RequestedTree />
   {isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : scene}
 </>);

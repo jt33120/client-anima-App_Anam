@@ -59,63 +59,67 @@ const blocsAnimes = (): { selecteur: string; corps: string }[] => {
 
 const monter = (className?: string) => {
   const { container } = render(<GraineAttente className={className} />);
-  const svg = container.querySelector("[data-graine-attente]");
-  expect(svg, "le crochet data-graine-attente a disparu").not.toBeNull();
-  return svg as SVGSVGElement;
+  const graine = container.querySelector("[data-graine-attente]");
+  expect(graine, "le crochet data-graine-attente a disparu").not.toBeNull();
+  return graine as HTMLSpanElement;
 };
 
 describe("[LA GRAINE] décorative, muette, accrochée", () => {
-  it("[LE CŒUR] le SVG est décoratif (aria-hidden, focusable=false) et porte le crochet des tests", () => {
+  it("[LE CŒUR] la graine botanique est décorative, muette et absente du parcours clavier", () => {
     // Le canevas voisin porte déjà `role="img"` et l'aria-label de l'étape (ArbreLunaire.tsx). Une
     // graine qui parlerait dirait l'étape deux fois ; une graine focusable ferait un arrêt de
     // tabulation sur du décor. Elle est muette, et c'est le crochet `data-` qui la rend trouvable.
-    const svg = monter("essai");
-    expect(svg.tagName.toLowerCase()).toBe("svg");
-    expect(svg.getAttribute("aria-hidden")).toBe("true");
-    expect(svg.getAttribute("focusable")).toBe("false");
-    expect(svg.getAttribute("role"), "un rôle sur du décor : l'étape serait dite deux fois").toBeNull();
-    expect(svg.getAttribute("tabindex")).toBeNull();
-    expect(svg.classList.contains("essai"), "className n'est pas transmis").toBe(true);
-    // Aucun texte : ni <text>, ni <title>, ni <desc> — rien qu'un lecteur d'écran pourrait lire.
-    expect(svg.querySelector("text, title, desc, foreignObject")).toBeNull();
-    expect(svg.textContent?.trim()).toBe("");
+    const graine = monter("essai");
+    expect(graine.tagName.toLowerCase()).toBe("span");
+    expect(graine.getAttribute("aria-hidden")).toBe("true");
+    expect(graine.getAttribute("role"), "un rôle sur du décor : l'étape serait dite deux fois").toBeNull();
+    expect(graine.getAttribute("tabindex")).toBeNull();
+    expect(graine.querySelector('a[href], button, input, select, textarea, [tabindex], [contenteditable="true"]')).toBeNull();
+    expect(graine.classList.contains("essai"), "className n'est pas transmis").toBe(true);
+    expect(graine.querySelector("text, title, desc, foreignObject")).toBeNull();
+    expect(graine.textContent?.trim()).toBe("");
+    expect(graine.querySelector("img")?.getAttribute("alt")).toBe("");
   });
 
-  it("aucun style inline, nulle part dans le dessin", () => {
+  it("aucune animation inline ; seule la neutralisation de couleur de next/image est admise", () => {
     // Le soulèvement et le souffle vivent dans la feuille ; un `style=` sur un élément serait un
     // second endroit où l'animation pourrait naître, hors de portée des gardes ci-dessous.
-    const svg = monter();
-    const avecStyle = [svg, ...svg.querySelectorAll("*")].filter((e) => e.hasAttribute("style"));
-    expect(avecStyle.map((e) => e.tagName), "un style inline s'est glissé dans la graine").toEqual([]);
+    const graine = monter();
+    const avecStyle = [graine, ...graine.querySelectorAll<HTMLElement>("*")].filter((e) => e.hasAttribute("style"));
+    for (const element of avecStyle) {
+      expect(element.tagName.toLowerCase(), "un style inline s'est glissé hors de l'image").toBe("img");
+      expect(Array.from(element.style), "une géométrie ou animation contourne la feuille CSS").toEqual(["color"]);
+      expect(element.style.color).toBe("transparent");
+    }
+    expect(TSX()).not.toMatch(/\bstyle\s*=/);
   });
 
-  it("[ANTI-VACUITÉ] il y a bien une graine dedans — une ellipse, dans le corps, sous un halo", () => {
-    // Sans ce témoin, un `<svg data-graine-attente aria-hidden />` vide passerait tout le describe.
-    const svg = monter();
-    expect(svg.getAttribute("viewBox"), "l'échelle du lotus (viewBox 48)").toBe("0 0 48 48");
-    const corps = svg.querySelector('[class*="corps"]');
-    expect(corps, "le groupe qui respire a disparu").not.toBeNull();
-    expect(corps!.querySelectorAll("ellipse").length, "la graine est une ellipse, une seule").toBe(1);
-    // Le halo est le FRÈRE du corps (sous le soulèvement), jamais son enfant : dedans, il fausserait
-    // la boîte `fill-box` depuis laquelle la graine se dresse.
-    const souleve = svg.querySelector('[class*="souleve"]');
+  it("[ANTI-VACUITÉ] une seule image nacrée dimensionnée partage le soulèvement avec son halo", () => {
+    const graine = monter();
+    const images = graine.querySelectorAll("img");
+    expect(images).toHaveLength(1);
+    const corps = images[0];
+    expect(corps.className).toMatch(/corps/);
+    const source = new URL(corps.src, window.location.href);
+    expect(source.searchParams.get("url") ?? source.pathname).toBe("/marque/graine-nacree.webp");
+    expect(corps.getAttribute("width")).toBe("384");
+    expect(corps.getAttribute("height")).toBe("384");
+    expect(corps.getAttribute("sizes")).toBe("112px");
+    expect(corps.getAttribute("draggable")).toBe("false");
+    // Le halo reste frère de l'image : sa boîte ne modifie pas l'origine du souffle.
+    const souleve = graine.querySelector('[class*="souleve"]');
     expect(souleve, "le groupe qui se soulève a disparu").not.toBeNull();
     expect(souleve!.querySelector(':scope > [class*="halo"]'), "le halo ne monte plus avec la graine").not.toBeNull();
-    expect(corps!.querySelector('[class*="halo"]'), "le halo est entré dans le corps qui respire").toBeNull();
+    expect(corps.parentElement).toBe(souleve);
     // Sans className, la classe reste propre : ni « undefined », ni espace traînant.
-    expect(svg.getAttribute("class")).toMatch(/^\S+$/);
+    expect(graine.getAttribute("class")).toMatch(/^\S+$/);
   });
 
-  it("les couleurs viennent des tokens de la palette gelée, jamais d'un hex en dur", () => {
-    // La palette est gelée au hex près dans tests/arbre-lunaire.test.ts L29-38, et globals.css la
-    // reflète en tokens (`--lueur`, `--arbre-tronc`, `--arbre-branche`). Un hex recopié ici serait
-    // une seconde source de vérité — et resterait nacre en mode contraste renforcé, où tout le
-    // reste de l'arbre devient bleu profond.
+  it("le halo utilise la lueur du thème et le décor n'intercepte pas les gestes", () => {
     const css = CSS();
-    for (const token of ["--lueur", "--arbre-tronc", "--arbre-branche"]) {
-      expect(css, `${token} n'habille plus la graine`).toContain(`var(${token})`);
-    }
-    expect(TSX(), "le trait ne passe plus par currentColor").toMatch(/stroke="currentColor"/);
+    const halo = /\.halo\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(halo, "le halo ne suit plus la lueur du thème").toContain("var(--lueur)");
+    expect(css).toMatch(/\.graine\s*\{[^}]*pointer-events:\s*none/);
     for (const [nom, src] of [["la feuille", css], ["le composant", sansCommentaires(TSX())]] as const) {
       expect(src, `un hex en dur dans ${nom}`).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     }
@@ -188,6 +192,13 @@ describe("[LE SOUFFLE] le même que le lotus, et rien qui rebondisse", () => {
     const blocs = toutesLesKeyframes();
     const tout = blocs.map((b) => b.corps).join("\n");
 
+    const opacites = [...tout.matchAll(/opacity:\s*([\d.]+)/g)].map((m) => Number(m[1]));
+    expect(opacites.length, "le halo n'a plus de souffle visible").toBeGreaterThan(0);
+    for (const opacite of opacites) {
+      expect(opacite).toBeGreaterThanOrEqual(0.25);
+      expect(opacite).toBeLessThanOrEqual(1);
+    }
+
     const echelles = [...tout.matchAll(/scale\(([\d.]+)\)/g)].map((m) => Number(m[1]));
     expect(echelles.length, "la graine ne respire plus").toBeGreaterThan(0);
     for (const e of echelles) {
@@ -237,7 +248,7 @@ describe("[LE SOUFFLE] le même que le lotus, et rien qui rebondisse", () => {
     expect(animes[".souleve"]?.[2]).toMatch(/calc\(var\(--cycle\)\s*\*\s*2\)/);
     // Origine : le milieu du BAS de sa propre boîte — elle se dresse, elle ne gonfle pas du centre.
     const corps = /\.corps\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
-    expect(corps).toMatch(/transform-box:\s*fill-box/);
+    expect(corps).toMatch(/object-fit:\s*contain/);
     expect(corps).toMatch(/transform-origin:\s*50%\s+100%/);
   });
 

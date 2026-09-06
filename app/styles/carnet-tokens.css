@@ -36,6 +36,22 @@
   --carnet-entete-hauteur: calc(3.75rem + env(safe-area-inset-top, 0px));
   --carnet-conversation-titre: 1.75rem;
   --carnet-duree-region: 280ms;
+  --arbre-graine-taille: 7rem;
+  --arbre-apercu-hauteur: clamp(17rem, 38vh, 24rem);
+  --arbre-ciel-opacite: 0.15;
+  --arbre-fond-etoile: radial-gradient(ellipse at 50% 28%, color-mix(in srgb, var(--arbre-ciel-brume) 62%, transparent), transparent 66%), radial-gradient(ellipse at 50% 78%, color-mix(in srgb, var(--arbre-sol-brume) 58%, transparent), transparent 55%), var(--carnet-jardin);
+  --arbre-annotation: 1.375rem;
+  --arbre-ciel-brume: #273459;
+  --arbre-sol-brume: #273854;
+  --arbre-commande-taille: 0.8125rem;
+  --arbre-bois-clair: #B6B6D0;
+  --arbre-bois: #858AA8;
+  --arbre-bois-ombre: #4D5274;
+  --arbre-feuille-ciel: #A8CFD9;
+  --arbre-feuille-lavande: #B9ADDC;
+  --arbre-feuille-rose: #E5BDCC;
+  --arbre-feuille-ombre: #556581;
+  --arbre-nacre: #ECEDF8;
 }
 :root:not([data-a11y="contraste"]) {
   --fond: #11182D;

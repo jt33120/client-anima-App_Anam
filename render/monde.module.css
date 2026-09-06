@@ -1393,3 +1393,6 @@
   .navLien { transition: none; }
   .navLien:active { transform: none; }
 }
+
+/* A sheet opened inside a region must also cover the persistent navigation. */
+.regionActive:has([role="dialog"][aria-modal="true"]) { z-index: 60; }

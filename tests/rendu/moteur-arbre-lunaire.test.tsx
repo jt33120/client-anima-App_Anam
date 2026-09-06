@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { BrancheProjetee } from "@/lib/scene/projection";
 import {
   CANEVAS,
+  CENTRE_ARBRE,
   construireGeometrieLunaire,
 } from "@/render/arbre/geometrie";
 import { MoteurArbreLunaire } from "@/render/arbre/MoteurArbreLunaire";
@@ -137,8 +138,8 @@ const brancheFeuillaison = (intensite: number): BrancheProjetee => ({
 
 afterEach(() => vi.restoreAllMocks());
 
-/** L'ellipse exacte de `peindreGraine` : centre (704, 1367), 24 × 31, inclinée de −0,18 rad. */
-const ELLIPSE_GRAINE = [CANEVAS.largeur / 2, 1367, 24, 31, -0.18, 0, Math.PI * 2];
+/** Le pied peint reste au même point que la graine DOM et le repère géométrique partagé. */
+const ELLIPSE_GRAINE = [CENTRE_ARBRE.x, CENTRE_ARBRE.solY + 7, 24, 31, -0.18, 0, Math.PI * 2];
 
 describe("moteur Canvas lunaire — exécution réelle des chemins de peinture", () => {
   it("l'étape 0 compose quatre couches transparentes et ne peint RIEN — la graine est le SVG superposé", () => {
@@ -172,7 +173,7 @@ describe("moteur Canvas lunaire — exécution réelle des chemins de peinture",
     expect(canvas.height).toBe(Math.ceil(CANEVAS.hauteur * 0.7));
   });
 
-  it("peint les 60 branches dans les quatre couches, avec joints et lumière du handoff", () => {
+  it("peint les 60 branches dans les quatre couches, avec leurs feuilles et leur rayonnement", () => {
     const instrumentation = installerContexte();
     const canvas = document.createElement("canvas");
     const moteur = new MoteurArbreLunaire(canvas);
@@ -187,18 +188,38 @@ describe("moteur Canvas lunaire — exécution réelle des chemins de peinture",
     // (immobile, elle n'a pas besoin de la couche SVG). Sans ce témoin, « aucune ellipse à l'étape 0 »
     // serait aussi vrai d'un `peindreGraine` supprimé.
     expect(base.ellipses, "la graine au pied de l'arbre a disparu du bitmap").toContainEqual(ELLIPSE_GRAINE);
-    expect(
-      base.gradientsRadiaux.some((gradient) =>
-        gradient.stops.some(([, couleur]) => couleur === "rgba(10,9,26,0.22)"),
-      ),
-      "la contre-ombre des joints du handoff a disparu",
-    ).toBe(true);
+    expect(base.gradientsRadiaux.length, "les raccords n'ont plus de matière ombrée").toBeGreaterThan(2);
     expect(principal.drawSources.slice(-4)).toEqual([
       base.canvas,
       bois.canvas,
       feuilles.canvas,
       lueur.canvas,
     ]);
+  });
+
+  it("une feuillaison complète reste sans aura ; sa déclaration de rayonnement invalide bien le cache", () => {
+    const instrumentation = installerContexte();
+    const canvas = document.createElement("canvas");
+    const moteur = new MoteurArbreLunaire(canvas);
+    moteur.mettreAJour(construireGeometrieLunaire([brancheFeuillaison(1)]), false);
+    const [principal, base, , feuilles, lueur] = instrumentation.ordre;
+    expect(feuilles.drawSources.length).toBeGreaterThan(0);
+    expect(lueur.appels.stroke ?? 0).toBe(0);
+    expect(lueur.arcs).toEqual([]);
+    const baseAvant = base.appels.clearRect;
+    const compositionAvant = principal.appels.clearRect;
+
+    const rayonnante = construireGeometrieLunaire([{ ...brancheFeuillaison(1), etat: "rayonnement" }]);
+    moteur.mettreAJour(rayonnante, false);
+    expect(lueur.appels.stroke).toBeGreaterThan(0);
+    expect(lueur.arcs.length).toBeGreaterThan(0);
+    expect(base.appels.clearRect).toBe(baseAvant);
+    expect(principal.appels.clearRect).toBe(compositionAvant + 1);
+
+    const cuissonAvant = lueur.appels.clearRect;
+    moteur.mettreAJour(rayonnante, false);
+    expect(lueur.appels.clearRect).toBe(cuissonAvant);
+    expect(principal.appels.clearRect).toBe(compositionAvant + 1);
   });
 
   it("un changement de réserve ne recuit ni bois, ni feuilles, ni lueurs", () => {

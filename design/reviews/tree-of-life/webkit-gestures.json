@@ -1,0 +1,18 @@
+{
+  "engine": "WebKit",
+  "viewport": "390x844",
+  "name": "Branche : Me faire confiance",
+  "touchTapOpened": true,
+  "escapeClosed": true,
+  "focusRestored": true,
+  "dragPointer": "mouse (trusted browser events)",
+  "before": "translate(0px) scale(1)",
+  "after": "translate(45px, 30px) scale(1)",
+  "afterReleasedMove": "translate(45px, 30px) scale(1)",
+  "noDetailAfterDrag": true,
+  "noGhostPan": true,
+  "errors": [],
+  "intercepted": [
+    "http://127.0.0.1:4179/api/anam/plan?brancheId=visual-tree-1"
+  ]
+}

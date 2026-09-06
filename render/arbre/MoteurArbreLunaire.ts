@@ -1,4 +1,5 @@
 import { intensiteBornee, type BrancheProjetee } from "@/lib/scene";
+import tokens from "@/design/tokens.json";
 import {
   CANEVAS,
   CENTRE_ARBRE,
@@ -12,14 +13,16 @@ import {
   type SorteBoisLunaire,
 } from "./geometrie";
 
-/** Valeurs validées par le handoff — aucune couleur de thème ne doit les dériver. */
+const MATIERE = tokens.arbre;
+
+/** Palette du jardin, issue de la même source que les surfaces et les commandes DOM. */
 export const PALETTE_LUNAIRE = {
-  ciel: "#0C0A1E",
-  tronc: "#6A6690",
-  branche: "#9A96BE",
-  feuillage: "#8FB6D8",
-  lueur: "#CDE4F8",
-  accroche: "#8FC1EF",
+  ciel: tokens.shared["carnet-jardin"],
+  tronc: MATIERE.bois,
+  branche: MATIERE.boisClair,
+  feuillage: MATIERE.feuilleCiel,
+  lueur: MATIERE.nacre,
+  accroche: MATIERE.feuilleCiel,
 } as const;
 
 export const COUCHES_LUNAIRES = ["base", "wood", "leaf", "glow"] as const;
@@ -32,8 +35,7 @@ export function contenuEtapeLunaire(nombreBranches: number): {
 }
 
 /**
- * L'échelle de rastérisation du handoff : le canevas logique 1408 × 2503 est peint à 0,7 pixel par
- * unité. C'est le RÉGLAGE DE L'ARBRE RÉEL, celui qu'on peut agrandir au zoom, et il ne bouge pas.
+ * Résolution bornée : le canevas logique est peint à 0,7 pixel par unité, sans multiplier le DPR.
  */
 export const ECHELLE_HANDOFF = 0.7;
 const composantesHex = (hex: string): readonly [number, number, number] => {
@@ -42,8 +44,12 @@ const composantesHex = (hex: string): readonly [number, number, number] => {
 };
 const NACRE = composantesHex(PALETTE_LUNAIRE.lueur).join(",");
 const ACCROCHE = composantesHex(PALETTE_LUNAIRE.accroche).join(",");
-const FEUILLAGE = composantesHex(PALETTE_LUNAIRE.feuillage);
-const LUEUR = composantesHex(PALETTE_LUNAIRE.lueur);
+const alpha = (couleur: string, opacite: number) => `rgba(${composantesHex(couleur).join(",")},${opacite})`;
+const melanger = (a: string, b: string, proportion: number) => {
+  const debut = composantesHex(a);
+  const fin = composantesHex(b);
+  return `rgb(${debut.map((c, i) => Math.round(c + (fin[i] - c) * proportion)).join(",")})`;
+};
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 const smooth = (a: number, b: number, x: number) => {
   const u = clamp((x - a) / (b - a), 0, 1);
@@ -54,6 +60,11 @@ export function lumiereDeBranche(branche: BrancheProjetee): number {
   if (branche.etat === "naissance") return 0;
   if (branche.etat === "rayonnement") return 1;
   return intensiteBornee(branche.intensite);
+}
+
+/** L'illumination est déclarée par la personne ; une feuillaison complète ne la déduit jamais. */
+export function rayonnementDeBranche(branche: BrancheProjetee): boolean {
+  return branche.etat === "rayonnement";
 }
 
 /** Progression continue de la matière du bois, partagée par le moteur et ses gardes pures. */
@@ -106,48 +117,39 @@ interface SpriteFeuille {
   readonly hauteur: number;
 }
 
-type FormeFeuille = { L: number; W: number; courbe: number };
+type FormeFeuille = { L: number; W: number; courbe: number; couleur: string };
 
 function genererFeuillesLunaires(
   branche: BranchePlacee,
   rng: GenerateurAleatoireLunaire,
 ): readonly FeuilleLunaire[] {
   const bulbe = branche.bulbe;
-  const base = branche.principale.pts[0];
-  const portee = Math.hypot(bulbe.x - base.x, bulbe.y - base.y) + bulbe.r;
-  const nombre = Math.round(bulbe.r * bulbe.r * 0.011);
+  const supports = branche.rameaux.length ? branche.rameaux : [branche.principale];
+  const nombre = Math.min(520, Math.round(bulbe.r * bulbe.r * 0.0065));
   const feuilles: FeuilleLunaire[] = [];
   for (let i = 0; i < nombre; i++) {
-    const angle = rng() * 6.2832;
-    const rayon = Math.sqrt(rng()) * bulbe.r * 1.04;
-    const x = bulbe.x + Math.cos(angle) * rayon;
-    const y = bulbe.y + Math.sin(angle) * rayon * 0.92;
-    const dx = x - base.x;
-    const dy = y - base.y;
-    const distance = Math.hypot(dx, dy) || 1;
-    const ox = x - bulbe.x;
-    const oy = y - bulbe.y;
-    const distanceOrigine = Math.hypot(ox, oy) || 1;
-    const rotation =
-      Math.atan2(
-        (dx / distance) * 0.45 + (ox / distanceOrigine) * 0.55,
-        -(dy / distance) * 0.45 - (oy / distanceOrigine) * 0.55,
-      ) +
-      (rng() - 0.5) * 0.7;
+    // Chaque pétiole part d'une ramille réelle. Les touffes suivent les fourches et laissent des
+    // trouées, au lieu de remplir des disques sans relation avec la structure du bois.
+    const support = supports[Math.floor(rng() * supports.length)];
+    const progression = 0.24 + Math.pow(rng(), 0.68) * 0.76;
+    const index = Math.min(support.pts.length - 2, Math.floor(progression * (support.pts.length - 1)));
+    const point = support.pts[index];
+    const suivant = support.pts[index + 1];
+    const direction = Math.atan2(suivant.y - point.y, suivant.x - point.x);
+    const cote = i % 2 ? 1 : -1;
+    const petiole = 2 + rng() * 14;
+    const x = point.x - Math.sin(direction) * petiole * cote;
+    const y = point.y + Math.cos(direction) * petiole * cote;
+    const rotation = direction + Math.PI / 2 + cote * (0.45 + rng() * 0.65);
     const hauteurLocale = clamp((bulbe.y - y) / bulbe.r + 0.5, 0, 1);
-    const bord = clamp(rayon / bulbe.r, 0, 1);
-    const ton = clamp(
-      0.24 + 0.3 * hauteurLocale + 0.2 * bord + (rng() - 0.5) * 0.28,
-      0,
-      1,
-    );
+    const ton = clamp(0.27 + 0.3 * hauteurLocale + progression * 0.17 + (rng() - 0.5) * 0.35, 0, 1);
     feuilles.push({
       x,
       y,
       rotation,
-      u: clamp(distance / portee, 0, 1),
-      echelle: (0.5 + Math.pow(rng(), 1.4) * 0.95) * (bulbe.r / 118),
-      forme: Math.floor(rng() * 6),
+      u: clamp(0.04 + (support.u0 ?? 0.5) * 0.62 + progression * 0.22, 0, 0.92),
+      echelle: (0.65 + Math.pow(rng(), 1.2) * 0.82) * clamp(bulbe.r / 210, 0.7, 1.3),
+      forme: rng() < 0.07 ? 5 : Math.floor(rng() * 5),
       ton: clamp(Math.floor(ton * 5), 0, 4),
     });
   }
@@ -155,7 +157,7 @@ function genererFeuillesLunaires(
 }
 
 /**
- * Reprend le flux partagé de `buildLeaves()` pour les treize routes officielles. Les extensions ont
+ * Conserve un flux partagé pour les treize routes fixes. Les extensions ont
  * leur propre flux stable : ajouter une 60e branche ne peut donc jamais déplacer les feuilles nées.
  */
 export function construireFeuillesLunaires(
@@ -183,7 +185,7 @@ function contexte2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null 
 }
 
 /**
- * Port de la classe Canvas du handoff. Le moteur est volontairement muet : il reçoit une géométrie
+ * Le moteur est volontairement muet : il reçoit une géométrie
  * déjà associée à la projection et ne déclenche aucun geste. Les quatre bitmaps ne sont repeints que
  * lorsque la projection change ; la composition finale ne fait que quatre drawImage + les accroches.
  */
@@ -200,18 +202,7 @@ export class MoteurArbreLunaire {
   private readonly lumiere = { x: -0.52, y: -0.85 };
   private readonly echelle: number;
 
-  /**
-   * @param echelle pixels par unité du canevas logique. Par défaut celle du handoff.
-   *
-   * ⚠️ PARAMÈTRE AJOUTÉ LE 2026-09-04, POUR UN APPELANT ET UN SEUL : le portail d'entrée. Mesuré
-   * dans Chromium à `Emulation.setCPUThrottlingRate: 4` (un téléphone de milieu de gamme) : une
-   * cuisson en plein rayonnement à l'échelle du handoff coûte **1 814 ms** de fil principal. Le
-   * portail couvre l'hydratation — payer deux secondes de calcul PENDANT elle retarderait
-   * précisément ce qu'il attend. Le portail dessine un arbre de quelques centaines de pixels ; il
-   * n'a aucune raison de payer celui qu'on peut agrandir au zoom.
-   *
-   * L'arbre réel, lui, garde le défaut : cette valeur est celle du prototype validé au pixel près.
-   */
+  /** Le portail peut demander une résolution inférieure à celle du jardin agrandissable. */
   constructor(canvas: HTMLCanvasElement, echelle: number = ECHELLE_HANDOFF) {
     this.canvas = canvas;
     this.echelle = echelle;
@@ -260,7 +251,8 @@ export class MoteurArbreLunaire {
     }
 
     const contenu = contenuEtapeLunaire(geometrie.branches.length);
-    const etape = `${troncEnReserve ? "reserve" : "plein"}:${contenu.arbre ? "arbre" : "graine"}`;
+    const charpente = [...new Set(geometrie.branches.map(({ fourche }) => `${fourche.x}:${fourche.y}`))].sort().join("|");
+    const etape = `${troncEnReserve ? "reserve" : "plein"}:${contenu.arbre ? "arbre" : "graine"}:${charpente}`;
     let compositionSale = false;
     if (this.etapePeinte !== etape) {
       this.peindreBase(geometrie, troncEnReserve, contenu.arbre);
@@ -268,7 +260,7 @@ export class MoteurArbreLunaire {
       compositionSale = true;
     }
     const signatureDynamique = geometrie.branches
-      .map(({ rang, branche }) => `${rang}:${lumiereDeBranche(branche)}`)
+      .map(({ rang, branche }) => `${rang}:${lumiereDeBranche(branche)}:${rayonnementDeBranche(branche)}`)
       .join("|");
     if (this.signatureDynamique !== signatureDynamique) {
       this.rebake(geometrie.branches);
@@ -282,27 +274,12 @@ export class MoteurArbreLunaire {
     contexte.clearRect(0, 0, CANEVAS.largeur, CANEVAS.hauteur);
   }
 
-  private tons(kind: SorteBoisLunaire) {
-    if (kind === "trunk" || kind === "root") return { hi: "#918DB4", mid: PALETTE_LUNAIRE.tronc, lo: "#4C4870" };
-    if (kind === "leader") return { hi: "#A8A4CA", mid: "#837FA9", lo: "#605C88" };
-    return { hi: "#C0BDDA", mid: PALETTE_LUNAIRE.branche, lo: "#7A76A0" };
+  private tons() {
+    return { hi: MATIERE.boisClair, mid: MATIERE.bois, lo: MATIERE.boisOmbre };
   }
 
-  private teinteFeuille(lumiere: number): string {
-    const valeur = clamp(lumiere, 0, 1);
-    const paliers = [
-      [38, 46, 78],
-      [58, 82, 122],
-      [98, 136, 178],
-      FEUILLAGE,
-      LUEUR,
-    ];
-    const segment = valeur * 4;
-    const i = Math.min(3, Math.floor(segment));
-    const f = segment - i;
-    const a = paliers[i];
-    const b = paliers[i + 1];
-    return `rgb(${(a[0] + (b[0] - a[0]) * f) | 0},${(a[1] + (b[1] - a[1]) * f) | 0},${(a[2] + (b[2] - a[2]) * f) | 0})`;
+  private teinteFeuille(lumiere: number, couleur: string): string {
+    return melanger(MATIERE.feuilleOmbre, couleur, 0.16 + clamp(lumiere, 0, 1) * 0.84);
   }
 
   private peindreSegment(
@@ -346,7 +323,7 @@ export class MoteurArbreLunaire {
     const milieu = points[points.length >> 1];
     const coteEclaire = milieu.nx * this.lumiere.x + milieu.ny * this.lumiere.y > 0 ? 1 : -1;
     const largeurMoyenne = (base.w + pointe.w) / 2;
-    const tons = this.tons(segment.kind);
+    const tons = this.tons();
 
     if (matiere < 1 && (segment.kind === "trunk" || segment.kind === "root")) {
       // Même silhouette et contraste ; seule la richesse de matière (dégradé/stries) reste en réserve.
@@ -359,7 +336,8 @@ export class MoteurArbreLunaire {
         milieu.y - milieu.ny * milieu.w * 0.5 * coteEclaire,
       );
       gradient.addColorStop(0, tons.hi);
-      gradient.addColorStop(0.42, tons.mid);
+      gradient.addColorStop(0.24, tons.hi);
+      gradient.addColorStop(0.5, tons.mid);
       gradient.addColorStop(1, tons.lo);
       contexte.fillStyle = gradient;
     } else {
@@ -399,11 +377,11 @@ export class MoteurArbreLunaire {
 
     if (largeurMoyenne >= 5 && matiere >= 1) {
       contexte.lineCap = "round";
-      contexte.strokeStyle = "rgba(205,228,248,0.26)";
-      contexte.lineWidth = Math.max(0.8, largeurMoyenne * 0.12);
+      contexte.strokeStyle = alpha(MATIERE.nacre, 0.13);
+      contexte.lineWidth = Math.max(0.6, largeurMoyenne * 0.032);
       tracerLigne(0.6, coteEclaire);
-      contexte.strokeStyle = "rgba(18,16,42,0.5)";
-      contexte.lineWidth = Math.max(0.9, largeurMoyenne * 0.18);
+      contexte.strokeStyle = alpha(MATIERE.boisOmbre, 0.24);
+      contexte.lineWidth = Math.max(0.6, largeurMoyenne * 0.055);
       tracerLigne(0.58, -coteEclaire);
     }
 
@@ -411,9 +389,9 @@ export class MoteurArbreLunaire {
       for (const strie of segment.stries) {
         contexte.strokeStyle =
           strie.tone > 0
-            ? `rgba(190,196,228,${strie.al})`
-            : `rgba(20,18,46,${strie.al + 0.05})`;
-        contexte.lineWidth = Math.max(0.8, largeurMoyenne * strie.wf);
+            ? alpha(MATIERE.nacre, strie.al)
+            : alpha(MATIERE.boisOmbre, strie.al + 0.04);
+        contexte.lineWidth = Math.max(0.45, largeurMoyenne * strie.wf);
         contexte.lineCap = "round";
         contexte.beginPath();
         for (let i = 0; i < points.length; i++) {
@@ -431,7 +409,7 @@ export class MoteurArbreLunaire {
   }
 
   private peindreTraitNu(contexte: CanvasRenderingContext2D, segment: SegmentLunaire): void {
-    contexte.strokeStyle = "#4C4870";
+    contexte.strokeStyle = alpha(MATIERE.boisClair, 0.66);
     contexte.lineWidth = 2;
     contexte.lineCap = "round";
     contexte.lineJoin = "round";
@@ -441,7 +419,7 @@ export class MoteurArbreLunaire {
   }
 
   private peindreJoint(contexte: CanvasRenderingContext2D, joint: JointLunaire): void {
-    const r = Math.max(5, joint.r * 0.72);
+    const r = Math.max(3, joint.r * 0.58);
     const gradient = contexte.createRadialGradient(
       joint.x + this.lumiere.x * r * 0.4,
       joint.y + this.lumiere.y * r * 0.4,
@@ -450,20 +428,20 @@ export class MoteurArbreLunaire {
       joint.y,
       r,
     );
-    gradient.addColorStop(0, "rgba(145,141,180,0.5)");
-    gradient.addColorStop(0.42, "rgba(76,72,112,0.6)");
-    gradient.addColorStop(1, "rgba(30,28,58,0)");
+    gradient.addColorStop(0, alpha(MATIERE.boisClair, 0.18));
+    gradient.addColorStop(0.42, alpha(MATIERE.boisOmbre, 0.24));
+    gradient.addColorStop(1, alpha(MATIERE.boisOmbre, 0));
     contexte.fillStyle = gradient;
     contexte.beginPath();
     contexte.arc(joint.x, joint.y, r, 0, Math.PI * 2);
     contexte.fill();
 
-    // Contre-ombre du handoff : elle ferme visuellement le raccord du côté opposé à la lune.
+    // Une ombre locale raccorde les fourches sans les cercler.
     const ox = joint.x - this.lumiere.x * r * 0.46;
     const oy = joint.y - this.lumiere.y * r * 0.46;
     const ombre = contexte.createRadialGradient(ox, oy, 0, ox, oy, r * 0.86);
-    ombre.addColorStop(0, "rgba(10,9,26,0.22)");
-    ombre.addColorStop(1, "rgba(10,9,26,0)");
+    ombre.addColorStop(0, alpha(MATIERE.boisOmbre, 0.18));
+    ombre.addColorStop(1, alpha(MATIERE.boisOmbre, 0));
     contexte.fillStyle = ombre;
     contexte.beginPath();
     contexte.arc(ox, oy, r * 0.86, 0, Math.PI * 2);
@@ -486,13 +464,13 @@ export class MoteurArbreLunaire {
       32,
     );
     gradient.addColorStop(0, PALETTE_LUNAIRE.lueur);
-    gradient.addColorStop(0.28, "#918DB4");
+    gradient.addColorStop(0.28, MATIERE.boisClair);
     gradient.addColorStop(1, PALETTE_LUNAIRE.tronc);
     contexte.fillStyle = gradient;
     contexte.beginPath();
     contexte.ellipse(CENTRE_ARBRE.x, y, 24, 31, -0.18, 0, Math.PI * 2);
     contexte.fill();
-    contexte.strokeStyle = "rgba(205,228,248,0.38)";
+    contexte.strokeStyle = alpha(MATIERE.nacre, 0.28);
     contexte.lineWidth = 1.4;
     contexte.stroke();
   }
@@ -511,8 +489,8 @@ export class MoteurArbreLunaire {
       contexte.translate(CENTRE_ARBRE.x, CENTRE_ARBRE.solY + 10);
       contexte.scale(1, 0.12);
       const ombre = contexte.createRadialGradient(0, 0, 0, 0, 0, 330);
-      ombre.addColorStop(0, "rgba(6,5,18,0.5)");
-      ombre.addColorStop(1, "rgba(6,5,18,0)");
+      ombre.addColorStop(0, alpha(PALETTE_LUNAIRE.ciel, 0.56));
+      ombre.addColorStop(1, alpha(PALETTE_LUNAIRE.ciel, 0));
       contexte.fillStyle = ombre;
       contexte.beginPath();
       contexte.arc(0, 0, 330, 0, Math.PI * 2);
@@ -521,7 +499,17 @@ export class MoteurArbreLunaire {
 
       const ordre: Record<SorteBoisLunaire, number> = { root: 0, trunk: 1, leader: 2, branch: 3, twig: 4 };
       for (const segment of [...geometrie.statiques].sort((a, b) => ordre[a.kind] - ordre[b.kind])) {
+        if (segment.kind === "leader") {
+          const pointe = segment.pts.at(-1)!;
+          const porteUneBranche = geometrie.branches.some(({ fourche }) => fourche.x === pointe.x && fourche.y === pointe.y);
+          if (!porteUneBranche) continue;
+        }
+        if (segment.kind === "root") {
+          const profondeur = (segment.pts[0].y - CENTRE_ARBRE.solY) / 490;
+          contexte.globalAlpha = 0.76 * (1 - clamp(profondeur, 0, 1) * 0.7);
+        }
         this.peindreSegment(contexte, segment, 1, reserve ? 0.55 : 1);
+        contexte.globalAlpha = 1;
       }
       for (const joint of geometrie.joints) {
         if (joint.kind === "root" || joint.kind === "leader") this.peindreJoint(contexte, joint);
@@ -539,12 +527,12 @@ export class MoteurArbreLunaire {
 
   private creerSpritesFeuilles(): readonly (readonly SpriteFeuille[])[] {
     const formes: readonly FormeFeuille[] = [
-      { L: 44, W: 0.3, courbe: 0.05 },
-      { L: 46, W: 0.42, courbe: -0.12 },
-      { L: 40, W: 0.52, courbe: 0.14 },
-      { L: 48, W: 0.34, courbe: 0 },
-      { L: 38, W: 0.6, courbe: -0.07 },
-      { L: 42, W: 0.46, courbe: 0.1 },
+      { L: 37, W: 0.3, courbe: 0.08, couleur: MATIERE.feuilleCiel },
+      { L: 42, W: 0.35, courbe: -0.14, couleur: MATIERE.feuilleLavande },
+      { L: 34, W: 0.42, courbe: 0.16, couleur: MATIERE.feuilleCiel },
+      { L: 40, W: 0.28, courbe: -0.06, couleur: MATIERE.feuilleCiel },
+      { L: 33, W: 0.46, courbe: -0.09, couleur: MATIERE.feuilleLavande },
+      { L: 35, W: 0.38, courbe: 0.12, couleur: MATIERE.feuilleRose },
     ];
     const tons = [0.18, 0.36, 0.55, 0.76, 0.95];
     return formes.map((forme) => tons.map((ton) => this.creerSpriteFeuille(forme, ton)));
@@ -569,9 +557,9 @@ export class MoteurArbreLunaire {
     const milieuX = (baseX + pointeX) / 2;
     const milieuY = (baseY + pointeY) / 2;
     const gradient = contexte.createLinearGradient(baseX, baseY, pointeX, pointeY);
-    gradient.addColorStop(0, this.teinteFeuille(clamp(lumiere - 0.2, 0, 1)));
-    gradient.addColorStop(0.45, this.teinteFeuille(lumiere));
-    gradient.addColorStop(1, this.teinteFeuille(clamp(lumiere - 0.05, 0, 1)));
+    gradient.addColorStop(0, this.teinteFeuille(clamp(lumiere - 0.28, 0, 1), forme.couleur));
+    gradient.addColorStop(0.48, this.teinteFeuille(lumiere, forme.couleur));
+    gradient.addColorStop(1, this.teinteFeuille(clamp(lumiere + 0.12, 0, 1), forme.couleur));
     contexte.fillStyle = gradient;
     contexte.beginPath();
     contexte.moveTo(baseX, baseY);
@@ -579,13 +567,27 @@ export class MoteurArbreLunaire {
     contexte.quadraticCurveTo(milieuX - largeurMax, milieuY, baseX, baseY);
     contexte.closePath();
     contexte.fill();
-    contexte.strokeStyle = lumiere > 0.5 ? "rgba(205,228,248,0.4)" : "rgba(20,18,44,0.4)";
-    contexte.lineWidth = Math.max(0.8, longueur * 0.022);
+    contexte.strokeStyle = alpha(lumiere > 0.5 ? MATIERE.nacre : MATIERE.feuilleOmbre, 0.23);
+    contexte.lineWidth = Math.max(0.6, longueur * 0.018);
     contexte.lineCap = "round";
     contexte.beginPath();
     contexte.moveTo(baseX, baseY);
     contexte.quadraticCurveTo(milieuX, milieuY, pointeX, pointeY);
     contexte.stroke();
+    // Nervures secondaires fines, cuites une fois dans les trente sprites réutilisables.
+    contexte.strokeStyle = alpha(MATIERE.nacre, 0.11);
+    contexte.lineWidth = 0.55;
+    for (let i = 1; i <= 3; i++) {
+      const u = i / 4;
+      const x = baseX + (pointeX - baseX) * u;
+      const y = baseY + (pointeY - baseY) * u;
+      for (const cote of [-1, 1]) {
+        contexte.beginPath();
+        contexte.moveTo(x, y);
+        contexte.quadraticCurveTo(x + cote * largeurMax * 0.3, y - longueur * 0.06, x + cote * largeurMax * Math.sin(Math.PI * u) * 0.65, y - longueur * 0.11);
+        contexte.stroke();
+      }
+    }
     return { canvas, baseX, baseY, largeur, hauteur };
   }
 
@@ -611,9 +613,9 @@ export class MoteurArbreLunaire {
     }
     if (sousPoints.length < 2) return;
     const passes: readonly [number, string, number, number][] = [
-      [0.95, `rgba(120,160,215,${0.1 * force})`, 3, 26],
-      [0.4, `rgba(160,196,232,${0.16 * force})`, 1.8, 13],
-      [0.14, `rgba(${NACRE},${0.42 * force})`, 1, 4.4],
+      [0.95, alpha(MATIERE.feuilleLavande, 0.1 * force), 3, 20],
+      [0.4, alpha(MATIERE.feuilleCiel, 0.15 * force), 1.8, 10],
+      [0.14, alpha(MATIERE.nacre, 0.3 * force), 0.7, 3],
     ];
     for (const [facteur, couleur, min, max] of passes) {
       contexte.strokeStyle = couleur;
@@ -661,12 +663,12 @@ export class MoteurArbreLunaire {
     for (const feuille of this.feuilles.get(branche.rang) ?? []) {
       if (!feuilleVisibleLunaire(feuille.u, etat)) continue;
       const apparition = clamp((etat - feuille.u) / 0.16, 0, 1);
-      const ton = clamp(feuille.ton + Math.round(etat * 1.5), 0, 4);
+      const ton = clamp(feuille.ton + Math.round(etat * 0.75), 0, 4);
       const sprite = this.sprites[feuille.forme]?.[ton];
       if (!sprite) continue;
       const echelle = feuille.echelle * (0.36 + 0.64 * apparition);
       feuilles.save();
-      feuilles.globalAlpha = apparition;
+      feuilles.globalAlpha = apparition * (0.76 + feuille.ton * 0.05);
       feuilles.translate(feuille.x, feuille.y);
       feuilles.rotate(feuille.rotation);
       feuilles.scale(echelle, echelle);
@@ -680,18 +682,20 @@ export class MoteurArbreLunaire {
       feuilles.restore();
     }
 
+    if (!rayonnementDeBranche(branche.branche)) return;
+
     lueur.save();
     lueur.globalCompositeOperation = "lighter";
     lueur.lineCap = "round";
-    this.lueurLeLong(lueur, branche.principale.pts, etat, 1);
+    this.lueurLeLong(lueur, branche.principale.pts, etat, 0.7);
     for (const rameau of branche.rameaux) {
       const fraction = clamp((etat - (rameau.u0 ?? 0)) / 0.22, 0, 1);
-      if (fraction > 0.02) this.lueurLeLong(lueur, rameau.pts, fraction, 0.7);
+      if (fraction > 0.02) this.lueurLeLong(lueur, rameau.pts, fraction, 0.4);
     }
     const bloom = smooth(0.45, 1, etat);
     if (bloom > 0.01) {
-      const rayon = branche.bulbe.r * 1.5;
-      lueur.globalAlpha = bloom * 0.3;
+      const rayon = branche.bulbe.r * 1.6;
+      lueur.globalAlpha = bloom * 0.62;
       const gradient = lueur.createRadialGradient(
         branche.bulbe.x,
         branche.bulbe.y,
@@ -700,8 +704,8 @@ export class MoteurArbreLunaire {
         branche.bulbe.y,
         rayon,
       );
-      gradient.addColorStop(0, `rgba(${NACRE},0.5)`);
-      gradient.addColorStop(0.55, `rgba(${NACRE},0.16)`);
+      gradient.addColorStop(0, alpha(MATIERE.feuilleLavande, 0.32));
+      gradient.addColorStop(0.55, alpha(MATIERE.feuilleCiel, 0.16));
       gradient.addColorStop(1, `rgba(${NACRE},0)`);
       lueur.fillStyle = gradient;
       lueur.beginPath();

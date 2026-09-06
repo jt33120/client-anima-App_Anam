@@ -18,7 +18,7 @@ import { dimensionnerTout } from "./_outils";
  * le comportement (leçon de la re-revue 4.6, en tête d'arbre-mesure.test.tsx).
  *
  * Trois choses, et rien d'autre :
- *  1. à l'étape 0, la graine SVG est DANS le conteneur du canevas — le même `.monde`, donc le même
+ *  1. à l'étape 0, la graine botanique est DANS le conteneur du canevas — le même `.monde`, donc le même
  *     repère et le même chemin de visibilité (la région inactive l'emporte avec le canevas) — et le
  *     moteur, sous la MÊME condition, ne peint plus sa graine : sinon il y en aurait deux ;
  *  2. dès la première branche, elle QUITTE le DOM (absente, pas masquée) ;
@@ -32,7 +32,7 @@ import { dimensionnerTout } from "./_outils";
  * pied de l'arbre est bien peinte — la mesure mord, l'absence à l'étape 0 est une vraie absence.
  */
 
-/** L'ellipse EXACTE de `peindreGraine` (MoteurArbreLunaire.ts) : centre (704, 1367), 24 × 31, −0,18 rad. */
+/** Témoin du moteur réel : sa graine peinte, distincte de l'image DOM de l'état d'attente. */
 const ELLIPSE_GRAINE = [CENTRE_ARBRE.x, CENTRE_ARBRE.solY + 7, 24, 31, -0.18, 0, Math.PI * 2];
 
 /**
@@ -120,20 +120,22 @@ describe("[LE CŒUR] à l'étape graine, la graine d'attente est là — et le m
 
     const canvas = canevas();
     expect(canvas.getAttribute("data-etape-arbre"), "témoin : on est bien à l'étape graine").toBe("graine");
-    const svg = graine(container);
-    expect(svg, "la graine d'attente n'est pas montée à l'étape 0").not.toBeNull();
+    const botanique = graine(container);
+    expect(botanique, "la graine d'attente n'est pas montée à l'étape 0").not.toBeNull();
+    expect(container.querySelectorAll("[data-graine-attente]")).toHaveLength(1);
+    expect(botanique!.querySelectorAll("img")).toHaveLength(1);
 
     // LE MÊME CONTENEUR que le canevas (`.monde`) : même repère (portrait mesuré, pan/zoom) et surtout
     // même chemin de visibilité — la région inactive (`visibility: hidden`, `inert`) l'emporte avec le
     // canevas. Une graine montée ailleurs aurait besoin d'un second retrait, que personne ne garderait.
-    expect(svg!.parentElement, "la graine ne vit pas dans le conteneur du canevas").toBe(canvas.parentElement);
+    expect(botanique!.parentElement, "la graine ne vit pas dans le conteneur du canevas").toBe(canvas.parentElement);
     // Et APRÈS le canevas dans le DOM : elle se peint par-dessus le bitmap, pas dessous.
     expect(
-      canvas.compareDocumentPosition(svg!) & Node.DOCUMENT_POSITION_FOLLOWING,
+      canvas.compareDocumentPosition(botanique!) & Node.DOCUMENT_POSITION_FOLLOWING,
       "la graine est peinte SOUS le canevas",
     ).toBeTruthy();
 
-    // Le moteur a tourné (il compose ses couches) MAIS n'a pas tracé la graine : elle est le SVG.
+    // Le moteur compose ses couches sans tracer de graine : l'image DOM occupe cette place.
     expect(moteur.appelsDuMoteur(), "témoin : le moteur n'a rien fait, la mesure ne prouverait rien").toBeGreaterThan(0);
     expect(moteur.grainesPeintes(), "le moteur peint encore sa graine à l'étape 0 : il y en a deux").toBe(0);
   });
@@ -145,7 +147,7 @@ describe("[LE CŒUR] à l'étape graine, la graine d'attente est là — et le m
     const { container } = monter(scene([branche("a")]));
     expect(canevas().getAttribute("data-etape-arbre")).toBe("branches");
     expect(moteur.grainesPeintes(), "la graine au pied de l'arbre a disparu du bitmap").toBeGreaterThanOrEqual(1);
-    expect(graine(container), "et la graine SVG ne doit pas la doubler").toBeNull();
+    expect(graine(container), "et la graine botanique ne doit pas la doubler").toBeNull();
   });
 });
 
@@ -153,8 +155,7 @@ describe("[LE CŒUR] dès la première branche, la graine d'attente QUITTE le DO
   it("montée avec une branche : `[data-graine-attente]` est ABSENTE — pas masquée, absente", () => {
     const { container } = monter(scene([branche("a")]));
     expect(graine(container)).toBeNull();
-    // Aucun SVG du tout : la graine d'attente était le seul admis, et il n'a rien à faire ici.
-    expect(container.querySelector("svg")).toBeNull();
+    expect(container.querySelector('img[src*="graine-nacree"]')).toBeNull();
   });
 
   it("SCÉNARIO NOMINAL — graine puis PREMIÈRE branche : elle disparaît au re-rendu, le canevas reste le même", () => {
@@ -183,18 +184,21 @@ describe("[LE CŒUR] dès la première branche, la graine d'attente QUITTE le DO
 });
 
 describe("[ANTI-VACUITÉ] positionnée par une classe de arbre.module.css, jamais par un style — et cette classe ne bouge pas", () => {
-  it("le SVG intégré ne porte AUCUN `style=` et reçoit la classe `.graineAttente` du module", () => {
+  it("la graine intégrée reçoit sa classe de placement sans style inline ni cible clavier", () => {
     // Un `style=` serait un second endroit d'où une géométrie — ou une animation — pourrait naître,
     // hors de portée des gardes de graine-attente.test.tsx (« aucun style inline »). Et la garde
     // « aucun pourcentage hors chaîne » de tests/arbre-rendu.test.ts n'a rien à lire en JSX.
     const { container } = monter(scene([]));
-    const svg = graine(container)!;
-    expect(svg.hasAttribute("style"), "un style inline s'est glissé sur la graine intégrée").toBe(false);
+    const botanique = graine(container)!;
+    expect(botanique.hasAttribute("style"), "un style inline s'est glissé sur la graine intégrée").toBe(false);
+    expect(botanique.getAttribute("aria-hidden")).toBe("true");
+    expect(botanique.hasAttribute("tabindex")).toBe(false);
+    expect(botanique.querySelector("[tabindex], button, a[href], input")).toBeNull();
     // Les classes de CSS Modules gardent leur nom dans le hachage de vitest (`_graineAttente_…`) :
     // c'est ce qui rend la règle ci-dessous ATTACHÉE à l'élément, pas seulement présente dans la feuille.
-    expect(svg.getAttribute("class") ?? "", "la classe de placement n'est pas posée sur le SVG").toMatch(/graineAttente/);
+    expect(botanique.getAttribute("class") ?? "", "la classe de placement n'est pas posée sur la graine").toMatch(/graineAttente/);
     // Et le composant garde sa propre classe (`.graine`, celle qui porte la taille et pointer-events).
-    expect(svg.getAttribute("class") ?? "").toMatch(/\bgraine\b|_graine_/);
+    expect(botanique.getAttribute("class") ?? "").toMatch(/\bgraine\b|_graine_/);
   });
 
   it("[LE CŒUR] la règle `.graineAttente` ne fait QUE du placement : position / inset / transform / taille", () => {
@@ -214,16 +218,17 @@ describe("[ANTI-VACUITÉ] positionnée par une classe de arbre.module.css, jamai
     expect((css.match(/\.graineAttente\b/g) ?? []).length, "une seconde règle .graineAttente est apparue").toBe(1);
   });
 
-  it("[LE CŒUR] ses coordonnées sont celles de la graine peinte — 704 / 1408 et 1367 / 2503, tirées de geometrie.ts", () => {
-    // Le SVG remplace une ellipse que le moteur posait en (CENTRE_ARBRE.x, CENTRE_ARBRE.solY + 7). Si
+  it("[LE CŒUR] la graine botanique reste alignée avec le sol réel et utilise sa taille tokenisée", () => {
+    // La graine remplace celle du moteur en (CENTRE_ARBRE.x, CENTRE_ARBRE.solY + 7). Si
     // les constantes bougent ou si quelqu'un « ajuste » la classe à l'œil, la graine se décolle du
     // point où l'arbre naîtra : la première branche partirait d'à côté.
     const corps = regleGraine();
     const valeur = (prop: string) => Number(new RegExp(`${prop}:\\s*([\\d.]+)%`).exec(corps)?.[1]);
     expect(valeur("left"), "`left` n'est pas un pourcentage du monde").toBeCloseTo((CENTRE_ARBRE.x / CANEVAS.largeur) * 100, 1);
     expect(valeur("top"), "`top` n'est pas un pourcentage du monde").toBeCloseTo(((CENTRE_ARBRE.solY + 7) / CANEVAS.hauteur) * 100, 1);
-    // Et la boîte de 48 unités (viewBox du composant) rend 48 px : les « 3 px » du soulèvement sont 3 px.
-    expect(corps).toMatch(/--taille-graine:\s*48px/);
+    expect(corps).toMatch(/--taille-graine:\s*var\(--arbre-graine-taille\)/);
+    const tokens = sansCommentaires(lire("app/styles/carnet-tokens.css"));
+    expect(tokens).toMatch(/--arbre-graine-taille:\s*7rem/);
   });
 
   it("[ANTI-VACUITÉ] l'animation existe bel et bien — dans graine-attente.module.css, pas ici", () => {

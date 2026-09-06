@@ -1,0 +1,540 @@
+[
+  {
+    "throttle": 1,
+    "rows": [
+      {
+        "name": "seed",
+        "n": 0,
+        "scale": 0.7,
+        "geometryMs": 2.9000000059604645,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 11.899999991059303,
+          "flushedMs": 43.20000000298023,
+          "calls": {
+            "createLinearGradient": 30,
+            "fill": 30,
+            "stroke": 210,
+            "clearRect": 5,
+            "drawImage": 4
+          }
+        },
+        "same": {
+          "dispatchMs": 0.09999999403953552,
+          "flushedMs": 0.19999998807907104,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": null
+      },
+      {
+        "name": "young",
+        "n": 1,
+        "scale": 0.7,
+        "geometryMs": 0.699999988079071,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 28.799999997019768,
+          "flushedMs": 59.20000000298023,
+          "calls": {
+            "createLinearGradient": 45,
+            "fill": 188,
+            "stroke": 255,
+            "clearRect": 5,
+            "createRadialGradient": 37,
+            "drawImage": 524
+          }
+        },
+        "same": {
+          "dispatchMs": 0.09999999403953552,
+          "flushedMs": 0.09999999403953552,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 22.299999997019768,
+          "flushedMs": 51.5,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 1,
+            "fill": 55,
+            "stroke": 1661,
+            "drawImage": 524,
+            "createRadialGradient": 2
+          }
+        }
+      },
+      {
+        "name": "canopy",
+        "n": 13,
+        "scale": 0.7,
+        "geometryMs": 0.5999999940395355,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 95.20000000298023,
+          "flushedMs": 126,
+          "calls": {
+            "createLinearGradient": 59,
+            "fill": 654,
+            "stroke": 293,
+            "clearRect": 5,
+            "createRadialGradient": 49,
+            "drawImage": 3948
+          }
+        },
+        "same": {
+          "dispatchMs": 0.10000000894069672,
+          "flushedMs": 0.10000000894069672,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0.10000000894069672,
+          "flushedMs": 0.10000000894069672,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 78.90000000596046,
+          "flushedMs": 108.70000000298023,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 13,
+            "fill": 519,
+            "stroke": 1685,
+            "drawImage": 3948,
+            "createRadialGradient": 14
+          }
+        }
+      },
+      {
+        "name": "dense",
+        "n": 40,
+        "scale": 0.7,
+        "geometryMs": 4.5,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 128.70000000298023,
+          "flushedMs": 159.70000000298023,
+          "calls": {
+            "createLinearGradient": 85,
+            "fill": 1218,
+            "stroke": 345,
+            "clearRect": 5,
+            "createRadialGradient": 76,
+            "drawImage": 7132
+          }
+        },
+        "same": {
+          "dispatchMs": 0.10000000894069672,
+          "flushedMs": 0.29999999701976776,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 121,
+          "flushedMs": 151.09999999403954,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 39,
+            "fill": 1083,
+            "stroke": 1737,
+            "drawImage": 7132,
+            "createRadialGradient": 41
+          }
+        }
+      },
+      {
+        "name": "radiant",
+        "n": 13,
+        "scale": 0.7,
+        "geometryMs": 0.800000011920929,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 138.09999999403954,
+          "flushedMs": 168.5,
+          "calls": {
+            "createLinearGradient": 59,
+            "fill": 667,
+            "stroke": 13385,
+            "clearRect": 5,
+            "createRadialGradient": 62,
+            "drawImage": 3948
+          }
+        },
+        "same": {
+          "dispatchMs": 0,
+          "flushedMs": 0.09999999403953552,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 113.5,
+          "flushedMs": 142.90000000596046,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 13,
+            "fill": 530,
+            "stroke": 11459,
+            "drawImage": 3948,
+            "createRadialGradient": 25
+          }
+        }
+      },
+      {
+        "name": "portal",
+        "n": 13,
+        "scale": 0.35,
+        "geometryMs": 2.2000000029802322,
+        "bitmap": [
+          493,
+          877
+        ],
+        "initial": {
+          "dispatchMs": 74.20000000298023,
+          "flushedMs": 81.70000000298023,
+          "calls": {
+            "createLinearGradient": 59,
+            "fill": 667,
+            "stroke": 13385,
+            "clearRect": 5,
+            "createRadialGradient": 62,
+            "drawImage": 3948
+          }
+        },
+        "same": {
+          "dispatchMs": 0,
+          "flushedMs": 0.09999999403953552,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 56.80000001192093,
+          "flushedMs": 64.5,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 13,
+            "fill": 530,
+            "stroke": 11459,
+            "drawImage": 3948,
+            "createRadialGradient": 25
+          }
+        },
+        "portalPixels": 211497,
+        "seedPixel": {
+          "x": 246.39999999999998,
+          "y": 618.4499999999999
+        },
+        "readbackMs": 6.100000008940697
+      }
+    ]
+  },
+  {
+    "throttle": 4,
+    "rows": [
+      {
+        "name": "seed",
+        "n": 0,
+        "scale": 0.7,
+        "geometryMs": 8.900000005960464,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 43,
+          "flushedMs": 181.5,
+          "calls": {
+            "createLinearGradient": 30,
+            "fill": 30,
+            "stroke": 210,
+            "clearRect": 5,
+            "drawImage": 4
+          }
+        },
+        "same": {
+          "dispatchMs": 0,
+          "flushedMs": 0.8999999910593033,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": null
+      },
+      {
+        "name": "young",
+        "n": 1,
+        "scale": 0.7,
+        "geometryMs": 2.800000011920929,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 129.5,
+          "flushedMs": 257.09999999403954,
+          "calls": {
+            "createLinearGradient": 45,
+            "fill": 188,
+            "stroke": 255,
+            "clearRect": 5,
+            "createRadialGradient": 37,
+            "drawImage": 524
+          }
+        },
+        "same": {
+          "dispatchMs": 0.7000000029802322,
+          "flushedMs": 0.7999999970197678,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0.4000000059604645,
+          "flushedMs": 0.4000000059604645,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 94,
+          "flushedMs": 206.79999999701977,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 1,
+            "fill": 55,
+            "stroke": 1661,
+            "drawImage": 524,
+            "createRadialGradient": 2
+          }
+        }
+      },
+      {
+        "name": "canopy",
+        "n": 13,
+        "scale": 0.7,
+        "geometryMs": 6,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 471.29999999701977,
+          "flushedMs": 608.2999999970198,
+          "calls": {
+            "createLinearGradient": 59,
+            "fill": 654,
+            "stroke": 293,
+            "clearRect": 5,
+            "createRadialGradient": 49,
+            "drawImage": 3948
+          }
+        },
+        "same": {
+          "dispatchMs": 0.5,
+          "flushedMs": 1.4000000059604645,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0.09999999403953552,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 390.5,
+          "flushedMs": 533.5999999940395,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 13,
+            "fill": 519,
+            "stroke": 1685,
+            "drawImage": 3948,
+            "createRadialGradient": 14
+          }
+        }
+      },
+      {
+        "name": "dense",
+        "n": 40,
+        "scale": 0.7,
+        "geometryMs": 46.30000001192093,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 639.5999999940395,
+          "flushedMs": 778,
+          "calls": {
+            "createLinearGradient": 85,
+            "fill": 1218,
+            "stroke": 345,
+            "clearRect": 5,
+            "createRadialGradient": 76,
+            "drawImage": 7132
+          }
+        },
+        "same": {
+          "dispatchMs": 0,
+          "flushedMs": 4,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0.09999999403953552,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 588.8999999910593,
+          "flushedMs": 755.2000000029802,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 39,
+            "fill": 1083,
+            "stroke": 1737,
+            "drawImage": 7132,
+            "createRadialGradient": 41
+          }
+        }
+      },
+      {
+        "name": "radiant",
+        "n": 13,
+        "scale": 0.7,
+        "geometryMs": 2.5999999940395355,
+        "bitmap": [
+          986,
+          1753
+        ],
+        "initial": {
+          "dispatchMs": 666,
+          "flushedMs": 800.6000000089407,
+          "calls": {
+            "createLinearGradient": 59,
+            "fill": 667,
+            "stroke": 13385,
+            "clearRect": 5,
+            "createRadialGradient": 62,
+            "drawImage": 3948
+          }
+        },
+        "same": {
+          "dispatchMs": 1.199999988079071,
+          "flushedMs": 2.199999988079071,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0.10000000894069672,
+          "flushedMs": 0.10000000894069672,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 533.6000000089407,
+          "flushedMs": 690.7999999970198,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 13,
+            "fill": 530,
+            "stroke": 11459,
+            "drawImage": 3948,
+            "createRadialGradient": 25
+          }
+        }
+      },
+      {
+        "name": "portal",
+        "n": 13,
+        "scale": 0.35,
+        "geometryMs": 24.19999998807907,
+        "bitmap": [
+          493,
+          877
+        ],
+        "initial": {
+          "dispatchMs": 376.6000000089407,
+          "flushedMs": 410.79999999701977,
+          "calls": {
+            "createLinearGradient": 59,
+            "fill": 667,
+            "stroke": 13385,
+            "clearRect": 5,
+            "createRadialGradient": 62,
+            "drawImage": 3948
+          }
+        },
+        "same": {
+          "dispatchMs": 0,
+          "flushedMs": 0.9000000059604645,
+          "calls": {}
+        },
+        "equivalent": {
+          "dispatchMs": 0,
+          "flushedMs": 0.29999999701976776,
+          "calls": {}
+        },
+        "idleCalls": {},
+        "changed": {
+          "dispatchMs": 292.79999999701977,
+          "flushedMs": 329,
+          "calls": {
+            "clearRect": 4,
+            "createLinearGradient": 13,
+            "fill": 530,
+            "stroke": 11459,
+            "drawImage": 3948,
+            "createRadialGradient": 25
+          }
+        },
+        "portalPixels": 211497,
+        "seedPixel": {
+          "x": 246.39999999999998,
+          "y": 618.4499999999999
+        },
+        "readbackMs": 11.600000008940697
+      }
+    ]
+  }
+]

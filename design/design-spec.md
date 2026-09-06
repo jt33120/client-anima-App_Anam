@@ -95,3 +95,7 @@ archivée, URL/SHA vérifiés et geste de retour documenté dans la spec de livr
 Front uniquement : aucun changement API, données, migrations, auth, consentements, calculs,
 intégrations ou contrats réseau. Aucun résultat personnel inventé. Aucun paramétrage distant du
 backend. La branche reste séparée de main pour le test.
+
+## 9. Arbre de vie céleste
+
+La refonte de l’arbre suit [la direction dédiée](tree-of-life-spec.md) : proportions botaniques, matières nacrées, canopée pastel, lumière issue des seuls états réels. L’exploration illustrée des étapes reste explicitement pédagogique.

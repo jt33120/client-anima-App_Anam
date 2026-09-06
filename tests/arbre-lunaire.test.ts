@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { BrancheProjetee } from "@/lib/scene/projection";
+import tokens from "@/design/tokens.json";
 import {
   BULBES_CANONIQUES,
   CANEVAS,
+  CENTRE_ARBRE,
   construireGeometrieLunaire,
   placerBranches,
 } from "@/render/arbre/geometrie";
@@ -12,6 +14,7 @@ import {
   construireFeuillesLunaires,
   contenuEtapeLunaire,
   lumiereDeBranche,
+  rayonnementDeBranche,
 } from "@/render/arbre/MoteurArbreLunaire";
 
 const branche = (i: number, etat: BrancheProjetee["etat"] = "naissance", intensite = 0): BrancheProjetee => ({
@@ -25,16 +28,16 @@ const branche = (i: number, etat: BrancheProjetee["etat"] = "naissance", intensi
 
 const branches = (n: number) => Array.from({ length: n }, (_, i) => branche(i));
 
-describe("handoff lunaire — contrat visuel", () => {
-  it("porte le repère portrait et la palette validés au hex près", () => {
+describe("arbre céleste — contrat visuel", () => {
+  it("conserve le repère partagé et tire toute sa palette des tokens", () => {
     expect(CANEVAS).toEqual({ largeur: 1408, hauteur: 2503 });
     expect(PALETTE_LUNAIRE).toEqual({
-      ciel: "#0C0A1E",
-      tronc: "#6A6690",
-      branche: "#9A96BE",
-      feuillage: "#8FB6D8",
-      lueur: "#CDE4F8",
-      accroche: "#8FC1EF",
+      ciel: tokens.shared["carnet-jardin"],
+      tronc: tokens.arbre.bois,
+      branche: tokens.arbre.boisClair,
+      feuillage: tokens.arbre.feuilleCiel,
+      lueur: tokens.arbre.nacre,
+      accroche: tokens.arbre.feuilleCiel,
     });
     expect(COUCHES_LUNAIRES).toEqual(["base", "wood", "leaf", "glow"]);
   });
@@ -44,23 +47,15 @@ describe("handoff lunaire — contrat visuel", () => {
     expect(contenuEtapeLunaire(1)).toEqual({ graine: true, arbre: true });
   });
 
-  it("garde les 13 bulbes officiels, dans l'ordre de branche du prototype", () => {
-    expect(BULBES_CANONIQUES).toEqual([
-      { x: 704, y: 250, r: 180 },
-      { x: 590, y: 420, r: 148 },
-      { x: 818, y: 415, r: 148 },
-      { x: 452, y: 340, r: 158 },
-      { x: 286, y: 470, r: 146 },
-      { x: 360, y: 640, r: 150 },
-      { x: 560, y: 610, r: 138 },
-      { x: 430, y: 830, r: 132 },
-      { x: 956, y: 335, r: 158 },
-      { x: 1122, y: 465, r: 146 },
-      { x: 1048, y: 635, r: 150 },
-      { x: 848, y: 605, r: 138 },
-      { x: 978, y: 825, r: 132 },
-    ]);
+  it("répartit les premières pousses de chaque côté, avec un sous-sol inférieur au quart du portrait", () => {
+    expect(BULBES_CANONIQUES).toHaveLength(13);
+    expect(BULBES_CANONIQUES[1].x).toBeLessThan(CENTRE_ARBRE.x);
+    expect(BULBES_CANONIQUES[2].x).toBeGreaterThan(CENTRE_ARBRE.x);
     expect(placerBranches(branches(13)).map((p) => p.bulbe)).toEqual(BULBES_CANONIQUES);
+    const racines = construireGeometrieLunaire(branches(13)).statiques.filter((s) => s.kind === "root");
+    const profondeur = Math.max(...racines.flatMap((r) => r.pts.map((p) => p.y))) - CENTRE_ARBRE.solY;
+    expect(profondeur).toBeGreaterThan(200);
+    expect(profondeur).toBeLessThan(CANEVAS.hauteur / 4);
   });
 
   it("ne plafonne pas à 13 : 60 branches ont 60 ancres distinctes et restent dans le repère", () => {
@@ -90,16 +85,16 @@ describe("handoff lunaire — contrat visuel", () => {
     }
   });
 
-  it("reprend le flux RNG partagé du prototype avant la toute première feuille", () => {
+  it("rattache les pétioles au bois plutôt qu'à des disques indépendants de la ramure", () => {
     const geometrie = construireGeometrieLunaire(branches(13));
-    const premiere = construireFeuillesLunaires(geometrie).get(0)?.[0];
-    expect(premiere).toBeDefined();
-    expect(premiere!.x).toBeCloseTo(885.1429315138475, 10);
-    expect(premiere!.y).toBeCloseTo(225.6383771304068, 10);
-    expect(premiere!.rotation).toBeCloseTo(1.112404142774229, 10);
-    expect(premiere!.u).toBeCloseTo(0.8350856832643974, 10);
-    expect(premiere!.echelle).toBeCloseTo(1.2100487613344457, 10);
-    expect({ forme: premiere!.forme, ton: premiere!.ton }).toEqual({ forme: 2, ton: 3 });
+    const feuilles = construireFeuillesLunaires(geometrie);
+    for (const placee of geometrie.branches) {
+      const supports = placee.rameaux.flatMap((r) => r.pts);
+      for (const feuille of feuilles.get(placee.rang) ?? []) {
+        const distance = Math.min(...supports.map((p) => Math.hypot(p.x - feuille.x, p.y - feuille.y)));
+        expect(distance).toBeLessThanOrEqual(16);
+      }
+    }
   });
 
   it("génère des feuilles pour chacun des 60 rangs sans déplacer les feuilles existantes", () => {
@@ -141,7 +136,7 @@ describe("handoff lunaire — contrat visuel", () => {
   });
 });
 
-describe("handoff lunaire — états indépendants", () => {
+describe("arbre céleste — états indépendants", () => {
   it("mappe naissance, feuillaison et rayonnement sans état global", () => {
     expect(lumiereDeBranche(branche(0, "naissance", 0.9))).toBe(0);
     expect(lumiereDeBranche(branche(1, "feuillaison", 0.58))).toBeCloseTo(0.58, 8);
@@ -152,5 +147,11 @@ describe("handoff lunaire — états indépendants", () => {
     expect(lumiereDeBranche(branche(0, "feuillaison", Number.NaN))).toBe(0);
     expect(lumiereDeBranche(branche(1, "feuillaison", -4))).toBe(0);
     expect(lumiereDeBranche(branche(2, "feuillaison", 8))).toBe(1);
+  });
+
+  it("réserve l'aura à une déclaration de rayonnement, même face à une feuillaison complète", () => {
+    expect(rayonnementDeBranche(branche(0, "feuillaison", 1))).toBe(false);
+    expect(rayonnementDeBranche(branche(0, "feuillaison", 8))).toBe(false);
+    expect(rayonnementDeBranche(branche(0, "rayonnement", 0))).toBe(true);
   });
 });

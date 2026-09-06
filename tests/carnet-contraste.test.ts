@@ -102,3 +102,27 @@ describe("Carnet celeste reading surfaces", () => {
     });
   }
 });
+
+describe("Botanical garden keeps its own readable ink in both themes", () => {
+  it("remains AA through the two radial veils and the brightest possible texture", () => {
+    const couches = [...tokens.shared["arbre-fond-etoile"].matchAll(/color-mix\(in srgb, var\(--([a-z-]+)\) (\d+(?:\.\d+)?)%, transparent\)/g)];
+    expect(couches).toHaveLength(2);
+    let fonds: Rgb[] = [rgb(tokens.shared["carnet-jardin"])];
+    for (const couche of couches.reverse()) {
+      // A garden role cannot silently resolve to a light-theme color.
+      const teinte = tokens.shared[couche[1] as keyof typeof tokens.shared];
+      expect(teinte).toMatch(/^#[0-9a-f]{6}$/i);
+      fonds = fonds.flatMap((fond) => [0, 0.5, 1].map((fraction) =>
+        superposer(rgb(teinte), fond, Number(couche[2]) / 100 * fraction),
+      ));
+    }
+    for (const fond of fonds) {
+      const maximum = hex(superposer(rgb("#FFFFFF"), fond, Number(tokens.shared["arbre-ciel-opacite"])));
+      expect(ratioContraste(tokens.shared["carnet-jardin-encre"], maximum)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("keeps the zoom symbols readable on their hover surface", () => {
+    expect(ratioContraste(tokens.shared["carnet-jardin-encre"], tokens.shared["arbre-ciel-brume"])).toBeGreaterThanOrEqual(4.5);
+  });
+});
