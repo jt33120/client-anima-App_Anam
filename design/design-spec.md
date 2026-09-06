@@ -84,6 +84,8 @@ effacer l'identité lunaire.
   mouvement réduit font partie de la composition, pas d'une retouche ultérieure.
 - L'arbre domine le portail. Le lotus et les étoiles restent des décors statiques ou calmement
   bornés ; aucune seconde couche de particules animées ne concurrence la scène.
+- À l'étape graine, l'explication de l'arbre est un texte court posé directement sur le ciel, sans
+  carte. Une phrase discrète sous la graine marque le point de départ sans créer de progression.
 
 ## 9. Aujourd’hui, Psychologie et Anam
 

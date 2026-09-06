@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
-import { ARIA_CANEVAS, VIDE_TITRE } from "@/render/arbre/copie-arbre";
+import { ARIA_CANEVAS, VIDE_CE_QU_EST_L_ARBRE } from "@/render/arbre/copie-arbre";
 import type { BrancheProjetee, ProjectionScene } from "@/lib/scene";
 import { dimensionnerTout } from "./_outils";
 
@@ -48,7 +48,7 @@ describe("Mon arbre — port lunaire réel", () => {
       "l'ancien tronc SVG ne doit plus exister",
     ).toBeNull();
     expect(container.querySelector("[data-graine-attente]"), "la graine d'attente manque à l'étape 0").not.toBeNull();
-    expect(screen.getByText(VIDE_TITRE)).toBeTruthy();
+    expect(screen.getByText(VIDE_CE_QU_EST_L_ARBRE)).toBeTruthy();
   });
 
   it("ne remplace pas le Canvas quand les branches apparaissent et rend les 20 actions DOM", () => {

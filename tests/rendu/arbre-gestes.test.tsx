@@ -6,7 +6,7 @@ import {
   ACTION_RENOMMER,
   ACTION_CENTRER,
   CHAMP_RENOMMER_LABEL,
-  VIDE_TITRE,
+  VIDE_CE_QU_EST_L_ARBRE,
   BASCULE_LISTE,
 } from "@/render/arbre/copie-arbre";
 import type { BrancheProjetee, ProjectionScene } from "@/lib/scene";
@@ -188,7 +188,7 @@ describe("[re-revue] le pointeur est CAPTURÉ : un relâchement hors cadre n'arm
 describe("[étape graine] la copie défile sans piloter le zoom derrière elle", () => {
   it("la molette dans la carte vide reste à la carte", () => {
     const { props } = monter(0);
-    const texte = screen.getByText(VIDE_TITRE);
+    const texte = screen.getByText(VIDE_CE_QU_EST_L_ARBRE);
     const evenement = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 120 });
 
     texte.dispatchEvent(evenement);

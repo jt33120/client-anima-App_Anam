@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { dimensionnerTout } from "./_outils";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
-import { VIDE_CE_QU_EST_L_ARBRE } from "@/render/arbre/copie-arbre";
+import { MESSAGE_GRAINE_PLANTEE, VIDE_CE_QU_EST_L_ARBRE } from "@/render/arbre/copie-arbre";
 import type { ProjectionScene } from "@/lib/scene/projection";
 
 /**
@@ -146,18 +146,17 @@ describe("[L'ARBRE VIDE S'EXPLIQUE]", () => {
     );
   }
 
-  it("il dit ce qu'est le tronc, comment naît une branche, et qui décide de la pleine lumière", () => {
+  it("explique simplement ce que l'arbre symbolise et comment il grandit", () => {
     monter();
-    for (const phrase of VIDE_CE_QU_EST_L_ARBRE) {
-      expect(screen.getByText(phrase), `phrase absente de l'écran : ${phrase}`).toBeTruthy();
-    }
+    expect(screen.getByText(VIDE_CE_QU_EST_L_ARBRE)).toBeTruthy();
+    expect(screen.getByText(MESSAGE_GRAINE_PLANTEE)).toBeTruthy();
   });
 
   it("[FR-057/FR-031] il n'y promet rien et n'y compte rien", () => {
     // ⚠️ UN ÉCRAN VIDE EST L'ENDROIT LE PLUS TENTANT POUR UNE CAROTTE. « Tu verras ton arbre
     // grandir », « il te manque une branche », « bientôt » : chacune transforme une explication en
     // promesse. On décrit un mécanisme, au présent.
-    const tout = VIDE_CE_QU_EST_L_ARBRE.join(" ");
+    const tout = VIDE_CE_QU_EST_L_ARBRE;
     expect(tout).not.toMatch(/bientôt|tu verras|tu pourras|deviendra|débloqu|il te manque|encore \d/i);
     expect(tout.match(/\d+/g) ?? []).toEqual([]);
   });
@@ -182,6 +181,7 @@ describe("[L'ARBRE VIDE S'EXPLIQUE]", () => {
         onDeclarerRayonnement={vi.fn(async () => "ok" as const)}
       />,
     );
-    expect(screen.queryByText(VIDE_CE_QU_EST_L_ARBRE[0])).toBeNull();
+    expect(screen.queryByText(VIDE_CE_QU_EST_L_ARBRE)).toBeNull();
+    expect(screen.queryByText(MESSAGE_GRAINE_PLANTEE)).toBeNull();
   });
 });

@@ -219,18 +219,14 @@ test.describe("La barre de régions", () => {
     // depuis un arbre vide, donc exactement ce dont on a besoin le premier jour — sous la ligne
     // de flottaison d'un défilement imbriqué que rien n'annonce. C'est ce que le rognage du
     // dessin sur écran court évite, et sans cette mesure-là il n'était prouvé par rien.
-    // RC-I2 a ajouté l'explication complète dans cet état : le panneau peut désormais défiler,
-    // mais l'unique chemin vers la fiche du tronc reste placé AVANT ce texte long et visible sans
-    // geste. L'ancien invariant `scrollHeight === clientHeight` interdisait précisément ce contenu.
+    // L'unique chemin vers la fiche du tronc reste visible sans geste, même avec l'explication.
     await expect(
       page.getByRole("button", { name: /heure de naissance/i }),
       "le seul chemin vers la fiche du tronc demande un geste pour être vu",
     ).toBeInViewport();
 
-    // Le panneau peut être plus court que sa copie afin de laisser la graine visible. La fin de
-    // l'explication doit néanmoins rester atteignable dans CE panneau, sans faire glisser toute la
-    // scène derrière la navigation.
-    const finExplication = page.getByText(/^Ensuite elle vit/);
+    // Le texte simple reste atteignable sans faire glisser toute la scène derrière la navigation.
+    const finExplication = page.getByText(/^Cet arbre symbolise ton évolution/);
     await finExplication.scrollIntoViewIfNeeded();
     await expect(finExplication, "la fin de l'explication de Mon évolution est inaccessible").toBeInViewport();
     expect(await page.evaluate(mesureurDeChevauchement)).toEqual([]);

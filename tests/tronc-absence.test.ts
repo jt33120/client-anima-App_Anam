@@ -105,8 +105,7 @@ const INTERDITS: readonly { motif: RegExp; pourquoi: string; sauf?: (s: string) 
 
 /** Les libellés qu'on SAIT visibles : ils prouvent que l'extrait examiné est bien le bon (discipline b). */
 const TEMOINS_ATTENDUS: readonly string[] = [
-  copieArbre.VIDE_TITRE,
-  copieArbre.VIDE_CORPS,
+  copieArbre.VIDE_CE_QU_EST_L_ARBRE,
   copieArbre.VIDE_OU_NAISSENT_LES_BRANCHES,
   copieArbre.BASCULE_LISTE,
   copieArbre.BASCULE_ARBRE,

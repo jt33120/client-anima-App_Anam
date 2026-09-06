@@ -46,6 +46,7 @@ import {
   ZOOM_PLUS,
   ZOOM_MOINS,
   ARIA_TRONC_A_COMPLETER,
+  MESSAGE_GRAINE_PLANTEE,
 } from "./copie-arbre";
 import FicheBranche, { type ResultatGeste } from "./FicheBranche";
 import FicheTronc from "./FicheTronc";
@@ -459,7 +460,12 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
                 le composant se garde sans style inline (tests/rendu/graine-attente.test.tsx). Elle se
                 met à l'échelle avec le monde au zoom, comme la graine peinte le faisait dans le bitmap
                 — c'est un objet du dessin, pas une cible tactile. `pointer-events: none` chez elle. */}
-            {etapeGraine && <GraineAttente className={s.graineAttente} />}
+            {etapeGraine && (
+              <>
+                <GraineAttente className={s.graineAttente} />
+                <p className={`${s.graineMessage} t-meta`}>{MESSAGE_GRAINE_PLANTEE}</p>
+              </>
+            )}
 
             {/* Story 5.3 — la cible du TRONC, dans la même couche et le même repère que les accroches.
                 Elle n'existe que s'il manque quelque chose : un tronc complet n'a AUCUNE affordance,

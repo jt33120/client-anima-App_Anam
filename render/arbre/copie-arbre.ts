@@ -30,8 +30,6 @@ export const LIBELLE_ETAT: Record<EtatBranche, string> = {
 
 export const ARIA_CANEVAS = "Ton arbre : chaque branche est une prise de conscience que tu as nommée.";
 export const ARIA_ZONE_ARBRE = "Zone de l’arbre : utilise les flèches pour te déplacer.";
-export const VIDE_TITRE = "Rien n’a encore été nommé.";
-export const VIDE_CORPS = "C’est normal, ça vient en parlant.";
 
 /**
  * CE QU'EST L'ARBRE, DIT SUR L'ÉCRAN VIDE (retour du 2026-08-23).
@@ -44,7 +42,7 @@ export const VIDE_CORPS = "C’est normal, ça vient en parlant.";
  * du jeu. C'est l'endroit où il y a le plus de place pour l'expliquer, et le seul moment où elle en
  * a besoin.
  *
- * ⚠️ TROIS PHRASES, ET AUCUNE NE PROMET RIEN. Ni « tu verras », ni « ton arbre deviendra », ni
+ * ⚠️ UN PARAGRAPHE COURT, QUI NE PROMET RIEN. Ni « tu verras », ni « ton arbre deviendra », ni
  * combien il en faut : FR-057 refuse le teasing, FR-031 refuse le compte, et un futur promis sur un
  * écran vide est la définition de la carotte. On décrit un MÉCANISME — ce qui fait naître une
  * branche, ce qu'elle devient, qui décide — au présent.
@@ -53,11 +51,10 @@ export const VIDE_CORPS = "C’est normal, ça vient en parlant.";
  * en dessous et pour la même raison : Anam ne présente pas le produit, elle parle à quelqu'un. Lui
  * faire réciter le fonctionnement de son propre monde en ferait une notice.
  */
-export const VIDE_CE_QU_EST_L_ARBRE = [
-  "Le tronc, c’est ton socle : ce qui était déjà là à ta naissance, et qui ne change pas.",
-  "Une branche naît quand quelque chose revient dans tes échanges avec Anam et qu’elle te propose de le nommer : jamais sur l’instant, et jamais sans que tu aies dit oui.",
-  "Ensuite elle vit : elle prend des feuilles à mesure que tu y reviens, et c’est toi, pas Anam, qui décides le jour où elle est en pleine lumière.",
-] as const;
+export const VIDE_CE_QU_EST_L_ARBRE =
+  "Cet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.";
+
+export const MESSAGE_GRAINE_PLANTEE = "Une graine est plantée. Tu peux t’en remercier.";
 
 /**
  * Story 3.3 (AC6) — LA PHRASE SOBRE, et la seule surface commerciale de toute la région arbre.

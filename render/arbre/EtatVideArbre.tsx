@@ -1,7 +1,7 @@
 /*
  * EtatVideArbre — L'ÉTAT VIDE DE L'ARBRE, en UN SEUL endroit (Story 3.3, AC2 [DUR]).
  *
- * ⚠️ POURQUOI CE COMPOSANT EXISTE. `VIDE_TITRE` / `VIDE_CORPS` étaient rendus par DEUX composants
+ * ⚠️ POURQUOI CE COMPOSANT EXISTE. L'explication de l'état vide était rendue par DEUX composants
  * (`ArbreInteractif` pour le canevas, `VueListe` pour le doublage non-spatial). Deux copies du même
  * écran, c'est deux endroits où ajouter un cadenas, un aperçu flouté ou un bandeau — et surtout un
  * endroit où l'oublier. AC2 exige que le vide d'un compte gratuit soit « le même vide » qu'un compte
@@ -14,8 +14,6 @@
  */
 
 import {
-  VIDE_TITRE,
-  VIDE_CORPS,
   VIDE_CE_QU_EST_L_ARBRE,
   VIDE_OU_NAISSENT_LES_BRANCHES,
 } from "./copie-arbre";
@@ -44,25 +42,14 @@ export default function EtatVideArbre({ direOuNaissentLesBranches, onOuvrirTronc
     <div className={s.vide}>
       {/* Le dessin ne vit plus ici : l'étape 0 garde le même Canvas lunaire que l'arbre vivant.
           Ce composant ne porte que la copie et le chemin nommé vers la fiche du tronc. */}
-      <p className={s.videTitre}>{VIDE_TITRE}</p>
-      <p className={s.videCorps}>{VIDE_CORPS}</p>
       {/* Le chemin vers la fiche du tronc reste avant le texte long : sur un téléphone, la personne
           qui vient précisément compléter son heure n'a pas à faire défiler l'explication pour
           retrouver l'unique action de cet état. */}
       {onOuvrirTronc && <BoutonTronc onOuvrir={onOuvrirTronc} />}
 
-      {/* ⚠️ CE QU'EST L'ARBRE, ICI ET NULLE PART AILLEURS (retour du 2026-08-23). Cet écran est le
-          seul du produit où il n'y a rien à regarder — donc le seul où il y a la place de
-          l'expliquer, et le seul moment où quelqu'un en a besoin. Dès qu'une branche existe, le
-          dessin explique tout seul et ces trois phrases disparaissent avec l'état vide : aucune
-          persistance, aucun « ne plus afficher », rien à fermer. */}
-      <div className={s.videExplication}>
-        {VIDE_CE_QU_EST_L_ARBRE.map((phrase) => (
-          <p className={s.videCorps} key={phrase}>
-            {phrase}
-          </p>
-        ))}
-      </div>
+      {/* Dès qu'une branche existe, le dessin reprend la parole et ce texte disparaît avec l'état
+          vide : aucune persistance, aucun « ne plus afficher », rien à fermer. */}
+      <p className={s.videCorps}>{VIDE_CE_QU_EST_L_ARBRE}</p>
       {/* Un `<p>` nu, dans le flux, sans bouton ni lien ni fermeture : la phrase n'est pas une bannière,
           elle fait partie de l'écran. Rien à cliquer, donc rien à refuser. */}
       {direOuNaissentLesBranches && <p className={s.videCorps}>{VIDE_OU_NAISSENT_LES_BRANCHES}</p>}
