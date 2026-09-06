@@ -53,9 +53,48 @@ La correspondance Git/déploiement est donc vérifiée; aucun paramètre distant
    examiner le diff.
 3. Pousser la branche et attendre sa Preview; vérifier URL, Ready, SHA et interface réelle.
    Si Julian peut y tester l'application, conserver les alias de production initiaux.
-4. Si protection Preview ou origine d'auth empêche le test réel, promouvoir le déploiement de
-   branche à l'origine existante après contrôles et archivage de la baseline. Aucune fusion dans
-   main ni modification Supabase n'est nécessaire.
+4. Si protection Preview ou origine d'auth empêche le test réel, reconstruire la branche avec
+   `vercel deploy --prod --yes` dans l'environnement de production, après contrôles et archivage
+   de la baseline. Ne pas promouvoir directement le build Preview. Aucune fusion dans main ni
+   modification Supabase n'est nécessaire.
+
+## Collision de déploiement et correctif ciblé
+
+La Preview Git du commit nocturne `8a8fe0b6dec1e7e6990ad0fef764bd21ef29375f` est READY.
+La publication CLI normale de ce même commit a terminé son build, puis Vercel a refusé le
+déploiement car son `deploymentId` existait déjà. La configuration préexistante dérivait cet
+identifiant des 32 premiers caractères du SHA : deux publications du même commit partageaient
+donc le même identifiant.
+
+Le correctif de `next.config.ts` donne priorité à `VERCEL_DEPLOYMENT_ID`, puis conserve les
+replis historiques `VERCEL_GIT_COMMIT_SHA` et `NEXT_DEPLOYMENT_ID`. La validation et la limite
+de 32 caractères restent en place. Vercel documente cet identifiant comme propre à chaque
+déploiement et disponible au build comme à l'exécution :
+[variables système Vercel](https://vercel.com/docs/environment-variables/system-environment-variables#vercel_deployment_id).
+La revue indépendante ne relève aucun blocage dans ce changement ciblé. Le pilote confirme
+six tests de version skew réussis, ESLint et TypeScript réussis.
+
+Le protocole Next de compatibilité entre versions est préservé : identifiant dans les ressources
+et navigations, puis rechargement complet en cas de différence de version. Cette propriété ne
+constitue pas une vérification de l'activation du service Skew Protection du projet ni une
+garantie de conservation d'un état de formulaire uniquement en mémoire. Les requêtes `fetch`
+personnalisées ne sont pas automatiquement couvertes par ce routage ; elles restent inchangées.
+Voir le guide installé `node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/deploymentId.md`
+et la [documentation Vercel Skew Protection](https://vercel.com/docs/skew-protection).
+
+Ce correctif ajoute une modification de configuration de livraison front à la portée UI.
+La preuve antérieure des 367 fichiers inchangés reste une preuve de la refonte avant ce correctif ;
+`next.config.ts` en est désormais l'exception explicite. API, logique métier, migrations,
+`package.json`, `vercel.json` et contrôles de schéma ne sont pas modifiés.
+L'écart distant préexistant sur les migrations 0091–0093 reste documenté ; aucune migration
+n'est appliquée et aucune garantie de concordance du schéma distant n'est revendiquée.
+
+La nouvelle livraison doit partir d'une archive propre du commit corrigé et poussé, avec une
+commande `vercel deploy --prod` normale et les métadonnées de branche/SHA correspondantes.
+Le prébuild `--promotion` s'exécute sans changement, sans `--prebuilt` ni neutralisation de
+variable. Respecter un éventuel blocage du pipeline. L'ID READY, le SHA final et les alias restent
+à confirmer après cette nouvelle exécution ; le rollback conservé demeure
+`dpl_DFEd5WyGwpeoQM5fbnTDFUNKC4z4`.
 
 ## Retour avant toute refonte
 
