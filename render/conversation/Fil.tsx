@@ -10,6 +10,7 @@ import PropositionBranche from "./PropositionBranche";
 import InvitationIntegration from "./InvitationIntegration";
 import HypotheseEnneagramme from "./HypotheseEnneagramme";
 import { AnamPrepare } from "./LotusAttente";
+import IntroductionAnam from "./IntroductionAnam";
 import CarteTiree from "../lecture/CarteTiree";
 import Restitution from "../lecture/Restitution";
 import { estAncreEnBas } from "./composeur-clavier";
@@ -17,8 +18,9 @@ import type { Tour } from "./types";
 import s from "./conversation.module.css";
 
 /**
- * Fil — le flux vertical unique de la conversation (Story 2.2, B2 ; AC1). SANS bulles opposées :
- * mêmes marges, distinction par la typographie + le filet (voir TourAnam/TourUtilisatrice).
+ * Fil — le flux vertical unique de la conversation (Story 2.2, B2 ; AC1). SANS bulles opposées
+ * pour les tours ordinaires : mêmes marges, distinction par la typographie + le filet. La seule
+ * exception est la première prise de parole, courte scène d'accueil avant tout tour utilisateur.
  *
  * Suivi du bas NON CAPTIF (AC3) : on ne recolle au bas QUE si l'utilisatrice y était déjà (mesuré
  * au scroll). Dès qu'elle remonte, on cesse de la ramener — et on ne reprend pas seul.
@@ -191,9 +193,7 @@ export default function Fil({
   return (
     <div className={s.fil} ref={conteneur}>
       {introduction ? (
-        <p className={`${s.introductionStatique} t-anam`} data-introduction-anam="">
-          {introduction}
-        </p>
+        <IntroductionAnam texte={introduction} />
       ) : null}
       {tours.map((t) => (
         <Fragment key={t.id}>

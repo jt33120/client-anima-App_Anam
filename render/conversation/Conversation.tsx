@@ -883,7 +883,9 @@ export default function Conversation({
 
   return (
     <div className={s.conversation} ref={shell}>
-      <ApparitionAnam beat={beat} />
+      {/* À l'ouverture, le portrait accompagne désormais la bulle d'accueil dans le fil. Les
+          apparitions plein format restent réservées aux autres temps forts. */}
+      <ApparitionAnam beat={beat === "ouverture" ? null : beat} />
       <Fil
         introduction={
           tours.some((tour) => tour.role === "utilisatrice") ? null : introduction

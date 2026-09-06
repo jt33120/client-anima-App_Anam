@@ -30,13 +30,24 @@
   scroll-behavior: auto;
 }
 
-.introductionStatique {
+.introductionAnam {
+  width: 100%;
   max-width: var(--mesure);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--esp-3);
+  margin: 0;
+}
+
+.introductionBulle {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--esp-9);
   margin: 0;
   padding: var(--esp-4);
   border: 1px solid color-mix(in srgb, var(--lueur) 22%, transparent);
   border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--fond) 86%, transparent);
+  background: color-mix(in srgb, var(--surface-elevee) 88%, transparent);
   color: var(--texte);
   line-height: 1.65;
 }
@@ -219,13 +230,20 @@
   flex: none;
   min-height: var(--cible-tactile);
   min-width: var(--cible-tactile);
-  padding: var(--esp-3) var(--esp-5);
+  padding: 0;
   background: transparent;
   border: 1px solid var(--bordure-forte);
   border-radius: var(--rayon);
   color: var(--texte);
   cursor: pointer;
   transition: border-color var(--duree-standard) var(--courbe);
+}
+
+.flecheEnvoi {
+  display: block;
+  font-family: var(--pile-ui);
+  font-size: var(--taille-h3);
+  line-height: 1;
 }
 .envoi:hover:not(:disabled) {
   border-color: var(--accent);
@@ -268,6 +286,10 @@
   width: clamp(80px, 24vw, 120px);
   aspect-ratio: 2 / 3;
 }
+.imageAnam.introductionPortrait {
+  flex: none;
+  width: clamp(var(--esp-8), 18vw, var(--esp-9));
+}
 .imageAnamImg {
   position: absolute;
   inset: 0;
@@ -291,12 +313,14 @@
    l'image) : sinon une boîte vide ~120px + une annonce fantôme « Illustration nocturne » subsistent
    (revue 2.2). Aucune info perdue : la présence est aussi portée par le signe de la surimpression. */
 :global(:root[data-a11y="contraste"]) .apparition,
+:global(:root[data-a11y="contraste"]) .introductionPortrait,
 :global(:root[data-a11y="contraste"]) .imageAnamImg,
 :global(:root[data-a11y="contraste"]) .imageAnamRepli {
   display: none;
 }
 @media (prefers-contrast: more) {
   :global(:root:not([data-a11y="nuit"])) .apparition,
+  :global(:root:not([data-a11y="nuit"])) .introductionPortrait,
   :global(:root:not([data-a11y="nuit"])) .imageAnamImg,
   :global(:root:not([data-a11y="nuit"])) .imageAnamRepli {
     display: none;

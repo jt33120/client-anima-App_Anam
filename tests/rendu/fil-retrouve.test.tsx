@@ -62,9 +62,9 @@ const ouverturePersistante = (
 describe("[QA T3] au montage, le fil déjà écrit est LÀ", () => {
   it("[RC-H1] montre la phrase exacte dans un journal sans tour utilisateur, sans fabriquer de tour", () => {
     const { container } = render(<Conversation introduction={ACCUEIL_ANAM} />);
-    const introduction = screen.getByText(ACCUEIL_ANAM);
+    const introduction = screen.getByRole("note", { name: ACCUEIL_ANAM });
 
-    expect(introduction.getAttribute("data-introduction-anam")).not.toBeNull();
+    expect(introduction.closest("[data-introduction-anam]")).not.toBeNull();
     expect(container.querySelectorAll("[data-introduction-anam]")).toHaveLength(1);
     expect(fluxControle.envoyer).not.toHaveBeenCalled();
   });

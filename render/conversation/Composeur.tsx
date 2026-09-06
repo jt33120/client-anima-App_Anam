@@ -120,7 +120,7 @@ export default function Composeur({
           disabled={!valeur.trim() || occupe || bloque}
           aria-label="Envoyer"
         >
-          <span className="t-bouton">Envoyer</span>
+          <span className={s.flecheEnvoi} aria-hidden="true">→</span>
         </button>
       </div>
     </div>
