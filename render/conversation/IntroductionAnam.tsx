@@ -12,11 +12,20 @@ const RYTHME_FRAPPE_MS = 22;
  * comme si elle s'écrivait. Le texte complet reste immédiatement accessible via le nom du
  * `role="note"` et l'animation est supprimée lorsque les mouvements sont réduits.
  */
-export default function IntroductionAnam({ texte }: { texte: string }) {
+export default function IntroductionAnam({
+  texte,
+  statique = false,
+}: {
+  texte: string;
+  /** La phrase générale du journal vide, distincte d'une ouverture quotidienne persistée. */
+  statique?: boolean;
+}) {
   const [longueurVisible, setLongueurVisible] = useState(0);
 
   useEffect(() => {
-    const mouvementReduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mouvementReduit =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (mouvementReduit) {
       setLongueurVisible(texte.length);
       return;
@@ -41,13 +50,22 @@ export default function IntroductionAnam({ texte }: { texte: string }) {
   }, [texte]);
 
   return (
-    <div className={s.introductionAnam} data-introduction-anam="">
+    <div
+      className={s.introductionAnam}
+      data-introduction-anam={statique ? "" : undefined}
+      data-parole-ouverture-anam={statique ? undefined : ""}
+    >
       <p
         className={`${s.introductionBulle} t-anam fondu-texte`}
         role="note"
         aria-label={texte}
       >
-        <span aria-hidden="true">{texte.slice(0, longueurVisible)}</span>
+        {/* Le texte invisible réserve dès la première frame la hauteur finale de la bulle. La
+            frappe se superpose dans cette boîte stable : aucun mot ne pousse le composeur. */}
+        <span className={s.texteOuvertureReserve} aria-hidden="true">{texte}</span>
+        <span className={s.texteOuvertureFrappe} aria-hidden="true">
+          {texte.slice(0, longueurVisible)}
+        </span>
       </p>
       <ImageAnam
         format="presence"

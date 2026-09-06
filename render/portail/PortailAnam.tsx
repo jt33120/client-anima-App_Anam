@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { etatDuPortail, momentDuDepart, portailFini } from "@/lib/scene/portail";
-import ImageAnam from "../conversation/ImageAnam";
 import LotusAttente from "../conversation/LotusAttente";
 import s from "./portail.module.css";
 
@@ -104,9 +103,20 @@ export default function PortailAnam({
       aria-label={copie.annonce}
     >
       <div className={s.scene}>
-        <div aria-hidden="true">
-          <ImageAnam format="veille" alt="" chargement="eager" className={s.portrait} />
-        </div>
+        {/* Le PNG est volontairement servi directement : c'est le premier visuel du document et
+            il doit rester fiable sur Safari/iOS, sans négociation AVIF ni CSS d'un autre écran. */}
+        <img
+          src="/scene/veille/anam-veille.png"
+          srcSet="/scene/veille/anam-veille@2x.png 2x"
+          width="360"
+          height="537"
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          fetchPriority="high"
+          decoding="sync"
+          className={s.portrait}
+        />
         {/* Le nom porte le scintillement de `globals.css` — le halo derrière la lettre, jamais une
             ombre portée sur le texte (leçon de `tests/voile.test.ts`). */}
         <p className={`${s.nom} t-titre scintillement`}>{copie.nom}</p>

@@ -60,14 +60,14 @@
   text-align: center;
 }
 
-/* Le format Veille est le portrait de dos officiel. Sa hauteur commande la composition afin que
-   la silhouette reste entière sur téléphone comme sur bureau. La classe doublée prend le pas sur
-   la taille compacte du format Veille utilisée dans le fil de conversation. */
-.portrait.portrait {
+/* Le profil de dos est autonome dans le portail : aucun style du fil de conversation ne peut
+   désormais réduire ou masquer sa boîte. */
+.portrait {
+  display: block;
   width: auto;
   height: min(68svh, 36rem);
   max-width: 100%;
-  aspect-ratio: 2 / 3;
+  object-fit: contain;
 }
 
 /* ── CE QUI SE LIT SOUS LE PORTRAIT ────────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@
     gap: var(--esp-2);
   }
 
-  .portrait.portrait {
+  .portrait {
     height: min(60svh, 26rem);
   }
 }

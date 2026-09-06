@@ -75,6 +75,20 @@ describe("[QA T3] au montage, le fil déjà écrit est LÀ", () => {
     expect(screen.getByText(HISTORIQUE[0].texte)).toBeTruthy();
   });
 
+  it("remplace l'accueil statique par la parole d'ouverture d'Anam, sans les superposer", () => {
+    const phrase = "Te revoilà. Qu’est-ce qui t’occupe aujourd’hui ?";
+    const { container } = render(
+      <Conversation
+        introduction={ACCUEIL_ANAM}
+        historique={[{ id: "bonjour", role: "anam", texte: phrase, separateurAvant: true }]}
+      />,
+    );
+
+    expect(container.querySelector("[data-introduction-anam]")).toBeNull();
+    expect(container.querySelectorAll("[data-parole-ouverture-anam]")).toHaveLength(1);
+    expect(screen.getByRole("note", { name: phrase })).toBeTruthy();
+  });
+
   it("[LE CŒUR] les trois tours paraissent, dans l'ordre reçu", () => {
     // Mutation-cible : ne pas amorcer l'état avec l'historique. C'est l'état d'avant, et il laissait
     // toute la suite verte — le fil vivait entièrement dans l'état local du composant.

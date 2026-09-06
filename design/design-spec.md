@@ -82,8 +82,10 @@ effacer l'identité lunaire.
 - Les composants de référence sont : carte papier, bouton primaire, bouton secondaire, disclosure,
   conteneur d'illustration et état vide/indisponible. Leurs états focus, contraste renforcé et
   mouvement réduit font partie de la composition, pas d'une retouche ultérieure.
-- Le profil de dos d'Anam domine le portail de chargement. Le lotus et les étoiles restent des décors statiques ou calmement
-  bornés ; aucune seconde couche de particules animées ne concurrence la scène.
+- Le profil de dos d'Anam domine le portail de chargement et y est servi directement en PNG pour
+  rester fiable dès la première peinture, notamment sur Safari/iOS. Le lotus et les étoiles restent
+  des décors statiques ou calmement bornés ; aucune seconde couche de particules animées ne
+  concurrence la scène.
 - À l'étape graine, l'explication de l'arbre est un texte court posé directement sur le ciel, sans
   carte. Une phrase discrète sous la graine marque le point de départ sans créer de progression.
 
@@ -103,9 +105,13 @@ effacer l'identité lunaire.
   moteur reste à valider. Un futur outil n’imite jamais un résultat.
 - Dans Anam, l’arbre persistant s’éteint totalement. Le ciel reste visible, le fil garde ses voiles
   locaux et un repère « Aujourd’hui » sépare le nouveau jour sans devenir une carte. Quand aucun
-  tour utilisateur n'existe, l'introduction statique est exactement : « Confie ici ce que tu portes
+  tour n'existe et qu'aucune ouverture quotidienne n'est en préparation, l'introduction statique
+  est exactement : « Confie ici ce que tu portes
   en toi. Un espace pour te comprendre, évoluer, te dépasser et révéler la personne que tu es
-  appelée à devenir. » Elle n'est ni persistée ni rejouée comme un message.
+  appelée à devenir. » Elle n'est ni persistée ni rejouée comme un message. La parole quotidienne
+  d'Anam prend sa place dans une bulle stable, avec son portrait à droite et une frappe progressive.
+  Quand le clavier s'ouvre, sa hauteur est réservée dans la colonne : le composeur reste sous le fil
+  sans jamais recouvrir la parole.
 
 ## 10. Non-buts
 

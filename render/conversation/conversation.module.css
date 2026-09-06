@@ -15,6 +15,17 @@
   width: 100%;
   max-width: var(--contenu-max);
   margin: 0 auto;
+  /* Le clavier réduit la hauteur UTILE de toute la colonne. Réserver sa place ici maintient le
+     composeur dans le flux et réduit le fil ; déplacer seulement le composeur le superposait au
+     message qu'il devait permettre de lire. */
+  padding-bottom: var(--decalage-clavier, 0px);
+  transition: padding-bottom var(--duree-courte) var(--courbe);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conversation {
+    transition: none;
+  }
 }
 
 /* ── Le fil : flux vertical UNIQUE, sans bulles opposées (AC1). Gap = respiration. ── */
@@ -40,6 +51,7 @@
 }
 
 .introductionBulle {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
   min-height: var(--esp-9);
@@ -50,6 +62,15 @@
   background: color-mix(in srgb, var(--surface-elevee) 88%, transparent);
   color: var(--texte);
   line-height: 1.65;
+}
+
+.texteOuvertureReserve {
+  visibility: hidden;
+}
+
+.texteOuvertureFrappe {
+  position: absolute;
+  inset: var(--esp-4);
 }
 
 /* Frontière du jour dans le fil : une respiration et un filet, jamais une carte ni une bulle. */
@@ -192,14 +213,7 @@
   gap: var(--esp-3);
   padding: var(--esp-3) var(--esp-2);
   padding-bottom: max(var(--esp-3), env(safe-area-inset-bottom));
-  transform: translateY(calc(-1 * var(--decalage-clavier, 0px)));
-  transition: transform var(--duree-courte) var(--courbe);
   background: linear-gradient(to top, var(--fond) 62%, transparent);
-}
-@media (prefers-reduced-motion: reduce) {
-  .composeur {
-    transition: none;
-  }
 }
 
 .champ {

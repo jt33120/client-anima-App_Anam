@@ -888,7 +888,11 @@ export default function Conversation({
       <ApparitionAnam beat={beat === "ouverture" ? null : beat} />
       <Fil
         introduction={
-          tours.some((tour) => tour.role === "utilisatrice") ? null : introduction
+          tours.length === 0 &&
+          etatOuverture === "repos" &&
+          !ouvertureQuotidienneDue
+            ? introduction
+            : null
         }
         tours={tours}
         annonce={annonce}

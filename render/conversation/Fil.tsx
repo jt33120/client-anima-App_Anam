@@ -101,6 +101,12 @@ export default function Fil({
 }) {
   const conteneur = useRef<HTMLDivElement>(null);
   const etaitEnBas = useRef(true);
+  const derniereOuvertureAnam = [...tours]
+    .reverse()
+    .find(
+      (tour) =>
+        tour.role === "anam" && tour.separateurAvant && tour.etat === "complet",
+    )?.id;
 
   /**
    * ── UN DÉFILEMENT QUE NOUS PROVOQUONS NE DIT RIEN DE SON INTENTION (QA tour 2, BLOQUANT) ──────
@@ -193,7 +199,7 @@ export default function Fil({
   return (
     <div className={s.fil} ref={conteneur}>
       {introduction ? (
-        <IntroductionAnam texte={introduction} />
+        <IntroductionAnam texte={introduction} statique />
       ) : null}
       {tours.map((t) => (
         <Fragment key={t.id}>
@@ -203,14 +209,18 @@ export default function Fil({
             </div>
           )}
           {t.role === "anam" ? (
-          <TourAnam
-            key={t.id}
-            texte={t.texte}
-            etat={t.etat}
-            onReessayer={
-              t.etat === "echec" && onReessayer && !quotaEpuise ? () => onReessayer(t.id) : undefined
-            }
-          />
+          t.id === derniereOuvertureAnam ? (
+            <IntroductionAnam texte={t.texte} />
+          ) : (
+            <TourAnam
+              key={t.id}
+              texte={t.texte}
+              etat={t.etat}
+              onReessayer={
+                t.etat === "echec" && onReessayer && !quotaEpuise ? () => onReessayer(t.id) : undefined
+              }
+            />
+          )
         ) : t.role === "ressource" ? (
           // L'ancre du filet : `scrollIntoView` la vise à l'insertion (voir l'encadré T26 ci-dessus).
           <div key={t.id} ref={ressourceRef}>
