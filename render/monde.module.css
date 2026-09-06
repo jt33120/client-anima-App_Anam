@@ -1323,3 +1323,66 @@
 .arbreEnRetraitArbre {
   --imagerie-opacite: 0;
 }
+
+/* Carnet celeste — editorial shell. Historical scene mechanics remain intact. */
+.monde { background: var(--fond); }
+.ciel, .voie, .etoiles, .arbreMonde, .grain { display: none; }
+.region { padding-top: calc(var(--cible-tactile) + var(--esp-7)); }
+.panneau { mask-image: none; -webkit-mask-image: none; }
+.bloc { margin-top: 0; width: 100%; max-width: var(--carnet-largeur); text-align: left; gap: var(--esp-6); }
+.carnetEntete { position: relative; padding: var(--esp-6) 0 var(--esp-4); }
+.carnetAnnotation { font: var(--carnet-note)/1.3 var(--pile-manuscrite); color: var(--accent); margin: 0 0 var(--esp-3); }
+.carnetTitre { font-family: var(--pile-anam); font-size: var(--carnet-display); font-weight: var(--carnet-poids); line-height: var(--carnet-line); letter-spacing: -0.035em; margin: 0; }
+.carnetTitre em { font-weight: inherit; color: var(--accent); }
+.carnetSousTitre { color: var(--texte-doux); font: var(--carnet-texte)/1.7 var(--pile-ui); max-width: var(--mesure); margin: var(--esp-5) 0 0; }
+.bloc .carnetDate { font-family: var(--pile-ui); font-size: var(--carnet-petit); text-transform: uppercase; letter-spacing: var(--carnet-tracking); color: var(--texte-doux); border-top: 1px solid var(--bordure); padding-top: var(--esp-5); }
+.nav { pointer-events: auto; background: var(--surface); border-top: 1px solid var(--bordure); gap: 0; padding-top: var(--esp-2); }
+.navLien { flex: 1; flex-direction: column; gap: var(--esp-1); padding: var(--esp-2); border-radius: var(--rayon-md); }
+.navLien :global(.t-bouton) { font-size: var(--carnet-petit); }
+.navLien[aria-current="location"] { background: var(--carnet-lavande); color: var(--texte); }
+.carnetNavIcone { width: var(--carnet-icon); height: var(--carnet-icon); display: block; }
+.carnetNavIcone svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.carnetMarque, .carnetRubrique { display: none; }
+.carnetNavPied { display: flex; align-items: center; justify-content: center; padding-left: var(--esp-2); }
+.carnetNavPied p { display: none; }
+.carnetTheme { min-width: var(--cible-tactile); min-height: var(--cible-tactile); border: 1px solid var(--bordure); background: var(--fond); color: var(--texte-doux); border-radius: var(--rayon-full); padding: var(--esp-2) var(--esp-3); cursor: pointer; font: var(--carnet-petit)/1.4 var(--pile-ui); }
+.carnetTheme:hover { color: var(--texte); border-color: var(--bordure-forte); }
+.surimpression { background: var(--fond); border-bottom: 1px solid var(--bordure); }
+.surimpressionVoile { display: none; }
+.regionConversation { background: var(--fond); padding-bottom: calc(var(--hauteur-nav) + var(--esp-5)); }
+.regionArbre { background: var(--fond); }
+.titreConversation { font-family: var(--pile-anam); font-size: var(--carnet-logo); text-align: left; width: 100%; max-width: var(--carnet-largeur); }
+.lotusAnam { display: none; }
+.passage { border-left: 2px solid var(--bordure-forte); padding: var(--esp-3) var(--esp-5); text-align: left; background: var(--surface); border-radius: 0 var(--rayon-md) var(--rayon-md) 0; }
+@media (min-width: 768px) {
+  .carnetEntete { min-height: var(--carnet-hero); padding-right: 42%; display: flex; flex-direction: column; justify-content: center; }
+  .carnetEntete::after { content: ""; position: absolute; inset: 0 0 0 64%; border-radius: var(--carnet-rayon-lg); background: var(--carnet-rose) url('/marque/carnet-aquarelle.webp') center/cover; opacity: var(--carnet-image-opacity); }
+}
+@media (min-width: 1024px) {
+  .nav { width: var(--carnet-rail); align-items: stretch; justify-content: flex-start; border-top: 0; border-right: 1px solid var(--bordure); padding: var(--esp-7) var(--esp-5); gap: var(--esp-3); }
+  .navLien { flex: 0; min-height: calc(var(--cible-tactile) + var(--esp-3)); flex-direction: row; justify-content: flex-start; gap: var(--esp-3); padding: var(--esp-3) var(--esp-4); }
+  .navLien:hover { background: var(--carnet-lavande); }
+  .navLien :global(.t-bouton) { font-size: var(--carnet-texte); }
+  .carnetMarque { display: flex; flex-direction: column; padding: 0 var(--esp-3) var(--esp-8); }
+  .carnetNom { font: var(--carnet-logo)/1 var(--pile-anam); letter-spacing: -0.06em; }
+  .carnetNom span { color: var(--accent); }
+  .carnetSignature { font: var(--carnet-petit)/1.5 var(--pile-ui); color: var(--texte-doux); margin-top: var(--esp-3); }
+  .carnetRubrique { display: block; padding: 0 var(--esp-4) var(--esp-3); color: var(--texte-doux); font: var(--carnet-petit)/1.5 var(--pile-ui); letter-spacing: var(--carnet-tracking); text-transform: uppercase; }
+  .carnetNavPied { margin-top: auto; padding: var(--esp-5) var(--esp-3) 0; border-top: 1px solid var(--bordure); flex-direction: column; align-items: flex-start; gap: var(--esp-4); }
+  .carnetNavPied p { display: block; font: var(--carnet-note)/1.4 var(--pile-manuscrite); margin: 0; color: var(--texte-doux); }
+  .region { padding-left: calc(var(--carnet-rail) + var(--esp-7)); padding-right: var(--esp-7); }
+  .regionConversation { padding-bottom: var(--esp-5); }
+  .surimpression { left: var(--carnet-rail); padding-left: var(--esp-7); padding-right: var(--esp-7); }
+  .carnetEntete { padding-top: var(--esp-4); }
+}
+@media (max-width: 389px) {
+  .nav { padding-inline: var(--esp-2); }
+  .navLien { padding-inline: var(--esp-1); }
+  .carnetNavPied { padding-left: var(--esp-1); }
+}
+.carnetIndisponible { padding: var(--esp-6); border: 1px solid var(--bordure); border-radius: var(--carnet-rayon); background: var(--surface); color: var(--texte-doux); }
+.carnetIndisponible p { margin: 0 0 var(--esp-4); max-width: var(--mesure); }
+@media (max-width: 767px) {
+  .carnetEntete { padding-top: var(--esp-3); padding-bottom: 0; }
+  .carnetSousTitre { margin-top: var(--esp-4); }
+}

@@ -1,11 +1,14 @@
 import "./styles/globals.css";
+import "./styles/carnet-tokens.css";
+import "./styles/carnet.css";
 import type { Metadata, Viewport } from "next";
-import { couleursNuit } from "@/app/styles/tokens";
+import carnetTokens from "@/design/tokens.json";
 import type { ReactNode } from "react";
-import { policeAnam, policeUi } from "./styles/polices";
+import { policeAnam, policeUi, policeManuscrite } from "./styles/polices";
 import { CouvercleConfidentialite } from "@/render/confidentialite/CouvercleConfidentialite";
 import { passkeysActives } from "@/lib/auth/verrou-prive";
 import InitialiserDocumentPortail from "@/render/portail/InitialiserDocumentPortail";
+import { ThemeCarnetDocument } from "@/render/carnet/ThemeCarnet";
 
 // NFR-015 — identité discrète : « Anam » sur TOUTES les routes. Le `template` littéral
 // (sans %s) absorbe tout title enfant en « Anam » ; les pages l'explicitent aussi
@@ -41,26 +44,18 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   interactiveWidget: "resizes-content",
-  // QA tour 2 — IL N'Y AVAIT AUCUNE `theme-color` DANS TOUT LE DOCUMENT (mesuré : 0 occurrence).
-  // La barre du système (encoche Android, barre d'état iOS en PWA) restait donc à la couleur par
-  // défaut du navigateur, en bordure d'une scène de nuit. C'est `--fond`, et rien d'autre : le mode
-  // « contraste renforcé » est un réglage d'accessibilité qui s'active à la main, pas un thème jour
-  // — il n'y a donc pas de variante `prefers-color-scheme` à déclarer ici.
-  // ⚠️ LU DANS LE FICHIER DE DESIGN, PLUS RECOPIÉ (2026-09-03 : « toutes les couleurs dans des
-  // fichiers de design qu'il suffit de modifier »). Cette valeur était `#1C2740` écrit à la main,
-  // c'est-à-dire une copie de `--fond` prise le jour de la bascule au navy. Elle serait restée
-  // navy le jour où le fond changerait — et personne ne regarde la barre du système en relisant
-  // une palette. C'est le dernier endroit du produit où une couleur vivait hors des jetons.
-  themeColor: couleursNuit.fond,
+  // The server starts with paper; ThemeCarnetDocument follows the saved preference.
+  themeColor: carnetTokens.light.fond,
 };
 
 // UX-DR-36 : lang="fr" sur le document.
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr" className={`${policeAnam.variable} ${policeUi.variable}`}>
+    <html lang="fr" className={`${policeAnam.variable} ${policeUi.variable} ${policeManuscrite.variable}`}>
       {/* suppressHydrationWarning : des extensions (Grammarly…) injectent des attributs
           dans <body> avant l'hydratation — mitigation recommandée par Next/React. */}
       <body suppressHydrationWarning>
+        <ThemeCarnetDocument />
         <InitialiserDocumentPortail />
         {children}
         {/* Story 6.2 (AC5) — la vignette du sélecteur de tâches ne montre jamais l'intérieur d'une

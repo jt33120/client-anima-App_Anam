@@ -1,0 +1,30 @@
+/* Carnet celeste: shared editorial rhythm, including secondary and recovery screens. */
+body {
+  background: var(--fond);
+  color: var(--texte);
+}
+::selection {
+  background: var(--accent);
+  color: var(--sur-accent);
+}
+.t-display {
+  font-size: var(--carnet-display);
+  line-height: var(--carnet-line);
+  letter-spacing: -0.035em;
+}
+.t-surtitre {
+  letter-spacing: var(--carnet-tracking);
+}
+button, input, textarea, select, a {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: var(--esp-1);
+}
+input, textarea, select {
+  accent-color: var(--accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}

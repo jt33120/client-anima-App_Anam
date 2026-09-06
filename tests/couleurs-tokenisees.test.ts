@@ -126,7 +126,8 @@ describe("[E5-S2] aucune couleur écrite à la main dans les feuilles du monde",
     const monde = codeSeul(lire("render/monde.module.css"));
     const masques = [...monde.matchAll(/(?:-webkit-)?mask-image:[^;]*;/g)].map((m) => m[0]);
     expect(masques.length, "plus aucun masque de dissolution dans le monde").toBeGreaterThanOrEqual(2);
-    for (const masque of masques) expect(masque).toMatch(/\bblack\b/);
+    // Carnet celeste has opaque chrome: removing its dissolution mask is intentional.
+    for (const masque of masques) expect(masque).toMatch(/\b(?:black|none)\b/);
   });
 });
 

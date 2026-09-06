@@ -36,7 +36,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--respiration);
-  padding: var(--esp-4) var(--esp-2) var(--esp-5);
+  padding: var(--esp-5) var(--esp-3) var(--esp-6);
+  scrollbar-color: var(--bordure-forte) transparent;
   /* JAMAIS smooth : défilement instantané → cohérent reduced-motion ET suivi du bas non captif. */
   scroll-behavior: auto;
 }
@@ -45,7 +46,7 @@
   width: 100%;
   max-width: var(--mesure);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--esp-3);
   margin: 0;
 }
@@ -56,10 +57,9 @@
   min-width: 0;
   min-height: var(--esp-9);
   margin: 0;
-  padding: var(--esp-4);
-  border: 1px solid color-mix(in srgb, var(--lueur) 22%, transparent);
-  border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--surface-elevee) 88%, transparent);
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--texte);
   line-height: 1.65;
 }
@@ -70,7 +70,7 @@
 
 .texteOuvertureFrappe {
   position: absolute;
-  inset: var(--esp-4);
+  inset: 0;
 }
 
 /* Frontière du jour dans le fil : une respiration et un filet, jamais une carte ni une bulle. */
@@ -100,6 +100,7 @@
 /* Voix d'Anam — Fraunces (t-anam), SANS fond / bulle / bordure. */
 .tourAnam {
   max-width: var(--mesure);
+  padding-inline: var(--esp-3);
 }
 .tourAnam p {
   margin: 0;
@@ -111,7 +112,11 @@
 .tourUtilisatrice {
   max-width: var(--mesure);
   border-left: 1px solid var(--bordure-forte);
+  padding: var(--esp-3) var(--esp-4);
   padding-left: var(--esp-4);
+  margin-inline: var(--esp-3);
+  background: var(--carnet-rose);
+  border-radius: 0 var(--carnet-rayon) var(--carnet-rayon) 0;
 }
 .tourUtilisatrice p {
   margin: 0;
@@ -210,10 +215,13 @@
   flex: none;
   display: flex;
   align-items: flex-end;
-  gap: var(--esp-3);
-  padding: var(--esp-3) var(--esp-2);
-  padding-bottom: max(var(--esp-3), env(safe-area-inset-bottom));
-  background: linear-gradient(to top, var(--fond) 62%, transparent);
+  gap: var(--esp-2);
+  margin: var(--esp-2) var(--esp-2) max(var(--esp-3), env(safe-area-inset-bottom));
+  padding: var(--esp-2);
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--carnet-rayon);
+  background: var(--surface);
+  box-shadow: var(--ombre-posee);
 }
 
 .champ {
@@ -221,8 +229,9 @@
   min-height: var(--cible-tactile);
   resize: none;
   padding: var(--esp-3) var(--esp-4);
-  background: var(--surface-elevee);
-  border: 1px solid var(--bordure-forte);
+  min-width: 0;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--rayon-md);
   color: var(--texte);
   font-family: var(--pile-ui);
@@ -245,10 +254,10 @@
   min-height: var(--cible-tactile);
   min-width: var(--cible-tactile);
   padding: 0;
-  background: transparent;
-  border: 1px solid var(--bordure-forte);
-  border-radius: var(--rayon);
-  color: var(--texte);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--rayon-full);
+  color: var(--sur-accent);
   cursor: pointer;
   transition: border-color var(--duree-standard) var(--courbe);
 }
@@ -256,7 +265,7 @@
 .flecheEnvoi {
   display: block;
   font-family: var(--pile-ui);
-  font-size: var(--taille-h3);
+  font-size: var(--carnet-note);
   line-height: 1;
 }
 .envoi:hover:not(:disabled) {
@@ -460,4 +469,53 @@
   flex-direction: column;
   gap: var(--esp-2);
   margin: 0;
+}
+
+/* Anam writes a letter at the top of the shared journal. */
+.introductionLettre {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-5);
+  background: var(--carnet-lavande);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon-lg) var(--carnet-rayon-lg) var(--rayon-sm) var(--carnet-rayon-lg);
+}
+
+.signatureAnam {
+  color: var(--accent);
+  font-family: var(--pile-manuscrite);
+  font-size: var(--carnet-note);
+  line-height: 1.2;
+}
+
+.composeur:focus-within {
+  border-color: var(--accent);
+}
+
+@media (max-width: 639px) {
+  .introductionAnam {
+    align-items: end;
+    gap: 0;
+  }
+
+  .introductionLettre {
+    padding: var(--esp-4);
+  }
+
+  .imageAnam.introductionPortrait {
+    width: var(--esp-8);
+  }
+}
+
+@media (min-width: 960px) {
+  .fil {
+    padding: var(--esp-6) var(--esp-6) var(--esp-7);
+  }
+
+  .composeur {
+    margin-inline: var(--esp-6);
+  }
 }

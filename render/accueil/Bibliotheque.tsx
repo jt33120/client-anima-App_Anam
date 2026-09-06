@@ -31,18 +31,25 @@ export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
   return (
     <div className={s.bibliotheque}>
       <div className={s.quotidien} data-quotidien>
-        {mantra && <MantraDuJour mantra={mantra} />}
+        {mantra && (
+          <div className={s.feuilletMantra}>
+            <p className={`t-titre ${s.annotation}`}>Une pensée à garder</p>
+            <MantraDuJour mantra={mantra} />
+            <span className={s.traitMantra} aria-hidden />
+          </div>
+        )}
         <div className={s.cartesQuotidiennes}>
           {ciel && <CarteCiel carte={ciel} />}
         </div>
       </div>
 
-      <div className={s.transitionUnivers} aria-hidden><span /></div>
-
       <section className={s.univers} aria-labelledby="moi-univers">
         <div className={s.enteteUnivers}>
-          <p className={`t-meta ${s.surtitreUnivers}`}>Mon monde intérieur</p>
-          <h2 id="moi-univers" className="t-titre">Mes univers</h2>
+          <div>
+            <p className={`t-surtitre ${s.surtitreUnivers}`}>Mon monde intérieur</p>
+            <h2 id="moi-univers" className="t-display">Mes univers</h2>
+          </div>
+          <p className={`t-titre ${s.annotationUnivers}`}>À ton rythme.</p>
         </div>
         <ul className={s.grilleUnivers}>
           {univers.map((univers) => <PorteUnivers key={univers.cle} univers={univers} />)}
@@ -62,10 +69,9 @@ function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
     <li className={s.itemUnivers}>
       <article className={s.porteUnivers} data-univers={univers.cle}>
         <Link className={s.lienUnivers} href={univers.url}>
-          <span className={s.eclat} aria-hidden />
           <span className={s.glyphe}><GlypheUnivers cle={univers.cle} /></span>
           <span className={s.texteUnivers}>
-            <span className={`t-titre-sm ${s.nomUnivers}`}>{univers.titre}</span>
+            <span className={`t-titre ${s.nomUnivers}`}>{univers.titre}</span>
             <span className={`t-meta ${s.accrocheUnivers}`}>{univers.accroche}</span>
           </span>
           <span className={s.fleche} aria-hidden>→</span>
@@ -88,7 +94,7 @@ function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
 
 function MantraDuJour({ mantra }: { readonly mantra: CarteVue }) {
   if (mantra.texte.statut === "ecrit") {
-    return <blockquote className={`t-anam ${s.mantraDuJour}`}>« {mantra.texte.texte} »</blockquote>;
+    return <blockquote className={`t-display ${s.mantraDuJour}`}>« {mantra.texte.texte} »</blockquote>;
   }
 
   return <p className={`t-meta ${s.mantraAbsent}`}>Anima n’a pas encore écrit ce mantra.</p>;

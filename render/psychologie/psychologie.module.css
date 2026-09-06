@@ -1,5 +1,5 @@
 .halte {
-  max-width: var(--contenu-max);
+  max-width: calc(var(--contenu-max) + var(--esp-9));
   margin: 0 auto;
   padding: var(--esp-7) var(--marge-mobile) var(--esp-8);
   display: flex;
@@ -15,7 +15,8 @@
 }
 
 .titre {
-  text-align: center;
+  text-align: left;
+  text-wrap: balance;
 }
 
 .grille {
@@ -39,26 +40,18 @@
   padding: var(--esp-5);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--sur-papier-doux) 28%, transparent);
-  border-radius: var(--rayon-lg);
-  background:
-    var(--texture-papier),
-    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 12%, transparent), transparent 34%),
-    var(--papier);
+  border-radius: var(--carnet-rayon-lg);
+  background: var(--surface);
   color: var(--sur-papier);
 }
 
 .moduleActif {
   border-color: color-mix(in srgb, var(--sur-papier-doux) 48%, transparent);
-  background:
-    var(--texture-papier),
-    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--lueur) 15%, transparent), transparent 38%),
-    var(--papier);
+  background: var(--carnet-lavande);
 }
 
 .methode {
-  background:
-    var(--texture-papier),
-    color-mix(in srgb, var(--papier) 88%, transparent);
+  background: var(--carnet-sauge);
 }
 
 .etiquette {
@@ -87,7 +80,7 @@
   min-height: var(--cible-tactile);
   margin-top: auto;
   padding: var(--esp-2) var(--esp-4);
-  border-radius: var(--rayon);
+  border-radius: var(--rayon-full);
   background: var(--accent);
   color: var(--sur-accent);
   text-decoration: none;
@@ -120,5 +113,23 @@
   .indicateurActif {
     animation: none;
     opacity: 0.65;
+  }
+}
+
+.moduleActif:nth-child(2) {
+  background: var(--carnet-rose);
+}
+
+.moduleActif:nth-child(3) {
+  background: var(--carnet-sauge);
+}
+
+@media (min-width: 960px) {
+  .grille {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .module {
+    min-height: calc(var(--cible-tactile) * 6);
   }
 }

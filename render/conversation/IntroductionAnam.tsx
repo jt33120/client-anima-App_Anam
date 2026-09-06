@@ -55,18 +55,21 @@ export default function IntroductionAnam({
       data-introduction-anam={statique ? "" : undefined}
       data-parole-ouverture-anam={statique ? undefined : ""}
     >
-      <p
-        className={`${s.introductionBulle} t-anam fondu-texte`}
-        role="note"
-        aria-label={texte}
-      >
+      <div className={s.introductionLettre}>
+        <span className={s.signatureAnam}>Anam</span>
+        <p
+          className={`${s.introductionBulle} t-anam fondu-texte`}
+          role="note"
+          aria-label={texte}
+        >
         {/* Le texte invisible réserve dès la première frame la hauteur finale de la bulle. La
             frappe se superpose dans cette boîte stable : aucun mot ne pousse le composeur. */}
         <span className={s.texteOuvertureReserve} aria-hidden="true">{texte}</span>
         <span className={s.texteOuvertureFrappe} aria-hidden="true">
           {texte.slice(0, longueurVisible)}
         </span>
-      </p>
+        </p>
+      </div>
       <ImageAnam
         format="presence"
         alt="Illustration nocturne"

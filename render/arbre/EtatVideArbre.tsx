@@ -40,6 +40,7 @@ export interface ProprietesEtatVideArbre {
 export default function EtatVideArbre({ direOuNaissentLesBranches, onOuvrirTronc }: ProprietesEtatVideArbre) {
   return (
     <div className={s.vide}>
+      <p className={s.videAnnotation}>Tout commence ici.</p>
       {/* Le dessin ne vit plus ici : l'étape 0 garde le même Canvas lunaire que l'arbre vivant.
           Ce composant ne porte que la copie et le chemin nommé vers la fiche du tronc. */}
       {/* Le chemin vers la fiche du tronc reste avant le texte long : sur un téléphone, la personne

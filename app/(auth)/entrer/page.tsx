@@ -51,6 +51,16 @@ export default async function PageEntrer({
 
   return (
     <main className={s.page}>
+      <aside className={s.jardin} aria-label="Bienvenue dans ton carnet intérieur">
+        <p className={s.marque}>anam<span>.</span></p>
+        <div className={s.jardinTexte}>
+          <p className={s.annotation}>Un moment rien qu’à toi</p>
+          <h2 className={s.jardinTitre}>Et si tu prenais<br />le temps de<br /><em>t’écouter ?</em></h2>
+          <p className={s.jardinDescription}>Un carnet pour te découvrir.<br />Un espace pour laisser grandir l’essentiel.</p>
+        </div>
+        <div className={s.illustration} aria-hidden />
+        <p className={s.jardinNote}>Revenir à soi, doucement.</p>
+      </aside>
       <div className={s.contenu}>
         <p className="t-surtitre">Anam</p>
         <h1 className="t-display">

@@ -1,7 +1,7 @@
 /*
  * arbre.module.css — L'arbre de vie (région « arbre »), sa fiche, sa vue liste, et l'échange source.
- * Charte « nuit galactique » : argent lunaire (aucun brun, aucun or), lueur nacre pour le rayonnement,
- * accent lotus RÉSERVÉ au point d'accroche. Aucun rouge. Anneau de focus jamais supprimé (bordure-forte).
+ * The lunar drawing keeps its original palette inside a plum garden. Reading surfaces use the
+ * shared carnet tokens; focus, gestures, and scroll containers keep their existing behavior.
  */
 
 .arbre {
@@ -32,9 +32,11 @@
   justify-content: space-between;
   gap: var(--esp-3);
   flex: none;
-  background: color-mix(in srgb, var(--fond) 88%, transparent);
-  border-radius: var(--rayon-md);
-  padding: var(--esp-1) var(--esp-2);
+  flex-wrap: wrap;
+  background: var(--carnet-sauge);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  padding: var(--esp-2);
 }
 
 .zoomBoutons {
@@ -123,7 +125,7 @@
   min-height: var(--cible-tactile);
   min-width: var(--cible-tactile);
   padding: 0 var(--esp-3);
-  border-radius: var(--rayon-md);
+  border-radius: var(--rayon-full);
   border: 1px solid var(--bordure-forte);
   background: var(--surface);
   color: var(--texte);
@@ -133,7 +135,7 @@
 }
 .actionPrincipale {
   background: var(--accent);
-  color: var(--fond);
+  color: var(--sur-accent);
   border-color: transparent;
 }
 .actionPrincipale:disabled {
@@ -164,7 +166,9 @@
   flex: 1;
   min-height: 18rem;
   overflow: hidden;
-  border-radius: var(--rayon-lg);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon-lg);
+  background: var(--carnet-jardin);
   touch-action: none; /* le pan/zoom est géré par les gestes, pas le navigateur */
 }
 .canevas:focus-visible {
@@ -209,14 +213,14 @@
   transform: translate(-50%, -50%);
   --taille-graine: 48px;
 }
-.graineMessage {
+.canevas .graineMessage {
   position: absolute;
   left: 50%;
   top: calc(54.61% + var(--esp-7));
   width: min(calc(100% - 2 * var(--esp-5)), var(--mesure));
   margin: 0;
   transform: translateX(-50%);
-  color: var(--texte-doux);
+  color: var(--carnet-jardin-encre);
   text-align: center;
   pointer-events: none;
 }
@@ -262,9 +266,10 @@
   max-height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--surface-elevee);
+  background: var(--surface);
   border: 1px solid var(--bordure-forte);
-  border-radius: var(--rayon-lg);
+  border-radius: var(--carnet-rayon-lg);
+  box-shadow: var(--ombre-posee);
   padding: var(--esp-5);
   display: flex;
   flex-direction: column;
@@ -395,8 +400,9 @@
 .vide {
   flex: 1;
   display: flex;
-  background: color-mix(in srgb, var(--fond) 88%, transparent);
-  border-radius: var(--rayon-md);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
   flex-direction: column;
   align-items: center;
   /* ⚠️ `safe`, ET C'EST LA MOITIÉ DE LA CORRECTION. Un `center` ordinaire qui déborde déborde DES
@@ -440,6 +446,9 @@
   max-height: 50%;
   transform: translateX(-50%);
   overflow-y: auto;
+  border-radius: var(--carnet-rayon);
+  background: var(--surface);
+  scrollbar-color: var(--bordure-forte) var(--surface);
   overscroll-behavior: contain;
   touch-action: pan-y;
 }
@@ -450,7 +459,7 @@
   align-items: flex-start;
   justify-content: flex-start;
   text-align: left;
-  padding: var(--esp-3) var(--esp-4) 0;
+  padding: var(--esp-4);
 }
 .videTitre {
   font-family: var(--pile-anam);
@@ -474,10 +483,10 @@
   overflow-y: auto;
 }
 .listeItem {
-  background: var(--surface);
+  background: var(--carnet-sauge);
   border: 1px solid var(--bordure);
-  border-radius: var(--rayon-lg);
-  padding: var(--esp-4);
+  border-radius: var(--carnet-rayon);
+  padding: var(--esp-5);
   display: flex;
   flex-direction: column;
   gap: var(--esp-1);
@@ -617,5 +626,37 @@
   :global(:root:not([data-a11y="nuit"])) .barre,
   :global(:root:not([data-a11y="nuit"])) .vide {
     background: var(--fond);
+  }
+}
+
+.videAnnotation {
+  margin: 0 0 var(--esp-2);
+  color: var(--accent);
+  font-family: var(--pile-manuscrite);
+  font-size: var(--carnet-note);
+  line-height: 1.2;
+}
+
+.zoomBoutons {
+  margin-left: auto;
+}
+
+.actionSecondaire:hover,
+.zoomBouton:hover {
+  background: var(--carnet-lavande);
+}
+
+@media (min-width: 960px) {
+  .arbre {
+    gap: var(--esp-4);
+  }
+
+  .barre {
+    padding: var(--esp-3) var(--esp-4);
+  }
+
+  .videSuperposition {
+    top: var(--esp-4);
+    max-width: calc(var(--mesure) - var(--esp-7));
   }
 }

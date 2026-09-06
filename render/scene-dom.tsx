@@ -49,6 +49,8 @@ import type {
 } from "./conversation/types";
 import type { ResultatGeste } from "./arbre/FicheBranche";
 import s from "./monde.module.css";
+import ThemeCarnet from "./carnet/ThemeCarnet";
+import GlypheUnivers from "./GlypheUnivers";
 
 export interface ProprietesSceneRendue {
   /** Domain-projection serveur, en lecture seule (AD-7). Le rendu ne l'écrit jamais. */
@@ -849,9 +851,16 @@ export default function SceneDom({
               </>
             ) : (
               <div className={s.bloc}>
+                {r.id === "accueil" && (
+                  <header className={s.carnetEntete}>
+                    <p className={s.carnetAnnotation}>Revenir à soi, un jour à la fois.</p>
+                    <p className={s.carnetTitre}>Un peu de ciel.<br /><em>Beaucoup de toi.</em></p>
+                    <p className={s.carnetSousTitre}>Ton espace pour explorer, ressentir et laisser grandir ce qui compte.</p>
+                  </header>
+                )}
                 {/* h1 par région : une seule est non-inert à la fois → une seule h1 exposée. */}
                 <h1
-                  className="t-titre"
+                  className={`t-titre ${s.carnetDate}`}
                   tabIndex={-1}
                   ref={(el) => void (entetes.current[r.id] = el)}
                 >
@@ -880,7 +889,12 @@ export default function SceneDom({
                     />
                     {bibliotheque ? (
                       <Bibliotheque bibliotheque={bibliotheque} />
-                    ) : null}
+                    ) : (
+                      <div className={s.carnetIndisponible} role="status">
+                        <p>Ton carnet du jour n’a pas pu s’ouvrir. Tu peux réessayer ou retrouver Anam.</p>
+                        <button className={s.carnetTheme} type="button" onClick={() => router.refresh()}>Réessayer</button>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="t-corps">{CORPS[r.id]}</p>
@@ -902,6 +916,11 @@ export default function SceneDom({
           doubler. */}
       {!seuilActif && (
         <nav className={s.nav} aria-label="Régions">
+          <div className={s.carnetMarque} aria-hidden>
+            <span className={s.carnetNom}>anam<span>.</span></span>
+            <span className={s.carnetSignature}>Le carnet intérieur</span>
+          </div>
+          <span className={s.carnetRubrique} aria-hidden>Prendre le temps</span>
           {REGIONS.map((r) => (
             <button
               key={r.id}
@@ -910,9 +929,16 @@ export default function SceneDom({
               aria-current={region === r.id ? "location" : undefined}
               onClick={(event) => aller(r.id, r.id === "anam" && event.detail > 0)}
             >
+              <span className={s.carnetNavIcone} aria-hidden>
+                <GlypheUnivers cle={r.id === "accueil" ? "astrologie" : r.id === "anam" ? "numerologie" : "psychologie"} />
+              </span>
               <span className="t-bouton">{r.nom}</span>
             </button>
           ))}
+          <div className={s.carnetNavPied}>
+            <p>À ton rythme.</p>
+            <ThemeCarnet className={s.carnetTheme} />
+          </div>
         </nav>
       )}
     </main>

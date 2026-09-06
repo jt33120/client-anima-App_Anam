@@ -1,9 +1,9 @@
 .figure {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-3);
+  gap: var(--esp-5);
   width: 100%;
-  max-width: var(--contenu-max);
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -103,11 +103,7 @@
   touch-action: none;
   border: 1px solid var(--bordure-forte);
   border-radius: var(--rayon-full);
-  background:
-    var(--texture-papier),
-    radial-gradient(circle at 32% 24%, color-mix(in srgb, var(--nebuleuse) 28%, transparent), transparent 30%),
-    radial-gradient(circle at 68% 74%, color-mix(in srgb, var(--lueur) 14%, transparent), transparent 28%),
-    var(--fond);
+  background: var(--carnet-lavande);
   cursor: grab;
   user-select: none;
 }
@@ -123,7 +119,7 @@
 }
 
 .fondRoue {
-  fill: color-mix(in srgb, var(--surface-elevee) 58%, var(--fond));
+  fill: var(--surface);
   stroke: var(--bordure-forte);
   stroke-width: 2;
 }
@@ -277,7 +273,7 @@
 }
 
 .aspectConjonction {
-  stroke: var(--nebuleuse);
+  stroke: var(--accent);
 }
 
 .aspectSextile {
@@ -286,12 +282,12 @@
 }
 
 .aspectCarre {
-  stroke: var(--aube);
+  stroke: var(--alerte);
   stroke-dasharray: 9 6;
 }
 
 .aspectTrigone {
-  stroke: var(--jour);
+  stroke: var(--succes);
   stroke-dasharray: 18 8;
 }
 
@@ -358,14 +354,11 @@
   flex-direction: column;
   gap: var(--esp-4);
   padding: var(--esp-4);
-  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
-  border-radius: var(--rayon-lg);
-  background:
-    var(--texture-papier),
-    radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--jour) 42%, transparent), transparent 32%),
-    var(--papier);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  background: var(--carnet-lavande);
   color: var(--sur-papier);
-  box-shadow: var(--ombre-posee);
+  box-shadow: none;
 }
 
 .entetePlanete {
@@ -456,11 +449,12 @@
 @media (max-width: 420px) {
   .enteteInstrument {
     align-items: flex-start;
+    flex-direction: column;
   }
 
   .commandes {
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 
   .glypheSigne {
@@ -485,5 +479,42 @@
   :global(:root:not([data-a11y="nuit"])) .roue,
   :global(:root:not([data-a11y="nuit"])) .fichePlanete {
     background: var(--surface);
+  }
+}
+
+/* The instrument and its reading occupy facing pages on a wide screen. */
+@media (min-width: 960px) {
+  .figure {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--esp-6);
+  }
+
+  .enteteInstrument {
+    grid-column: 1 / -1;
+  }
+
+  .roue {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+  }
+
+  .fichePlanete,
+  .ficheAvecAspects {
+    display: flex;
+    grid-column: 2;
+    grid-row: 2;
+    padding: var(--esp-5);
+  }
+
+  .recentrer {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: start;
+  }
+
+  .legende {
+    grid-column: 1 / -1;
   }
 }

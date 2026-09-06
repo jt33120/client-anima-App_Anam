@@ -1,0 +1,4 @@
+@font-face { font-family: PreviewFraunces; src: url('../../app/styles/fonts/fraunces-variable.woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: PreviewInter; src: url('../../app/styles/fonts/inter-variable.woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: PreviewCaveat; src: url('../../app/styles/fonts/caveat-medium.woff2'); font-weight: 500; font-display: swap; }
+:root { --police-anam: PreviewFraunces; --police-ui: PreviewInter; --police-manuscrite: PreviewCaveat; }

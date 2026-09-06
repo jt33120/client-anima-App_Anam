@@ -4,9 +4,9 @@
    l'objet est l'exercice d'un droit. */
 
 .halte {
-  max-width: 38rem;
+  max-width: var(--mesure);
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
+  padding: var(--esp-7) var(--marge-mobile) var(--esp-8);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -46,9 +46,11 @@
 .fait {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--texte-doux) 30%, transparent);
+  gap: var(--esp-3);
+  padding: var(--esp-5);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  background: var(--surface);
 }
 
 .phrase {
@@ -75,11 +77,11 @@
   color: var(--texte);
   background: transparent;
   border: 1px solid var(--texte-doux);
-  border-radius: 999px;
+  border-radius: var(--rayon-full);
   /* La cible tactile passe par le JETON, jamais par un littéral : `tests/cible-tactile.test.ts` lit
      les feuilles de style et refuse une commande qui la redéclare à la main. */
   min-height: var(--cible-tactile);
-  padding: 0 1.2rem;
+  padding: 0 var(--esp-4);
   cursor: pointer;
 }
 
@@ -100,8 +102,8 @@
   color: var(--texte);
   background: transparent;
   border: 1px solid var(--texte-doux);
-  border-radius: 0.5rem;
-  padding: 0.6rem;
+  border-radius: var(--rayon-md);
+  padding: var(--esp-3);
   /* Le JETON NU, jamais un `calc` : `tests/cible-tactile.test.ts` exige la forme exacte, et il a
      raison — une expression peut dériver sous les 44 px sans que personne ne le voie. La hauteur
      visuelle du champ vient de `rows`, pas d'ici. */
