@@ -1,6 +1,6 @@
 /* Carnet celeste: shared editorial rhythm, including secondary and recovery screens. */
 body {
-  background: var(--fond);
+  background: var(--carnet-gradient-fond);
   color: var(--texte);
 }
 ::selection {

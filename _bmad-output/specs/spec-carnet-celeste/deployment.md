@@ -1,5 +1,22 @@
 # Livraison réversible — carnet céleste
 
+## Référence avant l'itération nocturne
+
+- Branche locale et distante : `codex/carnet-celeste-ui`, suivi origin confirmé.
+- SHA de première refonte : `40dcd22593c6c69737def3641f51f62c57b7a63c`.
+- Déploiement READY production confirmé indépendamment par API Vercel :
+  `dpl_DFEd5WyGwpeoQM5fbnTDFUNKC4z4`.
+- URL immuable : https://anima-pnkj83tjc-julian-talous-projects.vercel.app.
+- Alias public : https://anima-app-swart.vercel.app.
+- Retour de la prochaine livraison :
+  `vercel rollback dpl_DFEd5WyGwpeoQM5fbnTDFUNKC4z4 --yes`.
+
+La prochaine itération utilise cette référence pour revenir à la première refonte. L'ancienne
+référence ci-dessous est conservée pour retrouver l'interface antérieure à toute refonte.
+Les métadonnées Vercel githubCommitSha et githubCommitRef concordent avec le SHA et la branche.
+L'autorisation utilisateur de pousser et publier demeure acquise; aucune nouvelle confirmation
+n'est nécessaire pour les gestes déjà autorisés. Aucune migration n'entre dans le périmètre.
+
 ## État initial inspecté le 2026-09-06
 
 - Dépôt distant : `jt33120/client-anima-App_Anam`.
@@ -16,7 +33,7 @@ La liaison Git Vercel est confirmée vers ce même dépôt; productionBranch vau
 La protection SSO vaut prod_deployment_urls_and_all_previews : les Preview et URL immuables
 exigent un accès Vercel, tandis que le domaine public existant est la cible du test en condition.
 
-Production active confirmée par CLI puis API Vercel (champs filtrés, aucun secret affiché) :
+Production avant toute refonte confirmée par CLI puis API Vercel (champs filtrés) :
 
 - ID : `dpl_AdP629qKoaeWkNhABqpVD6ZA3eo5`, READY, target production.
 - URL immuable : https://anima-c39d4076o-julian-talous-projects.vercel.app.
@@ -40,20 +57,22 @@ La correspondance Git/déploiement est donc vérifiée; aucun paramètre distant
    branche à l'origine existante après contrôles et archivage de la baseline. Aucune fusion dans
    main ni modification Supabase n'est nécessaire.
 
-## Retour
+## Retour avant toute refonte
 
 Avec une Preview, la production reste disponible à son URL habituelle. Si la branche est
 promue, réactiver la référence initiale via Vercel Rollback ou
 `vercel rollback dpl_AdP629qKoaeWkNhABqpVD6ZA3eo5 --yes`, puis vérifier les alias et l'interface initiale. La syntaxe a été confirmée par la CLI locale.
 Aucune migration ne conditionne le retour.
 
-## Preuves finales à compléter par la livraison
+## Preuves de première livraison et prochaine itération
 
 - Branche livrée : `codex/carnet-celeste-ui`; SHA exact inscrit dans les métadonnées Vercel du déploiement.
 - Déploiement et URL initiaux : vérifiés ci-dessus.
 - URL cible de la refonte : https://anima-app-swart.vercel.app; publier via `vercel deploy --prod` normal.
 - Contrôles locaux : build Next, lint, 590 tests de rendu, palette et parité; captures dans `design/reviews/carnet-celeste/`.
 - Livraison depuis une archive propre du commit, sans fichier local non suivi, sans modification du prébuild ni variable de contournement.
+- L'itération nocturne ajoute ses propres captures et contrôles selon validation-nocturne.md;
+  les preuves antérieures ne suffisent pas à clore le défaut du clavier mobile.
 
 Les E2E qui créent des comptes visent la stack Supabase locale, jamais la production. La CI
 actuelle épingle 2.92.0 pour sa configuration passkey; cette observation ne modifie aucun pin.

@@ -49,7 +49,7 @@ import type {
 } from "./conversation/types";
 import type { ResultatGeste } from "./arbre/FicheBranche";
 import s from "./monde.module.css";
-import ThemeCarnet from "./carnet/ThemeCarnet";
+import { useConversationViewport } from "./conversation/useConversationViewport";
 import GlypheUnivers from "./GlypheUnivers";
 
 export interface ProprietesSceneRendue {
@@ -287,6 +287,7 @@ export default function SceneDom({
     (franchi) => etatInitialPour(regionDOuverture(franchi)),
   );
   const region = etat.regionCourante;
+  const viewportConversation = useConversationViewport(region === "anam");
   /* Naviguer par la barre ANNULE le rejeu de l'échange source : sans ça, `echangeExtrait` restait collé et
      la région Anam demeurait bloquée sur l'ancien extrait, sans composeur (piège de navigation, revue 4.6). */
   /**
@@ -603,6 +604,7 @@ export default function SceneDom({
 
   return (
     <main
+      ref={viewportConversation}
       className={`${s.monde} ${tourOuvert ? s.tourOuvert : ""} ${region === "accueil" ? s.accueilActif : ""}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -853,19 +855,22 @@ export default function SceneDom({
               <div className={s.bloc}>
                 {r.id === "accueil" && (
                   <header className={s.carnetEntete}>
-                    <p className={s.carnetAnnotation}>Revenir à soi, un jour à la fois.</p>
-                    <p className={s.carnetTitre}>Un peu de ciel.<br /><em>Beaucoup de toi.</em></p>
-                    <p className={s.carnetSousTitre}>Ton espace pour explorer, ressentir et laisser grandir ce qui compte.</p>
+                    <h1 className={s.carnetDate} tabIndex={-1}
+                      ref={(el) => void (entetes.current[r.id] = el)}>
+                      {libelleDateAccueil(jourAccueil)}
+                    </h1>
+                    <p className={s.carnetTitre}>Ton ciel<br /><em>intérieur.</em></p>
+                    <p className={s.carnetAnnotation}>Un instant pour toi.</p>
                   </header>
                 )}
                 {/* h1 par région : une seule est non-inert à la fois → une seule h1 exposée. */}
-                <h1
+                {r.id !== "accueil" && <h1
                   className={`t-titre ${s.carnetDate}`}
                   tabIndex={-1}
                   ref={(el) => void (entetes.current[r.id] = el)}
                 >
-                  {r.id === "accueil" ? libelleDateAccueil(jourAccueil) : r.nom}
-                </h1>
+                  {r.nom}
+                </h1>}
                 {/* Story 5.6 — la bibliothèque remplace le texte d'attente. Une lecture en panne
                     (`null`) laisse la région vide plutôt que de fermer la scène (AC7). */}
                 {r.id === "accueil" ? (
@@ -927,7 +932,7 @@ export default function SceneDom({
               type="button"
               className={s.navLien}
               aria-current={region === r.id ? "location" : undefined}
-              onClick={(event) => aller(r.id, r.id === "anam" && event.detail > 0)}
+              onClick={() => aller(r.id)}
             >
               <span className={s.carnetNavIcone} aria-hidden>
                 <GlypheUnivers cle={r.id === "accueil" ? "astrologie" : r.id === "anam" ? "numerologie" : "psychologie"} />
@@ -937,7 +942,6 @@ export default function SceneDom({
           ))}
           <div className={s.carnetNavPied}>
             <p>À ton rythme.</p>
-            <ThemeCarnet className={s.carnetTheme} />
           </div>
         </nav>
       )}

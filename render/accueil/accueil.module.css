@@ -4,7 +4,7 @@
 .bibliotheque {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-8);
+  gap: var(--esp-6);
   width: 100%;
   min-width: 0;
 }
@@ -12,7 +12,7 @@
 .quotidien {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--esp-5);
+  gap: var(--esp-4);
 }
 
 .feuilletMantra {
@@ -20,23 +20,23 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
-  gap: var(--esp-5);
+  justify-content: flex-start;
+  gap: var(--esp-2);
   min-width: 0;
-  padding: var(--esp-6) var(--esp-5);
-  border-radius: var(--carnet-rayon-lg) var(--rayon) var(--carnet-rayon-lg) var(--rayon);
-  background: var(--carnet-rose);
+  padding: var(--esp-4) var(--esp-5);
+  border: calc(var(--esp-1) / 4) solid var(--bordure);
+  border-inline-start: var(--esp-1) solid var(--bordure-forte);
+  border-radius: var(--rayon-md);
+  background: var(--carnet-gradient-mantra, var(--surface));
   color: var(--carnet-encre);
 }
 
-.annotation,
-.annotationUnivers {
+.annotation {
   margin: 0;
   color: var(--carnet-encre-douce);
 }
 
-.feuilletMantra .annotation,
-.enteteUnivers .annotationUnivers {
+.feuilletMantra .annotation {
   font-family: var(--pile-manuscrite);
   font-size: var(--carnet-note);
 }
@@ -54,15 +54,8 @@
 }
 .mantraAbsent { color: var(--carnet-encre-douce); font-style: italic; }
 
-.traitMantra {
-  width: var(--esp-7);
-  height: calc(var(--esp-1) / 4);
-  margin-top: var(--esp-2);
-  background: currentColor;
-}
-
 .cartesQuotidiennes { display: flex; flex-direction: column; min-width: 0; }
-.univers { display: flex; flex-direction: column; gap: var(--esp-5); }
+.univers { display: flex; flex-direction: column; gap: var(--esp-4); }
 
 .enteteUnivers {
   display: flex;
@@ -78,12 +71,11 @@
   color: var(--texte);
 }
 .surtitreUnivers { margin: 0; color: var(--texte-doux); }
-.annotationUnivers { padding-bottom: var(--esp-1); }
 
 .grilleUnivers {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--esp-4);
+  gap: var(--esp-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -98,23 +90,23 @@
   min-height: 100%;
   overflow: hidden;
   border: calc(var(--esp-1) / 4) solid var(--bordure);
-  border-radius: var(--carnet-rayon);
-  background: var(--carnet-lavande);
+  border-radius: var(--rayon-lg);
+  background: var(--carnet-gradient-carte, var(--surface));
   color: var(--carnet-encre);
 }
 
-.porteUnivers[data-univers="numerologie"] { background: var(--carnet-rose); }
-.porteUnivers[data-univers="psychologie"] { background: var(--carnet-sauge); }
+.porteUnivers[data-univers="numerologie"] .glyphe { color: var(--arbre-branche); }
+.porteUnivers[data-univers="psychologie"] .glyphe { color: var(--arbre-feuillage); }
 
 .lienUnivers {
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--esp-4);
-  min-height: calc(var(--cible-tactile) * 3);
+  gap: var(--esp-3);
+  min-height: calc(var(--cible-tactile) * 2);
   flex: 1;
-  padding: var(--esp-5);
+  padding: var(--esp-4);
   color: inherit;
   text-decoration: none;
   transition: background var(--duree-courte) var(--courbe);
@@ -132,8 +124,8 @@
 .glyphe {
   display: grid;
   place-items: center;
-  width: var(--esp-7);
-  height: var(--esp-7);
+  width: var(--esp-6);
+  height: var(--esp-6);
   color: var(--carnet-encre);
 }
 
@@ -148,7 +140,7 @@
   stroke-linejoin: round;
 }
 
-.texteUnivers { display: flex; flex-direction: column; gap: var(--esp-2); min-width: 0; }
+.texteUnivers { display: flex; flex-direction: column; gap: var(--esp-1); min-width: 0; }
 .nomUnivers { color: inherit; overflow-wrap: anywhere; }
 .accrocheUnivers { color: var(--carnet-encre-douce); text-wrap: pretty; }
 
@@ -171,8 +163,8 @@
   align-items: center;
   justify-content: center;
   min-height: var(--cible-tactile);
-  margin: 0 var(--esp-5) var(--esp-5);
-  padding: var(--esp-3) var(--esp-4);
+  margin: 0 var(--esp-4) var(--esp-4);
+  padding: var(--esp-2) var(--esp-3);
   border: calc(var(--esp-1) / 4) solid var(--bordure-forte);
   border-radius: var(--rayon-full);
   background: var(--surface);
@@ -208,12 +200,12 @@
 @media (min-width: 640px) {
   .grilleUnivers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .itemUnivers:nth-child(3):last-child { grid-column: 1 / -1; }
-  .feuilletMantra { padding: var(--esp-7) var(--esp-6); }
+  .feuilletMantra { padding: var(--esp-5); }
 
   .itemUnivers:not(:nth-child(3):last-child) .lienUnivers {
     grid-template-columns: minmax(0, 1fr) auto;
     align-content: start;
-    row-gap: var(--esp-5);
+    row-gap: var(--esp-3);
   }
 
   .itemUnivers:not(:nth-child(3):last-child) .texteUnivers {
@@ -228,10 +220,9 @@
 }
 
 @media (min-width: 1200px) {
-  .quotidien { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: stretch; }
-  .feuilletMantra { padding: var(--esp-7); }
-  .lienUnivers { gap: var(--esp-5); padding: var(--esp-6); }
-  .actionUnivers { align-self: flex-start; margin-inline: var(--esp-6); margin-bottom: var(--esp-6); }
+  .quotidien { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); align-items: start; }
+  .lienUnivers { gap: var(--esp-4); padding: var(--esp-5); }
+  .actionUnivers { align-self: flex-start; margin-inline: var(--esp-5); margin-bottom: var(--esp-5); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -246,43 +237,50 @@
 .carte {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--esp-4);
+  justify-content: flex-start;
+  gap: var(--esp-3);
   width: 100%;
-  height: 100%;
   min-width: 0;
-  padding: var(--esp-6);
-  background: var(--jour);
+  padding: var(--esp-5);
+  background: var(--carnet-gradient-carte, var(--jour));
   color: var(--sur-jour);
   border: calc(var(--esp-1) / 4) solid var(--bordure);
-  border-radius: var(--carnet-rayon);
+  border-radius: var(--rayon-lg);
   text-align: left;
 }
 
 .carte h2 { margin: 0; color: var(--sur-jour); }
 .carte p { margin: 0; overflow-wrap: anywhere; }
 
-.sourceCiel {
-  display: inline-flex;
+.enteteCiel {
+  display: flex;
   align-items: center;
-  align-self: flex-start;
-  gap: var(--esp-2);
+  gap: var(--esp-3);
+}
+
+.identiteCiel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.sourceCiel {
   color: var(--sur-jour-doux);
 }
 
 .sourceCiel :global(.t-meta) { color: inherit; }
-.glypheCiel { width: var(--esp-5); height: var(--esp-5); color: inherit; }
+.glypheCiel { width: var(--esp-6); height: var(--esp-6); color: inherit; }
 
 .faits {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--esp-3) var(--esp-5);
+  gap: var(--esp-2) var(--esp-5);
   margin: 0;
-  padding-block: var(--esp-4);
+  padding-block: var(--esp-3);
   border-block: calc(var(--esp-1) / 4) solid var(--bordure);
 }
 
-.fait { display: flex; flex-direction: column; gap: var(--esp-1); min-width: 0; }
+.fait { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--esp-2); min-width: 0; }
 .fait dt { color: var(--sur-jour-doux); margin: 0; }
 .fait dd { color: var(--sur-jour); margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .nonEcrit { color: var(--sur-jour-doux); font-style: italic; }

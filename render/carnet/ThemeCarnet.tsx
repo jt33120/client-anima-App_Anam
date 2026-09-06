@@ -16,9 +16,9 @@ const subscribe = (callback: () => void) => {
 };
 const snapshot = () => {
   if (sessionPreference !== null) return sessionPreference;
-  try { return localStorage.getItem(KEY) === "nuit"; } catch { return false; }
+  try { return localStorage.getItem(KEY) !== "papier"; } catch { return true; }
 };
-const serverSnapshot = () => false;
+const serverSnapshot = () => true;
 
 export function ThemeCarnetDocument() {
   const nuit = useSyncExternalStore(subscribe, snapshot, serverSnapshot);

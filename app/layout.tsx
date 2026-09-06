@@ -44,8 +44,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   interactiveWidget: "resizes-content",
-  // The server starts with paper; ThemeCarnetDocument follows the saved preference.
-  themeColor: carnetTokens.light.fond,
+  // Night also applies before hydration; an explicit paper preference remains available.
+  themeColor: carnetTokens.dark.fond,
 };
 
 // UX-DR-36 : lang="fr" sur le document.

@@ -11,7 +11,7 @@ import s from "./conversation.module.css";
  * prime sur DESIGN.md). Ne DISPARAÎT jamais (rendu tant que la conversation est montée).
  *
  * Entrée contextuelle (AC7, UX-DR-21) : la décision sm/md est prouvée dans `composeur-clavier`.
- * Anneau de focus visible sur le champ ET le bouton ; cibles ≥ 44px (CSS).
+ * The writing field uses one focus envelope; the send button keeps its own keyboard focus.
  */
 
 const MAX_LIGNES = 6;
@@ -58,17 +58,38 @@ export default function Composeur({
     if (bloque) motifRef.current?.focus();
   }, [bloque]);
 
-  // Auto-extension : jusqu'à MAX_LIGNES, puis défilement interne (le composeur ne pousse pas le fil
-  // hors de l'écran). Recalcul à chaque frappe.
+  // The CSS caps writing at three lines when the keyboard leaves a short viewport. Recompute
+  // on viewport changes too: a long draft must shrink when the keyboard opens and recover later.
   useEffect(() => {
     const el = champRef.current;
     if (!el) return;
-    el.style.height = "auto";
-    const ligne = parseFloat(getComputedStyle(el).lineHeight) || 24;
-    const max = ligne * MAX_LIGNES;
-    el.style.height = `${Math.min(el.scrollHeight, max)}px`;
-    el.style.overflowY = el.scrollHeight > max ? "auto" : "hidden";
-  }, [valeur]);
+    const ajuster = () => {
+      const style = getComputedStyle(el);
+      const ligne = Number.parseFloat(style.lineHeight) || 24;
+      const lignes = Math.min(MAX_LIGNES, Number.parseInt(style.getPropertyValue("--lignes-composeur"), 10) || MAX_LIGNES);
+      const interieur = Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom) || 0;
+      const bordures = Number.parseFloat(style.borderTopWidth) + Number.parseFloat(style.borderBottomWidth) || 0;
+      el.style.height = "auto";
+      const contenu = el.scrollHeight + bordures;
+      const max = ligne * lignes + interieur + bordures;
+      el.style.height = `${Math.min(contenu, max)}px`;
+      el.style.overflowY = contenu > max ? "auto" : "hidden";
+    };
+    // A frame also lets the scene apply its viewport attributes before reading inherited CSS.
+    let frame = 0;
+    const apresViewport = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(ajuster);
+    };
+    ajuster();
+    window.visualViewport?.addEventListener("resize", apresViewport);
+    window.addEventListener("resize", apresViewport);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.visualViewport?.removeEventListener("resize", apresViewport);
+      window.removeEventListener("resize", apresViewport);
+    };
+  }, [valeur, champRef]);
 
   const envoyer = () => {
     const t = valeur.trim();

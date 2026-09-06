@@ -94,5 +94,5 @@ const isSocle = window.location.pathname === "/socle";
 const mode = params.get("univers") === "numerologie" ? "numerologie" : "astrologie";
 createRoot(document.getElementById("root")!).render(<>
   <ThemeCarnetDocument />
-  {isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className="t-display">{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : scene}
+  {isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : scene}
 </>);

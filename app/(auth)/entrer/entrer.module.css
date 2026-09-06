@@ -149,7 +149,7 @@
 }
 
 /* The entrance reads like the opening spread of a personal notebook. */
-.page { padding: 0; align-items: stretch; background: var(--fond); }
+.page { padding: 0; align-items: stretch; background: var(--carnet-gradient-fond); }
 .jardin { display: none; }
 .contenu { padding: var(--esp-8) var(--esp-6); max-width: none; align-items: flex-start; justify-content: center; text-align: left; gap: var(--esp-5); }
 .contenu > h1 { max-width: var(--carnet-auth); }
@@ -161,7 +161,7 @@
 .contenu > :first-child { font-family: var(--pile-manuscrite); font-size: var(--carnet-note); text-transform: none; letter-spacing: normal; color: var(--accent); }
 @media (min-width: 768px) {
   .page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .jardin { display: flex; flex-direction: column; position: relative; overflow: hidden; padding: var(--esp-7); background: var(--carnet-rose); min-height: 100dvh; }
+  .jardin { display: flex; flex-direction: column; position: relative; overflow: hidden; padding: var(--esp-7); background: var(--carnet-gradient-mantra); min-height: 100dvh; }
   .marque { font: var(--carnet-logo)/1 var(--pile-anam); letter-spacing: -0.06em; margin: 0; }
   .marque span { color: var(--accent); }
   .jardinTexte { position: relative; z-index: 1; margin-top: var(--esp-8); }
@@ -169,7 +169,7 @@
   .jardinTitre { font: var(--carnet-poids) var(--carnet-display)/var(--carnet-line) var(--pile-anam); letter-spacing: -0.035em; margin: 0; }
   .jardinTitre em { color: var(--accent); }
   .jardinDescription { font: var(--carnet-texte)/1.7 var(--pile-ui); color: var(--texte-doux); margin-top: var(--esp-5); }
-  .illustration { flex: 1; min-height: var(--carnet-hero); margin-top: var(--esp-6); border-radius: var(--carnet-rayon-lg) var(--carnet-rayon-lg) 0 0; background: url('/marque/carnet-aquarelle.webp') center/cover; opacity: var(--carnet-image-opacity); }
+  .illustration { flex: 1; min-height: var(--carnet-hero); margin-top: var(--esp-6); border-radius: var(--carnet-rayon-lg) var(--carnet-rayon-lg) 0 0; background: var(--carnet-motif) 80% center/cover; opacity: var(--carnet-image-opacity); }
   .jardinNote { font: var(--carnet-note)/1.4 var(--pile-manuscrite); text-align: center; color: var(--texte-doux); margin: var(--esp-4) 0 0; }
   .contenu { padding: var(--esp-7); max-width: calc(var(--carnet-auth) + var(--esp-7) * 2); justify-self: center; }
 }
@@ -179,13 +179,13 @@
 }
 @media (max-width: 767px) {
   .page { flex-direction: column; }
-  .jardin { display: block; position: relative; overflow: hidden; background: var(--carnet-rose); padding: var(--esp-6); min-height: var(--carnet-hero-mobile); }
+  .jardin { display: block; position: relative; overflow: hidden; background: var(--carnet-gradient-mantra); padding: var(--esp-6); min-height: var(--carnet-hero-mobile); }
   .marque { position: relative; z-index: 1; font: var(--carnet-logo)/1 var(--pile-anam); margin: 0; }
   .marque span { color: var(--accent); }
   .jardinTexte { position: relative; z-index: 1; width: 60%; }
   .annotation { font: var(--carnet-note)/1.15 var(--pile-manuscrite); margin: var(--esp-4) 0 0; color: var(--accent); }
   .jardinTitre, .jardinDescription, .jardinNote { display: none; }
-  .illustration { position: absolute; inset: 0 0 0 60%; background: url('/marque/carnet-aquarelle.webp') center/cover; opacity: var(--carnet-image-opacity); }
+  .illustration { position: absolute; inset: 0 0 0 60%; background: var(--carnet-motif) 80% center/cover; opacity: var(--carnet-image-opacity); }
   .contenu { padding: var(--esp-6); }
   .contenu > :first-child { display: none; }
 }

@@ -15,17 +15,8 @@
   width: 100%;
   max-width: var(--contenu-max);
   margin: 0 auto;
-  /* Le clavier réduit la hauteur UTILE de toute la colonne. Réserver sa place ici maintient le
-     composeur dans le flux et réduit le fil ; déplacer seulement le composeur le superposait au
-     message qu'il devait permettre de lire. */
-  padding-bottom: var(--decalage-clavier, 0px);
-  transition: padding-bottom var(--duree-courte) var(--courbe);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .conversation {
-    transition: none;
-  }
+  /* The scene already fits visualViewport. No second keyboard offset belongs here. */
+  --lignes-composeur: 6;
 }
 
 /* ── Le fil : flux vertical UNIQUE, sans bulles opposées (AC1). Gap = respiration. ── */
@@ -35,8 +26,10 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--respiration);
-  padding: var(--esp-5) var(--esp-3) var(--esp-6);
+  gap: var(--esp-5);
+  padding: var(--esp-3) var(--esp-2) var(--esp-4);
+  overscroll-behavior-y: contain;
+  overflow-wrap: anywhere;
   scrollbar-color: var(--bordure-forte) transparent;
   /* JAMAIS smooth : défilement instantané → cohérent reduced-motion ET suivi du bas non captif. */
   scroll-behavior: auto;
@@ -81,6 +74,9 @@
   gap: var(--esp-3);
   color: var(--texte-doux);
   letter-spacing: 0.04em;
+  flex: none;
+  margin: 0;
+  min-height: 0;
 }
 
 .separateurJour::before,
@@ -160,8 +156,7 @@
   white-space: nowrap;
 }
 
-/* ── Composeur : bande basse, ne DISPARAÎT jamais (AC5). Remonte au-dessus du clavier virtuel via
-      --decalage-clavier (posé par visualViewport ; 0 par défaut → aucun effet sur desktop). ── */
+/* The composer stays in the visible scene, with one envelope around the writing controls. */
 /* Zone-colonne : un motif d'arrêt optionnel (quota épuisé, 3.4) au-dessus de la bande de saisie. */
 .composeurZone {
   flex: none;
@@ -216,22 +211,22 @@
   display: flex;
   align-items: flex-end;
   gap: var(--esp-2);
-  margin: var(--esp-2) var(--esp-2) max(var(--esp-3), env(safe-area-inset-bottom));
-  padding: var(--esp-2);
+  margin: var(--esp-2) var(--esp-2) 0;
+  padding: var(--esp-1);
   border: 1px solid var(--bordure-forte);
   border-radius: var(--carnet-rayon);
   background: var(--surface);
-  box-shadow: var(--ombre-posee);
+  box-shadow: none;
 }
 
-.champ {
+.composeur .champ {
   flex: 1 1 auto;
   min-height: var(--cible-tactile);
   resize: none;
-  padding: var(--esp-3) var(--esp-4);
+  padding: var(--esp-2) var(--esp-3);
   min-width: 0;
   background: transparent;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: var(--rayon-md);
   color: var(--texte);
   font-family: var(--pile-ui);
@@ -241,8 +236,8 @@
   color: var(--texte-doux);
 }
 .champ:focus-visible {
-  outline: 2px solid var(--bordure-forte);
-  outline-offset: 2px;
+  /* Focus is drawn by .composeur:focus-within, around the complete writing envelope. */
+  outline: none;
 }
 .champ:disabled {
   opacity: 0.5;
@@ -492,7 +487,51 @@
 }
 
 .composeur:focus-within {
-  border-color: var(--accent);
+  border-color: transparent;
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+:global([data-clavier-ouvert]) .conversation {
+  --lignes-composeur: 3;
+}
+
+:global([data-clavier-ouvert]) .fil {
+  gap: var(--esp-4);
+  padding-block: var(--esp-2);
+}
+
+:global([data-clavier-ouvert]) .tourAnam p,
+:global([data-clavier-ouvert]) .introductionBulle {
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+:global([data-clavier-ouvert]) .tourUtilisatrice {
+  padding-block: var(--esp-2);
+}
+
+:global([data-clavier-ouvert]) .introductionLettre {
+  padding: var(--esp-3);
+}
+
+:global([data-clavier-ouvert]) .imageAnam.introductionPortrait {
+  width: var(--cible-tactile);
+}
+
+:global([data-clavier-ouvert]) .composeur {
+  margin-top: var(--esp-1);
+}
+
+@media (max-height: 600px) {
+  .conversation {
+    --lignes-composeur: 3;
+  }
+
+  .fil {
+    gap: var(--esp-4);
+    padding-block: var(--esp-2);
+  }
 }
 
 @media (max-width: 639px) {

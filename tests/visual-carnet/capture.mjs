@@ -3,7 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-const output = process.env.CARNET_SCREENSHOT_DIR ?? join(tmpdir(), "anima-carnet-captures");
+const output = process.argv[2] ?? process.env.CARNET_SCREENSHOT_DIR ?? join(tmpdir(), "anima-carnet-captures");
 const origin = "http://127.0.0.1:4179";
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
@@ -19,7 +19,9 @@ try {
     for (const theme of ["papier", "nuit", "contraste"]) {
       await page.goto(origin, { waitUntil: "domcontentloaded" });
       await page.getByRole("heading", { name: "Mes univers" }).waitFor();
-      if (theme === "nuit") await page.getByRole("button", { name: "Passer au thème nuit" }).click();
+      const switchName = theme === "nuit" ? "Passer au thème nuit" : "Passer au thème papier";
+      const themeButton = page.getByRole("button", { name: switchName });
+      if (await themeButton.count()) await themeButton.click();
       if (theme === "contraste") await page.evaluate(() => { document.documentElement.dataset.a11y = "contraste"; });
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: join(output, `home-${width}-${theme}.png`) });

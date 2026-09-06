@@ -35,7 +35,6 @@ export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
           <div className={s.feuilletMantra}>
             <p className={`t-titre ${s.annotation}`}>Une pensée à garder</p>
             <MantraDuJour mantra={mantra} />
-            <span className={s.traitMantra} aria-hidden />
           </div>
         )}
         <div className={s.cartesQuotidiennes}>
@@ -47,9 +46,8 @@ export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
         <div className={s.enteteUnivers}>
           <div>
             <p className={`t-surtitre ${s.surtitreUnivers}`}>Mon monde intérieur</p>
-            <h2 id="moi-univers" className="t-display">Mes univers</h2>
+            <h2 id="moi-univers" className="t-titre">Mes univers</h2>
           </div>
-          <p className={`t-titre ${s.annotationUnivers}`}>À ton rythme.</p>
         </div>
         <ul className={s.grilleUnivers}>
           {univers.map((univers) => <PorteUnivers key={univers.cle} univers={univers} />)}
@@ -71,7 +69,7 @@ function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
         <Link className={s.lienUnivers} href={univers.url}>
           <span className={s.glyphe}><GlypheUnivers cle={univers.cle} /></span>
           <span className={s.texteUnivers}>
-            <span className={`t-titre ${s.nomUnivers}`}>{univers.titre}</span>
+            <span className={`t-titre-sm ${s.nomUnivers}`}>{univers.titre}</span>
             <span className={`t-meta ${s.accrocheUnivers}`}>{univers.accroche}</span>
           </span>
           <span className={s.fleche} aria-hidden>→</span>
@@ -94,7 +92,7 @@ function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
 
 function MantraDuJour({ mantra }: { readonly mantra: CarteVue }) {
   if (mantra.texte.statut === "ecrit") {
-    return <blockquote className={`t-display ${s.mantraDuJour}`}>« {mantra.texte.texte} »</blockquote>;
+    return <blockquote className={`t-anam ${s.mantraDuJour}`}>« {mantra.texte.texte} »</blockquote>;
   }
 
   return <p className={`t-meta ${s.mantraAbsent}`}>Anima n’a pas encore écrit ce mantra.</p>;
@@ -103,12 +101,12 @@ function MantraDuJour({ mantra }: { readonly mantra: CarteVue }) {
 function CarteCiel({ carte }: { readonly carte: CarteVue }) {
   return (
     <article className={s.carte} aria-labelledby={`carte-${carte.cle}`}>
-      <div className={s.sourceCiel}>
+      <header className={s.enteteCiel}>
         <span className={`${s.glyphe} ${s.glypheCiel}`} aria-hidden>
           <GlypheUnivers cle="astrologie" />
         </span>
-        <span className="t-meta">Astrologie</span>
-      </div>
+        <div className={s.identiteCiel}>
+          <span className={`t-meta ${s.sourceCiel}`}>Astrologie</span>
       {/* ⚠️ UNE SEULE VOIX DE TITRE PAR ÉCRAN (QA visuelle du 2026-08-19). `t-corps-fort` est de
           l'INTERFACE (Inter) : il mettait « Le mantra du jour » et « Ton ciel du jour » dans une
           grasse sans-serif à trois centimètres de « Tes nombres » en Fraunces — deux familles de
@@ -118,6 +116,8 @@ function CarteCiel({ carte }: { readonly carte: CarteVue }) {
       <h2 id={`carte-${carte.cle}`} className="t-titre-sm">
         {carte.titre}
       </h2>
+        </div>
+      </header>
 
       {carte.faits.length > 0 && (
         <dl className={s.faits}>

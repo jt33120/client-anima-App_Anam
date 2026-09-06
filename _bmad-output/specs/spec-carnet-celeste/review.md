@@ -1,7 +1,12 @@
-# Revue indépendante — carnet céleste
+# Revue indépendante — première livraison du carnet céleste
 
 2026-09-06. Périmètre : layout, thème, scène, navigation, accès, composants modifiés, tokens et
 livraison. Aucun défaut bloquant de front restant parmi les points examinés après corrections.
+
+Cette revue porte sur la première livraison `40dcd225`. Les retours utilisateur ultérieurs
+sur l'accueil trop grand/plat et le fil masqué au clavier ouvrent une nouvelle validation dans
+[validation-nocturne.md](validation-nocturne.md). Les mesures de boîtes ci-dessous ne reproduisaient
+pas un clavier physique mobile et ne prouvent donc pas la correction de ce dernier défaut.
 
 ## Défauts corrigés et preuves
 

@@ -4,39 +4,26 @@ Date : 2026-09-06. Mandat : carte blanche sur le front, expérience Vercel réve
 
 ## 1. Intention et décision forte
 
-Un carnet personnel ouvert à la lumière : sensible, vivant, lisible. Le papier ivoire, une encre
-aubergine et des respirations généreuses donnent aux informations la place de se lire. Un grand
-titre serif ouvre chaque chapitre; une annotation manuscrite rare souligne son intention.
+Un carnet céleste nocturne : bleu nuit, lumière bleu ciel et violet, lotus et étoiles sur une matière aquarellée. Le manuscrit ponctue les moments calmes ; les contenus longs retrouvent une taille de lecture. L'écran mobile montre du contenu utile dès son ouverture.
 
-La demande du 6 septembre supplante les anciennes contraintes « nuit native » et « pas de thème
-jour ». Papier devient l'ambiance par défaut; Nuit reste accessible. Les parcours métier et les
-protections de confidentialité demeurent des invariants.
-
-Références de matière : herbier ancien pour les marges et l'ivoire, carnet d'observation céleste
-pour les repères délicats, revue littéraire pour la hiérarchie typographique. L'identité vient de
-la composition et des assets déclarés, sans accumulation de panneaux identiques ni décoration
-qui concurrence les mots.
+La correction explicite du fondateur du 6 septembre (« mode nuit par défaut », « trop terre », captures accueil et clavier refusées) remplace la première direction papier. Nuit est aussi le rendu serveur et le repli sans stockage. Un choix Papier explicite reste respecté ; le contraste renforcé garde la priorité.
 
 ## 2. Palette et typographie
 
-| Rôle | Direction |
+| Rôle | Nuit par défaut |
 | --- | --- |
-| Fond | Papier ivoire `#faf7f2` |
-| Surface | Crème `#fffdf9` |
-| Texte | Encre aubergine `#3e3346` |
-| Texte secondaire | Aubergine grisée `#726377` |
-| Accent / action | Aubergine `#74577c` |
-| Lavande | `#ede5f4` |
-| Rose | `#f7e7e2` |
-| Sauge | `#e7ede3` |
+| Fond | Bleu nuit `#11182d` |
+| Surface | Bleu profond `#1a2541` |
+| Texte | Blanc céleste `#f0f2ff` |
+| Texte secondaire | Bleu gris `#b7c7e3` |
+| Accent | Bleu ciel `#add5ff` |
+| Lavande | `#303255` |
+| Violet | `#342e50` |
+| Bleu de brume | `#203e53` |
 
-Les pastels servent de surfaces; ils ne portent aucun texte sans paire de contraste mesurée.
-L'accent marque l'action principale et la sélection. Les surfaces papier conservent leur propre
-paire texte/fond en Papier comme en Nuit. Le mode contraste renforcé garde la priorité.
+Les dégradés nommés sont générés depuis les tokens. Les surfaces de lecture sont opaques, avec contrôle des arrêts de dégradé. L'image d'ambiance est limitée à 14 % en Nuit et 2 % en Papier ; le pire pixel blanc ou noir est couvert par un test de composition. Le lotus du petit en-tête occupe une moitié distincte du texte. Le contraste renforcé retire l'illustration et les dégradés.
 
-Fraunces porte les grands titres et la voix éditoriale. La fonte de texte existante sert à
-l'interface et aux contenus longs. Caveat, chargée localement, signe les annotations; elle ne
-porte jamais une consigne indispensable, une action, une erreur ou un texte long.
+Fraunces porte les titres et la citation, Inter les contenus et contrôles, Caveat les annotations rares. Sur mobile : titre autour de 30 px, citation de 19 px même pour un texte long, commandes de navigation de 12 px dans des cibles de 44 px au minimum. Aucun contenu n'est tronqué pour faire tenir la maquette.
 
 ## 3. Contrat de tokens et réversibilité
 
@@ -51,13 +38,13 @@ facile à retirer sans reconstituer l'ancien design.
 
 ## 4. Composition des familles d'écrans
 
-**Accueil / Aujourd'hui.** Date et mantra forment une ouverture éditoriale. La lecture du ciel
+**Accueil / Aujourd’hui.** Date, titre bref et lotus partagent un en-tête compact. Le mantra garde une taille de lecture. La lecture du ciel
 porte un statut clair et une action explicite. Les univers apparaissent ensuite comme des pages
 à explorer : sujet, description courte, destination. Le grand écran peut offrir une colonne de
 repères; le téléphone conserve le même ordre de lecture dans une seule colonne.
 
 **Anam.** Identité discrète, fil lisible et composeur ancré sans recouvrir la parole au clavier.
-Le portrait existant ponctue l'introduction. Les messages conservent leur provenance et leurs
+Le portrait existant ponctue l’introduction. Entrer dans Anam annonce son titre sans ouvrir le clavier. Un seul hook, au niveau scène, suit la hauteur et le décalage de VisualViewport ; aucune seconde déduction dans le fil. Le clavier masque la navigation et réduit les réserves. Le zoom natif garde la main. Les messages conservent leur provenance et leurs
 états réels; l'arbre persistant reste éteint. Aucun texte de démonstration n'est persisté ou
 présenté comme une réponse réelle.
 
@@ -77,14 +64,14 @@ Inventaire : scène globale, navigation, en-tête de chapitre, carte de lecture,
 boutons principal/secondaire, lien, champ et select, disclosure, feuille de profil, bandeau
 d'état, squelette, bulle Anam et composeur. Les composants existants gardent leurs responsabilités.
 
-Source d'illustration principale : aquarelle pastel existante `public/marque/header_mainpage.jpg`.
+Source d’illustration principale : `public/marque/lotus-celeste.webp`, aquarelle céleste créée avec imagegen intégré. Prompt et provenance : `design/lotus-celeste-asset.md`.
 Réutiliser portraits, lotus, glyphes existants et moteur Canvas lunaire. Aucun emoji d'interface,
 SVG improvisé ou famille d'icônes concurrente. Une texture éventuelle reste statique, discrète et
 sous les textes; tout nouvel asset exige une provenance explicite.
 
 ## 6. Mouvement et accessibilité
 
-Un fondu court accompagne une entrée; un changement de surface confirme l'appui. Aucun mouvement
+Un fondu de région de 280 ms accompagne une entrée; un changement de surface confirme l'appui. Aucun mouvement
 cyclique décoratif, filtre plein écran ou flou d'arrière-plan. `prefers-reduced-motion` conserve
 l'information et supprime le mouvement.
 
