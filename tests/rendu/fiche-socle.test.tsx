@@ -261,8 +261,15 @@ describe("[13.7] la carte natale exacte et son équivalent textuel", () => {
     expect(svg?.querySelector("desc")?.textContent).toContain("mêmes positions en texte");
     for (const position of complete.ciel.positions) {
       if (!position.projection) continue;
-      expect(svg?.querySelector(`g[transform='rotate(${position.projection} 160 160)']`), position.cle).not.toBeNull();
+      expect(
+        svg?.querySelector(`[data-corps='${position.cle}'][data-longitude='${position.projection}']`),
+        `${position.cle} doit garder sa longitude exacte jusque dans la roue`,
+      ).not.toBeNull();
       expect(container.textContent ?? "", position.cle).toContain(`Longitude : ${position.longitude}`);
+    }
+    expect(svg?.querySelectorAll("image").length, "les corps disponibles utilisent les assets du handoff").toBeGreaterThanOrEqual(10);
+    for (const glyphe of ["♈︎", "♉︎", "♊︎", "♋︎", "♌︎", "♍︎", "♎︎", "♏︎", "♐︎", "♑︎", "♒︎", "♓︎"]) {
+      expect(svg?.textContent ?? "", `signe absent de la roue : ${glyphe}`).toContain(glyphe);
     }
   });
 

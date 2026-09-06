@@ -1,5 +1,6 @@
 import Link from "next/link";
 import GlypheUnivers from "@/render/GlypheUnivers";
+import CarteNatale from "./CarteNatale";
 import s from "./socle.module.css";
 import type {
   ApercuUniversVue,
@@ -62,110 +63,6 @@ function ApercuSocle({ fiche, titre }: { readonly fiche: FicheSocleVue; readonly
         {fiche.apercus.map((apercu) => <PorteApercu key={apercu.cle} apercu={apercu} />)}
       </ul>
     </section>
-  );
-}
-
-const REPERES_ANGULAIRES = Object.freeze([0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]);
-const ETOILES_CIEL = Object.freeze([
-  [70, 78], [112, 52], [218, 64], [257, 101], [268, 222], [219, 267], [89, 245], [53, 176],
-]);
-const SYMBOLES_CIEL: Readonly<Record<string, string>> = Object.freeze({
-  soleil: "☉",
-  lune: "☽",
-  mercure: "☿",
-  venus: "♀",
-  mars: "♂",
-  jupiter: "♃",
-  saturne: "♄",
-  uranus: "♅",
-  neptune: "♆",
-  pluton: "♇",
-});
-
-function CarteNatale({ ciel }: { readonly ciel: SectionCielVue }) {
-  if (!ciel.projection) return null;
-  return (
-    <figure className={s.figureCiel}>
-      <div className={s.carteCiel}>
-        <svg
-          className={s.svgCiel}
-          viewBox="0 0 320 320"
-          role="img"
-          aria-labelledby="carte-natale-titre carte-natale-description"
-        >
-          <title id="carte-natale-titre">{ciel.projection.titre}</title>
-          <desc id="carte-natale-description">{ciel.projection.description}</desc>
-          <circle className={s.haloCiel} cx="160" cy="160" r="145" />
-          <circle className={s.anneauFort} cx="160" cy="160" r="128" />
-          <circle className={s.anneau} cx="160" cy="160" r="102" />
-          <circle className={s.anneauInterieur} cx="160" cy="160" r="52" />
-          <g aria-hidden>
-            {ETOILES_CIEL.map(([x, y]) => (
-              <path
-                key={`${x}-${y}`}
-                className={s.etoileCiel}
-                d={`M${x} ${y - 3}L${x + 1} ${y - 1}L${x + 3} ${y}L${x + 1} ${y + 1}L${x} ${y + 3}L${x - 1} ${y + 1}L${x - 3} ${y}L${x - 1} ${y - 1}Z`}
-              />
-            ))}
-          </g>
-          <text className={`t-meta ${s.graduationCiel}`} x="160" y="28" textAnchor="middle">0°</text>
-          <text className={`t-meta ${s.graduationCiel}`} x="292" y="164" textAnchor="middle">90°</text>
-          <text className={`t-meta ${s.graduationCiel}`} x="160" y="302" textAnchor="middle">180°</text>
-          <text className={`t-meta ${s.graduationCiel}`} x="28" y="164" textAnchor="middle">270°</text>
-          {REPERES_ANGULAIRES.map((angle) => (
-            <line
-              key={`repere-${angle}`}
-              className={s.repereAngulaire}
-              x1="160"
-              y1="32"
-              x2="160"
-              y2="58"
-              transform={`rotate(${angle} 160 160)`}
-            />
-          ))}
-          {ciel.cuspides.map((cuspide) => cuspide.projection && (
-            <line
-              key={cuspide.intitule}
-              className={s.cuspideCiel}
-              x1="160"
-              y1="58"
-              x2="160"
-              y2="83"
-              transform={`rotate(${cuspide.projection} 160 160)`}
-            />
-          ))}
-          {ciel.angles.map((angle) => angle.projection && (
-            <line
-              key={angle.intitule}
-              className={s.angleCiel}
-              x1="160"
-              y1="45"
-              x2="160"
-              y2="275"
-              transform={`rotate(${angle.projection} 160 160)`}
-            />
-          ))}
-          {ciel.positions.map((position) => position.projection && (
-            <g key={position.cle} transform={`rotate(${position.projection} 160 160)`}>
-              <text
-                className={s.corpsCiel}
-                x="160"
-                y="64"
-                textAnchor="middle"
-                transform={`rotate(-${position.projection} 160 58)`}
-              >
-                {SYMBOLES_CIEL[position.cle] ?? "✦"}
-              </text>
-            </g>
-          ))}
-          <circle className={s.coeurCiel} cx="160" cy="160" r="9" />
-        </svg>
-      </div>
-      <figcaption className={`t-meta ${s.legendeCiel}`}>
-        <span>{ciel.projection.repere}</span>
-        <span>Source de calcul : {ciel.projection.source}</span>
-      </figcaption>
-    </figure>
   );
 }
 

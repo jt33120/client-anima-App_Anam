@@ -144,6 +144,19 @@ export interface AngleFiche {
   readonly projection: string | null;
 }
 
+/** Un aspect natal majeur, déjà établi par le domaine et seulement dessiné par le rendu. */
+export interface AspectFiche {
+  readonly cle: string;
+  readonly depuis: Corps;
+  readonly vers: Corps;
+  readonly intituleDepuis: string;
+  readonly intituleVers: string;
+  readonly type: "conjonction" | "sextile" | "carre" | "trigone" | "opposition";
+  readonly orbe: string;
+  readonly projectionDepuis: string;
+  readonly projectionVers: string;
+}
+
 /** Ce qui manque au ciel, dit et non creusé. */
 export interface ManqueFiche {
   readonly intitule: string;
@@ -206,6 +219,7 @@ export interface SectionCiel {
   readonly positions: readonly PositionFiche[];
   readonly angles: readonly AngleFiche[];
   readonly cuspides: readonly AngleFiche[];
+  readonly aspects: readonly AspectFiche[];
   readonly manques: readonly ManqueFiche[];
   readonly reperesPrincipaux: readonly {
     readonly cle: "soleil" | "ascendant" | "lune";
@@ -490,6 +504,14 @@ const ORDINAL_MAISON = [
   "douzième",
 ] as const;
 
+const ASPECTS_NATALS = Object.freeze([
+  Object.freeze({ type: "conjonction" as const, angle: 0, orbeMax: 6 }),
+  Object.freeze({ type: "sextile" as const, angle: 60, orbeMax: 4 }),
+  Object.freeze({ type: "carre" as const, angle: 90, orbeMax: 6 }),
+  Object.freeze({ type: "trigone" as const, angle: 120, orbeMax: 6 }),
+  Object.freeze({ type: "opposition" as const, angle: 180, orbeMax: 6 }),
+]);
+
 function longitudeNormalisee(longitude: number): number {
   return ((longitude % 360) + 360) % 360;
 }
@@ -500,6 +522,54 @@ function longitudeLisible(longitude: number): string {
 
 function longitudeProjetee(longitude: number): string {
   return longitudeNormalisee(longitude).toFixed(6);
+}
+
+function aspectsDuTheme(theme: ThemeNatal, avecDegre: boolean): readonly AspectFiche[] {
+  if (!avecDegre) return Object.freeze([]);
+  const classiques = theme.positions.filter((position) => CORPS_CLASSIQUES.includes(position.corps as (typeof CORPS_CLASSIQUES)[number]));
+  const trouves: Array<AspectFiche & { readonly orbeTri: number }> = [];
+
+  for (let i = 0; i < classiques.length; i += 1) {
+    for (let j = i + 1; j < classiques.length; j += 1) {
+      const depuis = classiques[i];
+      const vers = classiques[j];
+      const ecartBrut = Math.abs(longitudeNormalisee(depuis.longitude) - longitudeNormalisee(vers.longitude));
+      const separation = Math.min(ecartBrut, 360 - ecartBrut);
+      for (const aspect of ASPECTS_NATALS) {
+        const orbeTri = Math.abs(separation - aspect.angle);
+        if (orbeTri > aspect.orbeMax) continue;
+        trouves.push({
+          cle: `${depuis.corps}-${aspect.type}-${vers.corps}`,
+          depuis: depuis.corps,
+          vers: vers.corps,
+          intituleDepuis: CORPS_LIBELLE[depuis.corps] ?? depuis.corps,
+          intituleVers: CORPS_LIBELLE[vers.corps] ?? vers.corps,
+          type: aspect.type,
+          orbe: `${orbeTri.toFixed(2).replace(".", ",")}°`,
+          projectionDepuis: longitudeProjetee(depuis.longitude),
+          projectionVers: longitudeProjetee(vers.longitude),
+          orbeTri,
+        });
+        break;
+      }
+    }
+  }
+
+  return Object.freeze(
+    trouves
+      .sort((a, b) => a.orbeTri - b.orbeTri || a.cle.localeCompare(b.cle, "fr"))
+      .map((aspect) => Object.freeze({
+        cle: aspect.cle,
+        depuis: aspect.depuis,
+        vers: aspect.vers,
+        intituleDepuis: aspect.intituleDepuis,
+        intituleVers: aspect.intituleVers,
+        type: aspect.type,
+        orbe: aspect.orbe,
+        projectionDepuis: aspect.projectionDepuis,
+        projectionVers: aspect.projectionVers,
+      })),
+  );
 }
 
 /**
@@ -532,6 +602,7 @@ export function sectionCiel(
       positions: [],
       angles: [],
       cuspides: [],
+      aspects: [],
       manques: [],
       reperesPrincipaux: [],
       sansHeure: null,
@@ -634,13 +705,16 @@ export function sectionCiel(
           titre: "Carte exacte de ton ciel de naissance",
           description:
             "Projection circulaire des longitudes écliptiques calculées. La liste qui suit donne les mêmes positions en texte.",
-          repere: "0° est placé en haut ; les longitudes progressent dans le sens horaire.",
+          repere: angles.length > 0
+            ? "L’Ascendant est placé à gauche ; les longitudes progressent dans le sens antihoraire."
+            : "Le Bélier est placé en haut ; les longitudes progressent dans le sens antihoraire.",
           source: theme.adaptateur,
         })
       : null,
     positions: Object.freeze(positions),
     angles: Object.freeze(angles),
     cuspides: Object.freeze(cuspides),
+    aspects: aspectsDuTheme(theme, avecDegre),
     manques: Object.freeze(manques),
     reperesPrincipaux,
     sansHeure: reparableParElle

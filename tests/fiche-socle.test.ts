@@ -345,6 +345,17 @@ describe("[13.7] la projection natale ne dépasse jamais la précision disponibl
     expect(ciel.projection).toBeNull();
     expect(ciel.positions.every((position) => position.longitude === null && position.projection === null)).toBe(true);
   });
+
+  it("établit les aspects majeurs dans le domaine et transporte leurs deux longitudes exactes", () => {
+    const ciel = sectionCiel(themeComplet, null);
+    expect(ciel.aspects.length, "un ciel complet doit exposer ses aspects majeurs sans les inventer dans le rendu").toBeGreaterThan(0);
+    for (const aspect of ciel.aspects) {
+      expect(aspect.projectionDepuis).toMatch(/^\d{1,3}\.\d{6}$/);
+      expect(aspect.projectionVers).toMatch(/^\d{1,3}\.\d{6}$/);
+      expect(aspect.orbe).toMatch(/^\d,\d{2}°$/);
+    }
+    expect(sectionCiel(themeSansHeure, null).aspects).toEqual([]);
+  });
 });
 
 describe("[13.6] le socle est un aperçu, chaque détail reste à un geste", () => {

@@ -54,6 +54,7 @@ const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
   { ou: "domaine · NombreManquantFiche", corps: corpsInterface(DOMAINE, "NombreManquantFiche") },
   { ou: "domaine · PositionFiche", corps: corpsInterface(DOMAINE, "PositionFiche") },
   { ou: "domaine · AngleFiche", corps: corpsInterface(DOMAINE, "AngleFiche") },
+  { ou: "domaine · AspectFiche", corps: corpsInterface(DOMAINE, "AspectFiche") },
   // 2026-09-01 : l'horoscope du jour traverse la frontière (titre + texte, JAMAIS la date).
   { ou: "domaine · HoroscopeFiche", corps: corpsInterface(DOMAINE, "HoroscopeFiche") },
   { ou: "domaine · SectionNombres", corps: corpsInterface(DOMAINE, "SectionNombres") },
@@ -67,6 +68,7 @@ const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
   { ou: "rendu · NombreManquantVue", corps: corpsInterface(RENDU, "NombreManquantVue") },
   { ou: "rendu · PositionVue", corps: corpsInterface(RENDU, "PositionVue") },
   { ou: "rendu · AngleVue", corps: corpsInterface(RENDU, "AngleVue") },
+  { ou: "rendu · AspectVue", corps: corpsInterface(RENDU, "AspectVue") },
   { ou: "rendu · HoroscopeVue", corps: corpsInterface(RENDU, "HoroscopeVue") },
   { ou: "rendu · SectionNombresVue", corps: corpsInterface(RENDU, "SectionNombresVue") },
   { ou: "rendu · SectionCielVue", corps: corpsInterface(RENDU, "SectionCielVue") },
@@ -107,6 +109,7 @@ const APPARIEMENTS: ReadonlyArray<[string, string]> = [
   ["NombreManquantFiche", "NombreManquantVue"],
   ["PositionFiche", "PositionVue"],
   ["AngleFiche", "AngleVue"],
+  ["AspectFiche", "AspectVue"],
   ["HoroscopeFiche", "HoroscopeVue"],
   ["SectionNombres", "SectionNombresVue"],
   ["SectionCiel", "SectionCielVue"],

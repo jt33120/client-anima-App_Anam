@@ -1,0 +1,489 @@
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  width: 100%;
+  max-width: var(--contenu-max);
+  margin: 0 auto;
+}
+
+.enteteInstrument,
+.commandes,
+.entetePlanete {
+  display: flex;
+  align-items: center;
+}
+
+.enteteInstrument {
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+.enteteInstrument h3,
+.fichePlanete h4,
+.surtitre,
+.surtitrePlanete,
+.aspectsPlanete p {
+  min-height: 0;
+  margin: 0;
+}
+
+.enteteInstrument h3,
+.fichePlanete h4 {
+  color: var(--sur-papier);
+}
+
+.surtitre,
+.surtitrePlanete {
+  color: var(--sur-papier-doux);
+}
+
+.commandes {
+  flex: none;
+  gap: var(--esp-2);
+}
+
+.commande,
+.commandeTexte,
+.recentrer,
+.isoler {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--cible-tactile);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 22%, var(--papier));
+  border-radius: var(--rayon-full);
+  background: var(--papier);
+  color: var(--sur-papier);
+  font: inherit;
+  cursor: pointer;
+}
+
+.commande {
+  width: var(--cible-tactile);
+  padding: 0;
+  font-family: var(--pile-anam);
+  font-size: 1.25rem;
+}
+
+.commandeTexte,
+.recentrer,
+.isoler {
+  padding: 0 var(--esp-4);
+  font-family: var(--pile-ui);
+  font-size: 0.8125rem;
+}
+
+.commandeTexte[aria-pressed="true"],
+.isoler[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--sur-accent);
+}
+
+.commande:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.commande:focus-visible,
+.commandeTexte:focus-visible,
+.recentrer:focus-visible,
+.isoler:focus-visible,
+.corps:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
+.roue {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  touch-action: none;
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon-full);
+  background:
+    var(--texture-papier),
+    radial-gradient(circle at 32% 24%, color-mix(in srgb, var(--nebuleuse) 28%, transparent), transparent 30%),
+    radial-gradient(circle at 68% 74%, color-mix(in srgb, var(--lueur) 14%, transparent), transparent 28%),
+    var(--fond);
+  cursor: grab;
+  user-select: none;
+}
+
+.roue:active {
+  cursor: grabbing;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fondRoue {
+  fill: color-mix(in srgb, var(--surface-elevee) 58%, var(--fond));
+  stroke: var(--bordure-forte);
+  stroke-width: 2;
+}
+
+.secteurSigne {
+  stroke: none;
+  opacity: 0.16;
+}
+
+.signeFeu {
+  fill: var(--aube);
+}
+
+.signeTerre {
+  fill: var(--nebuleuse);
+}
+
+.signeAir {
+  fill: var(--accent);
+}
+
+.signeEau {
+  fill: var(--jour);
+}
+
+.limiteSigne,
+.graduation,
+.graduationForte,
+.cuspide,
+.cuspideForte,
+.anneauMaisons,
+.anneauInterieur,
+.axePrincipal,
+.axeSecondaire,
+.rappel,
+.aspect {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.limiteSigne,
+.anneauMaisons,
+.anneauInterieur {
+  stroke: var(--bordure-forte);
+}
+
+.limiteSigne {
+  stroke-width: 1;
+  opacity: 0.62;
+}
+
+.graduation,
+.graduationForte {
+  stroke: var(--texte-doux);
+  stroke-linecap: round;
+}
+
+.graduation {
+  stroke-width: 0.8;
+  opacity: 0.34;
+}
+
+.graduationForte {
+  stroke-width: 1.2;
+  opacity: 0.62;
+}
+
+.glypheSigne,
+.numeroMaison,
+.etiquetteAxe,
+.etiquetteAxeSecondaire {
+  fill: var(--texte);
+  font-family: var(--pile-anam);
+  paint-order: stroke;
+  stroke: color-mix(in srgb, var(--fond) 82%, transparent);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.glypheSigne {
+  font-size: 1.35rem;
+}
+
+.numeroMaison {
+  font-family: var(--pile-ui);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  opacity: 0.78;
+}
+
+.anneauMaisons {
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+.anneauInterieur {
+  fill: color-mix(in srgb, var(--fond) 74%, transparent);
+  stroke-width: 1;
+  opacity: 0.9;
+}
+
+.cuspide,
+.cuspideForte {
+  stroke: var(--bordure-forte);
+  stroke-linecap: round;
+}
+
+.cuspide {
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+.cuspideForte {
+  stroke-width: 1.7;
+  opacity: 0.86;
+}
+
+.axePrincipal,
+.axeSecondaire {
+  stroke: var(--lueur);
+  stroke-linecap: round;
+}
+
+.axePrincipal {
+  stroke-width: 2;
+  opacity: 0.96;
+}
+
+.axeSecondaire {
+  stroke-width: 1.2;
+  opacity: 0.52;
+}
+
+.etiquetteAxe,
+.etiquetteAxeSecondaire {
+  font-family: var(--pile-ui);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.etiquetteAxeSecondaire {
+  opacity: 0.62;
+}
+
+.aspect {
+  stroke-linecap: round;
+  stroke-width: 1.6;
+  opacity: 0.78;
+  transition: opacity var(--duree-courte) var(--courbe);
+}
+
+.aspectConjonction {
+  stroke: var(--nebuleuse);
+}
+
+.aspectSextile {
+  stroke: var(--accent);
+  stroke-dasharray: 2 7;
+}
+
+.aspectCarre {
+  stroke: var(--aube);
+  stroke-dasharray: 9 6;
+}
+
+.aspectTrigone {
+  stroke: var(--jour);
+  stroke-dasharray: 18 8;
+}
+
+.aspectOpposition {
+  stroke: var(--texte-doux);
+  stroke-width: 2.2;
+}
+
+.aspect.attenue {
+  opacity: 0.14;
+}
+
+.rappel {
+  stroke: var(--texte-doux);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+.rappelAmas {
+  stroke: var(--lueur);
+  stroke-width: 1.4;
+  opacity: 0.86;
+}
+
+.corps {
+  cursor: pointer;
+  opacity: 0.94;
+  transition: opacity var(--duree-courte) var(--courbe);
+}
+
+.cible {
+  fill: var(--papier);
+  fill-opacity: 0.001;
+}
+
+.selection {
+  fill: color-mix(in srgb, var(--lueur) 16%, transparent);
+  stroke: var(--lueur);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.corpsActif {
+  opacity: 1;
+}
+
+.corpsAttenue {
+  opacity: 0.18;
+}
+
+.coeur {
+  fill: var(--lueur);
+  stroke: var(--fond);
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.recentrer {
+  align-self: center;
+}
+
+.fichePlanete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  padding: var(--esp-4);
+  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
+  border-radius: var(--rayon-lg);
+  background:
+    var(--texture-papier),
+    radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--jour) 42%, transparent), transparent 32%),
+    var(--papier);
+  color: var(--sur-papier);
+  box-shadow: var(--ombre-posee);
+}
+
+.entetePlanete {
+  gap: var(--esp-3);
+}
+
+.planeteApercu {
+  width: calc(var(--cible-tactile) + var(--esp-3));
+  height: calc(var(--cible-tactile) + var(--esp-3));
+  flex: none;
+}
+
+.faitsPlanete {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-2);
+  margin: 0;
+}
+
+.faitsPlanete > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding-bottom: var(--esp-2);
+  border-bottom: 1px solid color-mix(in srgb, var(--sur-papier) 12%, transparent);
+}
+
+.faitsPlanete dt,
+.faitsPlanete dd {
+  margin: 0;
+  color: var(--sur-papier);
+}
+
+.faitsPlanete dd {
+  text-align: right;
+}
+
+.aspectsPlanete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+.aspectsPlanete ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aspectsPlanete li {
+  color: var(--sur-papier);
+}
+
+.isoler {
+  align-self: flex-start;
+}
+
+.legende {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  color: var(--sur-papier-doux);
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .ficheAvecAspects {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    align-items: start;
+  }
+
+  .ficheAvecAspects .entetePlanete,
+  .ficheAvecAspects .faitsPlanete {
+    grid-column: 1;
+  }
+
+  .ficheAvecAspects .aspectsPlanete {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (max-width: 420px) {
+  .enteteInstrument {
+    align-items: flex-start;
+  }
+
+  .commandes {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .glypheSigne {
+    font-size: 1.1rem;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aspect,
+  .corps {
+    transition: none;
+  }
+}
+
+:global(:root[data-a11y="contraste"]) .roue,
+:global(:root[data-a11y="contraste"]) .fichePlanete {
+  background: var(--surface);
+}
+
+@media (prefers-contrast: more) {
+  :global(:root:not([data-a11y="nuit"])) .roue,
+  :global(:root:not([data-a11y="nuit"])) .fichePlanete {
+    background: var(--surface);
+  }
+}

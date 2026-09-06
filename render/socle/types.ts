@@ -80,6 +80,18 @@ export interface AngleVue {
   readonly projection: string | null;
 }
 
+export interface AspectVue {
+  readonly cle: string;
+  readonly depuis: string;
+  readonly vers: string;
+  readonly intituleDepuis: string;
+  readonly intituleVers: string;
+  readonly type: "conjonction" | "sextile" | "carre" | "trigone" | "opposition";
+  readonly orbe: string;
+  readonly projectionDepuis: string;
+  readonly projectionVers: string;
+}
+
 export interface ManqueVue {
   readonly intitule: string;
   readonly raison: string;
@@ -137,6 +149,7 @@ export interface SectionCielVue {
   readonly positions: readonly PositionVue[];
   readonly angles: readonly AngleVue[];
   readonly cuspides: readonly AngleVue[];
+  readonly aspects: readonly AspectVue[];
   readonly manques: readonly ManqueVue[];
   readonly reperesPrincipaux: readonly {
     readonly cle: "soleil" | "ascendant" | "lune";
