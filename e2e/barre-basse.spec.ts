@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import sharp from "sharp";
-import { attendreLePortail, ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { attendreLePortail, ouvrirUnCompteNeuf, passerLeTour, TITRE_DATE_ACCUEIL } from "./_entrer";
 
 /**
  * barre-basse.spec.ts — CE QU'ON LIT DANS LA BARRE NE DÉPEND PAS DE CE QUI PASSE DERRIÈRE
@@ -110,7 +110,7 @@ test.describe("La barre de régions", () => {
     await attendreLePortail(page);
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
     await page.waitForTimeout(1200);
 
     const region = page.locator('[class*="regionActive"]');
@@ -161,7 +161,7 @@ test.describe("La barre de régions", () => {
     await attendreLePortail(page);
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
     await page.waitForTimeout(1200);
 
     const region = page.locator('[class*="regionActive"]');

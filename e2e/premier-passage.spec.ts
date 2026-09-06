@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { ouvrirUnCompteNeuf, passerLeTour, TITRE_DATE_ACCUEIL } from "./_entrer";
 
 /**
  * premier-passage.spec.ts — « JE VIENS DE M'INSCRIRE » → « JE SAIS QUOI FAIRE » (H4)
@@ -41,7 +41,7 @@ test("[H4] le lieu se présente une fois, puis plus jamais", async ({ page }) =>
 
   // ── 2. La présentation est LUE avant les cartes, et sans avoir à chercher.
   await expect(titre).toBeInViewport();
-  await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
 
   // ── 3. Les trois noms de la présentation sont ceux de la barre : ce qu'on vient de lire est
   //       atteignable tout de suite, et c'est la moitié de « je sais quoi faire ».
@@ -52,7 +52,7 @@ test("[H4] le lieu se présente une fois, puis plus jamais", async ({ page }) =>
   //       (QA manuelle du 2026-08-19 : il était rendu à chaque chargement) — et l'accueil s'est tu.
   await page.waitForTimeout(1500); // la Server Action pose la date avant qu'on recharge
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Aujourd’hui", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Trois dimensions", level: 2, exact: true }),
     "la présentation revient à chaque chargement : la date n'a pas été posée, ou pas relue",

@@ -19,43 +19,23 @@ import s from "./accueil.module.css";
  * `tests/rendu/bibliotheque.test.tsx`.
  */
 
-const MOIS = [
-  "janvier",
-  "février",
-  "mars",
-  "avril",
-  "mai",
-  "juin",
-  "juillet",
-  "août",
-  "septembre",
-  "octobre",
-  "novembre",
-  "décembre",
-];
-
 export interface ProprietesBibliotheque {
   readonly bibliotheque: BibliothequeVue;
 }
 
 export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
-  const { cartes, jour, univers } = bibliotheque;
-  const date = `${jour.j} ${MOIS[jour.m - 1]}`;
+  const { cartes, univers } = bibliotheque;
   const mantra = cartes.find((carte) => carte.cle === "mantra");
   const ciel = cartes.find((carte) => carte.cle === "horoscope");
 
   return (
     <div className={s.bibliotheque}>
-      <section className={s.quotidien} aria-labelledby="moi-aujourdhui">
-        <div className={s.enteteQuotidien}>
-          <p className={`t-meta ${s.jour}`}>{date}</p>
-          <h2 id="moi-aujourdhui" className={`t-titre-sm ${s.titreQuotidien}`}>Mon parcours du jour</h2>
-        </div>
+      <div className={s.quotidien} data-quotidien>
+        {mantra && <MantraDuJour mantra={mantra} />}
         <div className={s.cartesQuotidiennes}>
-          {ciel && <Carte carte={ciel} enAvant />}
-          {mantra && <Carte carte={mantra} enAvant={false} />}
+          {ciel && <CarteCiel carte={ciel} />}
         </div>
-      </section>
+      </div>
 
       <div className={s.transitionUnivers} aria-hidden><span /></div>
 
@@ -106,9 +86,23 @@ function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
   );
 }
 
-function Carte({ carte, enAvant }: { carte: CarteVue; enAvant: boolean }) {
+function MantraDuJour({ mantra }: { readonly mantra: CarteVue }) {
+  if (mantra.texte.statut === "ecrit") {
+    return <blockquote className={`t-anam ${s.mantraDuJour}`}>« {mantra.texte.texte} »</blockquote>;
+  }
+
+  return <p className={`t-meta ${s.mantraAbsent}`}>Anima n’a pas encore écrit ce mantra.</p>;
+}
+
+function CarteCiel({ carte }: { readonly carte: CarteVue }) {
   return (
-    <article className={`${s.carte} ${enAvant ? s.enAvant : ""}`} aria-labelledby={`carte-${carte.cle}`}>
+    <article className={s.carte} aria-labelledby={`carte-${carte.cle}`}>
+      <div className={s.sourceCiel}>
+        <span className={`${s.glyphe} ${s.glypheCiel}`} aria-hidden>
+          <GlypheUnivers cle="astrologie" />
+        </span>
+        <span className="t-meta">Astrologie</span>
+      </div>
       {/* ⚠️ UNE SEULE VOIX DE TITRE PAR ÉCRAN (QA visuelle du 2026-08-19). `t-corps-fort` est de
           l'INTERFACE (Inter) : il mettait « Le mantra du jour » et « Ton ciel du jour » dans une
           grasse sans-serif à trois centimètres de « Tes nombres » en Fraunces — deux familles de
@@ -118,10 +112,6 @@ function Carte({ carte, enAvant }: { carte: CarteVue; enAvant: boolean }) {
       <h2 id={`carte-${carte.cle}`} className="t-titre-sm">
         {carte.titre}
       </h2>
-
-      {/* La mise en avant est ANNONCÉE, pas seulement plus grande : sans ça, la seule différence
-          serait visuelle, et l'information n'existerait pas pour qui n'y a pas accès. */}
-      {enAvant && <p className={`t-meta ${s.mention}`}>Mise en avant aujourd&rsquo;hui</p>}
 
       {carte.faits.length > 0 && (
         <dl className={s.faits}>

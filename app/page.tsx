@@ -36,6 +36,7 @@ import {
   LIBELLE_FERMER,
 } from "@/lib/domain/menu-compte";
 import { ACCUEIL_ANAM } from "@/lib/domain/copie-anam";
+import { jourCivilParis } from "@/lib/data/lire-quotidien";
 
 /**
  * ⚠️ RENDUE À LA DEMANDE, ET C'EST UNE GARDE (revue adversariale, R5).
@@ -166,6 +167,7 @@ export default async function Page() {
       onReclamerOuvertureQuotidienne={reclamerOuvertureDuJour}
       onChargerOuvertureCourante={chargerOuvertureCourante}
       bibliotheque={bibliotheque}
+      jourAccueil={jourCivilParis(maintenant)}
       historique={historique}
       onSocleAnnonce={marquerAnnonceSocleDite}
       onHypotheseDite={marquerHypotheseDite}

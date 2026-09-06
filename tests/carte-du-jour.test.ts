@@ -8,8 +8,8 @@ import { ratioContraste } from "@/app/styles/contraste";
  * LE CODE COULEUR DU JOUR (2026-09-02).
  *
  * Retour de Julian : « ce bleu magique fleur de lotus est utilisé pour les champs d'aujourd'hui,
- * c'est notre code couleur. » Deux cartes le portent, sur deux écrans : « Ton ciel du jour » et
- * « Le mantra du jour » sur l'accueil, « Ton ciel du jour » dans la halte du socle.
+ * c'est notre code couleur. » Le ciel le porte sur deux écrans : l'accueil et la halte du socle.
+ * Le mantra est désormais nu sous la date, sans encadré.
  *
  * ── CE QUE CE FICHIER GARDE, ET QUE `contraste.test.ts` NE PEUT PAS GARDER ─────────────────────
  *
@@ -96,8 +96,8 @@ describe("[LE BORD] aucune encre du mode sombre ne survit dans une carte du jour
   const accueil = lire("render/accueil/accueil.module.css");
   const socle = lire("render/socle/socle.module.css");
 
-  // Accueil : toutes les cartes de la feuille SONT les cartes du jour (le composant `Carte` n'est
-  // monté que dans « Ce que le jour propose »), et leurs règles vont jusqu'au bas du fichier.
+  // Accueil : la seule carte de la feuille est celle du ciel (`CarteCiel`), et ses règles vont
+  // jusqu'au bas du fichier.
   const carteAccueil = bloc(accueil, ".carte {", null);
   // Socle : de la carte à la règle nue de la mention. La borne est ancrée en début de ligne, sinon
   // elle mordrait sur `.carteJour .mentionModele` et couperait le bloc en son milieu.

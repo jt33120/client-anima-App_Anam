@@ -16,32 +16,33 @@
 .quotidien {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-4);
-}
-
-.enteteQuotidien {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--esp-3);
-}
-
-.titreQuotidien,
-.enteteUnivers h2 {
-  margin: 0;
-  color: var(--texte);
+  gap: var(--esp-5);
 }
 
 .cartesQuotidiennes {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--esp-4);
+  display: flex;
+  flex-direction: column;
 }
 
-@media (min-width: 640px) {
-  .cartesQuotidiennes {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.mantraDuJour,
+.mantraAbsent {
+  margin: 0;
+  padding-inline: var(--esp-2);
+  color: var(--texte);
+}
+
+.mantraDuJour {
+  text-wrap: balance;
+}
+
+.mantraAbsent {
+  color: var(--texte-doux);
+  font-style: italic;
+}
+
+.enteteUnivers h2 {
+  margin: 0;
+  color: var(--texte);
 }
 
 .transitionUnivers {
@@ -277,11 +278,6 @@
   }
 }
 
-.jour {
-  color: var(--texte-doux);
-  margin: 0;
-}
-
 .grille {
   display: grid;
   grid-template-columns: 1fr;
@@ -306,15 +302,15 @@
   display: flex;
 }
 
-/* ══ LES CARTES DU JOUR SONT BLEU LOTUS, ET C'EST UN CODE (2026-09-02) ═══════════════════════
+/* ══ LA CARTE DU CIEL EST BLEU LOTUS, ET C'EST UN CODE (2026-09-02) ══════════════════════════
 
    Retour de Julian : « ce bleu magique fleur de lotus est utilisé pour les champs d'aujourd'hui,
-   c'est notre code couleur. » Les deux cartes de « Ce que le jour propose » (le ciel, le mantra)
-   sont donc les seules surfaces peintes du produit — et c'est ce que le reste, resté navy, rend
-   lisible : un code couleur ne se voit que par ce qu'il exclut.
+   c'est notre code couleur. » Le ciel est désormais la seule surface quotidienne peinte : le
+   mantra est lié à la date par sa place et ses guillemets, sans encadré. C'est ce que le reste,
+   resté navy, rend lisible : un code couleur ne se voit que par ce qu'il exclut.
 
    ⚠️ L'ENCRE S'INVERSE ICI, ET SEULEMENT ICI. Un aplat clair dans un mode sombre : `--texte`
-   (Ivory) sur du Sky ne ferait que 1,20:1. Toute la copie de ces cartes passe donc par
+   (Ivory) sur du Sky ne ferait que 1,20:1. Toute la copie de cette carte passe donc par
    `--sur-jour` / `--sur-jour-doux`, dont `tests/contraste.test.ts` mesure les deux paires.
 
    ⚠️ ET CE N'EST PAS `--accent`, malgré la même valeur aujourd'hui. Le refus daté juste plus bas
@@ -327,9 +323,9 @@
 .carte {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-2);
+  gap: var(--esp-3);
   width: 100%;
-  padding: var(--esp-4);
+  padding: var(--esp-5);
   /* Le « papier » de la carte (retour du 2026-09-01 : des textures et des dégradés), rejoué dans
      le bleu : un dégradé STATIQUE du lotus vers un lotus à peine assombri. Le bas du dégradé est
      mesuré par `tests/carte-du-jour.test.ts` — à 5 % de navy, l'encre douce y tient encore 4,76. */
@@ -337,6 +333,7 @@
   color: var(--sur-jour);
   border: 1px solid color-mix(in srgb, var(--sur-jour) 22%, var(--jour));
   border-radius: var(--rayon-md);
+  text-align: left;
 }
 
 .carte h2 {
@@ -348,21 +345,23 @@
   margin: 0;
 }
 
-/* La carte mise en avant. Depuis le 2026-09-02, elle ne se distingue plus par sa COULEUR — les
-   deux cartes du jour sont bleu lotus, c'est le code — mais par sa place : plus d'air, un filet
-   plus marqué. Rien de clignotant, rien de compté : une carte posée devant, pas une notification. */
-.enAvant {
-  border-color: color-mix(in srgb, var(--sur-jour) 40%, var(--jour));
-  padding: var(--esp-5);
-  gap: var(--esp-3);
+/* Le signe d'origine reste secondaire : il explique d'où vient le ciel sans concurrencer son titre. */
+.sourceCiel {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--esp-2);
+  color: var(--sur-jour-doux);
 }
 
-/* ⚠️ JAMAIS L'ACCENT ICI (QA visuelle du 2026-08-19). L'accent est la couleur de l'action, et
-   d'elle seule — or cette étiquette n'est pas cliquable. La peindre en accent promettait un lien
-   inexistant et diluait le seul signal qui désigne ce qu'on peut toucher. */
-.mention {
-  color: var(--sur-jour-doux);
-  margin: 0;
+.sourceCiel :global(.t-meta) {
+  color: inherit;
+}
+
+.glypheCiel {
+  width: var(--esp-5);
+  height: var(--esp-5);
+  color: inherit;
 }
 
 .faits {

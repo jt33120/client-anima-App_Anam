@@ -2,6 +2,10 @@ import type { Page } from "@playwright/test";
 import { adresseNeuve, codeDans, courrielPour, viderLaBoite } from "./_boite-aux-lettres";
 import { boutonDemanderCode, boutonEntrerAvecCode, champAdresse, champCode } from "./_porte";
 
+/** Le foyer garde « Aujourd’hui » dans la navigation, mais son h1 est la date parisienne. */
+export const TITRE_DATE_ACCUEIL = /^(?:[1-9]|[12]\d|3[01]) (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)$/;
+export const TITRE_REGION_ACTIVE = /^(?:(?:[1-9]|[12]\d|3[01]) (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)|Anam|Mon évolution)$/;
+
 /**
  * Ouvrir un compte NEUF et traverser le tunnel — pour que les parcours qui suivent partent d'un
  * état connu, jamais d'un compte qu'un test précédent aurait laissé à moitié rempli.

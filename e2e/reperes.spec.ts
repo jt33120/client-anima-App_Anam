@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { attendreLePortail, ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { attendreLePortail, ouvrirUnCompteNeuf, passerLeTour, TITRE_REGION_ACTIVE } from "./_entrer";
 
 /**
  * reperes.spec.ts — LE LIEU S'EXPLIQUE, ET ÇA SE RELIT (QA manuelle du 2026-08-19)
@@ -86,7 +86,7 @@ test.describe("Repères", () => {
 
     // On revient d'où l'on vient, sans passer par l'historique du navigateur.
     await page.getByRole("link", { name: /Retour/ }).click();
-    await expect(page.getByRole("heading", { name: /^Aujourd’hui$|^Anam$|^Mon évolution$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: TITRE_REGION_ACTIVE, level: 1 })).toBeVisible();
   });
 
   test("[LA PORTE DE SECOURS RESTE PRIORITAIRE] ses ressources précèdent les repères", async ({

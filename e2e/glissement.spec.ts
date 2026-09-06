@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { ouvrirUnCompteNeuf, passerLeTour, TITRE_DATE_ACCUEIL } from "./_entrer";
 
 /**
  * glissement.spec.ts — LE DOIGT MÈNE (QA manuelle du 2026-08-19)
@@ -105,7 +105,7 @@ async function dansLeMonde(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /commencer/i }).click();
   await passerLeTour(page);
-  await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
   await page.waitForTimeout(1200);
 }
 

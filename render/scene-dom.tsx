@@ -37,6 +37,7 @@ import { versHalte } from "@/lib/scene/retour-scene";
 import Conversation from "./conversation/Conversation";
 import EchangeSource from "./conversation/EchangeSource";
 import Bibliotheque from "./accueil/Bibliotheque";
+import { libelleDateAccueil, type JourAccueil } from "./accueil/date";
 import PremierPassage, { type PremierPassageVue } from "./premier-passage";
 import Guide, { type EtapeGuideVue } from "./guide/Guide";
 import AvatarSeuil from "./seuil/AvatarSeuil";
@@ -84,6 +85,8 @@ export interface ProprietesSceneRendue {
    * parmi quatre, et une panne de socle ne doit fermer ni la conversation ni l'arbre.
    */
   bibliotheque?: BibliothequeVue | null;
+  /** Le jour parisien reste disponible même si la bibliothèque quotidienne ne peut pas être lue. */
+  jourAccueil: JourAccueil;
   /** QA tour 1 (T3) — le fil déjà écrit, pour que le rechargement ne l\u2019efface plus. */
   historique?: readonly TourHistorique[];
   /**
@@ -267,6 +270,7 @@ export default function SceneDom({
   onSocleAnnonce,
   onHypotheseDite,
   bibliotheque,
+  jourAccueil,
   historique,
   premierPassage,
   onSeuilFranchi,
@@ -851,7 +855,7 @@ export default function SceneDom({
                   tabIndex={-1}
                   ref={(el) => void (entetes.current[r.id] = el)}
                 >
-                  {r.nom}
+                  {r.id === "accueil" ? libelleDateAccueil(jourAccueil) : r.nom}
                 </h1>
                 {/* Story 5.6 — la bibliothèque remplace le texte d'attente. Une lecture en panne
                     (`null`) laisse la région vide plutôt que de fermer la scène (AC7). */}

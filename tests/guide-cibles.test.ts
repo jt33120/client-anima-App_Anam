@@ -337,16 +337,16 @@ describe("[fondateur 2026-09-01] le tour tient en cinq étapes d'une ou deux phr
   it("[LE CŒUR] aucun titre d'étape ne répète un <h2> rendu sur l'accueil, ni un nom de région", () => {
     // ⚠️ POURQUOI : la bulle du tour porte un <h2> (`render/guide/Guide.tsx`, `guide-titre`), et
     // les trois premières étapes se posent sur l'accueil, qui en rend déjà : « Trois dimensions »
-    // (premier passage, exactement quand le tour se joue) et « Ce que le jour propose » (section
-    // quotidienne, qui disait « Aujourd’hui » jusqu'au 2026-09-02 : ce mot est devenu le nom de la
-    // RÉGION, donc son <h1>, et le h2 a cédé la place, décision D7). Deux entêtes de même nom sur un
+    // (premier passage, exactement quand le tour se joue) et « Mes univers ». Le quotidien n'ajoute
+    // plus de h2 générique : la date porte le h1, puis le mantra et le ciel forment une seule lecture.
+    // Deux entêtes de même nom sur un
     // écran, et un lecteur d'écran ne les distingue plus : c'est ce qui est arrivé le 2026-08-25
     // avec « Trois places ». Les titres sont donc comparés aux <h2> RÉELLEMENT rendus et aux noms
     // de région RÉELLEMENT catalogués, pas à une liste recopiée ici.
     expect(
       H2_ACCUEIL,
       "l'extracteur ne retrouve plus les <h2> connus de l'accueil : la garde ne mesure rien",
-    ).toEqual(expect.arrayContaining(["Trois dimensions", "Mon parcours du jour"]));
+    ).toEqual(expect.arrayContaining(["Trois dimensions", "Mes univers"]));
     expect(NOMS_DE_REGION.length, "aucun nom de région lu au catalogue : la garde ne mesure rien").toBeGreaterThan(0);
     const collisions = ETAPES.map((e) => e.titre).filter((t) => TITRES_INTERDITS.includes(t));
     expect(collisions, "un titre d'étape porte le même nom qu'un <h2> de l'accueil ou qu'une région").toEqual([]);

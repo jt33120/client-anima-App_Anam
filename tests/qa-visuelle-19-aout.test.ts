@@ -236,12 +236,12 @@ describe("[QA 19/08] la porte de secours est une cible dans les DEUX dimensions"
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 describe("[QA 19/08] trois règles de la charte qui s'étaient perdues", () => {
-  it("l'étiquette de mise en avant n'est plus peinte en accent — elle n'est pas cliquable", () => {
-    // « L'accent est la couleur de l'action, et seulement de l'action. » Peindre une étiquette
-    // inerte en accent promet un lien qui n'existe pas ET affaiblit le seul signal qui désigne ce
-    // qu'on peut toucher : deux dégâts pour un seul écart.
-    const bloc = lire("render/accueil/accueil.module.css").match(/\.mention\s*\{([^}]*)\}/)?.[1] ?? "";
-    expect(bloc, "l'étiquette de mise en avant est redevenue accent").not.toMatch(
+  it("la signature astrologique du ciel n'est pas peinte en accent — elle n'est pas cliquable", () => {
+    // « L'accent est la couleur de l'action, et seulement de l'action. » Peindre une signature
+    // inerte en accent promettrait un lien qui n'existe pas et affaiblirait le signal d'action.
+    const bloc = lire("render/accueil/accueil.module.css").match(/\.sourceCiel\s*\{([^}]*)\}/)?.[1] ?? "";
+    expect(bloc, "la signature du ciel a disparu").toContain("--sur-jour-doux");
+    expect(bloc, "la signature astrologique est devenue accent").not.toMatch(
       /color:\s*var\(--accent\)/,
     );
   });

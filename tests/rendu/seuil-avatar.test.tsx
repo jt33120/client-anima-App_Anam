@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -60,15 +60,27 @@ const RENDU_SEUIL = () =>
 const PROJECTION: ProjectionScene = { tronc: { present: true }, branches: [] };
 const COPIE = { titre: TITRE_SEUIL, tagline: TAGLINE_SEUIL, action: ACTION_SEUIL, altAvatar: ALT_AVATAR_SEUIL };
 const MENU = { groupes: GROUPES_MENU, libelleGlyphe: LIBELLE_GLYPHE, titreFeuille: TITRE_FEUILLE, libelleFermer: LIBELLE_FERMER };
+const JOUR_ACCUEIL = { a: 2026, m: 9, j: 6 } as const;
 
 function monterLaScene(props: Partial<Parameters<typeof SceneDom>[0]> = {}) {
-  return render(<SceneDom projection={PROJECTION} menu={MENU} copieSeuil={COPIE} {...props} />);
+  return render(
+    <SceneDom projection={PROJECTION} menu={MENU} copieSeuil={COPIE} jourAccueil={JOUR_ACCUEIL} {...props} />,
+  );
 }
 
 const sectionSeuil = () => document.querySelector('section[aria-label="Seuil"]') as HTMLElement;
 /** La région d'accueil, PAR LE CATALOGUE — jamais son nom en littéral (Story 7.9 : il a déjà changé deux fois). */
 const sectionAccueil = () =>
   document.querySelector(`section[aria-label="${REGIONS.find((r) => r.id === "accueil")!.nom}"]`) as HTMLElement;
+
+describe("[Accueil] la date remplace le nom de région dans le grand titre", () => {
+  it("garde « Aujourd’hui » pour nommer le lieu, mais affiche le jour parisien dans son h1", () => {
+    monterLaScene({ seuilDejaFranchi: true });
+    const accueil = sectionAccueil();
+    expect(accueil.getAttribute("aria-label")).toBe("Aujourd’hui");
+    expect(within(accueil).getByRole("heading", { level: 1 }).textContent).toBe("6 septembre");
+  });
+});
 
 // ── Le double de contexte 2D — assez pour que `demarrerRemplissage` aille jusqu'au bout ──────────
 //

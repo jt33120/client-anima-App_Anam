@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { ouvrirUnCompteNeuf, passerLeTour, TITRE_DATE_ACCUEIL } from "./_entrer";
 
 /**
  * scene-imagerie.spec.ts — CE QUE L'ARRIÈRE-PLAN PEINT VRAIMENT, RÉGION PAR RÉGION
@@ -55,7 +55,7 @@ test.describe("Le décor de l'arbre", () => {
     await laisserRetomber(page);
 
     // La région d'accueil est bien celle qui est active — sans quoi la mesure ne dirait rien.
-    await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
 
     expect(
       await opaciteEffectiveArbre(page),

@@ -87,9 +87,11 @@ effacer l'identité lunaire.
 
 ## 9. Aujourd’hui, Psychologie et Anam
 
-- « Aujourd’hui » (la région d’accueil, nommée « Moi » jusqu’au 2026-09-02) commence par le jour, le
-  ciel et le mantra ; son entête interne dit exactement « Mon parcours du jour ». Les cartes portent
-  « Ton ciel du jour » et « Mon mantra du jour ». Un fondu vertical conduit ensuite à « Mon monde
+- « Aujourd’hui » (la région d’accueil, nommée « Moi » jusqu’au 2026-09-02) conserve ce nom dans la
+  navigation, mais son grand titre affiche la date courante sans année. Le mantra attaché à cette
+  date vient immédiatement dessous, sans carte et entre guillemets. « Ton ciel du jour » suit dans
+  l’unique carte quotidienne, signée par le glyphe et le libellé « Astrologie ». Un fondu vertical
+  conduit ensuite à « Mon monde
   intérieur » puis « Mes univers », avec trois
   portes stables : Astrologie, Numérologie et Psychologie. Human Design vit dans Psychologie avec
   l'Ennéagramme et Big Five ; il n'est pas dupliqué comme univers de premier rang.

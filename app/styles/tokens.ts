@@ -64,8 +64,8 @@ export const couleursNuit = {
   // ══ LE CODE COULEUR DU JOUR (2026-09-02) ═══════════════════════════════════════════════════
   //
   // Retour de Julian : « ce bleu magique fleur de lotus est utilisé pour les champs
-  // d'aujourd'hui, c'est notre code couleur. » Les cartes du jour (le ciel, le mantra) sont donc
-  // peintes en Sky, et le reste de l'app ne l'est pas : c'est ce qui fait le code.
+  // d'aujourd'hui, c'est notre code couleur. » La carte du ciel est donc peinte en Sky ; le mantra
+  // reste nu sous la date. Le reste de l'app ne l'est pas : c'est ce qui fait le code.
   //
   // ⚠️ CE N'EST PAS `accent`, MÊME SI LA VALEUR EST LA MÊME AUJOURD'HUI. `accent` est la couleur
   // de l'ACTION et d'elle seule (DESIGN.md §Colors, et `render/accueil/accueil.module.css` porte

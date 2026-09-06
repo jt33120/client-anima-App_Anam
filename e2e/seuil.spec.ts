@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { ouvrirUnCompteNeuf, passerLeTour } from "./_entrer";
+import { ouvrirUnCompteNeuf, passerLeTour, TITRE_DATE_ACCUEIL } from "./_entrer";
 
 /**
  * seuil.spec.ts — L'ÉCRAN D'ENTRÉE, MESURÉ (QA manuelle du 2026-08-19)
@@ -225,7 +225,7 @@ test.describe("Le seuil", () => {
 
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Régions" }).getByRole("button"),
       "le doublage non-spatial doit reprendre dès qu'il y a quelque chose à doubler (UX-DR-37)",
@@ -237,13 +237,13 @@ test.describe("Le seuil", () => {
     await page.goto("/");
     await page.getByRole("button", { name: /commencer/i }).click();
     await passerLeTour(page);
-    await expect(page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 })).toBeVisible();
     // La Server Action pose la date ; on lui laisse le temps de revenir avant de recharger.
     await page.waitForTimeout(1500);
 
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: /^Aujourd’hui$/, level: 1 }),
+      page.getByRole("heading", { name: TITRE_DATE_ACCUEIL, level: 1 }),
       "le monde ne s'ouvre pas sur l'accueil : la date n'a pas été posée, ou pas relue",
     ).toBeVisible();
     await expect(

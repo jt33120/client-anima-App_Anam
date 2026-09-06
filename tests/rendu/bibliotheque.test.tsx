@@ -50,13 +50,18 @@ const VUE: BibliothequeVue = {
 };
 
 describe("[Aujourd’hui] le quotidien et les univers ont chacun leur place", () => {
-  it("affiche le ciel et le mantra sous « Mon parcours du jour », mais aucune carte Anam ni profil stable", () => {
+  it("affiche le mantra nu avant le ciel signé Astrologie, mais aucune carte Anam ni profil stable", () => {
     render(<Bibliotheque bibliotheque={VUE} />);
 
-    const quotidien = screen.getByRole("region", { name: "Mon parcours du jour" });
-    expect(within(quotidien).getByText("14 août")).toBeTruthy();
-    expect(within(quotidien).getByRole("article", { name: "Ton ciel du jour" })).toBeTruthy();
-    expect(within(quotidien).getByRole("article", { name: "Mon mantra du jour" })).toBeTruthy();
+    const quotidien = document.querySelector("[data-quotidien]") as HTMLElement;
+    expect(quotidien).not.toBeNull();
+    const mantra = within(quotidien).getByText("« Remarque ce qui tient. »");
+    const ciel = within(quotidien).getByRole("article", { name: "Ton ciel du jour" });
+    expect(mantra.closest("article")).toBeNull();
+    expect(mantra.compareDocumentPosition(ciel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(ciel).getByText("Astrologie")).toBeTruthy();
+    expect(ciel.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
+    expect(within(quotidien).queryByRole("article", { name: "Mon mantra du jour" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Anam" })).toBeNull();
     expect(screen.queryByRole("article", { name: "Ton ennéagramme" })).toBeNull();
     expect(screen.queryByText(/elle se manifeste/i)).toBeNull();
@@ -68,7 +73,7 @@ describe("[Aujourd’hui] le quotidien et les univers ont chacun leur place", ()
     // un lecteur d'écran, deux titres pour une seule chose à l'œil. PRÉSENCE D'ABORD : la section
     // existe sous son nouveau nom, sinon les absences ci-dessous seraient vraies sur un composant vide.
     render(<Bibliotheque bibliotheque={VUE} />);
-    expect(screen.getByRole("region", { name: "Mon parcours du jour" })).toBeTruthy();
+    expect(document.querySelector("[data-quotidien]")).not.toBeNull();
     expect(screen.queryByRole("region", { name: "Aujourd’hui" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Aujourd’hui" })).toBeNull();
     expect(screen.queryByText(/^Aujourd’hui$/)).toBeNull();
