@@ -21,6 +21,9 @@ const MODELE: Record<TierIa, string> = {
   fort: "mistral-large-2512",
 };
 
+// Repli explicite du test privé : modèle daté, confirmé accessible avec la clé de test.
+const MODELE_FAIBLE_TEST = "ministral-14b-2512";
+
 /**
  * Résout le tier. Détresse (niveau ≥ 1) → FORT forcé pour toute capacité. Sinon : échange courant
  * → léger ; reconceptualisation & synthèse → fort.
@@ -65,6 +68,7 @@ export function tierPour(capacite: CapaciteIa, niveauSecurite: NiveauSecurite = 
   return capacite === "echange" ? "leger" : "fort";
 }
 
-export function modelePour(tier: TierIa): string {
+export function modelePour(tier: TierIa, autoriserModeleFaibleTest = false): string {
+  if (autoriserModeleFaibleTest) return MODELE_FAIBLE_TEST;
   return MODELE[tier];
 }

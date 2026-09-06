@@ -12,10 +12,12 @@ import { AdaptateurFactice } from "./adapters/factice";
  * silencieuse »). Sur une mauvaise config (AI_ADAPTER oublié ou mal orthographié sur Vercel), on
  * échoue haut et fort plutôt que de servir un stub à de vraies utilisatrices — revue 2.1.
  */
-export async function creerAiPort(): Promise<AiPort> {
+export async function creerAiPort(
+  options: { readonly autoriserModeleFaibleTest?: boolean } = {},
+): Promise<AiPort> {
   if (process.env.AI_ADAPTER === "mistral") {
     const { AdaptateurMistral } = await import("./adapters/mistral");
-    return new AdaptateurMistral(); // boot-guard art. 9 ici
+    return new AdaptateurMistral(options); // boot-guard art. 9 ici
   }
 
   const enProduction =

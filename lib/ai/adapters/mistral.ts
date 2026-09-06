@@ -81,13 +81,16 @@ function extraireTexte(contenu: unknown): string {
 
 export class AdaptateurMistral implements AiPort {
   private readonly client: Mistral;
+  private readonly autoriserModeleFaibleTest: boolean;
+  private modeleFaibleSignale = false;
 
-  constructor() {
+  constructor(options: { readonly autoriserModeleFaibleTest?: boolean } = {}) {
     assertConformiteArt9(); // lève avant toute construction si non conforme
     const cle = process.env.MISTRAL_API_KEY;
     if (!cle) {
       throw new Error("MISTRAL_API_KEY absente (secret serveur unique, jamais NEXT_PUBLIC_).");
     }
+    this.autoriserModeleFaibleTest = options.autoriserModeleFaibleTest === true;
     this.client = new Mistral({ apiKey: cle });
   }
 
@@ -100,9 +103,14 @@ export class AdaptateurMistral implements AiPort {
   /** Prépare tier/modele/messages EN UN endroit — completer et diffuser ne dérivent pas (revue 2.2). */
   private preparer(req: RequeteIa) {
     const tier = tierPour(req.capacite, req.niveauSecurite);
+    const modele = modelePour(tier, this.autoriserModeleFaibleTest);
+    if (this.autoriserModeleFaibleTest && !this.modeleFaibleSignale) {
+      console.warn("[ANIMA_TEST] modèle faible autorisé pour la conversation privée", { modele });
+      this.modeleFaibleSignale = true;
+    }
     return {
       tier,
-      modele: modelePour(tier),
+      modele,
       messages: req.messages.map((m) => ({ role: m.role, content: m.content })),
     };
   }

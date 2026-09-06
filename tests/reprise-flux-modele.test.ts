@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { classerEchec } from "@/lib/ai/adapters/mistral";
 
 /**
@@ -43,10 +43,11 @@ describe("[H6] la classification d'un échec du fournisseur", () => {
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
 const stream = vi.fn();
+const complete = vi.fn();
 
 vi.mock("@mistralai/mistralai", () => ({
   Mistral: class {
-    chat = { stream, complete: vi.fn() };
+    chat = { stream, complete };
   },
 }));
 vi.mock("server-only", () => ({}));
@@ -59,11 +60,14 @@ async function* fragments(...textes: string[]) {
 
 beforeEach(() => {
   stream.mockReset();
+  complete.mockReset();
   vi.stubEnv("MISTRAL_ZDR_CONFIRMED", "true");
   vi.stubEnv("MISTRAL_DPA_SIGNED", "true");
   vi.stubEnv("MISTRAL_PLAN", "scale");
   vi.stubEnv("MISTRAL_API_KEY", "cle-de-test");
 });
+
+afterEach(() => vi.unstubAllEnvs());
 
 async function textesDe(flux: AsyncIterable<{ type: string; texte?: string }>): Promise<string[]> {
   const out: string[] = [];
@@ -120,5 +124,67 @@ describe("[H6] la reprise s'arrête au premier fragment", () => {
     const a = new AdaptateurMistral();
     await expect(textesDe(a.diffuser(requete() as never))).rejects.toThrow(/still down/);
     expect(stream, "la reprise boucle").toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("[TEST PRIVÉ] le tier logique et le modèle physique restent traçables", () => {
+  it("envoie le modèle faible au SDK tout en rapportant le tier fort", async () => {
+    const { AdaptateurMistral } = await import("@/lib/ai/adapters/mistral");
+    complete.mockResolvedValueOnce({
+      choices: [{ message: { content: "Je suis là." } }],
+      usage: { promptTokens: 4, completionTokens: 3 },
+    });
+    const adaptateur = new AdaptateurMistral({ autoriserModeleFaibleTest: true });
+
+    const reponse = await adaptateur.completer({
+      capacite: "detection",
+      contientArt9: true,
+      messages: [{ role: "user", content: "Bonjour" }],
+    });
+
+    expect(complete).toHaveBeenCalledWith(
+      expect.objectContaining({ model: "ministral-14b-2512" }),
+    );
+    expect(reponse).toMatchObject({ tier: "fort", modele: "ministral-14b-2512" });
+  });
+
+  it("envoie aussi le modèle faible au flux et conserve tier/modèle dans sa trame de fin", async () => {
+    const { AdaptateurMistral } = await import("@/lib/ai/adapters/mistral");
+    stream.mockResolvedValueOnce(fragments("Je suis là."));
+    const adaptateur = new AdaptateurMistral({ autoriserModeleFaibleTest: true });
+    const evenements = [];
+
+    for await (const evenement of adaptateur.diffuser({
+      capacite: "detection",
+      contientArt9: true,
+      messages: [{ role: "user", content: "Bonjour" }],
+    })) {
+      evenements.push(evenement);
+    }
+
+    expect(stream).toHaveBeenCalledWith(expect.objectContaining({ model: "ministral-14b-2512" }));
+    expect(evenements.at(-1)).toMatchObject({
+      type: "fin",
+      tier: "fort",
+      modele: "ministral-14b-2512",
+    });
+  });
+
+  it("continue d'envoyer Large au SDK sans autorisation privée", async () => {
+    const { AdaptateurMistral } = await import("@/lib/ai/adapters/mistral");
+    complete.mockResolvedValueOnce({
+      choices: [{ message: { content: "Je suis là." } }],
+      usage: { promptTokens: 4, completionTokens: 3 },
+    });
+
+    await new AdaptateurMistral().completer({
+      capacite: "detection",
+      contientArt9: true,
+      messages: [{ role: "user", content: "Bonjour" }],
+    });
+
+    expect(complete).toHaveBeenCalledWith(
+      expect.objectContaining({ model: "mistral-large-2512" }),
+    );
   });
 });

@@ -19,7 +19,21 @@ production en dessous de Pro). « Phase de test » décrit notre intention, pas 
 > peut la TROUVER. La différence compte : le produit n'est pas publiable, et être trouvé aujourd'hui,
 > ce serait être trouvé par quelqu'un qui cherche de l'aide.
 
-Dernière revue : **2026-08-26** (§9 ouverte — la facture Scale). Revue précédente : **2026-08-18** (A1 re-mesurée et aggravée, A2 requalifiée et fermée côté code, §8 périmée corrigée).
+Dernière revue : **2026-09-06** (modèle faible privé temporaire). Revue précédente : **2026-08-26** (§9 ouverte — la facture Scale).
+
+
+### 🔴 TEMPORAIRE — modèle faible réservé au compte de Julian
+
+Depuis le **6 septembre 2026**, `ANIMA_MODELE_FAIBLE_TEST=oui` autorise
+`ministral-14b-2512` pour les appels de la conversation, uniquement sur le
+compte dont l'UUID serveur correspond à `ANIMA_TESTEUR_MODELE_FAIBLE_ID`. Les autres comptes sont
+refusés avant tout envoi ; l'ordonnanceur et les autres consommateurs IA ne reçoivent pas cette
+autorisation.
+
+**Avant la première vraie utilisatrice :** obtenir l'accès à un modèle fort validé, supprimer les
+deux variables Vercel, vérifier un échange complet sur Large, puis seulement poser
+`ANIMA_INDEXABLE=oui`. Tant que le mode faible vaut `oui`, `robots.txt` et `X-Robots-Tag` restent
+fermés même si la variable d'indexation est posée par erreur.
 
 
 ---

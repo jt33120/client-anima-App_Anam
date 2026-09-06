@@ -42,6 +42,21 @@ describe("[porte §7] `siteIndexable` — fermé par défaut", () => {
       );
     }
   });
+
+  it("le mode faible de test maintient la porte fermée malgré une demande d'ouverture", () => {
+    expect(
+      siteIndexable({ ANIMA_INDEXABLE: "oui", ANIMA_MODELE_FAIBLE_TEST: "oui" }),
+    ).toBe(false);
+  });
+
+  it.each(["true", "Oui", "oui ", "1", " "])(
+    "une valeur de test non vide, même invalide (%s), ferme aussi la porte",
+    (valeur) => {
+      expect(
+        siteIndexable({ ANIMA_INDEXABLE: "oui", ANIMA_MODELE_FAIBLE_TEST: valeur }),
+      ).toBe(false);
+    },
+  );
 });
 
 describe("[porte §7] `robots.txt` — la couche qui interdit d'EXPLORER", () => {
@@ -58,6 +73,12 @@ describe("[porte §7] `robots.txt` — la couche qui interdit d'EXPLORER", () =>
     const r = Array.isArray(regles) ? regles[0] : regles;
     expect(r.allow).toBe("/");
     expect(r.disallow).toContain("/api/");
+  });
+
+  it("reste fermé si le modèle faible de test a été oublié", () => {
+    vi.stubEnv("ANIMA_INDEXABLE", "oui");
+    vi.stubEnv("ANIMA_MODELE_FAIBLE_TEST", "oui");
+    expect(robots()).toEqual({ rules: [{ userAgent: "*", disallow: "/" }] });
   });
 
   it("la route est DYNAMIQUE — sinon la garde ne se referme pas sans redéploiement", () => {
@@ -103,5 +124,12 @@ describe("[porte §7] `X-Robots-Tag` — la couche qui interdit d'INDEXER", () =
     vi.stubEnv("ANIMA_INDEXABLE", "oui");
     const r = await proxy(requete("https://anima.test/"));
     expect(r.headers.get("X-Robots-Tag")).toBeNull();
+  });
+
+  it("conserve l'en-tête si le modèle faible de test a été oublié", async () => {
+    vi.stubEnv("ANIMA_INDEXABLE", "oui");
+    vi.stubEnv("ANIMA_MODELE_FAIBLE_TEST", "oui");
+    const r = await proxy(requete("https://anima.test/"));
+    expect(r.headers.get("X-Robots-Tag")).toBe("noindex, nofollow");
   });
 });

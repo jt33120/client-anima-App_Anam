@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse, after } from "next/server";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { creerAiPort } from "@/lib/ai/fabrique";
+import { autorisationModeleFaibleTest } from "@/lib/ai/modele-faible-test";
 import { diffuserSousEgressArt9, envoyerSousEgressArt9 } from "@/lib/ai/egress-guard";
 import { ENTETES_ART9 } from "@/lib/ai/entetes-art9";
 import { extraireMessages } from "@/lib/ai/valider-messages";
@@ -66,6 +67,7 @@ import { limiteAllocationResiduelle } from "@/lib/ai/allocation-config";
 import { deciderAdmissionQuota } from "@/lib/domain/admission-quota";
 import { avecDelai } from "@/lib/domain/delai";
 import { absorberDelta, etatTroncatureInitial } from "@/lib/domain/voix-anam";
+import { codeDErreur } from "@/lib/domain/code-erreur";
 import {
   absorberSousControle,
   terminerControle,
@@ -122,6 +124,25 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  let autorisationModeleFaible;
+  try {
+    autorisationModeleFaible = autorisationModeleFaibleTest(user.id);
+  } catch (e) {
+    console.error("anam/message : configuration du modèle faible invalide", {
+      code: codeDErreur(e),
+    });
+    return NextResponse.json(
+      { code: "configuration_ia_indisponible", message: "Service indisponible, réessaie." },
+      { status: 503, headers: ENTETES_ART9 },
+    );
+  }
+  if (autorisationModeleFaible === "refusee") {
+    return NextResponse.json(
+      { code: "service_indisponible", message: "Service indisponible, réessaie." },
+      { status: 503, headers: ENTETES_ART9 },
+    );
+  }
+
   const corps: unknown = await request.json().catch(() => null);
   const messages = extraireMessages(corps);
   if (!messages) {
@@ -172,7 +193,9 @@ export async function POST(request: NextRequest) {
   let adaptateur: AiPort;
   let securite: ResultatSecurite;
   try {
-    adaptateur = await creerAiPort(); // boot-guard (misconfig) → capté ici
+    adaptateur = await creerAiPort({
+      autoriserModeleFaibleTest: autorisationModeleFaible === "autorisee",
+    }); // boot-guard (misconfig) → capté ici
     securite = await evaluerSecuriteDuTour(
       {
         supabase,
@@ -581,7 +604,10 @@ export async function POST(request: NextRequest) {
   // (fort, AD-5) ; sinon échange. La VOIX qui exploite réellement l'arc relève de la Story 2.8.
   const capaciteGeneration: CapaciteIa = arc?.etat.phase === "nommer" ? "reconceptualisation" : CAPACITE;
   const tierServeur = tierPour(capaciteGeneration, niveauSecurite); // repli de métrage si le flux avorte avant `fin`
-  const modeleServeur = modelePour(tierServeur);
+  const modeleServeur = modelePour(
+    tierServeur,
+    autorisationModeleFaible === "autorisee",
+  );
 
   // Métrage de l'extraction d'arc — enregistré ICI (PAS dans le after() final) : les returns précoces
   // de la garde egress de génération (403/500) surviennent APRÈS ce point ; enregistré tôt, le coût FORT

@@ -75,9 +75,14 @@ export function estCleStripeDeTest(cle: string): boolean {
  */
 export function siteIndexable(env: {
   ANIMA_INDEXABLE?: string;
+  ANIMA_MODELE_FAIBLE_TEST?: string;
   // La signature d'index existe pour que `process.env` soit acceptable tel quel : sans elle,
   // TypeScript refuse (TS2559) un environnement qui ne déclare pas la clé nommée ci-dessus.
   [autreVariable: string]: string | undefined;
 }): boolean {
-  return env.ANIMA_INDEXABLE === "oui";
+  const drapeauModeleFaible = env.ANIMA_MODELE_FAIBLE_TEST;
+  return (
+    env.ANIMA_INDEXABLE === "oui" &&
+    (drapeauModeleFaible === undefined || drapeauModeleFaible === "")
+  );
 }

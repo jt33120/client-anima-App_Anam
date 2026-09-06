@@ -125,4 +125,12 @@ describe("Politique de tier — (capacité, niveau_sécurité) → tier (AD-5)",
     expect(modelePour("leger")).not.toMatch(/-latest/);
     expect(modelePour("fort")).not.toMatch(/-latest/);
   });
+
+  it("conserve les tiers logiques mais résout le modèle faible pour l'instance privée", () => {
+    expect(tierPour("detection", 0)).toBe("fort");
+    expect(modelePour("fort", true)).toBe("ministral-14b-2512");
+    expect(modelePour("leger", true)).toBe("ministral-14b-2512");
+    expect(modelePour("fort", false)).toBe("mistral-large-2512");
+    expect(modelePour("leger", false)).toBe("mistral-small-2603");
+  });
 });
