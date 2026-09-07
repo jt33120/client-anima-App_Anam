@@ -33,7 +33,8 @@ export function DialogueEvolution({ declencheur, onFermer, indexInitial = 0, id 
   );
 }
 
-export default function ComprendreEvolution({ variante = "information", onOuvrir }: {
+export default function ComprendreEvolution({ variante = "information", onOuvrir, compact = false }: {
+  readonly compact?: boolean;
   readonly variante?: "graine" | "information";
   /** A trigger inside the transformed garden delegates its dialog to the region root. */
   readonly onOuvrir?: (declencheur: HTMLButtonElement) => void;
@@ -45,10 +46,10 @@ export default function ComprendreEvolution({ variante = "information", onOuvrir
 
   return (
     <>
-      <button ref={declencheur} type="button" className={graine ? m.appel : s.actionSecondaire}
+      <button ref={declencheur} type="button" className={compact ? s.comprendreCompact : graine ? m.appel : s.actionSecondaire}
         aria-haspopup="dialog" aria-expanded={onOuvrir ? undefined : ouvert} aria-controls={ouvert ? id : undefined}
         onClick={(event) => onOuvrir ? onOuvrir(event.currentTarget) : setOuvert(true)}>
-        {graine ? "Voir la graine éclore" : ACTION_COMPRENDRE_EVOLUTION}
+        {compact ? "Comprendre" : graine ? "Voir la graine éclore" : ACTION_COMPRENDRE_EVOLUTION}
       </button>
       {ouvert && <DialogueEvolution id={id} declencheur={declencheur} onFermer={() => setOuvert(false)} indexInitial={graine ? 1 : 0} />}
     </>

@@ -118,3 +118,9 @@ le cadrage et les matières pastel de la planche 32 restent les repères communs
 utilisateur guide la lumière rose nacrée, sans reprendre son interface ni ses textes.
 Les trois étapes prolongent la même famille Lumière et la croissance personnelle existante,
 sans rééchelonner les états déjà atteints.
+
+## Mon évolution — 2026-09-07
+
+Use the current stage artwork as the stationary page background for the seed. Remove nested garden and text frames. Keep the region title and a small Comprendre control in one row, a short introduction, and a stage caption. Seed caption: « Une graine a été plantée, tu peux te féliciter ». Preserve branch access, list view, image retry and birth-time actions.
+
+Validation: 390/768/1440 px, Nuit and Papier, seed/mixed/dense/unavailable states. First pass found blank announcement spacing, a cropped seed on wide viewports, and controls competing with the caption; corrected with a full region composition, contained wide artwork, and separate control placement. Final captures show no horizontal overflow or browser errors; Comprendre restores focus. WebKit mobile also verifies the seed and dialog.

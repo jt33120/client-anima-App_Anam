@@ -14,7 +14,6 @@
  */
 
 import {
-  VIDE_CE_QU_EST_L_ARBRE,
   VIDE_OU_NAISSENT_LES_BRANCHES,
 } from "./copie-arbre";
 import BoutonTronc from "./BoutonTronc";
@@ -41,18 +40,9 @@ export default function EtatVideArbre({ direOuNaissentLesBranches, onOuvrirTronc
   return (
     <div className={s.vide}>
       <p className={s.videAnnotation}>Tout commence ici.</p>
-      {/* Le dessin ne vit plus ici : l'étape 0 garde le même Canvas lunaire que l'arbre vivant.
-          Ce composant ne porte que la copie et le chemin nommé vers la fiche du tronc. */}
-      {/* Le chemin vers la fiche du tronc reste avant le texte long : sur un téléphone, la personne
-          qui vient précisément compléter son heure n'a pas à faire défiler l'explication pour
-          retrouver l'unique action de cet état. */}
+      {/* Keep the birth-time action reachable above the static stage artwork. */}
       {onOuvrirTronc && <BoutonTronc onOuvrir={onOuvrirTronc} />}
 
-      {/* Dès qu'une branche existe, le dessin reprend la parole et ce texte disparaît avec l'état
-          vide : aucune persistance, aucun « ne plus afficher », rien à fermer. */}
-      <p className={s.videCorps}>{VIDE_CE_QU_EST_L_ARBRE}</p>
-      {/* Un `<p>` nu, dans le flux, sans bouton ni lien ni fermeture : la phrase n'est pas une bannière,
-          elle fait partie de l'écran. Rien à cliquer, donc rien à refuser. */}
       {direOuNaissentLesBranches && <p className={s.videCorps}>{VIDE_OU_NAISSENT_LES_BRANCHES}</p>}
     </div>
   );

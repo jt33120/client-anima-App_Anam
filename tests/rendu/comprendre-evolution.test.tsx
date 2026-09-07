@@ -70,17 +70,17 @@ describe("[RC-I2] comprendre Mon évolution", () => {
     expect(document.activeElement).toBe(ouverture);
   });
 
-  it("propose l’éclosion depuis la graine, ouvre la deuxième image et revient au bon déclencheur", async () => {
+  it("propose Comprendre depuis la graine, ouvre la première image et revient au bon déclencheur", async () => {
     dimensionnerTout(390, 620);
     const requetes = vi.fn();
     vi.stubGlobal("fetch", requetes);
     const user = userEvent.setup();
     render(<ArbreInteractif {...proprietes} projection={{ tronc: { present: true }, branches: [] }} />);
-    const ouverture = screen.getByRole("button", { name: "Voir la graine éclore" });
+    const ouverture = screen.getByRole("button", { name: "Comprendre" });
     await user.click(ouverture);
     const dialogue = screen.getByRole("dialog");
-    expect(within(dialogue).getByAltText(PLANCHES_METAMORPHOSE[1].alt)).toBeTruthy();
-    expect(within(dialogue).getByRole<HTMLSelectElement>("combobox", { name: "Choisir une étape" }).value).toBe("1");
+    expect(within(dialogue).getByAltText(PLANCHES_METAMORPHOSE[0].alt)).toBeTruthy();
+    expect(within(dialogue).getByRole<HTMLSelectElement>("combobox", { name: "Choisir une étape" }).value).toBe("0");
     await user.click(within(dialogue).getByRole("button", { name: FERMER_COMPRENDRE_EVOLUTION }));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.activeElement).toBe(ouverture);
@@ -95,9 +95,9 @@ describe("[RC-I2] comprendre Mon évolution", () => {
     const user = userEvent.setup();
     render(<ArbreInteractif {...proprietes} />);
 
-    expect(screen.getByRole("button", { name: ACTION_COMPRENDRE_EVOLUTION })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Comprendre" })).toBeTruthy();
     await user.click(screen.getByRole("button", { name: /vue liste/i }));
-    expect(screen.getByRole("button", { name: ACTION_COMPRENDRE_EVOLUTION })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Comprendre" })).toBeTruthy();
   });
 
   it("explorer les images ne change ni les branches personnelles ni leur lien vers la conversation", async () => {
@@ -107,7 +107,7 @@ describe("[RC-I2] comprendre Mon évolution", () => {
     const avant = JSON.stringify(projection);
     const user = userEvent.setup();
     render(<ArbreInteractif {...proprietes} />);
-    await user.click(screen.getByRole("button", { name: ACTION_COMPRENDRE_EVOLUTION }));
+    await user.click(screen.getByRole("button", { name: "Comprendre" }));
     const dialogue = screen.getByRole("dialog");
     await user.selectOptions(within(dialogue).getByRole("combobox", { name: "Choisir une étape" }), "31");
     await user.keyboard("{Escape}");

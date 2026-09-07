@@ -838,15 +838,14 @@ export default function SceneDom({
               </>
             ) : r.id === "arbre" ? (
               <>
-                <h1
-                  className={`t-titre-sm ${s.titreConversation}`}
-                  tabIndex={-1}
-                  ref={(el) => void (entetes.current[r.id] = el)}
-                >
-                  {r.nom}
-                </h1>
-                {/* L'arbre RÉEL : projection muette + fiche + vue liste + pan/zoom (AD-7). */}
                 <ArbreInteractif
+                  titre={<h1
+                    className={`t-titre-sm ${s.titreConversation}`}
+                    tabIndex={-1}
+                    ref={(el) => void (entetes.current[r.id] = el)}
+                  >
+                    {r.nom}
+                  </h1>}
                   projection={projLocale}
                   camera={etat.camera}
                   brancheSelectionnee={etat.brancheSelectionnee}

@@ -34,3 +34,8 @@
   outline-offset: var(--metamorphose-focus-decalage);
 }
 .prechargement { display: none; }
+
+:global([data-evolution-graine]) .image { object-fit: cover; }
+@media (min-width: 48rem) {
+  :global([data-evolution-graine]) .image { object-fit: contain; }
+}

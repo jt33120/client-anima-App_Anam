@@ -729,3 +729,91 @@
 }
 
 .groupePanneau[aria-hidden="true"] { visibility: hidden; }
+
+/* The stage is the page background; reading and actions share one compact foreground. */
+.arbre[data-evolution-fond] {
+  position: relative;
+  isolation: isolate;
+  min-height: var(--carnet-evolution-hauteur);
+}
+.arbre[data-evolution-fond] .canevas {
+  position: absolute;
+  inset: 0;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+}
+.arbre[data-evolution-fond] .canevas::before { background: none; }
+.arbre .barre {
+  position: relative;
+  z-index: 2;
+  padding: var(--esp-3) var(--esp-4);
+  border: none;
+  border-radius: 0;
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+.barre h1 {
+  margin: 0;
+  text-align: left;
+  font-size: var(--carnet-evolution-titre);
+  color: var(--texte);
+  flex: 1;
+}
+.comprendreCompact {
+  flex: none;
+  min-height: var(--cible-tactile);
+  padding: var(--esp-1) var(--esp-2);
+  border: none;
+  border-radius: var(--rayon-full);
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: var(--carnet-texte);
+  cursor: pointer;
+}
+.comprendreCompact:hover { background: var(--carnet-lavande); }
+.comprendreCompact:focus-visible {
+  outline: var(--metamorphose-focus-largeur) solid var(--accent);
+  outline-offset: var(--metamorphose-focus-decalage);
+}
+.arbre .videSuperposition {
+  top: calc(var(--cible-tactile) + var(--esp-6));
+  left: 0;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  transform: none;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+}
+.arbre .videSuperposition .vide {
+  padding: var(--esp-2) var(--esp-4);
+  border: none;
+  border-radius: 0;
+  background: var(--surface);
+}
+.legendeEtape {
+  position: absolute;
+  inset-inline: var(--esp-4);
+  bottom: var(--esp-4);
+  margin: 0;
+  padding: var(--esp-3) var(--esp-4);
+  background: var(--surface);
+  color: var(--texte);
+  text-align: center;
+  font-family: var(--pile-anam);
+  font-size: var(--carnet-texte);
+  pointer-events: none;
+}
+.arbre[data-evolution-graine] .canevas { touch-action: pan-y; }
+.arbre[data-evolution-graine] .monde { transition: none; }
+.arbre .annonce:empty { position: absolute; min-height: 0; }
+.arbre .annonce:not(:empty) { position: relative; z-index: 3; background: var(--surface); }
+.barre h1 { white-space: nowrap; }
+.arbre .barre > .actionSecondaire { flex: none; }
+.arbre .zoomBoutons {
+  bottom: auto;
+  top: calc(var(--cible-tactile) * 2 + var(--esp-6));
+}

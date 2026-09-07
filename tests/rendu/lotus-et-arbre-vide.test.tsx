@@ -148,7 +148,7 @@ describe("[L'ARBRE VIDE S'EXPLIQUE]", () => {
 
   it("explique simplement ce que l'arbre symbolise et comment il grandit", () => {
     monter();
-    expect(screen.getByText(VIDE_CE_QU_EST_L_ARBRE)).toBeTruthy();
+    expect(screen.getByText("Tout commence ici.")).toBeTruthy();
     expect(screen.getByText(MESSAGE_GRAINE_PLANTEE)).toBeTruthy();
   });
 

@@ -1396,3 +1396,17 @@
 
 /* A sheet opened inside a region must also cover the persistent navigation. */
 .regionActive:has([role="dialog"][aria-modal="true"]) { z-index: 60; }
+
+/* Evolution artwork fills the available region below the global header. */
+.regionArbre {
+  padding-inline: 0;
+  padding-top: var(--carnet-entete-hauteur);
+  padding-bottom: var(--carnet-nav-hauteur);
+}
+@media (min-width: 960px) {
+  .regionArbre {
+    padding-left: var(--carnet-rail);
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+}

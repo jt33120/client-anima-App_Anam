@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { dimensionnerTout } from "./_outils";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
-import { VIDE_CE_QU_EST_L_ARBRE, VIDE_OU_NAISSENT_LES_BRANCHES, BASCULE_LISTE } from "@/render/arbre/copie-arbre";
+import { VIDE_OU_NAISSENT_LES_BRANCHES, BASCULE_LISTE } from "@/render/arbre/copie-arbre";
 import type { ProjectionScene } from "@/lib/scene/projection";
 
 /**
@@ -61,10 +61,10 @@ describe("[AC2 DUR] le vide d'un compte gratuit EST le vide d'un compte premium"
     // identiques et feraient passer tout ce fichier au vert. On prouve d'abord qu'on compare
     // quelque chose : l'explication de l'état vide est là, des deux côtés.
     const gratuite = monter(VIDE);
-    expect(gratuite.container.innerHTML).toContain(VIDE_CE_QU_EST_L_ARBRE);
+    expect(gratuite.container.innerHTML).toContain("Tout commence ici.");
     gratuite.unmount();
     const premium = monter(VIDE_PREMIUM);
-    expect(premium.container.innerHTML).toContain(VIDE_CE_QU_EST_L_ARBRE);
+    expect(premium.container.innerHTML).toContain("Tout commence ici.");
   });
 
   it("[LE CŒUR] le DOM est IDENTIQUE, à la phrase sobre d'AC6 près — et rien d'autre", async () => {
@@ -118,7 +118,7 @@ describe("[AC2 DUR] le vide d'un compte gratuit EST le vide d'un compte premium"
     monter(VIDE);
     expect(screen.queryByRole("button", { name: BASCULE_LISTE })).toBeNull();
     // Témoin : l'écran vide est bien monté — sans quoi l'absence ci-dessus ne prouverait rien.
-    expect(screen.getByText(VIDE_CE_QU_EST_L_ARBRE)).toBeTruthy();
+    expect(screen.getByText("Tout commence ici.")).toBeTruthy();
   });
 });
 

@@ -54,7 +54,7 @@ export const ARIA_ZONE_ARBRE = "Zone de l’arbre : utilise les flèches pour te
 export const VIDE_CE_QU_EST_L_ARBRE =
   "Cet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.";
 
-export const MESSAGE_GRAINE_PLANTEE = "Une graine est plantée. Tu peux t’en remercier.";
+export const MESSAGE_GRAINE_PLANTEE = "Une graine a été plantée, tu peux te féliciter";
 
 /**
  * Story 3.3 (AC6) — LA PHRASE SOBRE, et la seule surface commerciale de toute la région arbre.

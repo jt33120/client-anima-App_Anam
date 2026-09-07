@@ -72,7 +72,7 @@ describe("[HAUTE / re-revue] le canevas de l'arbre est MESURÉ dès qu'il est à
     const graine = document.querySelector("[data-index-croissance]")!;
     const mondeInitial = monde();
     expect(graine.getAttribute("data-etape-arbre")).toBe("graine");
-    expect(monde().style.width).toBe(`${LARGEUR_ATTENDUE}px`);
+    expect(monde().style.width).toBe("100%");
 
     // L’image change, mais le monde et les coordonnées des cibles restent mesurés.
     rerender(<ArbreInteractif {...proprietes(scene([branche("a")]))} />);

@@ -51,7 +51,8 @@ import {
 import FicheBranche, { type ResultatGeste } from "./FicheBranche";
 import FicheTronc from "./FicheTronc";
 import VueListe from "./VueListe";
-import ComprendreEvolution, { DialogueEvolution } from "./ComprendreEvolution";
+import ComprendreEvolution from "./ComprendreEvolution";
+import { PLANCHES_METAMORPHOSE } from "./metamorphose-planches";
 import s from "./arbre.module.css";
 
 /** Préférence d'AFFICHAGE seulement (aucune donnée art. 9) → localStorage acceptable. */
@@ -61,6 +62,7 @@ const GLISSER_MIN_PX = 8;
 const PAS_CLAVIER_PX = 40;
 
 export interface ProprietesArbreInteractif {
+  titre?: import("react").ReactNode;
   projection: ProjectionScene;
   camera: Camera;
   brancheSelectionnee: string | null;
@@ -103,8 +105,6 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   /** Texte de la région live persistante (voir le rendu). Aucune donnée art. 9 : des libellés statiques. */
   const [annonce, setAnnonce] = useState("");
-  const [explorationGraine, setExplorationGraine] = useState(false);
-  const declencheurExploration = useRef<HTMLButtonElement>(null);
 
   // ── AC8 : bascule vue liste / vue arbre, persistée (préférence d'affichage, sans art. 9) ──
   const [vueListe, setVueListe] = useState(false);
@@ -191,7 +191,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   // chaque rendu) — un accident qu'une mémoïsation des props aurait supprimé sans prévenir.
   useEffect(() => {
     const el = canevasRef.current;
-    if (!el) return;
+    if (!el || etapeGraine) return;
     const onWheel = (e: WheelEvent) => {
       if (e.target instanceof Element && e.target.closest("[data-couche-vide], [data-commandes-arbre]")) return;
       e.preventDefault();
@@ -199,7 +199,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [zoomer, canevasVisible]);
+  }, [zoomer, canevasVisible, etapeGraine]);
 
   // ── Pan / pincement, avec SEUIL de glisser ──
   const pointeurs = useRef<Map<number, { x: number; y: number }>>(new Map());
@@ -387,7 +387,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   }, [troncIncomplet]);
 
   return (
-    <div className={s.arbre}>
+    <div className={s.arbre} data-evolution-fond={canevasVisible ? "" : undefined} data-evolution-graine={vide ? "" : undefined}>
       {/* Région d'annonce a11y PERSISTANTE (même patron que la conversation). Elle vit ICI, et pas dans le
           champ de renommage, parce que ce champ est DÉMONTÉ au moment même où il aurait quelque chose à
           annoncer : le succès du renommage restait donc entièrement muet (re-revue). */}
@@ -396,7 +396,8 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
       </p>
 
       <div className={s.barre}>
-        <ComprendreEvolution />
+        {p.titre}
+        <ComprendreEvolution compact />
         {/* ⚠️ PAS DE BASCULE SUR UN ARBRE VIDE (retour du 2026-08-20 : « à quoi correspond vue liste
             pour l'arbre ? »). La question n'avait pas de réponse : les deux vues d'un arbre sans
             branche rendent LITTÉRALEMENT le même composant (`EtatVideArbre`, story 3.3), donc le
@@ -415,11 +416,6 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
         )}
 
       </div>
-
-      {explorationGraine && (
-        <DialogueEvolution indexInitial={1} declencheur={declencheurExploration}
-          onFermer={() => setExplorationGraine(false)} />
-      )}
 
       {indisponible ? (
         <div className={s.vide}>
@@ -443,16 +439,16 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
           className={s.canevas}
           tabIndex={0}
           role="group"
-          aria-label={ARIA_ZONE_ARBRE}
+          aria-label={etapeGraine ? "Ton évolution" : ARIA_ZONE_ARBRE}
           /* ⚠️ LE GLISSEMENT ENTRE RÉGIONS S'ARRÊTE ICI, ET C'EST OBLIGATOIRE. Un doigt qui part
              horizontalement sur ce canevas DÉPLACE L'ARBRE — c'est le geste propre de la région,
              écrit bien avant celui de la scène. Sans cette marque, les deux gestes liraient le même
              mouvement et le monde changerait de région pendant qu'on cadre une branche. La scène
              lit cet attribut sur toute la chaîne d'ancêtres du point de contact. */
           data-sans-glissement
-          onKeyDown={onKeyDownZone}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
+          onKeyDown={etapeGraine ? undefined : onKeyDownZone}
+          onPointerDown={etapeGraine ? undefined : onPointerDown}
+          onPointerMove={etapeGraine ? undefined : onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
@@ -468,7 +464,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
         )}
           <div
             className={`${s.monde} ${selectionnee ? s.mondeEstompe : ""}`}
-            style={{
+            style={etapeGraine ? { inset: 0, width: "100%", height: "100%" } : {
               left: boite.gauche,
               top: boite.haut,
               width: boite.largeur,
@@ -481,19 +477,6 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
               troncEnReserve={Boolean(troncIncomplet)}
               ariaLabel={ARIA_CANEVAS}
             />
-
-            {/* La première planche contient déjà la graine : aucune seconde image superposée. */}
-            {etapeGraine && (
-              <>
-                <div className={s.graineDecouverte} data-commandes-arbre
-                  style={{ transform: `translateX(-50%) scale(${1 / p.camera.zoom})` }}>
-                  <ComprendreEvolution variante="graine" onOuvrir={(declencheur) => {
-                    declencheurExploration.current = declencheur;
-                    setExplorationGraine(true);
-                  }} />
-                </div>
-              </>
-            )}
 
             {/* Story 5.3 — la cible du TRONC, dans la même couche et le même repère que les accroches.
                 Elle n'existe que s'il manque quelque chose : un tronc complet n'a AUCUNE affordance,
@@ -581,13 +564,15 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             </div>
           )}
 
+          <p className={s.legendeEtape}>{vide ? MESSAGE_GRAINE_PLANTEE : PLANCHES_METAMORPHOSE[indexCroissance].texte}</p>
+
           {vide && (
             <div className={s.videSuperposition} data-couche-vide="">
               <EtatVideArbre
                 direOuNaissentLesBranches={direOuNaissentLesBranches}
                 onOuvrirTronc={troncIncomplet ? () => setFicheTronc(true) : undefined}
               />
-              <p className={`${s.graineMessage} t-meta`}>{MESSAGE_GRAINE_PLANTEE}</p>
+
             </div>
           )}
 

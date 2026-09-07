@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
-import { VIDE_CE_QU_EST_L_ARBRE } from "@/render/arbre/copie-arbre";
 import { PLANCHES_METAMORPHOSE } from "@/render/arbre/metamorphose-planches";
 import type { BrancheProjetee, ProjectionScene } from "@/lib/scene";
 import { dimensionnerTout } from "./_outils";
@@ -42,7 +41,7 @@ describe("Mon arbre — illustration personnelle et accès réels", () => {
     expect(dessin?.getAttribute("data-etape-arbre")).toBe("graine");
     expect(decodeURIComponent(dessin?.querySelector("img")?.getAttribute("src") ?? "")).toContain(PLANCHES_METAMORPHOSE[0].src);
     expect(container.querySelector("canvas, svg, [data-graine-attente]")).toBeNull();
-    expect(screen.getByText(VIDE_CE_QU_EST_L_ARBRE)).toBeTruthy();
+    expect(screen.getByText("Tout commence ici.")).toBeTruthy();
   });
 
   it("conserve les 20 branches via les cibles individuelles, leurs groupes et la liste", () => {

@@ -29,7 +29,7 @@ describe("la graine personnelle intégrée au monde de l’arbre", () => {
     expect(decodeURIComponent(cadre?.querySelector("img")?.getAttribute("src") ?? "")).toContain(PLANCHES_METAMORPHOSE[0].src);
     expect(container.querySelector("canvas, [data-graine-attente]")).toBeNull();
     expect(contexte).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Voir la graine éclore" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Comprendre" })).toBeTruthy();
   });
 
   it("la première branche remplace la graine par son éclosion dans le même monde mesuré", () => {
