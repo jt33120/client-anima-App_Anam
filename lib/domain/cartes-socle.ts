@@ -6,8 +6,14 @@ import { texteConfiguration, texteLuneRelative } from "@/lib/corpus/horoscope";
 import { NON_ECRIT, type TexteCorpus } from "@/lib/corpus/port";
 import type { TypeEnneagramme } from "./enneagramme";
 import { MESSAGE_TYPE_ABSENT } from "./enneagramme-items";
-import type { CarteBibliotheque } from "./bibliotheque";
-import { MENTION_ECRITURE_MODELE } from "./copie-modele";
+import type { CarteBibliotheque, PartieEcriture } from "./bibliotheque";
+import {
+  INTITULE_PARTIE_CIEL,
+  INTITULE_PARTIE_GESTES,
+  INTITULE_PARTIE_POUR_TOI,
+  MENTION_ECRITURE_MODELE,
+} from "./copie-modele";
+import type { EcritureTroisParties } from "./verdict-horoscope";
 
 /**
  * cartes-socle.ts — LES CINQ CARTES, CONSTRUITES DEPUIS CE QUE LE SOCLE A CALCULÉ (Story 5.6, T5).
@@ -137,6 +143,21 @@ export function carteMantra(texte: TexteCorpus): CarteBibliotheque {
 }
 
 /**
+ * Les trois parties, dans l'ordre de lecture, avec leurs intitulés.
+ *
+ * ⚠️ L'ORDRE EST FIXE ET IL EST ÉCRIT ICI, PAS DANS LES RENDUS. C'est le seul endroit du produit qui
+ * décide qu'on lit le ciel, puis soi, puis les gestes — deux rendus montrent cette écriture, et un
+ * ordre décidé dans chaque JSX aurait divergé sans que rien ne rougisse.
+ */
+function partiesEnCarte(ecriture: EcritureTroisParties): readonly PartieEcriture[] {
+  return Object.freeze([
+    { intitule: INTITULE_PARTIE_CIEL, texte: ecriture.ciel },
+    { intitule: INTITULE_PARTIE_POUR_TOI, texte: ecriture.pourToi },
+    { intitule: INTITULE_PARTIE_GESTES, texte: ecriture.gestes },
+  ]);
+}
+
+/**
  * L'horoscope du jour.
  *
  * ⚠️ MÊME QUAND IL EST CALCULÉ, IL N'A PAS DE FAIT À MONTRER. Ce que la 5.4 produit, ce sont des
@@ -151,14 +172,15 @@ export function carteMantra(texte: TexteCorpus): CarteBibliotheque {
 export function carteHoroscope(
   horoscope: HoroscopeDuJour | null,
   /**
-   * Le texte écrit par le modèle pour CE ciel, ou `null` (retour du 2026-09-02). Il ne remplace pas
-   * `texte` : il vit dans son propre registre, avec sa mention, et `texte` reste le repli relu.
+   * Les TROIS parties écrites par le modèle pour CE ciel, ou `null` (2026-09-02, mises en parties le
+   * 2026-09-07). Elles ne remplacent pas `texte` : elles vivent dans leur propre registre, avec leur
+   * mention, et `texte` reste le repli relu.
    *
-   * ⚠️ SANS HOROSCOPE CALCULÉ, IL EST IGNORÉ. Un texte de modèle au-dessus d'un « je n'ai pas ta
-   * date » décrirait un ciel qu'on n'a pas su calculer ; l'appelant ne devrait pas en produire un,
+   * ⚠️ SANS HOROSCOPE CALCULÉ, ELLES SONT IGNORÉES. Un texte de modèle au-dessus d'un « je n'ai pas
+   * ta date » décrirait un ciel qu'on n'a pas su calculer ; l'appelant ne devrait pas en produire,
    * et si cela arrive, cette carte n'est pas l'endroit où l'incohérence doit passer.
    */
-  texteDuModele: string | null = null,
+  ecritureDuModele: EcritureTroisParties | null = null,
 ): CarteBibliotheque {
   return {
     cle: "horoscope",
@@ -172,9 +194,9 @@ export function carteHoroscope(
     // ne fabrique pas un repli, on transmet l'absence telle quelle.
     texte: horoscope === null ? NON_ECRIT : texteDuCiel(horoscope),
     ecritureModele:
-      horoscope === null || texteDuModele === null
+      horoscope === null || ecritureDuModele === null
         ? null
-        : { texte: texteDuModele, mention: MENTION_ECRITURE_MODELE },
+        : { parties: partiesEnCarte(ecritureDuModele), mention: MENTION_ECRITURE_MODELE },
   };
 }
 

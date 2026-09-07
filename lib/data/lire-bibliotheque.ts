@@ -138,9 +138,17 @@ export async function lireBibliotheque(
     // donnerait deux textes sous le même titre, le même jour — et rien ne rougirait, puisque les
     // deux sont plausibles. `texteDuJourGenere` mémoïse par signature de ciel : le second appel de
     // la même journée ne repart pas au modèle, il relit.
+    // ⚠️ L'ACCUEIL ATTEND MOINS QUE LA HALTE, ET IL NE POSE JAMAIS DE PIERRE TOMBALE (2026-09-07).
+    // C'est la page la plus vue du produit, et son commentaire dit qu'« une panne de socle ne doit
+    // fermer ni la conversation ni l'arbre ». Elle tente sa chance sur un cache froid — ce qui remplit
+    // le cache pour la vue suivante — mais elle rend la main vite, et le corpus prend le relais.
     const ecritureDuJour =
-      socle.horoscope.statut === "calcule"
-        ? await texteDuJourGenere(supabase, utilisatriceId, socle.horoscope.horoscope)
+      socle.horoscope.statut === "calcule" && socle.theme.statut === "calcule"
+        ? await texteDuJourGenere(supabase, utilisatriceId, {
+            horoscope: socle.horoscope.horoscope,
+            theme: socle.theme.theme,
+            attente: "accueil",
+          })
         : null;
     cartes.push(
       carteHoroscope(

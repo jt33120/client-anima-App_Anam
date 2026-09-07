@@ -580,7 +580,6 @@ export default function Conversation({
   // via onBeat) ; « cloture » = seam 2.9. Passif : l'apparition ne vole jamais le focus au composeur.
   const [beat, setBeat] = useState<Beat>("ouverture");
 
-  const shell = useRef<HTMLDivElement>(null);
   const champInterne = useRef<HTMLTextAreaElement>(null);
   const champRef = champRefExterne ?? champInterne;
   // Historique envoyé PAR tour d'Anam (id → {messages, jeton}) : « Réessayer » rejoue le BON tour, pas
@@ -614,26 +613,6 @@ export default function Conversation({
     onPreparation,
     prepare,
   ]);
-
-  // Clavier virtuel mobile (AC8) : `dvh` seul ne suffit pas (Chromium ne rétrécit pas les unités
-  // viewport à l'ouverture du clavier). On lit `visualViewport` (resize + scroll) et on expose le
-  // décalage en var CSS → le composeur remonte au-dessus du clavier. Repli : rien si absent (dvh).
-  useEffect(() => {
-    const vv = window.visualViewport;
-    const el = shell.current;
-    if (!vv || !el) return;
-    const maj = () => {
-      const decalage = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      el.style.setProperty("--decalage-clavier", `${decalage}px`);
-    };
-    maj();
-    vv.addEventListener("resize", maj);
-    vv.addEventListener("scroll", maj);
-    return () => {
-      vv.removeEventListener("resize", maj);
-      vv.removeEventListener("scroll", maj);
-    };
-  }, []);
 
   const lancer = useCallback(
     (messages: MessageEnvoi[], jeton: string) => {
@@ -882,7 +861,7 @@ export default function Conversation({
   );
 
   return (
-    <div className={s.conversation} ref={shell}>
+    <div className={s.conversation}>
       {/* À l'ouverture, le portrait accompagne désormais la bulle d'accueil dans le fil. Les
           apparitions plein format restent réservées aux autres temps forts. */}
       <ApparitionAnam beat={beat === "ouverture" ? null : beat} />

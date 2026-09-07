@@ -32,9 +32,9 @@ import {
   type Camera,
   type ProjectionScene,
 } from "@/lib/scene";
-import { construireGeometrieLunaire, CANEVAS } from "./geometrie";
-import ArbreLunaire from "./ArbreLunaire";
-import GraineAttente from "./GraineAttente";
+import { CADRE_ARBRE_PERSONNEL, ancreTroncPersonnel, placerAccrochesPersonnelles, regrouperAccrochesPersonnelles } from "./ancres-arbre-personnel";
+import { indexCroissancePersonnelle } from "./croissance-personnelle";
+import ArbrePersonnel from "./ArbrePersonnel";
 import EtatVideArbre from "./EtatVideArbre";
 import {
   ARIA_CANEVAS,
@@ -51,7 +51,7 @@ import {
 import FicheBranche, { type ResultatGeste } from "./FicheBranche";
 import FicheTronc from "./FicheTronc";
 import VueListe from "./VueListe";
-import ComprendreEvolution from "./ComprendreEvolution";
+import ComprendreEvolution, { DialogueEvolution } from "./ComprendreEvolution";
 import s from "./arbre.module.css";
 
 /** Préférence d'AFFICHAGE seulement (aucune donnée art. 9) → localStorage acceptable. */
@@ -59,8 +59,6 @@ const CLE_VUE = "anima:arbre:vueListe";
 /** Au-delà de ce déplacement, le geste est un GLISSER : le relâchement n'ouvre plus la fiche. */
 const GLISSER_MIN_PX = 8;
 const PAS_CLAVIER_PX = 40;
-/** Cible DOM du tronc lunaire, posée sur sa matière au-dessus du sol. */
-const CENTRE_TRONC = { x: 704, y: 1240 } as const;
 
 export interface ProprietesArbreInteractif {
   projection: ProjectionScene;
@@ -105,6 +103,8 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   /** Texte de la région live persistante (voir le rendu). Aucune donnée art. 9 : des libellés statiques. */
   const [annonce, setAnnonce] = useState("");
+  const [explorationGraine, setExplorationGraine] = useState(false);
+  const declencheurExploration = useRef<HTMLButtonElement>(null);
 
   // ── AC8 : bascule vue liste / vue arbre, persistée (préférence d'affichage, sans art. 9) ──
   const [vueListe, setVueListe] = useState(false);
@@ -127,12 +127,10 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     });
   };
 
-  const geometrie = useMemo(() => construireGeometrieLunaire(affichees), [affichees]);
-  const placees = geometrie.branches;
-  /** L'étape 0 vue par le DESSIN : le même prédicat que `data-etape-arbre="graine"` (ArbreLunaire.tsx) et
-   *  que `contenuEtapeLunaire` dans le moteur. Une seule source de vérité, pour que la graine SVG et la
-   *  graine peinte ne puissent jamais coexister (voir le rendu, sous le canevas). */
-  const etapeGraine = geometrie.branches.length === 0;
+  const indexCroissance = useMemo(() => indexCroissancePersonnelle(affichees), [affichees]);
+  const placees = useMemo(() => placerAccrochesPersonnelles(affichees, indexCroissance), [affichees, indexCroissance]);
+  const centreTronc = useMemo(() => ancreTroncPersonnel(indexCroissance), [indexCroissance]);
+  const etapeGraine = indexCroissance === 0;
   const selectionnee = affichees.find((b) => b.id === p.brancheSelectionnee) ?? null;
 
   // Ce qui décide de la PRÉSENCE du canevas dans le DOM. Déclaré ICI, avant l'effet de mesure, parce que
@@ -140,8 +138,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   // un ReferenceError (zone morte temporelle).
   const indisponible = p.projection.indisponible === true;
   const vide = !indisponible && affichees.length === 0;
-  // L'étape 0 ne remplace plus le monde par un dessin alternatif : le même Canvas lunaire reste
-  // présent et laisse voir le ciel. Une ancienne préférence « liste » ne peut pas cacher ce premier état.
+  // Une préférence « liste » ne cache jamais la graine du premier état personnel.
   const canevasVisible = !indisponible && (!vueListe || vide);
   /**
    * Story 3.3 (AC6) — la DÉCISION vient du modèle (`lib/scene`), jamais d'un test local sur l'entitlement.
@@ -155,7 +152,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
    */
   const direOuNaissentLesBranches = doitDireOuNaissentLesBranches({ ...p.projection, branches: affichees });
 
-  // ── Le PORTRAIT effectif du handoff : Canvas et accroches partagent EXACTEMENT ce repère ──
+  // L’image et les accroches partagent le même portrait, mesuré avant le pan et le zoom.
   const canevasRef = useRef<HTMLDivElement>(null);
   const [boite, setBoite] = useState({ gauche: 0, haut: 0, largeur: 0, hauteur: 0 });
   useLayoutEffect(() => {
@@ -163,9 +160,9 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     if (!el) return;
     const mesurer = () => {
       const { width, height } = el.getBoundingClientRect();
-      const echelle = Math.min(width / CANEVAS.largeur, height / CANEVAS.hauteur);
-      const largeur = Number.isFinite(echelle) ? CANEVAS.largeur * echelle : 0;
-      const hauteur = Number.isFinite(echelle) ? CANEVAS.hauteur * echelle : 0;
+      const echelle = Math.min(width / CADRE_ARBRE_PERSONNEL.largeur, height / CADRE_ARBRE_PERSONNEL.hauteur);
+      const largeur = Number.isFinite(echelle) ? CADRE_ARBRE_PERSONNEL.largeur * echelle : 0;
+      const hauteur = Number.isFinite(echelle) ? CADRE_ARBRE_PERSONNEL.hauteur * echelle : 0;
       setBoite({ gauche: (width - largeur) / 2, haut: (height - hauteur) / 2, largeur, hauteur });
     };
     mesurer();
@@ -196,7 +193,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     const el = canevasRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
-      if (e.target instanceof Element && e.target.closest("[data-couche-vide]")) return;
+      if (e.target instanceof Element && e.target.closest("[data-couche-vide], [data-commandes-arbre]")) return;
       e.preventDefault();
       zoomer(e.deltaY < 0 ? 1.12 : 1 / 1.12);
     };
@@ -206,6 +203,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   // ── Pan / pincement, avec SEUIL de glisser ──
   const pointeurs = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const captures = useRef<Map<number, Element>>(new Map());
   const depart = useRef<{ x: number; y: number; pan: { x: number; y: number } } | null>(null);
   const pincement = useRef<{ dist: number; zoom: number } | null>(null);
   const aGlisse = useRef(false);
@@ -218,7 +216,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
    */
   const horsCanevas = (cible: EventTarget | null) => {
     if (!(cible instanceof Element)) return false;
-    if (cible.closest("[data-couche-fiche], [data-couche-vide]")) return true;
+    if (cible.closest("[data-couche-fiche], [data-couche-vide], [data-commandes-arbre]")) return true;
     const el = cible as HTMLElement;
     return el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable === true;
   };
@@ -228,7 +226,11 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     // Capture du pointeur : sans elle, un bouton relâché HORS du canevas n'émet jamais `pointerup`,
     // `depart` restait armé et l'arbre suivait le curseur sans bouton pressé (re-revue).
     try {
-      e.currentTarget.setPointerCapture(e.pointerId);
+      // Keep the eventual click on its branch button. Capturing on the canvas retargets
+      // real pointer clicks to the ancestor, so the branch would only open by keyboard.
+      const cible = e.target instanceof Element ? e.target.closest("button") ?? e.currentTarget : e.currentTarget;
+      cible.setPointerCapture(e.pointerId);
+      captures.current.set(e.pointerId, cible);
     } catch {
       /* certains navigateurs refusent la capture sur un pointeur déjà relâché : le pan reste utilisable */
     }
@@ -267,10 +269,11 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   const onPointerUp = (e: React.PointerEvent) => {
     try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
+      captures.current.get(e.pointerId)?.releasePointerCapture(e.pointerId);
     } catch {
       /* déjà relâchée */
     }
+    captures.current.delete(e.pointerId);
     pointeurs.current.delete(e.pointerId);
     if (pointeurs.current.size < 2) pincement.current = null;
     if (pointeurs.current.size === 0) depart.current = null;
@@ -283,13 +286,14 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
    */
   const tailleAccrochePx = () => 44;
 
+
   /** Ramène l'accroche au centre du portrait (origine de transform = centre du monde). */
   const cadrerBranche = (accroche: { x: number; y: number }) => {
     const { largeur, hauteur } = boite;
     if (!largeur || !hauteur) return;
     const zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, 1.8));
-    const px = (accroche.x / CANEVAS.largeur) * largeur;
-    const py = (accroche.y / CANEVAS.hauteur) * hauteur;
+    const px = (accroche.x / CADRE_ARBRE_PERSONNEL.largeur) * largeur;
+    const py = (accroche.y / CADRE_ARBRE_PERSONNEL.hauteur) * hauteur;
     p.onCadrer({ zoom, pan: { x: -zoom * (px - largeur / 2), y: -zoom * (py - hauteur / 2) } });
   };
 
@@ -337,7 +341,32 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
    * depuis la conversation, et ça ne survit pas à un changement de région. Même rang que `vueListe`.
    */
   const troncIncomplet = p.projection.tronc.incomplet;
+  const groupesAccroches = useMemo(() => regrouperAccrochesPersonnelles(placees,
+    boite.largeur / CADRE_ARBRE_PERSONNEL.largeur * p.camera.zoom,
+    troncIncomplet && !vide ? centreTronc : undefined),
+  [placees, boite.largeur, p.camera.zoom, troncIncomplet, vide, centreTronc]);
+  const groupesProches = groupesAccroches.filter((groupe) => groupe.ids.length + Number(groupe.tronc) > 1);
+  const idsGroupes = new Set(groupesProches.flatMap((groupe) => groupe.ids));
+  const troncGroupe = groupesProches.some((groupe) => groupe.tronc);
+
   const [ficheTronc, setFicheTronc] = useState(false);
+  const [groupeOuvert, setGroupeOuvert] = useState<{ ids: string[]; tronc: boolean } | null>(null);
+  const declencheurGroupe = useRef<HTMLButtonElement | null>(null);
+  const panneauGroupe = useRef<HTMLDivElement | null>(null);
+  const fermerGroupe = useCallback(() => {
+    setGroupeOuvert(null);
+    requestAnimationFrame(() => {
+      if (declencheurGroupe.current?.isConnected) declencheurGroupe.current.focus();
+      else canevasRef.current?.focus();
+    });
+  }, []);
+  useEffect(() => {
+    if (!groupeOuvert || selectionnee || ficheTronc) return;
+    const fermer = (event: KeyboardEvent) => { if (event.key === "Escape") fermerGroupe(); };
+    document.addEventListener("keydown", fermer);
+    return () => document.removeEventListener("keydown", fermer);
+  }, [groupeOuvert, selectionnee, ficheTronc, fermerGroupe]);
+
   const declencheurTronc = useRef<HTMLButtonElement | null>(null);
   const fermerFicheTronc = useCallback(() => {
     setFicheTronc(false);
@@ -378,23 +407,19 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             a ici aucun contenu spatial à doubler. Le seul chemin de l'écran — la fiche du tronc —
             vit dans l'état vide lui-même, et `tests/rendu/tronc-incomplet.test.tsx` le vérifie dans
             les trois états dès qu'une branche existe. */}
-        {!vide && (
+        {!vide && !indisponible && (
           /* `aria-pressed` retiré : combiné à un libellé qui bascule, il annonçait l'inverse de la réalité. */
           <button type="button" className={s.actionSecondaire} onClick={basculer}>
             {vueListe ? BASCULE_ARBRE : BASCULE_LISTE}
           </button>
         )}
-        {!vueListe && !vide && !indisponible && (
-          <div className={s.zoomBoutons}>
-            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1 / 1.2)} aria-label={ZOOM_MOINS}>
-              <span aria-hidden>−</span>
-            </button>
-            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1.2)} aria-label={ZOOM_PLUS}>
-              <span aria-hidden>+</span>
-            </button>
-          </div>
-        )}
+
       </div>
+
+      {explorationGraine && (
+        <DialogueEvolution indexInitial={1} declencheur={declencheurExploration}
+          onFermer={() => setExplorationGraine(false)} />
+      )}
 
       {indisponible ? (
         <div className={s.vide}>
@@ -431,6 +456,16 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
+        {!vueListe && !vide && !indisponible && (
+          <div className={s.zoomBoutons} data-commandes-arbre>
+            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1 / 1.2)} aria-label={ZOOM_MOINS}>
+              <span aria-hidden>−</span>
+            </button>
+            <button type="button" className={s.zoomBouton} onClick={() => zoomer(1.2)} aria-label={ZOOM_PLUS}>
+              <span aria-hidden>+</span>
+            </button>
+          </div>
+        )}
           <div
             className={`${s.monde} ${selectionnee ? s.mondeEstompe : ""}`}
             style={{
@@ -441,43 +476,36 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
               transform: `translate(${p.camera.pan.x}px, ${p.camera.pan.y}px) scale(${p.camera.zoom})`,
             }}
           >
-            <ArbreLunaire
-              geometrie={geometrie}
+            <ArbrePersonnel
+              index={indexCroissance}
               troncEnReserve={Boolean(troncIncomplet)}
               ariaLabel={ARIA_CANEVAS}
             />
 
-            {/* LA GRAINE QUI N'ATTEND QUE D'ÉCLORE (retour du fondateur) — à l'étape 0 SEULEMENT.
-                Le SVG animé `GraineAttente` se superpose au canevas, au point exact où le moteur posait
-                sa graine peinte ; le moteur, lui, saute `peindreGraine` sous la MÊME condition
-                (`MoteurArbreLunaire.peindreBase`) — sinon deux graines au même endroit, une qui respire
-                et une figée dessous.
-                ⚠️ DANS `.monde`, à côté du canevas, et nulle part ailleurs. Elle partage ainsi son
-                repère (le portrait mesuré, le pan/zoom) ET son chemin de visibilité : la région
-                inactive (`visibility: hidden`, `inert` — monde.module.css `.region`) l'emporte avec le
-                canevas ; il n'y a aucun second mécanisme à garder, aucun retrait à lui apprendre.
-                Positionnée par une CLASSE (arbre.module.css `.graineAttente`), jamais en `style=` :
-                le composant se garde sans style inline (tests/rendu/graine-attente.test.tsx). Elle se
-                met à l'échelle avec le monde au zoom, comme la graine peinte le faisait dans le bitmap
-                — c'est un objet du dessin, pas une cible tactile. `pointer-events: none` chez elle. */}
+            {/* La première planche contient déjà la graine : aucune seconde image superposée. */}
             {etapeGraine && (
               <>
-                <GraineAttente className={s.graineAttente} />
-                <p className={`${s.graineMessage} t-meta`}>{MESSAGE_GRAINE_PLANTEE}</p>
+                <div className={s.graineDecouverte} data-commandes-arbre
+                  style={{ transform: `translateX(-50%) scale(${1 / p.camera.zoom})` }}>
+                  <ComprendreEvolution variante="graine" onOuvrir={(declencheur) => {
+                    declencheurExploration.current = declencheur;
+                    setExplorationGraine(true);
+                  }} />
+                </div>
               </>
             )}
 
             {/* Story 5.3 — la cible du TRONC, dans la même couche et le même repère que les accroches.
                 Elle n'existe que s'il manque quelque chose : un tronc complet n'a AUCUNE affordance,
                 rien à fermer, rien à découvrir (AC4). */}
-            {troncIncomplet && !vide && (
+            {troncIncomplet && !vide && !troncGroupe && (
               <button
                 type="button"
                 ref={declencheurTronc}
                 className={`${s.accroche} ${s.cibleTronc}`}
                 style={{
-                  left: `${(CENTRE_TRONC.x / CANEVAS.largeur) * 100}%`,
-                  top: `${(CENTRE_TRONC.y / CANEVAS.hauteur) * 100}%`,
+                  left: `${(centreTronc.x / CADRE_ARBRE_PERSONNEL.largeur) * 100}%`,
+                  top: `${(centreTronc.y / CADRE_ARBRE_PERSONNEL.hauteur) * 100}%`,
                   transform: `translate(-50%, -50%) scale(${1 / p.camera.zoom})`,
                 }}
                 aria-label={ARIA_TRONC_A_COMPLETER}
@@ -488,17 +516,37 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
               />
             )}
 
-            {/* Accroches CLIQUABLES — dans le MÊME repère portrait que le Canvas. Elles gardent 44 px
+            {/* Accroches CLIQUABLES — dans le même repère portrait que l’image. Elles gardent 44 px
                 même lorsqu'elles se recouvrent ; zoom, clavier et vue liste désambiguïsent la densité. */}
-            {placees.map((pl) => (
+            {groupesProches.map((groupe) => (
+              <button key={groupe.ids.join(":")} type="button" className={`${s.accroche} ${s.groupeAccroches}`}
+                data-groupe-branches={groupe.ids.join(" ")}
+                style={{ left: `${groupe.accroche.x / CADRE_ARBRE_PERSONNEL.largeur * 100}%`,
+                  top: `${groupe.accroche.y / CADRE_ARBRE_PERSONNEL.hauteur * 100}%`,
+                  transform: `translate(-50%, -50%) scale(${1 / p.camera.zoom})` }}
+                aria-label={groupe.tronc ? "Voir les branches et le tronc proches" : `Voir les ${groupe.ids.length} branches proches`}
+                aria-expanded={groupeOuvert?.ids.join(":") === groupe.ids.join(":")}
+                onClick={(event) => {
+                  if (aGlisse.current && event.detail !== 0) return;
+                  declencheurGroupe.current = event.currentTarget;
+                  setGroupeOuvert(groupe);
+                  requestAnimationFrame(() => panneauGroupe.current?.focus());
+                }}>
+                <span aria-hidden>{groupe.ids.length + Number(groupe.tronc)}</span>
+              </button>
+            ))}
+            {placees.filter((pl) => !idsGroupes.has(pl.branche.id)).map((pl) => (
               <button
                 key={pl.branche.id}
                 ref={(el) => void accroches.current.set(pl.branche.id, el)}
                 type="button"
                 className={s.accroche}
+                data-branche-arbre={pl.branche.id}
+                data-etat-branche={pl.branche.etat}
+                title={pl.branche.nom?.trim() || "Branche sans nom"}
                 style={{
-                  left: `${(pl.accroche.x / CANEVAS.largeur) * 100}%`,
-                  top: `${(pl.accroche.y / CANEVAS.hauteur) * 100}%`,
+                  left: `${(pl.accroche.x / CADRE_ARBRE_PERSONNEL.largeur) * 100}%`,
+                  top: `${(pl.accroche.y / CADRE_ARBRE_PERSONNEL.hauteur) * 100}%`,
                   width: tailleAccrochePx(),
                   height: tailleAccrochePx(),
                   transform: `translate(-50%, -50%) scale(${1 / p.camera.zoom})`,
@@ -512,12 +560,34 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             ))}
           </div>
 
+          {groupeOuvert && (
+            <div ref={panneauGroupe} className={s.groupePanneau} role="group" aria-label="Branches proches" tabIndex={-1}
+              inert={Boolean(selectionnee || ficheTronc)} aria-hidden={selectionnee || ficheTronc ? true : undefined}
+              data-commandes-arbre data-sans-glissement>
+              <div className={s.groupeEntete}>
+                <p className="t-corps">Choisis une branche</p>
+                <button className={s.actionSecondaire} type="button" onClick={fermerGroupe}>Fermer les branches proches</button>
+              </div>
+              {groupeOuvert.tronc && troncIncomplet && <button ref={declencheurTronc} className={s.groupeChoix} type="button"
+                onClick={() => setFicheTronc(true)} aria-label={ARIA_TRONC_A_COMPLETER}>Ton tronc à compléter</button>}
+              {groupeOuvert.ids.map((id) => {
+                const branche = affichees.find((candidate) => candidate.id === id);
+                return branche && <button key={id} type="button" className={s.groupeChoix}
+                  ref={(element) => void accroches.current.set(id, element)}
+                  aria-label={`Branche : ${branche.nom?.trim() || "sans nom"}`} onClick={() => ouvrir(id)}>
+                  {branche.nom?.trim() || "Branche sans nom"}
+                </button>;
+              })}
+            </div>
+          )}
+
           {vide && (
             <div className={s.videSuperposition} data-couche-vide="">
               <EtatVideArbre
                 direOuNaissentLesBranches={direOuNaissentLesBranches}
                 onOuvrirTronc={troncIncomplet ? () => setFicheTronc(true) : undefined}
               />
+              <p className={`${s.graineMessage} t-meta`}>{MESSAGE_GRAINE_PLANTEE}</p>
             </div>
           )}
 
@@ -572,6 +642,10 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
                     // premier clic ouvrait la fiche, dont la couche `inset: 0` captait le second (re-revue).
                     const pl = placees.find((q) => q.branche.id === selectionnee.id);
                     fermerFiche();
+                    if (groupeOuvert) {
+                      setGroupeOuvert(null);
+                      requestAnimationFrame(() => canevasRef.current?.focus());
+                    }
                     if (pl) cadrerBranche(pl.accroche);
                   }
             }

@@ -80,12 +80,14 @@ describe("Ordre de lecture linéaire + composeur jamais masqué (AC3/AC5)", () =
 });
 
 describe("Anneau de focus, cibles, voile (AC5)", () => {
-  it("l'anneau de focus est présent sur CHAQUE cible focusable et jamais neutralisé", () => {
-    for (const sel of [".champ:focus-visible", ".envoi:focus-visible", ".reessayer:focus-visible"]) {
+  it("le champ partage un seul anneau avec son enveloppe et les autres commandes gardent le leur", () => {
+    for (const sel of [".composeur:focus-within", ".envoi:focus-visible", ".reessayer:focus-visible"]) {
       expect(bloc(css, sel), `${sel} sans anneau`).toMatch(/outline:\s*2px/);
     }
-    // ni `none`, ni `0`, ni `outline-width:0` — aucune neutralisation déguisée.
-    expect(css, "outline neutralisé").not.toMatch(/outline:\s*(none|0)\b/);
+    expect(bloc(css, ".champ:focus-visible")).toMatch(/outline:\s*none/);
+    // Only the field may delegate its focus to its envelope. Other controls keep an outline.
+    const sansChamp = css.replace(/\.champ:focus-visible\s*\{[^}]*\}/, "");
+    expect(sansChamp, "outline neutralisé hors du champ").not.toMatch(/outline:\s*(none|0)\b/);
     expect(css, "outline-width neutralisé").not.toMatch(/outline-width:\s*0/);
   });
 

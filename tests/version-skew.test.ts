@@ -4,6 +4,20 @@ import { describe, expect, it } from "vitest";
 import { deploymentIdPour } from "@/next.config";
 
 describe("[14.6] changement de déploiement et frontières françaises", () => {
+  it("keeps preview, production and redeployments of the same commit distinct", () => {
+    const commit = { VERCEL_GIT_COMMIT_SHA: "8a8fe0b6dec1e7e6990ad0fef764bd21ef29375f" };
+    const ids = ["dpl_preview123", "dpl_production456", "dpl_redeploy789"];
+    const builds = ids.map((id) => deploymentIdPour({ ...commit, VERCEL_DEPLOYMENT_ID: id }));
+    expect(builds).toEqual(ids);
+    expect(new Set(builds).size).toBe(3);
+    expect(deploymentIdPour({ ...commit, VERCEL_DEPLOYMENT_ID: ids[0] })).toBe(builds[0]);
+  });
+
+  it("rejects an invalid provider identifier rather than silently sharing the commit identifier", () => {
+    expect(() => deploymentIdPour({ VERCEL_DEPLOYMENT_ID: "invalid.id", VERCEL_GIT_COMMIT_SHA: "abc123" }))
+      .toThrow(/deployment_id_invalide:VERCEL_DEPLOYMENT_ID/);
+  });
+
   it("préfère le SHA Vercel et garde un identifiant de repli explicite", () => {
     expect(
       deploymentIdPour({

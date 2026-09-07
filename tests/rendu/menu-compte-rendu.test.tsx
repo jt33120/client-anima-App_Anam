@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { act, render, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, cleanup, fireEvent, waitFor, screen } from "@testing-library/react";
 
 const navigation = vi.hoisted(() => ({ pathname: "/" }));
 vi.mock("next/navigation", () => ({
@@ -374,7 +374,7 @@ describe("[7.3] ce qui ne bouge pas — le refus tenu", () => {
     // feuille — et le test passerait en mesurant l'entrée de menu au lieu du filet. On désigne donc
     // celui qui est HORS du dialogue, qui est précisément celui que FR-077 protège.
     const { container } = scene(false);
-    fireEvent.click(container.querySelector("button")!);
+    fireEvent.click(screen.getByRole("button", { name: LIBELLE_GLYPHE }));
     const tous = [...container.querySelectorAll("a[href='/aide']")];
     expect(tous.length, "le menu ouvert doit porter les DEUX : l'entrée et le filet").toBe(2);
     const filet = tous.find((a) => a.closest("[role='dialog']") === null);

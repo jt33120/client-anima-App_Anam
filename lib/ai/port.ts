@@ -37,9 +37,15 @@ export type CapaciteIa =
   | "hypothese_enneagramme"
   | "lecture"
   /**
-   * Le texte du jour de l'univers Astrologie (2026-09-02). SEULE capacité dont la charge utile ne
-   * contient AUCUN mot de l'utilisatrice : elle part d'une `SignatureDuCiel`, c'est-à-dire des
-   * énumérations et des entiers de 0 à 11.
+   * Le texte du jour de l'univers Astrologie (2026-09-02), en trois parties depuis le 2026-09-07.
+   *
+   * ⚠️ CETTE JSDOC AFFIRMAIT « SEULE capacité dont la charge utile ne contient AUCUN mot de
+   * l'utilisatrice ». C'ÉTAIT VRAI JUSQU'AU 2026-09-07, ET ÇA NE L'EST PLUS — c'est la ligne la plus
+   * dangereuse de ce fichier, parce que c'est celle qu'un relecteur croira sans la vérifier. La
+   * charge utile porte désormais son prénom, ses signes natals mis en mots, les branches qu'elle a
+   * nommées et ce qu'Anam a retenu d'elle : la même matière que la conversation, sous le même egress
+   * art. 9. Ce qui la borne n'est plus l'absence, ce sont trois types clos — `SignatureDuCiel`,
+   * `SocleNatalDit` et `MatiereContexte`.
    */
   | "horoscope";
 export type TierIa = "leger" | "fort";

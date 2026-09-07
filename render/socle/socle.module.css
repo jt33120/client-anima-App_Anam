@@ -1,9 +1,9 @@
 .halte {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-6);
+  gap: var(--esp-7);
   width: 100%;
-  max-width: calc(var(--contenu-max) + var(--esp-9));
+  max-width: var(--carnet-largeur);
   margin: 0 auto;
   padding: var(--esp-6) var(--marge-mobile) var(--esp-8);
   box-sizing: border-box;
@@ -20,7 +20,10 @@
 }
 
 .titreHalte {
-  text-align: center;
+  font-size: var(--carnet-display);
+  line-height: var(--carnet-line);
+  text-align: left;
+  text-wrap: balance;
 }
 
 .introduction {
@@ -53,20 +56,19 @@
 
 .section {
   padding: var(--esp-5);
-  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
-  border-radius: var(--rayon-lg);
-  background:
-    var(--texture-papier),
-    linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 16%, var(--papier)));
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon-lg);
+  background: var(--papier);
   color: var(--sur-papier);
-  box-shadow: var(--ombre-posee);
+  box-shadow: none;
 }
 
 .sectionCiel {
-  background:
-    var(--texture-papier),
-    radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--jour) 55%, transparent), transparent 34%),
-    linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 16%, var(--papier)));
+  background: var(--papier);
+}
+
+.sectionNombres {
+  background: var(--carnet-rose);
 }
 
 .section :is(h2, h3),
@@ -77,7 +79,6 @@
 .section .nombreFort,
 .section .devoilement > summary {
   color: var(--sur-papier);
-  min-height: var(--cible-tactile);
 }
 
 .section :is(.surtitre, .etiquette, .longitude, .maison, .legendeCiel, .noteCorpus, .panne),
@@ -114,30 +115,33 @@
 }
 
 .porteApercu {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--esp-4);
-  min-height: calc(var(--cible-tactile) * 3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-5);
+  min-height: calc(var(--cible-tactile) * 6);
+  height: 100%;
   padding: var(--esp-5);
-  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
-  border-radius: var(--rayon-lg);
-  background:
-    var(--texture-papier),
-    radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--jour) 48%, transparent), transparent 40%),
-    var(--papier);
-  color: var(--sur-papier);
-  box-shadow: var(--ombre-posee);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon-lg);
+  background: var(--carnet-lavande);
+  color: var(--carnet-encre);
   text-decoration: none;
   transition:
     border-color var(--duree-courte) var(--courbe),
-    background var(--duree-courte) var(--courbe),
     transform var(--duree-courte) var(--courbe);
+}
+
+.itemApercu:nth-child(2) .porteApercu {
+  background: var(--carnet-rose);
+}
+
+.itemApercu:nth-child(3) .porteApercu {
+  background: var(--carnet-sauge);
 }
 
 .porteApercu:hover {
   border-color: var(--bordure-forte);
-  background-color: var(--surface-elevee);
-  transform: translateY(-2px);
+  transform: translateY(calc(-1 * var(--esp-1)));
 }
 
 .porteApercu:focus-visible,
@@ -156,9 +160,9 @@
 .glypheApercu {
   display: grid;
   place-items: center;
-  width: calc(var(--cible-tactile) + var(--esp-2));
-  height: calc(var(--cible-tactile) + var(--esp-2));
-  color: var(--sur-papier);
+  width: var(--esp-8);
+  height: var(--esp-8);
+  color: var(--accent);
 }
 
 .glypheApercu svg {
@@ -173,6 +177,7 @@
 }
 
 .contenuApercu {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--esp-2);
@@ -184,6 +189,8 @@
 }
 
 .actionApercu {
+  margin-top: auto;
+  padding-top: var(--esp-4);
   display: inline-flex;
   align-items: center;
   gap: var(--esp-2);
@@ -194,7 +201,9 @@
 .faits {
   display: grid;
   gap: var(--esp-2);
-  margin: var(--esp-2) 0 0;
+  margin: var(--esp-4) 0 0;
+  padding-top: var(--esp-3);
+  border-top: 1px solid var(--bordure);
 }
 
 .fait {
@@ -223,11 +232,9 @@
 .sousSection,
 .manque {
   padding: var(--esp-4);
-  border: 1px solid color-mix(in srgb, var(--sur-papier) 18%, var(--papier));
-  border-radius: var(--rayon-md);
-  background:
-    var(--texture-papier),
-    color-mix(in srgb, var(--jour) 28%, var(--papier));
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  background: var(--surface);
 }
 
 .lectureSymbolique {
@@ -309,11 +316,9 @@
 }
 
 .devoilement {
-  border: 1px solid color-mix(in srgb, var(--sur-papier) 20%, var(--papier));
-  border-radius: var(--rayon-md);
-  background:
-    var(--texture-papier),
-    color-mix(in srgb, var(--jour) 18%, var(--papier));
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  background: var(--surface);
 }
 
 .devoilement > summary {
@@ -564,11 +569,9 @@
   flex-direction: column;
   gap: var(--esp-4);
   padding: var(--esp-5);
-  border: 1px solid color-mix(in srgb, var(--sur-papier) 20%, var(--papier));
-  border-radius: var(--rayon-lg);
-  background:
-    var(--texture-papier),
-    color-mix(in srgb, var(--jour) 24%, var(--papier));
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  background: var(--carnet-lavande);
 }
 
 .reperesPrincipaux > dl {
@@ -706,11 +709,11 @@
 .carteJour {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-3);
-  padding: var(--esp-4);
-  border: 1px solid color-mix(in srgb, var(--sur-jour) 30%, var(--jour));
-  border-radius: var(--rayon-md);
-  background: linear-gradient(168deg, var(--jour), color-mix(in srgb, var(--sur-jour) 5%, var(--jour)));
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon);
+  background: var(--jour);
   color: var(--sur-jour);
 }
 
@@ -743,6 +746,29 @@
   font-style: italic;
 }
 
+/* LES TROIS PARTIES DU TEXTE DU JOUR (2026-09-07).
+
+   ⚠️ ELLES SONT DÉCLARÉES APRÈS `.mentionModele`, ET C'EST DÉLIBÉRÉ. `tests/carte-du-jour.test.ts`
+   découpe ce fichier entre `.carteJour {` et `\n.mentionModele {` pour mesurer le bloc de la carte :
+   des classes insérées ENTRE les deux auraient déplacé la borne du découpage, et la garde aurait
+   mesuré autre chose sans que rien ne rougisse.
+
+   L'intitulé est un repère, pas un titre : il se lit avant le paragraphe et ne lui prend pas la
+   vedette. D'où le registre de surtitre et l'encre douce, qui est celle déjà mesurée sur cet aplat. */
+.partieModele {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.intitulePartie {
+  margin: 0;
+}
+
+.carteJour .intitulePartie {
+  color: var(--sur-jour-doux);
+}
+
 @media (min-width: 640px) {
   .boutonPrincipal {
     width: auto;
@@ -765,8 +791,12 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .itemApercu:nth-child(3):last-child {
-    grid-column: 1 / -1;
+  .grilleApercus {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .porteApercu {
+    padding: var(--esp-4);
   }
 }
 
@@ -793,5 +823,98 @@
   :global(:root:not([data-a11y="nuit"])) .entree,
   :global(:root:not([data-a11y="nuit"])) .carteCiel {
     background: var(--surface);
+  }
+}
+
+/* Editorial reading rhythm, shared with the carnet shell. */
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  padding-bottom: var(--esp-5);
+  border-bottom: 1px solid var(--bordure);
+}
+
+.annotation {
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--pile-manuscrite);
+  font-size: var(--carnet-note);
+  line-height: 1.2;
+}
+
+.nombreEditorial {
+  color: var(--accent);
+  font-family: var(--pile-anam);
+  font-size: var(--carnet-logo);
+  line-height: 1;
+  margin-bottom: var(--esp-2);
+}
+
+.libelleNombre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--esp-2);
+}
+
+.enteteSection {
+  padding-bottom: var(--esp-2);
+}
+
+.enteteSection h2 {
+  min-height: 0;
+  text-wrap: balance;
+}
+
+.uniteNombre > summary {
+  padding: var(--esp-5);
+  min-height: calc(var(--cible-tactile) * 3);
+}
+
+.uniteNombre[open] > summary {
+  min-height: var(--cible-tactile);
+}
+
+.uniteNombre .texteNombre {
+  padding: 0 var(--esp-5) var(--esp-5);
+}
+
+.boutonPrincipal,
+.boutonSecondaire {
+  border-radius: var(--rayon-full);
+}
+
+.portes {
+  border: 0;
+  border-top: 1px solid var(--bordure);
+  border-radius: 0;
+  background: transparent;
+  padding-inline: 0;
+}
+
+@media (min-width: 960px) {
+  .halte {
+    gap: var(--esp-7);
+  }
+
+  .section {
+    padding: var(--esp-7);
+  }
+
+  .porteApercu {
+    padding: var(--esp-5);
+  }
+
+  .ouverture {
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--esp-6);
+  }
+
+  .annotation {
+    flex: 0 0 auto;
+    max-width: calc(var(--mesure) / 3);
   }
 }

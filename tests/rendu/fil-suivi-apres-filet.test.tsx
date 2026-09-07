@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, act } from "@testing-library/react";
 import Fil from "@/render/conversation/Fil";
 import type { Tour } from "@/render/conversation/types";
+import { notifierRedimensionnement } from "./_outils";
 
 /**
  * fil-suivi-apres-filet.test.tsx — LE FIL NE SE FIGE PLUS APRÈS LE FILET (QA tour 2, BLOQUANT).
@@ -65,6 +66,31 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe("[QA tour 2] après le filet, la conversation suit toujours", () => {
+  it("garde la dernière réponse visible lorsque le clavier réduit le fil", async () => {
+    render(<Fil tours={[tourUtilisatrice("u1"), tourAnam("a1")]} annonce="" />);
+    const el = fil();
+    equiperConteneur(el, 900);
+    el.scrollTop = 500;
+    act(() => notifierRedimensionnement());
+    await rendreLaMainAuNavigateur();
+    Object.defineProperty(el, "clientHeight", { value: 220, configurable: true });
+    act(() => notifierRedimensionnement());
+    expect(el.scrollTop, "la dernière réponse ne doit pas passer sous le clavier").toBe(900);
+  });
+
+  it("laisse la lectrice à sa place lors d'un redimensionnement si elle relisait plus haut", async () => {
+    render(<Fil tours={[tourUtilisatrice("u1"), tourAnam("a1")]} annonce="" />);
+    const el = fil();
+    equiperConteneur(el, 900);
+    act(() => notifierRedimensionnement());
+    await rendreLaMainAuNavigateur();
+    el.scrollTop = 100;
+    act(() => el.dispatchEvent(new Event("scroll")));
+    Object.defineProperty(el, "clientHeight", { value: 220, configurable: true });
+    act(() => notifierRedimensionnement());
+    expect(el.scrollTop).toBe(100);
+  });
+
   it("⚠️ un tour qui arrive APRÈS le bloc de ressources ramène bien le fil en bas", async () => {
     let tours: Tour[] = [tourUtilisatrice("u1"), tourAnam("a1")];
     const { rerender } = render(<Fil tours={tours} annonce="" />);

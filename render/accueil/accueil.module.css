@@ -1,114 +1,87 @@
-/*
- * accueil.module.css — La bibliothèque en cartes (région « accueil », Story 5.6).
- * Charte « nuit galactique » : argent lunaire, accent lotus RÉSERVÉ à la carte du jour.
- * La carte est un OBJET REÇU, pas une ligne de menu (EXPERIENCE.md, « fiches de bibliothèque »).
- * Aucun badge, aucun compteur, aucun cadenas — il n'y a pas de classe pour en dessiner un.
- */
+/* A daily journal: a generous thought, a sky reading, then three personal worlds.
+   All data, destinations and absent states remain owned by the incoming projection. */
 
 .bibliotheque {
   display: flex;
   flex-direction: column;
-  gap: var(--esp-7);
+  gap: var(--esp-6);
   width: 100%;
-  max-width: var(--contenu-max);
+  min-width: 0;
 }
 
 .quotidien {
-  display: flex;
-  flex-direction: column;
-  gap: var(--esp-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
 }
 
-.cartesQuotidiennes {
+.feuilletMantra {
+  position: relative;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--esp-2);
+  min-width: 0;
+  padding: var(--esp-4) var(--esp-5);
+  border: calc(var(--esp-1) / 4) solid var(--bordure);
+  border-inline-start: var(--esp-1) solid var(--bordure-forte);
+  border-radius: var(--rayon-md);
+  background: var(--carnet-gradient-mantra, var(--surface));
+  color: var(--carnet-encre);
+}
+
+.annotation {
+  margin: 0;
+  color: var(--carnet-encre-douce);
+}
+
+.feuilletMantra .annotation {
+  font-family: var(--pile-manuscrite);
+  font-size: var(--carnet-note);
 }
 
 .mantraDuJour,
 .mantraAbsent {
   margin: 0;
-  padding-inline: var(--esp-2);
-  color: var(--texte);
+  color: var(--carnet-encre);
+  overflow-wrap: anywhere;
 }
 
-.mantraDuJour {
-  text-wrap: balance;
+.feuilletMantra .mantraDuJour {
+  font-size: var(--carnet-citation, var(--carnet-note));
+  text-wrap: pretty;
 }
+.mantraAbsent { color: var(--carnet-encre-douce); font-style: italic; }
 
-.mantraAbsent {
-  color: var(--texte-doux);
-  font-style: italic;
+.cartesQuotidiennes { display: flex; flex-direction: column; min-width: 0; }
+.univers { display: flex; flex-direction: column; gap: var(--esp-4); }
+
+.enteteUnivers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--esp-3) var(--esp-5);
 }
 
 .enteteUnivers h2 {
-  margin: 0;
+  margin: var(--esp-2) 0 0;
+  font-size: var(--carnet-section, var(--carnet-note));
   color: var(--texte);
 }
-
-.transitionUnivers {
-  position: relative;
-  align-self: center;
-  width: 1px;
-  height: var(--esp-7);
-  background: linear-gradient(to bottom, transparent, var(--bordure-forte), transparent);
-}
-
-.transitionUnivers span {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: var(--esp-2);
-  height: var(--esp-2);
-  border-radius: var(--rayon-full);
-  background: var(--lueur);
-  transform: translate(-50%, -50%);
-  opacity: 0.7;
-}
-
-.univers,
-.enteteUnivers {
-  display: flex;
-  flex-direction: column;
-}
-
-.univers {
-  gap: var(--esp-5);
-}
-
-.enteteUnivers {
-  gap: var(--esp-2);
-}
-
-.surtitreUnivers,
-.introUnivers {
-  margin: 0;
-  color: var(--texte-doux);
-}
+.surtitreUnivers { margin: 0; color: var(--texte-doux); }
 
 .grilleUnivers {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--esp-4);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-3);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-@media (min-width: 640px) {
-  .grilleUnivers {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  /* Human Design et Big Five vivent derrière Psychologie : la troisième porte assume donc la
-     largeur entière, au lieu de laisser une case vide qui ferait croire à un univers manquant. */
-  .itemUnivers:nth-child(3):last-child {
-    grid-column: 1 / -1;
-  }
-}
-
-.itemUnivers {
-  min-width: 0;
-}
+.itemUnivers { min-width: 0; }
 
 .porteUnivers {
   position: relative;
@@ -116,61 +89,44 @@
   flex-direction: column;
   min-height: 100%;
   overflow: hidden;
-  border: 1px solid var(--bordure);
+  border: calc(var(--esp-1) / 4) solid var(--bordure);
   border-radius: var(--rayon-lg);
-  background:
-    var(--texture-papier),
-    radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--jour) 44%, transparent), transparent 42%),
-    linear-gradient(155deg, var(--papier), color-mix(in srgb, var(--aube) 18%, var(--papier)));
-  color: var(--sur-papier);
-  box-shadow: var(--ombre-posee);
+  background: var(--carnet-gradient-carte, var(--surface));
+  color: var(--carnet-encre);
 }
+
+.porteUnivers[data-univers="numerologie"] .glyphe { color: var(--arbre-branche); }
+.porteUnivers[data-univers="psychologie"] .glyphe { color: var(--arbre-feuillage); }
 
 .lienUnivers {
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--esp-4);
-  min-height: calc(var(--cible-tactile) * 3);
-  padding: var(--esp-5);
-  color: var(--sur-papier);
+  gap: var(--esp-3);
+  min-height: calc(var(--cible-tactile) * 2);
+  flex: 1;
+  padding: var(--esp-4);
+  color: inherit;
   text-decoration: none;
-  transition:
-    border-color var(--duree-courte) var(--courbe),
-    background var(--duree-courte) var(--courbe),
-    transform var(--duree-courte) var(--courbe);
+  transition: background var(--duree-courte) var(--courbe);
 }
 
-.lienUnivers:hover {
-  background: color-mix(in srgb, var(--jour) 34%, transparent);
-  transform: translateY(-2px);
-}
+.lienUnivers:hover { background: var(--surface); }
+.lienUnivers:active { background: var(--surface-elevee); }
 
 .lienUnivers:focus-visible,
 .actionUnivers:focus-visible {
-  outline: 2px solid var(--bordure-forte);
-  outline-offset: 2px;
+  outline: calc(var(--esp-1) / 2) solid var(--bordure-forte);
+  outline-offset: calc(var(--esp-1) * -1);
 }
 
 .glyphe {
   display: grid;
   place-items: center;
-  width: calc(var(--cible-tactile) + var(--esp-2));
-  height: calc(var(--cible-tactile) + var(--esp-2));
-  color: var(--accent);
-}
-
-.porteUnivers[data-univers="astrologie"] .glyphe {
-  color: var(--accent);
-}
-
-.porteUnivers[data-univers="numerologie"] .glyphe {
-  color: var(--sur-jour-doux);
-}
-
-.porteUnivers[data-univers="psychologie"] .glyphe {
-  color: color-mix(in srgb, var(--accent) 72%, var(--sur-papier));
+  width: var(--esp-6);
+  height: var(--esp-6);
+  color: var(--carnet-encre);
 }
 
 .glyphe svg {
@@ -184,38 +140,22 @@
   stroke-linejoin: round;
 }
 
-.texteUnivers {
-  display: flex;
-  flex-direction: column;
-  gap: var(--esp-2);
-  min-width: 0;
-}
-
-.nomUnivers,
-.accrocheUnivers {
-  color: inherit;
-}
-
-.accrocheUnivers {
-  line-height: 1.55;
-  color: var(--sur-papier-doux);
-}
+.texteUnivers { display: flex; flex-direction: column; gap: var(--esp-1); min-width: 0; }
+.nomUnivers { color: inherit; overflow-wrap: anywhere; }
+.accrocheUnivers { color: var(--carnet-encre-douce); text-wrap: pretty; }
 
 .fleche {
-  color: var(--sur-papier);
-  font-size: 1.25rem;
+  display: grid;
+  place-items: center;
+  width: var(--esp-6);
+  height: var(--esp-6);
+  border: calc(var(--esp-1) / 4) solid currentColor;
+  border-radius: var(--rayon-full);
+  color: inherit;
+  transition: transform var(--duree-courte) var(--courbe);
 }
 
-.eclat {
-  position: absolute;
-  top: var(--esp-4);
-  right: var(--esp-5);
-  width: var(--esp-2);
-  height: var(--esp-2);
-  border-radius: var(--rayon-full);
-  background: var(--lueur);
-  opacity: 0.28;
-}
+.lienUnivers:hover .fleche { transform: translateX(var(--esp-1)); }
 
 .actionUnivers {
   position: relative;
@@ -223,18 +163,24 @@
   align-items: center;
   justify-content: center;
   min-height: var(--cible-tactile);
-  margin: 0 var(--esp-5) var(--esp-5);
-  padding: var(--esp-2) var(--esp-4);
-  border-radius: var(--rayon);
-  background: var(--accent);
-  color: var(--sur-accent);
+  margin: 0 var(--esp-4) var(--esp-4);
+  padding: var(--esp-2) var(--esp-3);
+  border: calc(var(--esp-1) / 4) solid var(--bordure-forte);
+  border-radius: var(--rayon-full);
+  background: var(--surface);
+  color: var(--texte);
   text-align: center;
   text-decoration: none;
+  transition: background var(--duree-courte) var(--courbe);
 }
+
+.actionUnivers:hover,
+.actionUnivers:active { background: var(--surface-elevee); }
+.actionUnivers :global(.t-bouton) { line-height: inherit; }
 
 .indicateurLien {
   position: absolute;
-  right: var(--esp-2);
+  right: var(--esp-3);
   bottom: var(--esp-2);
   width: var(--esp-2);
   height: var(--esp-2);
@@ -249,170 +195,100 @@
   animation: attenteLien var(--duree-standard) var(--courbe) var(--duree-courte) infinite alternate;
 }
 
-@keyframes attenteLien {
-  to { opacity: 0.65; }
+@keyframes attenteLien { to { opacity: 1; } }
+
+@media (min-width: 640px) {
+  .grilleUnivers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .itemUnivers:nth-child(3):last-child { grid-column: 1 / -1; }
+  .feuilletMantra { padding: var(--esp-5); }
+
+  .itemUnivers:not(:nth-child(3):last-child) .lienUnivers {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-content: start;
+    row-gap: var(--esp-3);
+  }
+
+  .itemUnivers:not(:nth-child(3):last-child) .texteUnivers {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .itemUnivers:not(:nth-child(3):last-child) .fleche {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (min-width: 1200px) {
+  .quotidien { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); align-items: start; }
+  .lienUnivers { gap: var(--esp-4); padding: var(--esp-5); }
+  .actionUnivers { align-self: flex-start; margin-inline: var(--esp-5); margin-bottom: var(--esp-5); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .eclat,
-  .indicateurLienActif {
-    animation: none;
-  }
-  .indicateurLienActif {
-    opacity: 0.65;
-  }
-  .lienUnivers {
-    transition: none;
-  }
-  .lienUnivers:hover {
-    transform: none;
-  }
+  .indicateurLienActif { animation: none; opacity: 1; }
+  .lienUnivers,
+  .actionUnivers,
+  .fleche { transition: none; }
+  .lienUnivers:hover .fleche { transform: none; }
 }
 
-:global(:root[data-a11y="contraste"]) .eclat {
-  display: none;
-}
-
-@media (prefers-contrast: more) {
-  :global(:root:not([data-a11y="nuit"])) .eclat {
-    display: none;
-  }
-}
-
-.grille {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--esp-4);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* `md` et au-delà : deux colonnes (EXPERIENCE.md §492). La carte du jour, en tête, garde toute
-   la largeur — c'est ce qui la met en avant sans avoir besoin d'un badge. */
-@media (min-width: 640px) {
-  .grille {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .item:first-child {
-    grid-column: 1 / -1;
-  }
-}
-
-.item {
-  display: flex;
-}
-
-/* ══ LA CARTE DU CIEL EST BLEU LOTUS, ET C'EST UN CODE (2026-09-02) ══════════════════════════
-
-   Retour de Julian : « ce bleu magique fleur de lotus est utilisé pour les champs d'aujourd'hui,
-   c'est notre code couleur. » Le ciel est désormais la seule surface quotidienne peinte : le
-   mantra est lié à la date par sa place et ses guillemets, sans encadré. C'est ce que le reste,
-   resté navy, rend lisible : un code couleur ne se voit que par ce qu'il exclut.
-
-   ⚠️ L'ENCRE S'INVERSE ICI, ET SEULEMENT ICI. Un aplat clair dans un mode sombre : `--texte`
-   (Ivory) sur du Sky ne ferait que 1,20:1. Toute la copie de cette carte passe donc par
-   `--sur-jour` / `--sur-jour-doux`, dont `tests/contraste.test.ts` mesure les deux paires.
-
-   ⚠️ ET CE N'EST PAS `--accent`, malgré la même valeur aujourd'hui. Le refus daté juste plus bas
-   (QA du 2026-08-19) tient toujours : l'accent est la couleur de l'action et d'elle seule. Un
-   aplat peint avec le jeton de l'action les ferait dériver ensemble. Deux rôles, deux jetons.
-
-   ⚠️ AUCUN CONTRÔLE NE VIT DANS CES CARTES, et c'est ce qui rend l'aplat sûr : un lien peint en
-   `--accent` (Sky) sur un fond Sky serait invisible. Si une carte du jour doit un jour porter un
-   bouton, il se peint en `--sur-jour`, jamais en accent. */
+/* The sky keeps its dedicated surface/ink pair, including absent and model-written text. */
 .carte {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   gap: var(--esp-3);
   width: 100%;
+  min-width: 0;
   padding: var(--esp-5);
-  /* Le « papier » de la carte (retour du 2026-09-01 : des textures et des dégradés), rejoué dans
-     le bleu : un dégradé STATIQUE du lotus vers un lotus à peine assombri. Le bas du dégradé est
-     mesuré par `tests/carte-du-jour.test.ts` — à 5 % de navy, l'encre douce y tient encore 4,76. */
-  background: linear-gradient(168deg, var(--jour), color-mix(in srgb, var(--sur-jour) 5%, var(--jour)));
+  background: var(--carnet-gradient-carte, var(--jour));
   color: var(--sur-jour);
-  border: 1px solid color-mix(in srgb, var(--sur-jour) 22%, var(--jour));
-  border-radius: var(--rayon-md);
+  border: calc(var(--esp-1) / 4) solid var(--bordure);
+  border-radius: var(--rayon-lg);
   text-align: left;
 }
 
-.carte h2 {
-  margin: 0;
-  color: var(--sur-jour);
-}
+.carte h2 { margin: 0; color: var(--sur-jour); }
+.carte p { margin: 0; overflow-wrap: anywhere; }
 
-.carte p {
-  margin: 0;
-}
-
-/* Le signe d'origine reste secondaire : il explique d'où vient le ciel sans concurrencer son titre. */
-.sourceCiel {
-  display: inline-flex;
+.enteteCiel {
+  display: flex;
   align-items: center;
-  align-self: flex-start;
-  gap: var(--esp-2);
+  gap: var(--esp-3);
+}
+
+.identiteCiel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.sourceCiel {
   color: var(--sur-jour-doux);
 }
 
-.sourceCiel :global(.t-meta) {
-  color: inherit;
-}
-
-.glypheCiel {
-  width: var(--esp-5);
-  height: var(--esp-5);
-  color: inherit;
-}
+.sourceCiel :global(.t-meta) { color: inherit; }
+.glypheCiel { width: var(--esp-6); height: var(--esp-6); color: inherit; }
 
 .faits {
   display: flex;
   flex-wrap: wrap;
   gap: var(--esp-2) var(--esp-5);
   margin: 0;
+  padding-block: var(--esp-3);
+  border-block: calc(var(--esp-1) / 4) solid var(--bordure);
 }
 
-.fait {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
+.fait { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--esp-2); min-width: 0; }
+.fait dt { color: var(--sur-jour-doux); margin: 0; }
+.fait dd { color: var(--sur-jour); margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.nonEcrit { color: var(--sur-jour-doux); font-style: italic; }
+.etatProduit { margin: 0; color: var(--sur-jour); }
+.mentionModele { margin: 0; color: var(--sur-jour-doux); font-style: italic; }
 
-.fait dt {
-  color: var(--sur-jour-doux);
-  margin: 0;
-}
-
-.fait dd {
-  color: var(--sur-jour);
-  margin: 0;
-  /* Les chiffres du socle s'alignent : chemin de vie, année personnelle, degrés. */
-  font-variant-numeric: tabular-nums;
-}
-
-/* L'absence de texte d'Anima. Discrète et lisible — ni une alerte, ni un teasing. */
-.nonEcrit {
-  color: var(--sur-jour-doux);
-  font-style: italic;
-}
-
-/* La voix du PRODUIT sur une carte (Story 7.8) — « le test n'a pas encore été passé ».
-
-   ⚠️ DÉLIBÉRÉMENT DIFFÉRENTE DE `.nonEcrit` ET DE `t-anam`. Le silence d'Anima se lit comme une
-   note en retrait, en italique ; ses mots à elle se lisent en `t-anam`. Ceci n'est ni l'un ni
-   l'autre : c'est le produit qui parle de lui-même, et le confondre avec la plume d'Anima
-   attribuerait à une personne réelle des mots qui ne sont pas d'elle (FR-054/FR-086). */
-.etatProduit {
-  margin: 0;
-  color: var(--sur-jour);
-  line-height: 1.6;
-}
-
-/* LA MENTION D'ÉCRITURE PAR UN MODÈLE (2026-09-02) — voir `render/socle/socle.module.css`, même
-   règle et même couple de jetons : discrète, mais au-dessus du seuil de contraste mesuré. */
-.mentionModele {
-  margin: 0;
-  color: var(--sur-jour-doux);
-  font-style: italic;
-}
+/* Les trois parties du texte du jour (2026-09-07) : mêmes règles que dans la halte du socle, parce
+   que c'est la MÊME carte à deux endroits. L'intitulé est un repère et non un titre — encre douce,
+   déjà mesurée sur cet aplat par `tests/contraste.test.ts`. */
+.partieModele { display: flex; flex-direction: column; gap: var(--esp-1); }
+.intitulePartie { margin: 0; color: var(--sur-jour-doux); }

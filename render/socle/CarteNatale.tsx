@@ -302,6 +302,7 @@ export default function CarteNatale({ ciel }: { readonly ciel: SectionCielVue })
 
       <div
         className={s.roue}
+        data-sans-glissement
         onPointerDown={pointerDown}
         onPointerMove={pointerMove}
         onPointerUp={pointerUp}

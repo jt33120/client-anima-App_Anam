@@ -1,136 +1,120 @@
-# Design spec — Anima
+# Design spec — Anima, carnet céleste
 
-## 1. Intention
+Date : 2026-09-06. Mandat : carte blanche sur le front, expérience Vercel réversible.
 
-En trois secondes, Anima doit sembler calme, intime et lisible : un lieu nocturne habité, jamais
-un tableau de bord administratif. Les anti-adjectifs sont dense, clinquant et opaque.
+## 1. Intention et décision forte
 
-Cette note resserre les décisions déjà décrites dans les artefacts BMAD `DESIGN.md` et
-`EXPERIENCE.md`. Elle ne crée pas une seconde direction artistique.
+Un carnet céleste nocturne : bleu nuit, lumière bleu ciel et violet, lotus et étoiles sur une matière aquarellée. Le manuscrit ponctue les moments calmes ; les contenus longs retrouvent une taille de lecture. L'écran mobile montre du contenu utile dès son ouverture.
 
-## 2. Décision forte
+La correction explicite du fondateur du 6 septembre (« mode nuit par défaut », « trop terre », captures accueil et clavier refusées) remplace la première direction papier. Nuit est aussi le rendu serveur et le repli sans stockage. Un choix Papier explicite reste respecté ; le contraste renforcé garde la priorité.
 
-La nuit galactique reste continue, tandis que chaque action repose sur une surface locale nette.
-La hiérarchie vient de Fraunces pour la voix et les titres, d’Inter pour l’interface, puis du rythme
-et des bordures — jamais d’un empilement d’effets.
+## 2. Palette et typographie
 
-## 3. Tokens
+| Rôle | Nuit par défaut |
+| --- | --- |
+| Fond | Bleu nuit `#11182d` |
+| Surface | Bleu profond `#1a2541` |
+| Texte | Blanc céleste `#f0f2ff` |
+| Texte secondaire | Bleu gris `#b7c7e3` |
+| Accent | Bleu ciel `#add5ff` |
+| Lavande | `#303255` |
+| Violet | `#342e50` |
+| Bleu de brume | `#203e53` |
 
-- Source de vérité actuelle : `app/styles/tokens.ts`, reflétée et gardée par
-  `app/styles/globals.css` et `tests/tokens-parite.test.ts`.
-- Cette source existante prévaut sur la convention générique `design/tokens.json` jusqu’à une
-  migration dédiée ; introduire un second fichier de tokens maintenant créerait deux vérités.
-- Couleurs : rôles `fond`, `surface`, `surface-elevee`, `texte`, `texte-doux`, `bordure`,
-  `bordure-forte`, `accent` et `accent-doux` exclusivement.
-- Espacement, rayons, cible tactile et mouvement : échelles `--esp-*`, `--rayon-*`,
-  `--cible-tactile`, `--duree-*` et `--courbe` exclusivement.
-- Aucun flou d’arrière-plan, filtre plein écran, ombre de texte ou animation cyclique. La scène a
-  déjà montré que ces effets dégradent fortement les performances.
+Les dégradés nommés sont générés depuis les tokens. Les surfaces de lecture sont opaques, avec contrôle des arrêts de dégradé. L'image d'ambiance est limitée à 14 % en Nuit et 2 % en Papier ; le pire pixel blanc ou noir est couvert par un test de composition. Le lotus du petit en-tête occupe une moitié distincte du texte. Le contraste renforcé retire l'illustration et les dégradés.
 
-## 4. Navigation et menu de profil
+Fraunces porte les titres et la citation, Inter les contenus et contrôles, Caveat les annotations rares. Sur mobile : titre autour de 30 px, citation de 19 px même pour un texte long, commandes de navigation de 12 px dans des cibles de 44 px au minimum. Aucun contenu n'est tronqué pour faire tenir la maquette.
 
-- Le glyphe de profil reste en haut à droite et ouvre immédiatement un dialogue modal nommé.
-- Le contenu est organisé dans cet ordre stable : **Aide**, **Explorer**, **Compte**,
-  **Confidentialité**. Une information identitaire ou relationnelle ne partage plus une liste plate
-  avec l’abonnement et les droits sur les données.
-- Les intitulés et descriptions restent courts. Aucun compteur, badge, cadenas ni signal commercial.
-- Un appui produit un retour visuel immédiat. Une navigation lente nomme la destination en cours,
-  pose `aria-busy` et conserve un emplacement stable pour éviter tout saut de mise en page.
-- Échap, le fond et le bouton Fermer referment la feuille ; le focus revient au glyphe. La
-  tabulation reste bornée dans le dialogue tant qu’il est ouvert.
+## 3. Contrat de tokens et réversibilité
 
-## 5. Page d’aide
+Le socle historique `app/styles/tokens.ts`, `app/styles/globals.css` et leur test de parité reste
+préservé. La surcouche carnet a pour source unique `design/tokens.json`; un script génère
+`app/styles/carnet-tokens.css`, importé après la feuille historique. Ne jamais corriger à la main
+une sortie générée. Toute valeur nouvelle entre dans les tokens de la surcouche.
 
-- Deux gestes distincts sont toujours visibles : **Retour à Anima** ferme normalement la halte et
-  revient dans le produit ; **Sortie rapide** ouvre un site neutre en remplaçant l’historique.
-- La sortie rapide n’est jamais le bouton de fermeture ordinaire et son nom ne peut pas être le
-  vague « Quitter ».
-- Les ressources humaines restent avant le mode d’emploi et la transparence. Les longs contenus
-  sont découpés en panneaux et fiches, avec une mesure de lecture bornée.
-- La page reste publique, sans session, sans IA et sans traceur.
+Un sélecteur Papier/Nuit contrôle `data-carnet-theme`. Une règle locale de page ne doit pas
+outrepasser cette préférence ni l'accessibilité. La séparation de la surcouche rend la direction
+facile à retirer sans reconstituer l'ancien design.
 
-## 6. États et accessibilité
+## 4. Composition des familles d'écrans
 
-- Cibles tactiles d’au moins `--cible-tactile`, anneau `:focus-visible` sur chaque contrôle.
-- États livrés : fermé/ouvert, navigation au repos/en cours, contenu court/dense, et mode contraste
-  renforcé. Les routes lentes gardent leurs `loading.tsx` locaux ; le menu fournit en plus la réponse
-  au geste avant le changement de route.
-- Le mouvement cède à `prefers-reduced-motion`; l’information d’attente, elle, reste visible.
+**Accueil / Aujourd’hui.** Date, titre bref et lotus partagent un en-tête compact. Le mantra garde une taille de lecture. La lecture du ciel
+porte un statut clair et une action explicite. Les univers apparaissent ensuite comme des pages
+à explorer : sujet, description courte, destination. Le grand écran peut offrir une colonne de
+repères; le téléphone conserve le même ordre de lecture dans une seule colonne.
 
-## 7. Assets
+**Anam.** Identité discrète, fil lisible et composeur ancré sans recouvrir la parole au clavier.
+Le portrait existant ponctue l’introduction. Entrer dans Anam annonce son titre sans ouvrir le clavier. Un seul hook, au niveau scène, suit la hauteur et le décalage de VisualViewport ; aucune seconde déduction dans le fil. Le clavier masque la navigation et réduit les réserves. Le zoom natif garde la main. Les messages conservent leur provenance et leurs
+états réels; l'arbre persistant reste éteint. Aucun texte de démonstration n'est persisté ou
+présenté comme une réponse réelle.
 
-Le glyphe de profil existant est conservé comme asset de navigation déjà établi. Les trois
-portes de la région « Aujourd’hui » emploient une unique famille de glyphes SVG au trait, sans bibliothèque externe
-ni emoji. « Mon évolution » emploie exclusivement le moteur Canvas issu du handoff lunaire canonique :
-ni PNG de référence, ni ancien arbre SVG alternatif.
+**Univers, lectures et socle.** Un en-tête de chapitre donne sujet et disponibilité. Résumé
+essentiel d'abord, détails ensuite via les contrôles existants. Astrologie, Numérologie et
+Psychologie gardent leurs destinations et leur structure métier. Une panne reste distincte
+d'une donnée absente ou d'un refus.
 
-## 8. Direction approuvée — nuit douce + papier lumineux
+**Accès, compte et aide.** Les mêmes contrôles traversent connexion, verrou, consentements,
+réglages et données personnelles. Le menu conserve Aide, Explorer, Compte et Confidentialité.
+Dans l'aide, « Retour à Anima » et « Sortie rapide » gardent leurs gestes distincts; la page reste
+publique.
 
-La variante B a été retenue le 2026-09-05 pour le programme de revue clientèle. Elle ne crée pas
-un thème jour : le monde reste une nuit navy continue, mais les contenus structurés prennent place
-sur de grandes surfaces papier Ivory. Ce contraste de matière rend la lecture plus claire sans
-effacer l'identité lunaire.
+## 5. Composants et assets
 
-- Le fond de scène reste `--fond`. Une page ne remplace pas localement le ciel par une couleur
-  claire plein écran.
-- Les cartes de lecture et les disclosures structurants emploient `--papier`, `--sur-papier` et
-  `--sur-papier-doux`. Les aplats Sky du quotidien conservent leur rôle distinct `--jour`.
-- Beige, Sky et Periwinkle structurent bordures, illustrations et accents. Aucun pastel ne porte du
-  texte sans paire de contraste mesurée.
-- Une surface papier a un contour net, un rayon du système, une seule ombre posée et un grain
-  fibreux discret commun qui évoque un papier ancien. Elle ne reçoit ni flou, ni verre translucide,
-  ni texture assez forte pour réduire le contraste.
-- Les composants de référence sont : carte papier, bouton primaire, bouton secondaire, disclosure,
-  conteneur d'illustration et état vide/indisponible. Leurs états focus, contraste renforcé et
-  mouvement réduit font partie de la composition, pas d'une retouche ultérieure.
-- Le profil de dos d'Anam domine le portail de chargement et y est servi directement en PNG pour
-  rester fiable dès la première peinture, notamment sur Safari/iOS. Le lotus et les étoiles restent
-  des décors statiques ou calmement bornés ; aucune seconde couche de particules animées ne
-  concurrence la scène.
-- À l'étape graine, l'explication de l'arbre est un texte court posé directement sur le ciel, sans
-  carte. Une phrase discrète sous la graine marque le point de départ sans créer de progression.
+Inventaire : scène globale, navigation, en-tête de chapitre, carte de lecture, porte d'univers,
+boutons principal/secondaire, lien, champ et select, disclosure, feuille de profil, bandeau
+d'état, squelette, bulle Anam et composeur. Les composants existants gardent leurs responsabilités.
 
-## 9. Aujourd’hui, Psychologie et Anam
+Source d’illustration principale : `public/marque/lotus-celeste.webp`, aquarelle céleste créée avec imagegen intégré. Prompt et provenance : `design/lotus-celeste-asset.md`.
+Réutiliser portraits, lotus, glyphes existants et moteur Canvas lunaire. Aucun emoji d'interface,
+SVG improvisé ou famille d'icônes concurrente. Une texture éventuelle reste statique, discrète et
+sous les textes; tout nouvel asset exige une provenance explicite.
 
-- « Aujourd’hui » (la région d’accueil, nommée « Moi » jusqu’au 2026-09-02) conserve ce nom dans la
-  navigation, mais son grand titre affiche la date courante sans année. Le mantra attaché à cette
-  date vient immédiatement dessous, sans carte et entre guillemets. « Ton ciel du jour » suit dans
-  l’unique carte quotidienne, signée par le glyphe et le libellé « Astrologie ». Un fondu vertical
-  conduit ensuite à « Mon monde
-  intérieur » puis « Mes univers », avec trois
-  portes stables : Astrologie, Numérologie et Psychologie. Human Design vit dans Psychologie avec
-  l'Ennéagramme et Big Five ; il n'est pas dupliqué comme univers de premier rang.
-- Une porte est une surface locale entière, avec glyphe, intitulé, phrase courte et destination.
-  L’Ennéagramme absent ajoute une action explicite ; aucun badge ne remplace cette phrase.
-- La halte Psychologie distingue visuellement ce qui est disponible de ce dont la méthode ou le
-  moteur reste à valider. Un futur outil n’imite jamais un résultat.
-- Dans Anam, l’arbre persistant s’éteint totalement. Le ciel reste visible, le fil garde ses voiles
-  locaux et un repère « Aujourd’hui » sépare le nouveau jour sans devenir une carte. Quand aucun
-  tour n'existe et qu'aucune ouverture quotidienne n'est en préparation, l'introduction statique
-  est exactement : « Confie ici ce que tu portes
-  en toi. Un espace pour te comprendre, évoluer, te dépasser et révéler la personne que tu es
-  appelée à devenir. » Elle n'est ni persistée ni rejouée comme un message. La parole quotidienne
-  d'Anam prend sa place dans une bulle stable, avec son portrait à droite et une frappe progressive.
-  Quand le clavier s'ouvre, sa hauteur est réservée dans la colonne : le composeur reste sous le fil
-  sans jamais recouvrir la parole.
+## 6. Mouvement et accessibilité
 
-## 10. Non-buts
+Un fondu de région de 280 ms accompagne une entrée; un changement de surface confirme l'appui. Aucun mouvement
+cyclique décoratif, filtre plein écran ou flou d'arrière-plan. `prefers-reduced-motion` conserve
+l'information et supprime le mouvement.
 
-Pas de thème jour, pas de navigation imbriquée, pas d’animation élaborée, pas de personnalisation du
-mantra, pas de réflexion Ennéagramme alimentée par la mémoire d'Anam et pas de déplacement de la
-sortie rapide hors de `/aide` dans cette tranche.
+Focus visible; cibles tactiles au token d'au moins 44 px; contraste texte courant d'au moins
+4,5:1; aucun état par couleur seule. Les dialogues préservent nom accessible, confinement et
+retour du focus. L'ambiance Nuit et le contraste renforcé sont vérifiés avec les mêmes contenus.
 
-Amendement du 2026-09-02 : ce non-but disait aussi « pas de nouvelle palette ». Il ne tient plus
-depuis le retour terrain de Julian du 2026-09-01, palette « Soft Balance » à l’appui (Ivory
-`#F0EFEA`, Sky `#D3DBF0`, Gray `#B8B5AC`, Beige `#E0D2C7`, Periwinkle `#7A90C9`, Navy `#1C2740`) :
-« le fond est trop violet et trop sombre, il faut une interface plus contrastée et lisible, avec le
-violet et le bleu ciel de la fleur de lotus, des textures et des dégradés ; utilise la palette
-fournie ». La palette entre dans `app/styles/tokens.ts` (story E5-S1, décision D5 du
-sprint-change-proposal-2026-08-31-retours-terrain-2) : nuit navy native, Sky en accent et en lueur,
-Ivory et Beige réservés au mode contraste renforcé, l’ancien violet gardé en décor (`--nebuleuse`,
-consommé depuis E5-S2 par le halo et la couche nébuleuse du ciel de `render/monde.module.css`, en
-radiaux statiques ; les couleurs en dur de `monde`, `guide`, `reperes` et `reglages` sont passées
-aux jetons, gardé par `tests/couleurs-tokenisees.test.ts`).
-Le mode sombre reste natif : ce n’est toujours pas un nouveau thème, et « pas de thème jour » reste
-un non-but. L'amendement est désormais complété par la décision du 2026-09-05 : Ivory devient une
-surface de lecture native locale (`--papier`), sans devenir le fond du monde.
+## 7. Vérification et livraison
+
+Deux boucles capture → critique → correction → recapture à 390, 768 et 1440 px couvrent accueil,
+Anam, lecture/univers, formulaire d'accès et compte, sans données sensibles. Vérifier vide,
+chargement, erreur et densité réelle, texte long, clavier mobile, navigation clavier, Nuit,
+contraste renforcé et mouvement réduit. Attendre un état visible explicite, pas `networkidle`.
+
+Lint, parité des tokens et tests ciblés pertinents complètent la revue visuelle. Ne revendiquer
+que les surfaces inspectées. Branche dédiée déployable Vercel, référence de production initiale
+archivée, URL/SHA vérifiés et geste de retour documenté dans la spec de livraison.
+
+## 8. Limites
+
+Front uniquement : aucun changement API, données, migrations, auth, consentements, calculs,
+intégrations ou contrats réseau. Aucun résultat personnel inventé. Aucun paramétrage distant du
+backend. La branche reste séparée de main pour le test.
+
+## 9. Arbre de vie céleste
+
+La refonte de l’arbre suit [la direction dédiée](tree-of-life-spec.md) : proportions botaniques, matières nacrées, canopée pastel, lumière issue des seuls états réels. L’exploration illustrée des étapes reste explicitement pédagogique.
+
+## 10. Métamorphose botanique en planches fixes
+
+Le retour du 7 septembre précise la continuité graine→racines→arbre→lumière et sa découverte
+dès l'écran vide. [Direction et contrat de métamorphose](metamorphosis-spec.md).
+
+## 11. Croissance de l'arbre personnel
+
+Le correctif suivant rétablit la croissance sur le parcours réel et affine fortement les étapes :
+[direction et intégration](living-growth-spec.md). Il remplace le contrat de galerie seule.
+
+## 12. Lumière du ciel, prolongement de l’illumination
+
+Trois nouvelles planches suivent les 32 existantes, toutes conservées : la lumière descend
+du ciel vers la couronne, traverse le bois vivant, puis rejoint les racines. La silhouette,
+le cadrage et les matières pastel de la planche 32 restent les repères communs. La référence
+utilisateur guide la lumière rose nacrée, sans reprendre son interface ni ses textes.
+Les trois étapes prolongent la même famille Lumière et la croissance personnelle existante,
+sans rééchelonner les états déjà atteints.

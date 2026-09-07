@@ -31,18 +31,23 @@ export default function Bibliotheque({ bibliotheque }: ProprietesBibliotheque) {
   return (
     <div className={s.bibliotheque}>
       <div className={s.quotidien} data-quotidien>
-        {mantra && <MantraDuJour mantra={mantra} />}
+        {mantra && (
+          <div className={s.feuilletMantra}>
+            <p className={`t-titre ${s.annotation}`}>Une pensée à garder</p>
+            <MantraDuJour mantra={mantra} />
+          </div>
+        )}
         <div className={s.cartesQuotidiennes}>
           {ciel && <CarteCiel carte={ciel} />}
         </div>
       </div>
 
-      <div className={s.transitionUnivers} aria-hidden><span /></div>
-
       <section className={s.univers} aria-labelledby="moi-univers">
         <div className={s.enteteUnivers}>
-          <p className={`t-meta ${s.surtitreUnivers}`}>Mon monde intérieur</p>
-          <h2 id="moi-univers" className="t-titre">Mes univers</h2>
+          <div>
+            <p className={`t-surtitre ${s.surtitreUnivers}`}>Mon monde intérieur</p>
+            <h2 id="moi-univers" className="t-titre">Mes univers</h2>
+          </div>
         </div>
         <ul className={s.grilleUnivers}>
           {univers.map((univers) => <PorteUnivers key={univers.cle} univers={univers} />)}
@@ -62,7 +67,6 @@ function PorteUnivers({ univers }: { readonly univers: UniversVue }) {
     <li className={s.itemUnivers}>
       <article className={s.porteUnivers} data-univers={univers.cle}>
         <Link className={s.lienUnivers} href={univers.url}>
-          <span className={s.eclat} aria-hidden />
           <span className={s.glyphe}><GlypheUnivers cle={univers.cle} /></span>
           <span className={s.texteUnivers}>
             <span className={`t-titre-sm ${s.nomUnivers}`}>{univers.titre}</span>
@@ -97,12 +101,12 @@ function MantraDuJour({ mantra }: { readonly mantra: CarteVue }) {
 function CarteCiel({ carte }: { readonly carte: CarteVue }) {
   return (
     <article className={s.carte} aria-labelledby={`carte-${carte.cle}`}>
-      <div className={s.sourceCiel}>
+      <header className={s.enteteCiel}>
         <span className={`${s.glyphe} ${s.glypheCiel}`} aria-hidden>
           <GlypheUnivers cle="astrologie" />
         </span>
-        <span className="t-meta">Astrologie</span>
-      </div>
+        <div className={s.identiteCiel}>
+          <span className={`t-meta ${s.sourceCiel}`}>Astrologie</span>
       {/* ⚠️ UNE SEULE VOIX DE TITRE PAR ÉCRAN (QA visuelle du 2026-08-19). `t-corps-fort` est de
           l'INTERFACE (Inter) : il mettait « Le mantra du jour » et « Ton ciel du jour » dans une
           grasse sans-serif à trois centimètres de « Tes nombres » en Fraunces — deux familles de
@@ -112,6 +116,8 @@ function CarteCiel({ carte }: { readonly carte: CarteVue }) {
       <h2 id={`carte-${carte.cle}`} className="t-titre-sm">
         {carte.titre}
       </h2>
+        </div>
+      </header>
 
       {carte.faits.length > 0 && (
         <dl className={s.faits}>
@@ -152,7 +158,16 @@ function CarteCiel({ carte }: { readonly carte: CarteVue }) {
            personne. Le style qui affirme et la mention qui dit d'où ça vient vont ensemble ; l'un
            sans l'autre rend la carte fausse. */
         <>
-          <p className="t-corps">{carte.ecritureModele.texte}</p>
+          {/* ⚠️ LES MÊMES TROIS PARTIES QUE DANS LA HALTE, ET DANS LE MÊME ORDRE (2026-09-07). Ni
+              l'ordre ni les intitulés ne sont décidés ici : ils viennent de la carte, donc de
+              `cartes-socle.ts`. Deux JSX qui nommeraient chacun les parties auraient divergé au
+              premier renommage, et la divergence serait invisible — les deux seraient plausibles. */}
+          {carte.ecritureModele.parties.map((partie) => (
+            <div key={partie.intitule} className={s.partieModele}>
+              <h4 className={`t-surtitre ${s.intitulePartie}`}>{partie.intitule}</h4>
+              <p className="t-corps">{partie.texte}</p>
+            </div>
+          ))}
           <p className={`t-meta ${s.mentionModele}`}>{carte.ecritureModele.mention}</p>
         </>
       ) : carte.texte.statut === "ecrit" ? (

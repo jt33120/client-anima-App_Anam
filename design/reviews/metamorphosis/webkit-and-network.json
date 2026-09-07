@@ -1,0 +1,1338 @@
+{
+  "checkedAt": "2026-09-07T15:58:30.923Z",
+  "harness": "http://127.0.0.1:4179/?tree=seed",
+  "scope": "Local fixtures, no real account or API data. WebKit engine with touch/mobile viewport; not a physical iPhone. Network sizes are raw local WebP assets, not deployed Next image optimization timings.",
+  "sourceSha256": {
+    "render/arbre/MetamorphoseArbre.tsx": "9d4e72687b0171b0dc12ec43cc9f235d620af84e4c8a0ac89082e0dc3b9aa5e1",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/metamorphose-planches.ts": "a22ae3a6ae031380123b1218c932c2527bdcc04066808bc6e3e6902fc2894340",
+    "render/arbre/metamorphose.module.css": "cd972c204ac006d23014df923af9f10994029c98122245831ab0f063759e50a2"
+  },
+  "unitTests": {
+    "files": [
+      "tests/rendu/comprendre-evolution.test.tsx",
+      "tests/rendu/metamorphose-arbre.test.tsx"
+    ],
+    "passed": 15,
+    "failed": 0,
+    "eslint": "passed"
+  },
+  "webkit": {
+    "engine": "WebKit",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "snapshots": [
+      {
+        "label": "01-eclosion",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 2 sur 8 — L’écl"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-01",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 1 sur 8 — La gr"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": true
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-02",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 2 sur 8 — L’écl"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-03",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 3 sur 8 — Les p"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-04",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 4 sur 8 — La pr"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-05",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 5 sur 8 — Le je"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-06",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 6 sur 8 — Le dé"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-07",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 7 sur 8 — L’arb"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "planche-08",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreIllustration 8 sur 8 — La pl"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": true
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "keyboard-endpoint-last",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "BUTTON",
+          "label": "Voir l’illustration 08 : La pleine lumière",
+          "text": "08"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": true
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "keyboard-endpoint-first",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "BUTTON",
+          "label": "Voir l’illustration 01 : La graine",
+          "text": "01"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": true
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "closed-focus-restored",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": null,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Voir la graine éclore"
+        },
+        "buttons": [],
+        "scrollContainers": []
+      },
+      {
+        "label": "error-before-retry",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Comprendre mon évolutionRevenir à mon évolutionDe la graine à la lumièreCette illustration n’a pas p"
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Réessayer l’illustration",
+            "width": 192.328125,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      },
+      {
+        "label": "error-recovered-focus",
+        "pageOverflow": false,
+        "horizontalScroll": 0,
+        "dialog": {
+          "x": 0,
+          "y": 118.171875,
+          "width": 390,
+          "height": 725.828125
+        },
+        "active": {
+          "tag": "DIV",
+          "label": "Illustration : L’éclosion",
+          "text": ""
+        },
+        "buttons": [
+          {
+            "name": "Revenir à mon évolution",
+            "width": 158.875,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image précédente",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Image suivante",
+            "width": 179,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 01 : La graine",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 02 : L’éclosion",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 03 : Les premières racines",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 04 : La première pousse",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 05 : Le jeune arbre",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 06 : Le déploiement",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 07 : L’arbre de vie",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          },
+          {
+            "name": "Voir l’illustration 08 : La pleine lumière",
+            "width": 45.75,
+            "height": 44,
+            "disabled": false
+          }
+        ],
+        "scrollContainers": []
+      }
+    ],
+    "errors": [],
+    "api": [],
+    "assertions": [
+      "Seed CTA opens the hatching image (index 1).",
+      "All eight plates load with correct markers and disabled endpoint controls.",
+      "Native Enter/Space navigation, focus trap and Escape restore the seed trigger.",
+      "Named close button also restores seed-trigger focus.",
+      "Aborted asset shows retry, recovers the same illustration and keeps focus on its stable panel."
+    ],
+    "focusLast": {
+      "tag": "BUTTON",
+      "label": "Voir l’illustration 08 : La pleine lumière",
+      "disabled": false
+    },
+    "focusFirst": {
+      "tag": "BUTTON",
+      "label": "Voir l’illustration 01 : La graine",
+      "disabled": false
+    }
+  },
+  "network": {
+    "snapshots": [
+      {
+        "label": "closed",
+        "requested": [],
+        "metrics": {
+          "overflow": false,
+          "images": [],
+          "resources": []
+        }
+      },
+      {
+        "label": "eclosion",
+        "requested": [
+          "/marque/metamorphose/02-eclosion.webp",
+          "/marque/metamorphose/03-enracinement.webp"
+        ],
+        "metrics": {
+          "overflow": false,
+          "images": [
+            {
+              "src": "/marque/metamorphose/02-eclosion.webp",
+              "complete": true,
+              "naturalWidth": 1024,
+              "width": 364,
+              "height": 327.15625
+            },
+            {
+              "src": "/marque/metamorphose/03-enracinement.webp",
+              "complete": true,
+              "naturalWidth": 1024,
+              "width": 0,
+              "height": 0
+            }
+          ],
+          "resources": [
+            {
+              "path": "/marque/metamorphose/02-eclosion.webp",
+              "duration": 2.599999997764826,
+              "transferSize": 76902,
+              "decodedBodySize": 76602
+            },
+            {
+              "path": "/marque/metamorphose/03-enracinement.webp",
+              "duration": 2.199999999254942,
+              "transferSize": 78010,
+              "decodedBodySize": 77710
+            }
+          ]
+        }
+      },
+      {
+        "label": "illumination",
+        "requested": [
+          "/marque/metamorphose/02-eclosion.webp",
+          "/marque/metamorphose/03-enracinement.webp",
+          "/marque/metamorphose/08-illumination.webp"
+        ],
+        "metrics": {
+          "overflow": false,
+          "images": [
+            {
+              "src": "/marque/metamorphose/08-illumination.webp",
+              "complete": true,
+              "naturalWidth": 1024,
+              "width": 364,
+              "height": 327.15625
+            }
+          ],
+          "resources": [
+            {
+              "path": "/marque/metamorphose/02-eclosion.webp",
+              "duration": 2.599999997764826,
+              "transferSize": 76902,
+              "decodedBodySize": 76602
+            },
+            {
+              "path": "/marque/metamorphose/03-enracinement.webp",
+              "duration": 2.199999999254942,
+              "transferSize": 78010,
+              "decodedBodySize": 77710
+            },
+            {
+              "path": "/marque/metamorphose/08-illumination.webp",
+              "duration": 3.900000002235174,
+              "transferSize": 401866,
+              "decodedBodySize": 401566
+            }
+          ]
+        }
+      },
+      {
+        "label": "closed-again",
+        "requested": [
+          "/marque/metamorphose/02-eclosion.webp",
+          "/marque/metamorphose/03-enracinement.webp",
+          "/marque/metamorphose/08-illumination.webp"
+        ],
+        "metrics": {
+          "overflow": false,
+          "images": [],
+          "resources": [
+            {
+              "path": "/marque/metamorphose/02-eclosion.webp",
+              "duration": 2.599999997764826,
+              "transferSize": 76902,
+              "decodedBodySize": 76602
+            },
+            {
+              "path": "/marque/metamorphose/03-enracinement.webp",
+              "duration": 2.199999999254942,
+              "transferSize": 78010,
+              "decodedBodySize": 77710
+            },
+            {
+              "path": "/marque/metamorphose/08-illumination.webp",
+              "duration": 3.900000002235174,
+              "transferSize": 401866,
+              "decodedBodySize": 401566
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "path": "/marque/metamorphose/02-eclosion.webp",
+        "method": "GET"
+      },
+      {
+        "path": "/marque/metamorphose/03-enracinement.webp",
+        "method": "GET"
+      },
+      {
+        "path": "/marque/metamorphose/08-illumination.webp",
+        "method": "GET"
+      }
+    ],
+    "responses": [
+      {
+        "path": "/marque/metamorphose/02-eclosion.webp",
+        "status": 200
+      },
+      {
+        "path": "/marque/metamorphose/03-enracinement.webp",
+        "status": 200
+      },
+      {
+        "path": "/marque/metamorphose/08-illumination.webp",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "api": []
+  },
+  "review": {
+    "remainingBlockingFindings": [],
+    "fixedFinding": "Native disabled endpoint commands previously dropped keyboard focus on WebKit. Both endpoints now move focus to the matching enabled image marker before disabling the command.",
+    "observations": [
+      "The gallery receives only an initial image index and a static manifest; it has no personal tree projection or mutation callback.",
+      "The modal is mounted outside the transformed garden, preserving viewport bounds.",
+      "All eight image assets decode, image error preserves navigation and retries successfully, and close/Escape restore the original seed trigger.",
+      "Current image and at most its next neighbor are requested. A closed gallery requests no gallery assets.",
+      "Existing real branch and conversation links remain callable after exploring the gallery in integration tests."
+    ]
+  }
+}

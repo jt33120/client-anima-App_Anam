@@ -1,0 +1,381 @@
+{
+  "before": {
+    "render/arbre/MetamorphoseArbre.tsx": "dfb5cb8ceeb3f86c2fdbdb01c9ac87cdc224f465c9956e3d57ff1dd6bcfed024",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/metamorphose.module.css": "1dbfad0c0f7ef56221fe19d35384a67f67144370bd46d651f7aad3aece148cbb",
+    "render/arbre/ArbreInteractif.tsx": "da51f3beba27ff809d435e7cbfdb45d6951a27d26342986e915b9315c7c82c13",
+    "render/arbre/arbre.module.css": "9e25b2e3e939ebebcce7689158c40de36bb5bf89d8f92c3e22b98bad28a0b371",
+    "render/arbre/metamorphose-planches.ts": "a22ae3a6ae031380123b1218c932c2527bdcc04066808bc6e3e6902fc2894340",
+    "app/styles/carnet-tokens.css": "01c6e865af08d8a2d60e54a0688a36189b8a702fa03b764316587686ca2195bb"
+  },
+  "after": {
+    "render/arbre/MetamorphoseArbre.tsx": "dfb5cb8ceeb3f86c2fdbdb01c9ac87cdc224f465c9956e3d57ff1dd6bcfed024",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/metamorphose.module.css": "1dbfad0c0f7ef56221fe19d35384a67f67144370bd46d651f7aad3aece148cbb",
+    "render/arbre/ArbreInteractif.tsx": "da51f3beba27ff809d435e7cbfdb45d6951a27d26342986e915b9315c7c82c13",
+    "render/arbre/arbre.module.css": "9e25b2e3e939ebebcce7689158c40de36bb5bf89d8f92c3e22b98bad28a0b371",
+    "render/arbre/metamorphose-planches.ts": "a22ae3a6ae031380123b1218c932c2527bdcc04066808bc6e3e6902fc2894340",
+    "app/styles/carnet-tokens.css": "01c6e865af08d8a2d60e54a0688a36189b8a702fa03b764316587686ca2195bb"
+  },
+  "sourceChanged": [],
+  "fatalError": null,
+  "results": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "ctaBounds": {
+        "x": 108.3984375,
+        "y": 690.578125,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 199,
+        "y": 674.25,
+        "width": 179,
+        "height": 44
+      },
+      "assetsBeforeOpen": [],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 327.15625
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 327.15625
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 327.15625
+        }
+      },
+      "stages": [
+        {
+          "position": 0,
+          "id": "graine",
+          "src": "/marque/metamorphose/01-graine.webp",
+          "alt": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 327.15625
+          },
+          "pressed": "true",
+          "previousDisabled": true,
+          "nextDisabled": false
+        },
+        {
+          "position": 7,
+          "id": "illumination",
+          "src": "/marque/metamorphose/08-illumination.webp",
+          "alt": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 327.15625
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/08-illumination.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "ctaBounds": {
+        "x": 297.3984375,
+        "y": 800.71875,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 388,
+        "y": 715.796875,
+        "width": 291,
+        "height": 44
+      },
+      "assetsBeforeOpen": [],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 388
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 388
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 388
+        }
+      },
+      "stages": [
+        {
+          "position": 0,
+          "id": "graine",
+          "src": "/marque/metamorphose/01-graine.webp",
+          "alt": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 388
+          },
+          "pressed": "true",
+          "previousDisabled": true,
+          "nextDisabled": false
+        },
+        {
+          "position": 7,
+          "id": "illumination",
+          "src": "/marque/metamorphose/08-illumination.webp",
+          "alt": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 388
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/08-illumination.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "ctaBounds": {
+        "x": 753.3984375,
+        "y": 850.609375,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 724,
+        "y": 715.796875,
+        "width": 291,
+        "height": 44
+      },
+      "assetsBeforeOpen": [],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 388
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 388
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 388
+        }
+      },
+      "stages": [
+        {
+          "position": 0,
+          "id": "graine",
+          "src": "/marque/metamorphose/01-graine.webp",
+          "alt": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 388
+          },
+          "pressed": "true",
+          "previousDisabled": true,
+          "nextDisabled": false
+        },
+        {
+          "position": 7,
+          "id": "illumination",
+          "src": "/marque/metamorphose/08-illumination.webp",
+          "alt": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 388
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/08-illumination.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    }
+  ]
+}

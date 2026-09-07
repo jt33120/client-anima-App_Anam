@@ -155,6 +155,24 @@ export default function Fil({
     return () => el.removeEventListener("scroll", surScroll);
   }, []);
 
+  // A keyboard or a growing draft changes the reading window without adding a tour. Keep the
+  // latest response in view only when the reader was following the bottom before that resize.
+  useEffect(() => {
+    const el = conteneur.current;
+    if (!el) return;
+    let hauteur = el.clientHeight;
+    const observateur = new ResizeObserver(() => {
+      if (hauteur === el.clientHeight) return;
+      hauteur = el.clientHeight;
+      if (etaitEnBas.current) {
+        marquerNotreDefilement();
+        el.scrollTop = el.scrollHeight;
+      }
+    });
+    observateur.observe(el);
+    return () => observateur.disconnect();
+  }, []);
+
   // À chaque nouveau contenu : recoller au bas UNIQUEMENT si on y était (défilement instantané,
   // jamais « smooth » → cohérent reduced-motion, et non captif).
   //

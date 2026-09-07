@@ -30,7 +30,10 @@ const TIER_ATTENDU: Record<CapaciteIa, TierIa> = {
   // 2026-09-02 — le texte du jour est la seule capacité tranchée par le CONTENU de sa charge utile
   // et non par le risque de paraphrase : elle ne contient aucun mot d'elle (aspects, distance en
   // signes), et ce qui revient passe par `verdictHoroscope` avant d'être montré.
-  horoscope: "leger",
+  // Passé au FORT le 2026-09-07 : la charge utile porte désormais son prénom, ses signes natals et
+  // ce qu'Anam a retenu d'elle, et la sortie est persistée puis re-servie deux jours. Ce sont les
+  // deux prédicats exacts qui mettent `lecture` et `compactage` au fort.
+  horoscope: "fort",
 };
 
 /**

@@ -1,0 +1,1054 @@
+[
+  {
+    "tree": "seed",
+    "label": "base",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": false,
+      "targets": [
+        {
+          "name": "Comprendre mon évolution",
+          "width": 332,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 304,
+          "scrollHeight": 377,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Ton arbre : chaque branche est une prise de conscience que tu as nommée.",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 303.078125,
+          "height": 538.796875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "text-bottom",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": false,
+      "targets": [
+        {
+          "name": "Comprendre mon évolution",
+          "width": 332,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 304,
+          "scrollHeight": 377,
+          "top": 73
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Ton arbre : chaque branche est une prise de conscience que tu as nommée.",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 303.078125,
+          "height": 538.796875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "halte-0",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Graine",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "halte-1",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 834,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Premier élan",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "halte-2",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Feuillaison",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "halte-3",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Pleine lumière",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "modal-bottom",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 83
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Pleine lumière",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "closed",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": false,
+      "targets": [
+        {
+          "name": "Comprendre mon évolution",
+          "width": 332,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 304,
+          "scrollHeight": 377,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Ton arbre : chaque branche est une prise de conscience que tu as nommée.",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 303.078125,
+          "height": 538.796875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "seed",
+    "label": "verification",
+    "errors": [],
+    "intercepted": [],
+    "focusRestored": true,
+    "escapeClosed": true
+  },
+  {
+    "tree": "mixed",
+    "label": "base",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": false,
+      "targets": [
+        {
+          "name": "Comprendre mon évolution",
+          "width": 245.234375,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Vue liste",
+          "width": 78.765625,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Réduire l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Agrandir l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [],
+      "canvas": [
+        {
+          "label": "Ton arbre : chaque branche est une prise de conscience que tu as nommée.",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 303.078125,
+          "height": 538.796875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "zoom-plus",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": false,
+      "targets": [
+        {
+          "name": "Comprendre mon évolution",
+          "width": 245.234375,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Vue liste",
+          "width": 78.765625,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Réduire l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Agrandir l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "width": 43.99998474121094,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [],
+      "canvas": [
+        {
+          "label": "Ton arbre : chaque branche est une prise de conscience que tu as nommée.",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 363.6937255859375,
+          "height": 646.5562744140625
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "zoom-minus",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": false,
+      "targets": [
+        {
+          "name": "Comprendre mon évolution",
+          "width": 245.234375,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Vue liste",
+          "width": 78.765625,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Réduire l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Agrandir l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [],
+      "canvas": [
+        {
+          "label": "Ton arbre : chaque branche est une prise de conscience que tu as nommée.",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 303.078125,
+          "height": 538.796875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "halte-0",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Graine",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "halte-1",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 834,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Premier élan",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "halte-2",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Feuillaison",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "halte-3",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 0
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Pleine lumière",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "modal-bottom",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": true,
+      "targets": [
+        {
+          "name": "Revenir à mon évolution",
+          "width": 158.875,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Graine",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Premier élan",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Feuillaison",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Pleine lumière",
+          "width": 88.5,
+          "height": 62,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [
+        {
+          "height": 725,
+          "scrollHeight": 808,
+          "top": 83
+        }
+      ],
+      "canvas": [
+        {
+          "label": "Un exemple d’arbre : Pleine lumière",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 179.28125,
+          "height": 318.71875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "closed",
+    "metrics": {
+      "overflow": false,
+      "bodyScroll": 0,
+      "dialog": false,
+      "targets": [
+        {
+          "name": "Comprendre mon évolution",
+          "width": 245.234375,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Vue liste",
+          "width": 78.765625,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Réduire l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Agrandir l’arbre",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Me faire confiance",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "width": 44,
+          "height": 44,
+          "onScreen": true,
+          "centerHit": true
+        }
+      ],
+      "scrollContainers": [],
+      "canvas": [
+        {
+          "label": "Ton arbre : chaque branche est une prise de conscience que tu as nommée.",
+          "bitmap": [
+            986,
+            1753
+          ],
+          "width": 303.078125,
+          "height": 538.796875
+        }
+      ]
+    }
+  },
+  {
+    "tree": "mixed",
+    "label": "verification",
+    "errors": [],
+    "intercepted": [],
+    "focusRestored": true,
+    "escapeClosed": true
+  }
+]

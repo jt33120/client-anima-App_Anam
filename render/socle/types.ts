@@ -103,9 +103,15 @@ export interface ManqueVue {
  * (retour du 2026-09-01 : l'horoscope est la première information de l'univers Astrologie).
  * Pas de date, pas de nombre : la seule forme numérique de cette frontière reste le type.
  */
+/** Une partie et son intitulé — voir `render/accueil/types.ts`, même forme et même raison. */
+export interface PartieEcritureVue {
+  readonly intitule: string;
+  readonly texte: string;
+}
+
 /** Un texte de modèle et sa mention — voir `render/accueil/types.ts`, même forme et même raison. */
 export interface EcritureModeleVue {
-  readonly texte: string;
+  readonly parties: readonly PartieEcritureVue[];
   readonly mention: string;
 }
 

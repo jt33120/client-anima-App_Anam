@@ -49,6 +49,8 @@ import type {
 } from "./conversation/types";
 import type { ResultatGeste } from "./arbre/FicheBranche";
 import s from "./monde.module.css";
+import { useConversationViewport } from "./conversation/useConversationViewport";
+import GlypheUnivers from "./GlypheUnivers";
 
 export interface ProprietesSceneRendue {
   /** Domain-projection serveur, en lecture seule (AD-7). Le rendu ne l'écrit jamais. */
@@ -285,6 +287,7 @@ export default function SceneDom({
     (franchi) => etatInitialPour(regionDOuverture(franchi)),
   );
   const region = etat.regionCourante;
+  const viewportConversation = useConversationViewport(region === "anam");
   /* Naviguer par la barre ANNULE le rejeu de l'échange source : sans ça, `echangeExtrait` restait collé et
      la région Anam demeurait bloquée sur l'ancien extrait, sans composeur (piège de navigation, revue 4.6). */
   /**
@@ -494,6 +497,15 @@ export default function SceneDom({
   const [echangeExtrait, setEchangeExtrait] = useState<string | null>(null);
   const router = useRouter();
 
+  // The saved foliage can change after a conversation response has finished streaming.
+  // Re-read it on entering the tree, including return navigation and swipe gestures.
+  const regionPrecedente = useRef(region);
+  useEffect(() => {
+    const precedente = regionPrecedente.current;
+    regionPrecedente.current = region;
+    if (region === "arbre" && precedente !== "arbre") router.refresh();
+  }, [region, router]);
+
   const voirDansConversation = (extraitSourceId: string) => {
     setEchangeExtrait(extraitSourceId);
     dispatch({ type: "voirDansConversation" }); // mémorise le cadrage de l'arbre (retour restaurable)
@@ -601,6 +613,7 @@ export default function SceneDom({
 
   return (
     <main
+      ref={viewportConversation}
       className={`${s.monde} ${tourOuvert ? s.tourOuvert : ""} ${region === "accueil" ? s.accueilActif : ""}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -849,14 +862,24 @@ export default function SceneDom({
               </>
             ) : (
               <div className={s.bloc}>
+                {r.id === "accueil" && (
+                  <header className={s.carnetEntete}>
+                    <h1 className={s.carnetDate} tabIndex={-1}
+                      ref={(el) => void (entetes.current[r.id] = el)}>
+                      {libelleDateAccueil(jourAccueil)}
+                    </h1>
+                    <p className={s.carnetTitre}>Ton ciel<br /><em>intérieur.</em></p>
+                    <p className={s.carnetAnnotation}>Un instant pour toi.</p>
+                  </header>
+                )}
                 {/* h1 par région : une seule est non-inert à la fois → une seule h1 exposée. */}
-                <h1
-                  className="t-titre"
+                {r.id !== "accueil" && <h1
+                  className={`t-titre ${s.carnetDate}`}
                   tabIndex={-1}
                   ref={(el) => void (entetes.current[r.id] = el)}
                 >
-                  {r.id === "accueil" ? libelleDateAccueil(jourAccueil) : r.nom}
-                </h1>
+                  {r.nom}
+                </h1>}
                 {/* Story 5.6 — la bibliothèque remplace le texte d'attente. Une lecture en panne
                     (`null`) laisse la région vide plutôt que de fermer la scène (AC7). */}
                 {r.id === "accueil" ? (
@@ -880,7 +903,12 @@ export default function SceneDom({
                     />
                     {bibliotheque ? (
                       <Bibliotheque bibliotheque={bibliotheque} />
-                    ) : null}
+                    ) : (
+                      <div className={s.carnetIndisponible} role="status">
+                        <p>Ton carnet du jour n’a pas pu s’ouvrir. Tu peux réessayer ou retrouver Anam.</p>
+                        <button className={s.carnetTheme} type="button" onClick={() => router.refresh()}>Réessayer</button>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="t-corps">{CORPS[r.id]}</p>
@@ -902,17 +930,28 @@ export default function SceneDom({
           doubler. */}
       {!seuilActif && (
         <nav className={s.nav} aria-label="Régions">
+          <div className={s.carnetMarque} aria-hidden>
+            <span className={s.carnetNom}>anam<span>.</span></span>
+            <span className={s.carnetSignature}>Le carnet intérieur</span>
+          </div>
+          <span className={s.carnetRubrique} aria-hidden>Prendre le temps</span>
           {REGIONS.map((r) => (
             <button
               key={r.id}
               type="button"
               className={s.navLien}
               aria-current={region === r.id ? "location" : undefined}
-              onClick={(event) => aller(r.id, r.id === "anam" && event.detail > 0)}
+              onClick={() => aller(r.id)}
             >
+              <span className={s.carnetNavIcone} aria-hidden>
+                <GlypheUnivers cle={r.id === "accueil" ? "astrologie" : r.id === "anam" ? "numerologie" : "psychologie"} />
+              </span>
               <span className="t-bouton">{r.nom}</span>
             </button>
           ))}
+          <div className={s.carnetNavPied}>
+            <p>À ton rythme.</p>
+          </div>
         </nav>
       )}
     </main>

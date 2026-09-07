@@ -1,8 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
-import { ARIA_CANEVAS } from "@/render/arbre/copie-arbre";
-import { CANEVAS } from "@/render/arbre/geometrie";
+import { CADRE_ARBRE_PERSONNEL } from "@/render/arbre/ancres-arbre-personnel";
 import type { BrancheProjetee, ProjectionScene } from "@/lib/scene";
 import { dimensionnerTout, notifierRedimensionnement, abonnementsVivants } from "./_outils";
 
@@ -20,9 +19,9 @@ import { dimensionnerTout, notifierRedimensionnement, abonnementsVivants } from 
  */
 
 const CONTENEUR = { largeur: 800, hauteur: 600 };
-/** Le handoff 1408×2503 prend toute la hauteur puis se centre dans la largeur disponible. */
+/** Le portrait personnel 1024×1536 prend toute la hauteur puis se centre dans la largeur disponible. */
 const HAUTEUR_ATTENDUE = CONTENEUR.hauteur;
-const LARGEUR_ATTENDUE = (CANEVAS.largeur / CANEVAS.hauteur) * HAUTEUR_ATTENDUE;
+const LARGEUR_ATTENDUE = (CADRE_ARBRE_PERSONNEL.largeur / CADRE_ARBRE_PERSONNEL.hauteur) * HAUTEUR_ATTENDUE;
 const GAUCHE_ATTENDUE = (CONTENEUR.largeur - LARGEUR_ATTENDUE) / 2;
 
 const branche = (id: string): BrancheProjetee => ({
@@ -49,12 +48,10 @@ function proprietes(projection: ProjectionScene) {
   };
 }
 
-/** Le `.monde` est le parent direct du Canvas : on le trouve par le rôle, jamais par un nom de classe
- *  (les classes de CSS Modules sont hachées à la compilation — s'y accrocher rendrait la garde fragile). */
+/** Le cadre personnel partage le monde mesuré avec les cibles, indépendamment de l’image. */
 function monde(): HTMLElement {
-  const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
-  const parent = canvas.parentElement;
-  if (!parent) throw new Error("le Canvas de l'arbre n'a pas de parent `.monde`");
+  const parent = document.querySelector<HTMLElement>("[data-index-croissance]")?.parentElement;
+  if (!parent) throw new Error("l’illustration de l’arbre n’a pas de monde mesuré");
   return parent;
 }
 
@@ -69,18 +66,19 @@ describe("[HAUTE / re-revue] le canevas de l'arbre est MESURÉ dès qu'il est à
     expect(m.style.left).toBe(`${GAUCHE_ATTENDUE}px`);
   });
 
-  it("SCÉNARIO NOMINAL — graine puis PREMIÈRE branche : le MÊME canevas reste mesuré", () => {
+  it("SCÉNARIO NOMINAL — graine puis PREMIÈRE branche : le MÊME monde reste mesuré", () => {
     dimensionnerTout(CONTENEUR.largeur, CONTENEUR.hauteur);
     const { rerender } = render(<ArbreInteractif {...proprietes(scene([]))} />);
-    const graine = screen.getByRole("img", { name: ARIA_CANEVAS });
+    const graine = document.querySelector("[data-index-croissance]")!;
+    const mondeInitial = monde();
     expect(graine.getAttribute("data-etape-arbre")).toBe("graine");
     expect(monde().style.width).toBe(`${LARGEUR_ATTENDUE}px`);
 
-    // La première branche ne remplace pas le ciel par un second dessin : le bitmap déjà monté est recuit.
+    // L’image change, mais le monde et les coordonnées des cibles restent mesurés.
     rerender(<ArbreInteractif {...proprietes(scene([branche("a")]))} />);
 
     const m = monde();
-    expect(screen.getByRole("img", { name: ARIA_CANEVAS })).toBe(graine);
+    expect(m).toBe(mondeInitial);
     expect(graine.getAttribute("data-etape-arbre")).toBe("branches");
     expect(m.style.width, "un monde de 0px = un arbre INVISIBLE au scénario nominal").toBe(`${LARGEUR_ATTENDUE}px`);
     expect(m.style.height).toBe(`${HAUTEUR_ATTENDUE}px`);
@@ -90,7 +88,7 @@ describe("[HAUTE / re-revue] le canevas de l'arbre est MESURÉ dès qu'il est à
   it("REPRISE DE PANNE — `indisponible` puis lecture réussie : le canevas apparaît et DOIT être mesuré", () => {
     dimensionnerTout(CONTENEUR.largeur, CONTENEUR.hauteur);
     const { rerender } = render(<ArbreInteractif {...proprietes(scene([], true))} />);
-    expect(screen.queryByRole("img", { name: ARIA_CANEVAS })).toBeNull();
+    expect(document.querySelector("[data-index-croissance]")).toBeNull();
 
     rerender(<ArbreInteractif {...proprietes(scene([branche("a")]))} />);
     expect(monde().style.width).toBe(`${LARGEUR_ATTENDUE}px`);
@@ -106,7 +104,7 @@ describe("[HAUTE / re-revue] le canevas de l'arbre est MESURÉ dès qu'il est à
     dimensionnerTout(400, 300);
     act(() => notifierRedimensionnement());
     expect(monde().style.width, "le composant doit RÉAGIR à la notification, pas seulement s'y abonner").toBe(
-      `${(CANEVAS.largeur / CANEVAS.hauteur) * 300}px`,
+      `${(CADRE_ARBRE_PERSONNEL.largeur / CADRE_ARBRE_PERSONNEL.hauteur) * 300}px`,
     );
   });
 

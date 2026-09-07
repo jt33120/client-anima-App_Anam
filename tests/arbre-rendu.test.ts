@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import tokens from "@/design/tokens.json";
+import { PALETTE_LUNAIRE } from "@/render/arbre/MoteurArbreLunaire";
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { LIBELLE_ETAT } from "@/render/arbre/copie-arbre";
@@ -176,10 +178,10 @@ describe("[AC3 DUR] les accroches et le dessin partagent le MÊME repère (fin d
     expect(arbre, "les deux dimensions du portrait pilotent la boîte du monde").toMatch(/largeur[\s\S]{0,80}hauteur/);
   });
 
-  it("le Canvas et les accroches vivent dans le MÊME conteneur `.monde` dimensionné en pixels", () => {
+  it("l’illustration et les accroches vivent dans le MÊME conteneur `.monde` dimensionné en pixels", () => {
     expect(arbre).toMatch(/width:\s*boite\.largeur/);
     expect(arbre).toMatch(/height:\s*boite\.hauteur/);
-    expect(arbre).toMatch(/<ArbreLunaire/);
+    expect(arbre).toMatch(/<ArbrePersonnel/);
   });
 
   it("le zoom part du CENTRE (au coin, l'arbre fuyait hors cadre en quelques clics)", () => {
@@ -308,7 +310,7 @@ describe("charte de l'arbre & reduced-motion", () => {
   const moteur = lire("render/arbre/MoteurArbreLunaire.ts");
 
   it("le rayonnement est la LUEUR nacre (pas un objet-fruit), aucun brun ni or", () => {
-    expect(moteur).toContain('lueur: "#CDE4F8"');
+    expect(PALETTE_LUNAIRE.lueur).toBe(tokens.arbre.nacre);
     expect(moteur).toMatch(/globalCompositeOperation\s*=\s*"lighter"/);
     // aucun brun/or codé en dur (charte : arbre de nuit argenté)
     expect(`${css}\n${moteur}`).not.toMatch(/#5c4526|#2b1f12|#0c0906|#ffb14d|gold|goldenrod/i);

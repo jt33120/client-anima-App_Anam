@@ -1,0 +1,87 @@
+{
+  "mode": "built-in imagegen",
+  "date": "2026-09-07",
+  "optimization": "WebP quality88 effort6; no resize or crop",
+  "assets": [
+    {
+      "stage": 1,
+      "name": "graine",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-677ed7cd-c782-40bb-9c8a-933493b57e0b.png",
+      "target": "public/marque/metamorphose/01-graine.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 87650,
+      "sha256": "5e42cb4a2bc4f8d110af14b601b27f155c2d5bcfbbe2d268dcee348e2b619051"
+    },
+    {
+      "stage": 2,
+      "name": "eclosion",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-2f9cc335-24c7-4b65-a473-d472d309db4b.png",
+      "target": "public/marque/metamorphose/02-eclosion.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 76602,
+      "sha256": "d94ef5728eeea53809b9a77440b4e97e7c0233a693aaaac052fcb7edb258c198"
+    },
+    {
+      "stage": 3,
+      "name": "enracinement",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-7da4ce07-2e22-44f5-a432-83e8be50aa42.png",
+      "target": "public/marque/metamorphose/03-enracinement.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 77710,
+      "sha256": "32c6939531ba222eca8a6b16f28752d0644753f026c0e3ecd173374e08bab65e"
+    },
+    {
+      "stage": 4,
+      "name": "pousse",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-e00f2913-9b37-4fb5-80d4-d4d1e49907b3.png",
+      "target": "public/marque/metamorphose/04-pousse.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 86954,
+      "sha256": "7c5cb85343d05ad0c980bb64481baec08f6a63571bba69ce2ec2fb1ed5e142b8"
+    },
+    {
+      "stage": 5,
+      "name": "jeune-arbre",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-4af65bdf-ff0d-406b-8bb1-ecb3079ee61a.png",
+      "target": "public/marque/metamorphose/05-jeune-arbre.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 110798,
+      "sha256": "5e277b16bb44aca17546d50a80938e020011842b70aad10f6304780b4d3d9f1a"
+    },
+    {
+      "stage": 6,
+      "name": "deploiement",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-425f4417-a9da-476d-970c-6d64112f1945.png",
+      "target": "public/marque/metamorphose/06-deploiement.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 214344,
+      "sha256": "e9700f061c1ab39fd6980bc2a9329e3b4884335b8c14ae6dacf88563b219e043"
+    },
+    {
+      "stage": 7,
+      "name": "canopee",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-d617c686-f04b-4319-86e6-91c355c3a4fb.png",
+      "target": "public/marque/metamorphose/07-canopee.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 348998,
+      "sha256": "960e2fb6faf899d12e4bb30374a3275ebc9d55713b5eff83a810c60a1ac1d844"
+    },
+    {
+      "stage": 8,
+      "name": "illumination",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-d1d3a91e-02c5-415f-b452-9675cd5a4d10.png",
+      "target": "public/marque/metamorphose/08-illumination.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 401566,
+      "sha256": "0b37e3ba9ff38f863d4670ca2bf5b71e2c29a4743fca43235daa6a3facbd724f"
+    }
+  ]
+}

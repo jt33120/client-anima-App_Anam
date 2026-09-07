@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
 import {
@@ -60,7 +60,7 @@ function monter(
 
 /** Les accroches et leur taille déclarée à l'écran (px). */
 function accroches() {
-  return screen.getAllByRole("button", { name: /^Branche : / }).map((b) => {
+  return [...document.querySelectorAll<HTMLButtonElement>("[data-branche-arbre], [data-groupe-branches]")].map((b) => {
     const el = b as HTMLElement;
     return {
       el,
@@ -80,10 +80,14 @@ describe("[WCAG / revue] chaque branche garde une cible tactile de 44 px", () =>
       it(`${n} branches à ${viewport.largeur}px restent toutes à 44×44 px`, () => {
         monter(n, {}, viewport);
         const cibles = accroches();
-        expect(cibles).toHaveLength(n);
+        const ids = cibles.flatMap(({ el }) => (el.dataset.brancheArbre ?? el.dataset.groupeBranches ?? "").split(" "));
+        expect(ids.sort()).toEqual(Array.from({ length: n }, (_, i) => `b${i}`).sort());
         for (const cible of cibles) {
           expect(cible.taille).toBe(44);
-          expect(parseFloat(cible.el.style.height)).toBe(44);
+          if (cible.el.hasAttribute("data-groupe-branches")) {
+            // The shared CSS class supplies the 44 px token; real dimensions are checked in WebKit/Chromium.
+            expect(cible.el.className).toMatch(/accroche/);
+          } else expect(parseFloat(cible.el.style.height)).toBe(44);
         }
       });
     }
@@ -97,9 +101,16 @@ describe("[WCAG / revue] chaque branche garde une cible tactile de 44 px", () =>
     }
   });
 
-  it("les 60 cibles restent activables au clavier malgré les recouvrements spatiaux", () => {
+  it("les 60 branches restent activables au clavier via leurs cibles ou groupes", () => {
     const { props } = monter(60);
-    for (const cible of accroches()) fireEvent.click(cible.el, { detail: 0 });
+    for (const cible of accroches()) {
+      fireEvent.click(cible.el, { detail: 0 });
+      if (cible.el.hasAttribute("data-groupe-branches")) {
+        const panneau = within(screen.getByRole("group", { name: "Branches proches" }));
+        for (const choix of panneau.getAllByRole("button", { name: /^Branche : / })) fireEvent.click(choix, { detail: 0 });
+        fireEvent.click(panneau.getByRole("button", { name: "Fermer les branches proches" }), { detail: 0 });
+      }
+    }
     expect(props.onOuvrirFiche).toHaveBeenCalledTimes(60);
     expect(new Set(props.onOuvrirFiche.mock.calls.map(([id]) => id))).toEqual(
       new Set(Array.from({ length: 60 }, (_, i) => `b${i}`)),

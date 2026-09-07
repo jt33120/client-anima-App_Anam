@@ -1,0 +1,1515 @@
+{
+  "before": {
+    "render/arbre/ArbrePersonnel.tsx": "444fc69d5a4087a212e59b6a4f9c73e1b23a3c9272741b459dd3437d0f05cb1e",
+    "render/arbre/ArbreInteractif.tsx": "1c98b2ef398acab1ec98472a418084b6495633fe2716edc2b376bb76f3e121af",
+    "render/arbre/ancres-arbre-personnel.ts": "808fca66c9f71a725b9439b1d8766b869cbd1695cac23fb9cf3088a0d1b8d354",
+    "render/arbre/croissance-personnelle.ts": "e170e3e12fabb00814a5eb0c64129c04f5ab7de03931b25e3b21e3af916a5aa1",
+    "render/arbre/arbre-personnel.module.css": "85410bd9db6ab24037928ffd2f718f46b120e12259e4a0beac4d7823e558c640",
+    "render/arbre/arbre.module.css": "0f105c442ce43df7116d457bd12041d3f85ca6fadfd2b53cb3925e4565d5f9e8",
+    "render/arbre/metamorphose-planches.ts": "c00535ae5ab23abacc8657a67d1b8fd7b3b402fe8e01698cfb99973f4546b305"
+  },
+  "after": {
+    "render/arbre/ArbrePersonnel.tsx": "444fc69d5a4087a212e59b6a4f9c73e1b23a3c9272741b459dd3437d0f05cb1e",
+    "render/arbre/ArbreInteractif.tsx": "1c98b2ef398acab1ec98472a418084b6495633fe2716edc2b376bb76f3e121af",
+    "render/arbre/ancres-arbre-personnel.ts": "808fca66c9f71a725b9439b1d8766b869cbd1695cac23fb9cf3088a0d1b8d354",
+    "render/arbre/croissance-personnelle.ts": "e170e3e12fabb00814a5eb0c64129c04f5ab7de03931b25e3b21e3af916a5aa1",
+    "render/arbre/arbre-personnel.module.css": "85410bd9db6ab24037928ffd2f718f46b120e12259e4a0beac4d7823e558c640",
+    "render/arbre/arbre.module.css": "0f105c442ce43df7116d457bd12041d3f85ca6fadfd2b53cb3925e4565d5f9e8",
+    "render/arbre/metamorphose-planches.ts": "c00535ae5ab23abacc8657a67d1b8fd7b3b402fe8e01698cfb99973f4546b305"
+  },
+  "sourceChanged": [],
+  "results": [
+    {
+      "width": 390,
+      "stage": 0,
+      "image": {
+        "src": "/marque/metamorphose/01-graine.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit."
+      },
+      "index": 0,
+      "overflow": false,
+      "targets": [],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 1,
+      "image": {
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La même graine s’ouvre délicatement et laisse apparaître un premier germe."
+      },
+      "index": 1,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 174,
+          "y": 571.0625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 2,
+      "image": {
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Des racines fines naissent de la graine entrouverte et se ramifient sous elle."
+      },
+      "index": 2,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 174,
+          "y": 576.1875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 3,
+      "image": {
+        "src": "/marque/metamorphose/04-pousse.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une jeune tige porte ses premières feuilles pastel au-dessus d’un petit réseau de racines."
+      },
+      "index": 3,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 171.9375,
+          "y": 376.234375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 4,
+      "image": {
+        "src": "/marque/croissance/05.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La même pousse gagne deux petites feuilles et conserve sa graine nacrée."
+      },
+      "index": 4,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 169.890625,
+          "y": 368.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 5,
+      "image": {
+        "src": "/marque/croissance/06.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La tige s’épaissit légèrement et porte de nouvelles feuilles bleu-lilas."
+      },
+      "index": 5,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 170.921875,
+          "y": 368.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 6,
+      "image": {
+        "src": "/marque/croissance/07.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un court rameau naît du jeune tronc nacré, au-dessus des racines fines."
+      },
+      "index": 6,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 169.890625,
+          "y": 369.75,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 7,
+      "image": {
+        "src": "/marque/croissance/08.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une seconde ramification équilibre la jeune pousse et son feuillage pastel."
+      },
+      "index": 7,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 173.3125,
+          "y": 363.59375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 8,
+      "image": {
+        "src": "/marque/croissance/09.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une première fourche apparaît sur un très jeune tronc à l’écorce claire."
+      },
+      "index": 8,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 168.53125,
+          "y": 390.9375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 9,
+      "image": {
+        "src": "/marque/croissance/10.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Les deux premières branches s’allongent et portent davantage de feuilles."
+      },
+      "index": 9,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 169.890625,
+          "y": 391.625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 10,
+      "image": {
+        "src": "/marque/croissance/11.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La jeune ramure s’équilibre sur un tronc souple relié à des racines plus fines."
+      },
+      "index": 10,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 170.234375,
+          "y": 394.015625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 11,
+      "image": {
+        "src": "/marque/croissance/12.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. L’écorce nacrée forme un petit tronc continu, du collet aux premières branches."
+      },
+      "index": 11,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 165.453125,
+          "y": 423.75,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 12,
+      "image": {
+        "src": "/marque/croissance/13.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Le petit arbre développe son réseau de racines et plusieurs rameaux feuillus."
+      },
+      "index": 12,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 166.46875,
+          "y": 369.75,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 146.984375,
+          "y": 423.75,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 13,
+      "image": {
+        "src": "/marque/croissance/14.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre encore fin gagne en hauteur et déploie trois branches maîtresses."
+      },
+      "index": 13,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 175.703125,
+          "y": 365.984375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 135.375,
+          "y": 431.265625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 14,
+      "image": {
+        "src": "/marque/croissance/15.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La jeune couronne prend une forme arrondie et naturellement asymétrique."
+      },
+      "index": 14,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 156.90625,
+          "y": 408.203125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 15,
+      "image": {
+        "src": "/marque/croissance/16.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un jeune arbre à l’écorce ivoire-lilas porte une couronne aérée de feuilles pastel."
+      },
+      "index": 15,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 176.734375,
+          "y": 382.734375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 115.203125,
+          "y": 395.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 16,
+      "image": {
+        "src": "/marque/croissance/17.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Des bouquets bleu ciel et lavande se multiplient sur la jeune ramure."
+      },
+      "index": 16,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 176.734375,
+          "y": 382.734375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 115.203125,
+          "y": 395.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 17,
+      "image": {
+        "src": "/marque/croissance/18.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La couronne gagne en densité tandis que le tronc vivant se renforce."
+      },
+      "index": 17,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 176.734375,
+          "y": 382.734375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 115.203125,
+          "y": 395.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 18,
+      "image": {
+        "src": "/marque/croissance/19.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Les bouquets de feuilles rejoignent peu à peu les branches voisines."
+      },
+      "index": 18,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 176.734375,
+          "y": 382.734375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 115.203125,
+          "y": 395.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 19,
+      "image": {
+        "src": "/marque/croissance/20.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une couronne généreuse forme un abri au-dessus d’un tronc nacré."
+      },
+      "index": 19,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 176.734375,
+          "y": 382.734375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 115.203125,
+          "y": 395.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 20,
+      "image": {
+        "src": "/marque/croissance/21.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La canopée élargie laisse passer une lumière céleste entre ses feuilles."
+      },
+      "index": 20,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 176.734375,
+          "y": 382.734375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 115.203125,
+          "y": 395.71875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 21,
+      "image": {
+        "src": "/marque/croissance/22.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Le tronc et les racines se renforcent sous une large ramure pastel."
+      },
+      "index": 21,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 174,
+          "y": 387.515625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 124.78125,
+          "y": 369.40625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 22,
+      "image": {
+        "src": "/marque/croissance/23.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre presque mature déploie une canopée généreuse aux contours souples."
+      },
+      "index": 22,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 149.390625,
+          "y": 373.15625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 23,
+      "image": {
+        "src": "/marque/croissance/24.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel."
+      },
+      "index": 23,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 103.578125,
+          "y": 374.53125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 24,
+      "image": {
+        "src": "/marque/croissance/25.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une douce lueur nacrée apparaît dans les racines du même arbre mature."
+      },
+      "index": 24,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 103.578125,
+          "y": 374.53125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 25,
+      "image": {
+        "src": "/marque/croissance/26.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une fine lumière chaude relie les racines au bas du tronc vivant."
+      },
+      "index": 25,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 103.578125,
+          "y": 374.53125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 26,
+      "image": {
+        "src": "/marque/croissance/27.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La sève lumineuse traverse le tronc jusqu’à sa première fourche."
+      },
+      "index": 26,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 103.578125,
+          "y": 374.53125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 27,
+      "image": {
+        "src": "/marque/croissance/28.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La lumière se prolonge dans les trois branches maîtresses de l’arbre."
+      },
+      "index": 27,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 96.75,
+          "y": 358.125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 28,
+      "image": {
+        "src": "/marque/croissance/29.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Des courants nacrés parcourent les rameaux, reliés aux racines lumineuses."
+      },
+      "index": 28,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 96.75,
+          "y": 358.125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Prendre ma place",
+          "x": 233.46875,
+          "y": 319.84375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 29,
+      "image": {
+        "src": "/marque/croissance/30.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. De petits points de lumière apparaissent dans les feuilles bleu ciel et lavande."
+      },
+      "index": 29,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 96.75,
+          "y": 358.125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Prendre ma place",
+          "x": 233.46875,
+          "y": 319.84375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 132.296875,
+          "y": 305.484375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 30,
+      "image": {
+        "src": "/marque/croissance/31.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La couronne entière s’éclaire doucement au-dessus du tronc et des racines."
+      },
+      "index": 30,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 96.75,
+          "y": 358.125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Prendre ma place",
+          "x": 233.46875,
+          "y": 319.84375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 132.296875,
+          "y": 305.484375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 184.59375,
+          "y": 309.25,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 31,
+      "image": {
+        "src": "/marque/croissance/32.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime."
+      },
+      "index": 31,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 89.453125,
+          "y": 365.1875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Prendre ma place",
+          "x": 233.46875,
+          "y": 319.84375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 132.296875,
+          "y": 305.484375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 184.59375,
+          "y": 309.25,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 0,
+      "image": {
+        "src": "/marque/metamorphose/01-graine.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit."
+      },
+      "index": 0,
+      "overflow": false,
+      "targets": [],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 4,
+      "image": {
+        "src": "/marque/croissance/05.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La même pousse gagne deux petites feuilles et conserve sa graine nacrée."
+      },
+      "index": 4,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 357.5625,
+          "y": 417.96875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 8,
+      "image": {
+        "src": "/marque/croissance/09.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une première fourche apparaît sur un très jeune tronc à l’écorce claire."
+      },
+      "index": 8,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 355.75,
+          "y": 447.375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 15,
+      "image": {
+        "src": "/marque/croissance/16.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un jeune arbre à l’écorce ivoire-lilas porte une couronne aérée de feuilles pastel."
+      },
+      "index": 15,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 366.609375,
+          "y": 436.515625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 285.1875,
+          "y": 453.703125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 23,
+      "image": {
+        "src": "/marque/croissance/24.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel."
+      },
+      "index": 23,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 418.625,
+          "y": 397.171875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 269.796875,
+          "y": 425.671875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 450.28125,
+          "y": 447.375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 31,
+      "image": {
+        "src": "/marque/croissance/32.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime."
+      },
+      "index": 31,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 430.15625,
+          "y": 375.234375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 251.109375,
+          "y": 413.296875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 450.28125,
+          "y": 447.375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 307.796875,
+          "y": 334.296875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 377,
+          "y": 339.265625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 0,
+      "image": {
+        "src": "/marque/metamorphose/01-graine.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit."
+      },
+      "index": 0,
+      "overflow": false,
+      "targets": [],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 4,
+      "image": {
+        "src": "/marque/croissance/05.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. La même pousse gagne deux petites feuilles et conserve sa graine nacrée."
+      },
+      "index": 4,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 813.1875,
+          "y": 449.84375,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 8,
+      "image": {
+        "src": "/marque/croissance/09.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Une première fourche apparaît sur un très jeune tronc à l’écorce claire."
+      },
+      "index": 8,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 811.25,
+          "y": 481.28125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 15,
+      "image": {
+        "src": "/marque/croissance/16.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un jeune arbre à l’écorce ivoire-lilas porte une couronne aérée de feuilles pastel."
+      },
+      "index": 15,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 822.859375,
+          "y": 469.671875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 735.8125,
+          "y": 488.046875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 23,
+      "image": {
+        "src": "/marque/croissance/24.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel."
+      },
+      "index": 23,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Branche : Me faire confiance",
+          "x": 878.46875,
+          "y": 427.609375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Trouver mon rythme",
+          "x": 719.359375,
+          "y": 458.078125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 912.3125,
+          "y": 481.28125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 31,
+      "image": {
+        "src": "/marque/croissance/32.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime."
+      },
+      "index": 31,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 890.796875,
+          "y": 404.15625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 699.375,
+          "y": 444.859375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 912.3125,
+          "y": 481.28125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 759.984375,
+          "y": 360.390625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 833.96875,
+          "y": 365.703125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    }
+  ],
+  "interactions": [
+    {
+      "width": 390,
+      "kind": "group",
+      "names": [
+        "Me faire confiance",
+        "Trouver mon rythme"
+      ],
+      "branchFocus": true,
+      "groupFocus": true,
+      "errors": [],
+      "api": [
+        "GET /api/anam/plan"
+      ]
+    },
+    {
+      "width": 390,
+      "live": [
+        1,
+        3,
+        11,
+        12,
+        22,
+        23,
+        24,
+        25,
+        31
+      ],
+      "before": "31",
+      "after": "31",
+      "actualBranchOpened": true,
+      "zoomWorks": true,
+      "errors": [],
+      "api": [
+        "GET /api/anam/plan",
+        "GET /api/anam/plan"
+      ]
+    },
+    {
+      "width": 768,
+      "live": [
+        1,
+        3,
+        11,
+        12,
+        22,
+        23,
+        24,
+        25,
+        31
+      ],
+      "before": "31",
+      "after": "31",
+      "actualBranchOpened": true,
+      "zoomWorks": true,
+      "errors": [],
+      "api": [
+        "GET /api/anam/plan"
+      ]
+    },
+    {
+      "width": 1440,
+      "live": [
+        1,
+        3,
+        11,
+        12,
+        22,
+        23,
+        24,
+        25,
+        31
+      ],
+      "before": "31",
+      "after": "31",
+      "actualBranchOpened": true,
+      "zoomWorks": true,
+      "errors": [],
+      "api": [
+        "GET /api/anam/plan"
+      ]
+    }
+  ],
+  "fatalError": null,
+  "failures": 0
+}

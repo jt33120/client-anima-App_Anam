@@ -36,7 +36,7 @@ function Faits({ faits }: { readonly faits: readonly FaitVue[] }) {
 
 function PorteApercu({ apercu }: { readonly apercu: ApercuUniversVue }) {
   return (
-    <li className={s.itemApercu}>
+    <li className={s.itemApercu} data-univers={apercu.cle}>
       <Link className={s.porteApercu} href={apercu.url}>
         <span className={s.glypheApercu}>
           <GlypheUnivers cle={apercu.cle} />
@@ -56,7 +56,7 @@ function ApercuSocle({ fiche, titre }: { readonly fiche: FicheSocleVue; readonly
   return (
     <section className={s.apercu} aria-labelledby="socle-apercu">
       <div className={s.enteteSection}>
-        <p className={`t-meta ${s.surtitre}`}>Mon monde intérieur</p>
+        <p className={`t-surtitre ${s.surtitre}`}>Mon monde intérieur</p>
         <h2 id="socle-apercu" className="t-titre">{titre}</h2>
       </div>
       <ul className={s.grilleApercus}>
@@ -79,6 +79,7 @@ function SectionNumerologie({
   return (
     <section className={`${s.section} ${s.sectionNombres}`} aria-labelledby="socle-nombres">
       <div className={s.enteteSection}>
+        <p className={`t-surtitre ${s.surtitre}`}>Les rythmes qui te traversent</p>
         <h2 id="socle-nombres" className="t-titre">{copie.titreNombres}</h2>
       </div>
 
@@ -90,7 +91,10 @@ function SectionNumerologie({
             <details key={lecture.cle} className={`${s.devoilement} ${s.uniteNombre}`}>
               <summary>
                 <span className={s.enteteNombre}>
-                  <span className="t-titre-sm">{lecture.intitule} · {lecture.valeur}</span>
+                  <span className={`t-titre-sm ${s.libelleNombre}`}>
+                    {lecture.intitule} ·{" "}
+                    <span className={s.nombreEditorial}>{lecture.valeur}</span>
+                  </span>
                   <span className={`t-meta ${s.archetypeNombre}`}>{lecture.archetype}</span>
                 </span>
               </summary>
@@ -242,7 +246,17 @@ function CielDuJour({
           qu'Anima a écrit. La règle du choix, elle, ne vit pas ici mais dans `texteMontre`. */}
       {horoscope.ecritureModele !== null ? (
         <>
-          <p className={`t-corps ${s.texte}`}>{horoscope.ecritureModele.texte}</p>
+          {/* ⚠️ TROIS PARTIES INTITULÉES, ET LES INTITULÉS VIENNENT DE LA DONNÉE (2026-09-07).
+              Le fondateur a demandé un texte structuré : le factuel, le personnalisé, le concret.
+              Sans les intitulés, trois paragraphes se lisent comme un seul texte long et la
+              structure ne vit que dans le prompt. Les mots eux-mêmes ne sont pas écrits ici : ils
+              viennent de `copie-modele.ts`, pour que l'accueil et cette halte les disent pareil. */}
+          {horoscope.ecritureModele.parties.map((partie) => (
+            <div key={partie.intitule} className={s.partieModele}>
+              <h4 className={`t-surtitre ${s.intitulePartie}`}>{partie.intitule}</h4>
+              <p className={`t-corps ${s.texte}`}>{partie.texte}</p>
+            </div>
+          ))}
           <p className={`t-meta ${s.mentionModele}`}>{horoscope.ecritureModele.mention}</p>
         </>
       ) : horoscope.texte.statut === "ecrit" ? (
@@ -265,6 +279,7 @@ function SectionAstrologie({
   return (
     <section className={`${s.section} ${s.sectionCiel}`} aria-labelledby="socle-ciel">
       <div className={s.enteteSection}>
+        <p className={`t-surtitre ${s.surtitre}`}>Entre ciel et soi</p>
         <h2 id="socle-ciel" className="t-titre">{copie.titreCiel}</h2>
       </div>
 
@@ -389,7 +404,10 @@ export default function FicheSocle({ fiche, copie, mode = "tout" }: ProprietesFi
   const { nombres, ciel, portes } = fiche;
   return (
     <>
-      <p className={`t-corps ${s.introduction}`}>{copie.introduction}</p>
+      <header className={s.ouverture}>
+        <p className={`t-corps ${s.introduction}`}>{copie.introduction}</p>
+        <p className={s.annotation}>Une autre façon de te rencontrer.</p>
+      </header>
 
       {mode === "tout" && <ApercuSocle fiche={fiche} titre={copie.titreApercu} />}
       {mode === "numerologie" && <SectionNumerologie nombres={nombres} copie={copie} />}

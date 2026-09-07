@@ -1,76 +1,56 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useRef, useState, type RefObject } from "react";
 import Feuille from "@/render/Feuille";
-import {
-  ACTION_COMPRENDRE_EVOLUTION,
-  ETAPES_EVOLUTION,
-  FERMER_COMPRENDRE_EVOLUTION,
-  LEGENDE_EXEMPLE_EVOLUTION,
-} from "./copie-arbre";
+import MetamorphoseArbre from "./MetamorphoseArbre";
+import { ACTION_COMPRENDRE_EVOLUTION, ETAPES_EVOLUTION, FERMER_COMPRENDRE_EVOLUTION, LEGENDE_EXEMPLE_EVOLUTION } from "./copie-arbre";
 import s from "./arbre.module.css";
+import m from "./metamorphose.module.css";
 
-function IllustrationEvolution() {
+export function DialogueEvolution({ declencheur, onFermer, indexInitial = 0, id }: {
+  readonly declencheur: RefObject<HTMLElement | null>;
+  readonly onFermer: () => void;
+  readonly indexInitial?: number;
+  readonly id?: string;
+}) {
   return (
-    <figure className={s.exempleEvolution}>
-      <svg viewBox="0 0 480 220" role="img" aria-labelledby="exemple-evolution-titre">
-        <title id="exemple-evolution-titre">Un exemple d’arbre avec un tronc et trois branches à différents états</title>
-        <g className={s.exempleBois} fill="none">
-          <path d="M240 205C232 165 244 130 238 84C235 60 229 41 234 20" />
-          <path d="M239 143C195 126 162 101 139 68" />
-          <path d="M238 112C281 99 315 72 334 39" />
-          <path d="M240 164C283 158 320 142 352 111" />
-        </g>
-        <g className={s.exempleFeuilles}>
-          <ellipse cx="136" cy="64" rx="9" ry="16" transform="rotate(-38 136 64)" />
-          <ellipse cx="334" cy="37" rx="9" ry="16" transform="rotate(34 334 37)" />
-          <ellipse cx="354" cy="109" rx="9" ry="16" transform="rotate(46 354 109)" />
-          <circle cx="334" cy="37" r="27" className={s.exempleRayonnement} />
-        </g>
-        <ellipse className={s.exempleGraine} cx="240" cy="207" rx="13" ry="7" />
-      </svg>
-      <figcaption className="t-meta">{LEGENDE_EXEMPLE_EVOLUTION}</figcaption>
-    </figure>
+    <Feuille id={id} titre={ACTION_COMPRENDRE_EVOLUTION} libelleFermer={FERMER_COMPRENDRE_EVOLUTION}
+      declencheur={declencheur} onFermer={onFermer}>
+      <MetamorphoseArbre indexInitial={indexInitial} />
+      <details className={m.explication}>
+        <summary className="t-corps">Ce que raconte mon arbre</summary>
+        <p className="t-meta">{LEGENDE_EXEMPLE_EVOLUTION}</p>
+        <ol className={m.etapes}>
+          {ETAPES_EVOLUTION.map((etape) => (
+            <li key={etape.titre}>
+              <h3 className="t-titre-sm">{etape.titre}</h3>
+              <p className="t-corps">{etape.corps}</p>
+            </li>
+          ))}
+        </ol>
+      </details>
+    </Feuille>
   );
 }
 
-export default function ComprendreEvolution() {
+export default function ComprendreEvolution({ variante = "information", onOuvrir }: {
+  readonly variante?: "graine" | "information";
+  /** A trigger inside the transformed garden delegates its dialog to the region root. */
+  readonly onOuvrir?: (declencheur: HTMLButtonElement) => void;
+}) {
   const [ouvert, setOuvert] = useState(false);
   const declencheur = useRef<HTMLButtonElement>(null);
   const id = useId();
+  const graine = variante === "graine";
 
   return (
     <>
-      <button
-        ref={declencheur}
-        type="button"
-        className={s.actionSecondaire}
-        aria-haspopup="dialog"
-        aria-expanded={ouvert}
-        aria-controls={ouvert ? id : undefined}
-        onClick={() => setOuvert(true)}
-      >
-        {ACTION_COMPRENDRE_EVOLUTION}
+      <button ref={declencheur} type="button" className={graine ? m.appel : s.actionSecondaire}
+        aria-haspopup="dialog" aria-expanded={onOuvrir ? undefined : ouvert} aria-controls={ouvert ? id : undefined}
+        onClick={(event) => onOuvrir ? onOuvrir(event.currentTarget) : setOuvert(true)}>
+        {graine ? "Voir la graine éclore" : ACTION_COMPRENDRE_EVOLUTION}
       </button>
-      {ouvert ? (
-        <Feuille
-          id={id}
-          titre={ACTION_COMPRENDRE_EVOLUTION}
-          libelleFermer={FERMER_COMPRENDRE_EVOLUTION}
-          declencheur={declencheur}
-          onFermer={() => setOuvert(false)}
-        >
-          <ol className={s.etapesEvolution}>
-            {ETAPES_EVOLUTION.map((etape) => (
-              <li key={etape.titre}>
-                <h3 className="t-titre-sm">{etape.titre}</h3>
-                <p className="t-corps">{etape.corps}</p>
-              </li>
-            ))}
-          </ol>
-          <IllustrationEvolution />
-        </Feuille>
-      ) : null}
+      {ouvert && <DialogueEvolution id={id} declencheur={declencheur} onFermer={() => setOuvert(false)} indexInitial={graine ? 1 : 0} />}
     </>
   );
 }

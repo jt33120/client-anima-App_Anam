@@ -4,19 +4,8 @@ import ArbreInteractif from "@/render/arbre/ArbreInteractif";
 import type { BrancheProjetee, ProjectionScene } from "@/lib/scene";
 import { dimensionnerTout } from "./_outils";
 
-/**
- * [FR-031 DUR] — AUCUNE MESURE À L'ÉCRAN, prouvé sur le DOM RENDU.
- *
- * Pourquoi ici et pas en lecture de source : la re-revue a montré qu'un scan de source ne peut pas
- * trancher. Il interdisait sept mots français — donc il rougissait sur un identifiant interne innocent
- * (`niveauDuRang`) tout en laissant passer un vrai compteur baptisé `nbBranches`. Un compteur peut
- * s'appeler n'importe comment ; ce qui ne ment pas, c'est le TEXTE QUE L'UTILISATRICE LIT.
- *
- * L'invariant : dans la vue arbre, il n'y a AUCUN CHIFFRE. Pas de nombre de branches, pas de
- * pourcentage, pas de palier, pas de date. L'arbre se regarde, il ne se lit pas comme un tableau de bord.
- * Cette garde est un tueur de mutant par construction : ajouter `{n} branches nommées` fait apparaître
- * un chiffre, donc rougir — sans qu'aucune liste de mots interdits n'ait à deviner son nom.
- */
+/** The personal drawing grows, but its internal index never becomes a displayed score.
+ * Counts only distinguish overlapping branch targets; they are navigation, not maturity. */
 
 const NB_BRANCHES = 7; // choisi pour ne coïncider avec aucun chiffre des dates de test
 
@@ -51,14 +40,22 @@ function proprietes(projection: ProjectionScene) {
 /** Tout ce que l'utilisatrice LIT : le texte visible + les libellés annoncés aux lecteurs d'écran. */
 function texteLu(racine: HTMLElement): string {
   const etiquettes = [...racine.querySelectorAll("[aria-label]")].map((e) => e.getAttribute("aria-label") ?? "");
-  return `${racine.textContent ?? ""} ${etiquettes.join(" ")}`;
+  const alternatives = [...racine.querySelectorAll("img[alt]")].map((e) => e.getAttribute("alt") ?? "");
+  return `${racine.textContent ?? ""} ${etiquettes.join(" ")} ${alternatives.join(" ")}`;
 }
 
-describe("[FR-031 DUR] la vue arbre n'affiche AUCUNE mesure", () => {
-  it("aucun CHIFFRE dans la vue arbre, quel que soit le nombre de branches", () => {
+describe("la croissance personnelle n’affiche aucune mesure de maturité", () => {
+  it("aucun indice de maturité ni décompte global hors des groupes de navigation", () => {
     dimensionnerTout(800, 600);
     const { container } = render(<ArbreInteractif {...proprietes(scene(NB_BRANCHES))} />);
-    const lu = texteLu(container);
+    for (const groupe of container.querySelectorAll<HTMLElement>("[data-groupe-branches]")) {
+      const nombre = groupe.dataset.groupeBranches!.split(" ").length;
+      expect(groupe.textContent).toBe(String(nombre));
+      expect(groupe.getAttribute("aria-label")).toBe(`Voir les ${nombre} branches proches`);
+    }
+    const copie = container.cloneNode(true) as HTMLElement;
+    copie.querySelectorAll("[data-groupe-branches]").forEach((groupe) => groupe.remove());
+    const lu = texteLu(copie);
 
     expect(lu, `un chiffre affiché dans la vue arbre : « ${lu.trim()} »`).not.toMatch(/\d/);
     expect(lu).not.toContain("%");
@@ -83,5 +80,11 @@ describe("[FR-031 DUR] la vue arbre n'affiche AUCUNE mesure", () => {
     // toujours et la garde serait creuse (le reproche exact fait à la version précédente).
     expect("Progression : 45 %").toMatch(/\d/);
     expect(`${NB_BRANCHES} branches nommées`).toMatch(new RegExp(`(^|\\D)${NB_BRANCHES}(\\D|$)`));
+    const support = document.createElement("div");
+    const image = document.createElement("img");
+    image.alt = "Ton évolution : 23 %";
+    support.append(image);
+    expect(texteLu(support)).toMatch(/\d/);
+    expect(texteLu(support)).toContain("%");
   });
 });

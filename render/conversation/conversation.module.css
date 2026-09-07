@@ -15,17 +15,8 @@
   width: 100%;
   max-width: var(--contenu-max);
   margin: 0 auto;
-  /* Le clavier réduit la hauteur UTILE de toute la colonne. Réserver sa place ici maintient le
-     composeur dans le flux et réduit le fil ; déplacer seulement le composeur le superposait au
-     message qu'il devait permettre de lire. */
-  padding-bottom: var(--decalage-clavier, 0px);
-  transition: padding-bottom var(--duree-courte) var(--courbe);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .conversation {
-    transition: none;
-  }
+  /* The scene already fits visualViewport. No second keyboard offset belongs here. */
+  --lignes-composeur: 6;
 }
 
 /* ── Le fil : flux vertical UNIQUE, sans bulles opposées (AC1). Gap = respiration. ── */
@@ -35,8 +26,11 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--respiration);
-  padding: var(--esp-4) var(--esp-2) var(--esp-5);
+  gap: var(--esp-5);
+  padding: var(--esp-3) var(--esp-2) var(--esp-4);
+  overscroll-behavior-y: contain;
+  overflow-wrap: anywhere;
+  scrollbar-color: var(--bordure-forte) transparent;
   /* JAMAIS smooth : défilement instantané → cohérent reduced-motion ET suivi du bas non captif. */
   scroll-behavior: auto;
 }
@@ -45,7 +39,7 @@
   width: 100%;
   max-width: var(--mesure);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--esp-3);
   margin: 0;
 }
@@ -56,10 +50,9 @@
   min-width: 0;
   min-height: var(--esp-9);
   margin: 0;
-  padding: var(--esp-4);
-  border: 1px solid color-mix(in srgb, var(--lueur) 22%, transparent);
-  border-radius: var(--rayon-md);
-  background: color-mix(in srgb, var(--surface-elevee) 88%, transparent);
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--texte);
   line-height: 1.65;
 }
@@ -70,7 +63,7 @@
 
 .texteOuvertureFrappe {
   position: absolute;
-  inset: var(--esp-4);
+  inset: 0;
 }
 
 /* Frontière du jour dans le fil : une respiration et un filet, jamais une carte ni une bulle. */
@@ -81,6 +74,9 @@
   gap: var(--esp-3);
   color: var(--texte-doux);
   letter-spacing: 0.04em;
+  flex: none;
+  margin: 0;
+  min-height: 0;
 }
 
 .separateurJour::before,
@@ -100,6 +96,7 @@
 /* Voix d'Anam — Fraunces (t-anam), SANS fond / bulle / bordure. */
 .tourAnam {
   max-width: var(--mesure);
+  padding-inline: var(--esp-3);
 }
 .tourAnam p {
   margin: 0;
@@ -111,7 +108,11 @@
 .tourUtilisatrice {
   max-width: var(--mesure);
   border-left: 1px solid var(--bordure-forte);
+  padding: var(--esp-3) var(--esp-4);
   padding-left: var(--esp-4);
+  margin-inline: var(--esp-3);
+  background: var(--carnet-rose);
+  border-radius: 0 var(--carnet-rayon) var(--carnet-rayon) 0;
 }
 .tourUtilisatrice p {
   margin: 0;
@@ -155,8 +156,7 @@
   white-space: nowrap;
 }
 
-/* ── Composeur : bande basse, ne DISPARAÎT jamais (AC5). Remonte au-dessus du clavier virtuel via
-      --decalage-clavier (posé par visualViewport ; 0 par défaut → aucun effet sur desktop). ── */
+/* The composer stays in the visible scene, with one envelope around the writing controls. */
 /* Zone-colonne : un motif d'arrêt optionnel (quota épuisé, 3.4) au-dessus de la bande de saisie. */
 .composeurZone {
   flex: none;
@@ -210,19 +210,23 @@
   flex: none;
   display: flex;
   align-items: flex-end;
-  gap: var(--esp-3);
-  padding: var(--esp-3) var(--esp-2);
-  padding-bottom: max(var(--esp-3), env(safe-area-inset-bottom));
-  background: linear-gradient(to top, var(--fond) 62%, transparent);
+  gap: var(--esp-2);
+  margin: var(--esp-2) var(--esp-2) 0;
+  padding: var(--esp-1);
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--carnet-rayon);
+  background: var(--surface);
+  box-shadow: none;
 }
 
-.champ {
+.composeur .champ {
   flex: 1 1 auto;
   min-height: var(--cible-tactile);
   resize: none;
-  padding: var(--esp-3) var(--esp-4);
-  background: var(--surface-elevee);
-  border: 1px solid var(--bordure-forte);
+  padding: var(--esp-2) var(--esp-3);
+  min-width: 0;
+  background: transparent;
+  border: 0;
   border-radius: var(--rayon-md);
   color: var(--texte);
   font-family: var(--pile-ui);
@@ -232,8 +236,8 @@
   color: var(--texte-doux);
 }
 .champ:focus-visible {
-  outline: 2px solid var(--bordure-forte);
-  outline-offset: 2px;
+  /* Focus is drawn by .composeur:focus-within, around the complete writing envelope. */
+  outline: none;
 }
 .champ:disabled {
   opacity: 0.5;
@@ -245,10 +249,10 @@
   min-height: var(--cible-tactile);
   min-width: var(--cible-tactile);
   padding: 0;
-  background: transparent;
-  border: 1px solid var(--bordure-forte);
-  border-radius: var(--rayon);
-  color: var(--texte);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--rayon-full);
+  color: var(--sur-accent);
   cursor: pointer;
   transition: border-color var(--duree-standard) var(--courbe);
 }
@@ -256,7 +260,7 @@
 .flecheEnvoi {
   display: block;
   font-family: var(--pile-ui);
-  font-size: var(--taille-h3);
+  font-size: var(--carnet-note);
   line-height: 1;
 }
 .envoi:hover:not(:disabled) {
@@ -460,4 +464,97 @@
   flex-direction: column;
   gap: var(--esp-2);
   margin: 0;
+}
+
+/* Anam writes a letter at the top of the shared journal. */
+.introductionLettre {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-5);
+  background: var(--carnet-lavande);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon-lg) var(--carnet-rayon-lg) var(--rayon-sm) var(--carnet-rayon-lg);
+}
+
+.signatureAnam {
+  color: var(--accent);
+  font-family: var(--pile-manuscrite);
+  font-size: var(--carnet-note);
+  line-height: 1.2;
+}
+
+.composeur:focus-within {
+  border-color: transparent;
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+:global([data-clavier-ouvert]) .conversation {
+  --lignes-composeur: 3;
+}
+
+:global([data-clavier-ouvert]) .fil {
+  gap: var(--esp-4);
+  padding-block: var(--esp-2);
+}
+
+:global([data-clavier-ouvert]) .tourAnam p,
+:global([data-clavier-ouvert]) .introductionBulle {
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+:global([data-clavier-ouvert]) .tourUtilisatrice {
+  padding-block: var(--esp-2);
+}
+
+:global([data-clavier-ouvert]) .introductionLettre {
+  padding: var(--esp-3);
+}
+
+:global([data-clavier-ouvert]) .imageAnam.introductionPortrait {
+  width: var(--cible-tactile);
+}
+
+:global([data-clavier-ouvert]) .composeur {
+  margin-top: var(--esp-1);
+}
+
+@media (max-height: 600px) {
+  .conversation {
+    --lignes-composeur: 3;
+  }
+
+  .fil {
+    gap: var(--esp-4);
+    padding-block: var(--esp-2);
+  }
+}
+
+@media (max-width: 639px) {
+  .introductionAnam {
+    align-items: end;
+    gap: 0;
+  }
+
+  .introductionLettre {
+    padding: var(--esp-4);
+  }
+
+  .imageAnam.introductionPortrait {
+    width: var(--esp-8);
+  }
+}
+
+@media (min-width: 960px) {
+  .fil {
+    padding: var(--esp-6) var(--esp-6) var(--esp-7);
+  }
+
+  .composeur {
+    margin-inline: var(--esp-6);
+  }
 }

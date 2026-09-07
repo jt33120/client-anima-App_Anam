@@ -32,6 +32,13 @@ const lire = (f: string) => readFileSync(resolve(RACINE, f), "utf-8");
 
 const DOMAINE = lire("lib/domain/fiche-socle.ts");
 const RENDU = lire("render/socle/types.ts");
+/**
+ * ⚠️ UNE TROISIÈME SOURCE, ET C'EST CE QUI RENDAIT LA BRÈCHE INVISIBLE. `EcritureModele` ne vit pas
+ * dans `fiche-socle.ts` : `HoroscopeFiche` l'IMPORTE de `bibliotheque.ts`, parce que la même
+ * écriture paraît sur l'accueil et dans la halte. La frontière du socle la traverse donc sans la
+ * déclarer, et l'extracteur, qui ne lisait qu'un fichier, ne pouvait pas la voir.
+ */
+const BIBLIOTHEQUE = lire("lib/domain/bibliotheque.ts");
 
 /** Extrait le corps d'une déclaration `export interface X {` … `}` (première accolade fermante seule). */
 function corpsInterface(source: string, nom: string): string {
@@ -57,6 +64,12 @@ const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
   { ou: "domaine · AspectFiche", corps: corpsInterface(DOMAINE, "AspectFiche") },
   // 2026-09-01 : l'horoscope du jour traverse la frontière (titre + texte, JAMAIS la date).
   { ou: "domaine · HoroscopeFiche", corps: corpsInterface(DOMAINE, "HoroscopeFiche") },
+  // ⚠️ AJOUTÉES LE 2026-09-07, ET ELLES MANQUAIENT DEPUIS LE 2026-09-02. `EcritureModele` et
+  // `EcritureModeleVue` traversent cette frontière depuis qu'un modèle écrit le texte du jour, et
+  // aucune des deux ne figurait ici : elles pouvaient DIVERGER champ pour champ sans qu'une seule
+  // ligne rougisse — précisément le mode de panne silencieux que ce fichier existe pour fermer.
+  { ou: "domaine · EcritureModele", corps: corpsInterface(BIBLIOTHEQUE, "EcritureModele") },
+  { ou: "domaine · PartieEcriture", corps: corpsInterface(BIBLIOTHEQUE, "PartieEcriture") },
   { ou: "domaine · SectionNombres", corps: corpsInterface(DOMAINE, "SectionNombres") },
   { ou: "domaine · SectionCiel", corps: corpsInterface(DOMAINE, "SectionCiel") },
   { ou: "domaine · SectionType", corps: corpsInterface(DOMAINE, "SectionType") },
@@ -70,6 +83,8 @@ const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
   { ou: "rendu · AngleVue", corps: corpsInterface(RENDU, "AngleVue") },
   { ou: "rendu · AspectVue", corps: corpsInterface(RENDU, "AspectVue") },
   { ou: "rendu · HoroscopeVue", corps: corpsInterface(RENDU, "HoroscopeVue") },
+  { ou: "rendu · EcritureModeleVue", corps: corpsInterface(RENDU, "EcritureModeleVue") },
+  { ou: "rendu · PartieEcritureVue", corps: corpsInterface(RENDU, "PartieEcritureVue") },
   { ou: "rendu · SectionNombresVue", corps: corpsInterface(RENDU, "SectionNombresVue") },
   { ou: "rendu · SectionCielVue", corps: corpsInterface(RENDU, "SectionCielVue") },
   { ou: "rendu · SectionTypeVue", corps: corpsInterface(RENDU, "SectionTypeVue") },
@@ -144,6 +159,23 @@ describe("[7.5/AC8 DUR] aucune des deux déclarations ne peut porter une mesure"
     // d'afficher quelque chose — le mode de panne le plus silencieux d'une frontière redéclarée.
     for (const [d, r] of APPARIEMENTS) {
       expect(champs(corpsInterface(RENDU, r)), `${d} ≠ ${r}`).toEqual(champs(corpsInterface(DOMAINE, d)));
+    }
+  });
+
+  it("[LE CŒUR] l’écriture d’un modèle coïncide elle aussi, champ pour champ", () => {
+    // ⚠️ APPARIÉE À PART PARCE QUE SON CÔTÉ DOMAINE VIT DANS `bibliotheque.ts`, pas dans
+    // `fiche-socle.ts` : la même écriture paraît sur l'accueil et dans la halte, donc elle est
+    // déclarée une fois pour les deux. C'est cette indirection qui l'a fait échapper à la garde
+    // pendant cinq jours — et un champ ajouté d'un seul côté ne casse rien, il fait juste cesser
+    // le rendu d'afficher quelque chose.
+    for (const [domaine, rendu] of [
+      ["EcritureModele", "EcritureModeleVue"],
+      ["PartieEcriture", "PartieEcritureVue"],
+    ] as const) {
+      expect(
+        champs(corpsInterface(RENDU, rendu)),
+        `${domaine} et ${rendu} ont divergé`,
+      ).toEqual(champs(corpsInterface(BIBLIOTHEQUE, domaine)));
     }
   });
 

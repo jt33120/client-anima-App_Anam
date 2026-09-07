@@ -25,3 +25,12 @@ export const policeUi = localFont({
   display: "swap",
   fallback: ["-apple-system", "Segoe UI", "system-ui", "sans-serif"],
 });
+
+export const policeManuscrite = localFont({
+  src: "./fonts/caveat-medium.woff2",
+  variable: "--police-manuscrite",
+  weight: "500",
+  style: "normal",
+  display: "swap",
+  fallback: ["cursive"],
+});

@@ -363,7 +363,7 @@ describe("[LA PORTE] elle s'appelle « commencer », en bas de casse, et franchi
     expect(sectionSeuil().querySelector("h1")?.getAttribute("tabindex")).toBe("-1");
   });
 
-  it("[RC-H3] un tap vers Anam focalise le composeur ; l'activation clavier annonce d'abord le titre", async () => {
+  it("announces Anam on entry and opens composition only when the message field is selected", async () => {
     const user = userEvent.setup();
     monterLaScene({ accueilAnam: ACCUEIL_ANAM });
     await user.click(screen.getByRole("button", { name: /commencer/i }));
@@ -372,6 +372,8 @@ describe("[LA PORTE] elle s'appelle « commencer », en bas de casse, et franchi
     const anam = navigationRegions.querySelector<HTMLButtonElement>("button:nth-of-type(2)")!;
     expect(anam.textContent).toBe("Anam");
     await user.click(anam);
+    expect(document.activeElement).toBe(screen.getByRole("heading", { name: "Anam", level: 1 }));
+    await user.click(screen.getByRole("textbox", { name: "Ton message à Anam" }));
     expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Ton message à Anam" }));
 
     fireEvent.click(navigationRegions.querySelectorAll("button")[0], { detail: 0 });

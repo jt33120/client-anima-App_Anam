@@ -38,8 +38,13 @@ export type TexteVue = { readonly statut: "ecrit"; readonly texte: string } | { 
  * écrit en ligne y injecte ses propres champs et la garde compare alors des listes qui ne veulent
  * plus rien dire. Le type nommé garde la mesure lisible des deux côtés.
  */
-export interface EcritureModeleVue {
+export interface PartieEcritureVue {
+  readonly intitule: string;
   readonly texte: string;
+}
+
+export interface EcritureModeleVue {
+  readonly parties: readonly PartieEcritureVue[];
   readonly mention: string;
 }
 
