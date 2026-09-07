@@ -204,10 +204,13 @@ describe("[LE BORD] les bornes de longueur disent ce qu’elles gardent", () => 
   });
 
   it("refuse la dissertation", () => {
-    // ⚠️ LE TÉMOIN A ÉTÉ ALLONGÉ AVEC LE PLAFOND (2026-09-07). À `.repeat(80)` il faisait 1 279
-    // signes : sous le nouveau plafond de 1 400, il SERAIT PASSÉ AU VERT SANS QUE PERSONNE NE LE
+    // ⚠️ LE TÉMOIN SUIT LE PLAFOND, ET IL A DÛ ÊTRE RALLONGÉ DEUX FOIS (2026-09-07). À
+    // `.repeat(80)` il faisait 1 279 signes ; le plafond est passé à 1 400 puis à 2 200 après
+    // mesure. À chaque fois, un témoin laissé en place SERAIT PASSÉ AU VERT SANS QUE PERSONNE NE LE
     // VOIE, et cette garde aurait cessé de garder quoi que ce soit en restant verte.
-    const verdict = verdictHoroscope("La Lune marche. ".repeat(120), CADRE);
+    // ⚠️ ET IL DOIT ÊTRE REFUSÉ POUR « trop_long », PAS POUR « structure » : un texte sans étiquette
+    // est écarté plus tôt. Le témoin est donc long AVANT d'être informe.
+    const verdict = verdictHoroscope("La Lune marche. ".repeat(200), CADRE);
     expect(verdict).toEqual({ accepte: false, motif: "trop_long" });
   });
 

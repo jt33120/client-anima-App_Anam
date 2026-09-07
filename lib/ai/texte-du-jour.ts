@@ -14,6 +14,7 @@ import { lireMatiereDuJour } from "@/lib/data/lire-contexte-anam";
 import { messagesHoroscope } from "@/lib/domain/consigne-horoscope";
 import type { MatiereContexte } from "@/lib/domain/contexte-anam";
 import {
+  cielDuJourDit,
   jourCivilIso,
   signatureCanonique,
   signatureDuCiel,
@@ -349,10 +350,14 @@ export async function texteDuJourGenere(
     };
 
     const adaptateur = await deps.creerPort();
+    // Le ciel du jour part au modèle ET entre dans les signes autorisés : sans le second, la garde
+    // refuserait le modèle pour avoir recopié exactement ce qu'on venait de lui dire.
+    const duJour = cielDuJourDit(horoscope.ciel);
     const cadre = {
       signesAutorises: signesAutorises(
         natal,
         signature.changements.map((c) => c.vers),
+        duJour.map((p) => p.signe),
       ),
       ascendantConnu: natal.ascendant !== null,
     };
@@ -363,7 +368,7 @@ export async function texteDuJourGenere(
         adaptateur,
         requete: {
           capacite: "horoscope",
-          messages: [...messagesHoroscope(signature, horoscope.jour, natal, contexte)],
+          messages: [...messagesHoroscope(signature, horoscope.jour, natal, contexte, duJour)],
           contientArt9: true,
         },
       }).then(async (envoi) => {

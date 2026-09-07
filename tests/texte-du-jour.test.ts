@@ -182,9 +182,15 @@ describe("[LE CŒUR] ce qui part au modèle, et ce qui n’en part jamais", () =
     const envoye = port.recues[0].messages.map((m) => m.content).join("\n");
 
     expect(envoye).toContain("Soleil en Bélier");
-    expect(envoye).toContain("Claire");
     expect(envoye).toContain("le déménagement");
+    expect(envoye).toContain("reprendre le chant");
     expect(d.lireContexte).toHaveBeenCalledTimes(1);
+
+    // ⚠️ ET LE PRÉNOM, LUI, NE PART PAS (2026-09-07). Mesuré : cinq générations sur cinq ouvraient
+    // la deuxième partie par « <Prénom>, tu sais ce que c'est que… », et la première utilisatrice
+    // s'appelle ANIMA — du même nom que le produit. `verdictHoroscope` refusait donc chaque texte
+    // pour `signature`, la garde FR-086. La personnalisation vient de son arbre, pas de son prénom.
+    expect(envoye).not.toContain("Claire");
   });
 
   it("déclare la capacité et le régime art. 9 attendus", async () => {

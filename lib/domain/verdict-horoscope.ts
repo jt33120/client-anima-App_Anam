@@ -112,14 +112,27 @@ export interface CadreDuVerdict {
  * débordement qu'un paragraphe factuel se met à proposer. Un modèle qui déborde sur une partie ne
  * peut pas l'emprunter à une autre.
  *
- * ⚠️ 3 × PARTIE_MAX = 1140 < LONGUEUR_MAX = 1400. Le total ne contredit JAMAIS les bornes par
- * partie : un texte conforme partie par partie ne peut pas être refusé pour sa longueur totale. Le
- * total ne sert plus qu'à écarter, avant tout travail, une réponse partie en boucle.
+ * ⚠️ 3 × PARTIE_MAX < LONGUEUR_MAX. Le total ne contredit JAMAIS les bornes par partie : un texte
+ * conforme partie par partie ne peut pas être refusé pour sa longueur totale. Le total ne sert plus
+ * qu'à écarter, avant tout travail, une réponse partie en boucle.
+ *
+ * ══ LES VALEURS ONT ÉTÉ MESURÉES, PAS ESTIMÉES (2026-09-07) ═══════════════════════════════════
+ *
+ * Premier jet : `PARTIE_MAX = 380`, `LONGUEUR_MAX = 1400`. Dix générations réelles sur le modèle
+ * qui sert en production ont produit des parties de 500 à 780 signes, pour des totaux de 1380 à
+ * 1850 : DIX REFUS SUR DIX, tous en `trop_long`. La fonctionnalité entière aurait été livrée sans
+ * jamais produire une ligne — et sans rien casser, puisque le repli corpus est propre.
+ *
+ * ⚠️ LA CONSIGNE A ÉTÉ RESSERRÉE EN MÊME TEMPS, ET C'EST L'AUTRE MOITIÉ DU CORRECTIF. Relever le
+ * plafond seul aurait laissé le modèle écrire aussi long qu'il voulait ; resserrer la consigne
+ * seule n'aurait rien garanti, une consigne n'étant pas une garantie. On demande donc trois phrases
+ * et quatre cents signes par partie, et on refuse au-delà de sept cents : l'écart entre les deux
+ * est la marge d'un modèle qui obéit à peu près, pas une permission.
  */
 export const LONGUEUR_MIN = 200;
-export const LONGUEUR_MAX = 1_400;
+export const LONGUEUR_MAX = 2_200;
 export const PARTIE_MIN = 60;
-export const PARTIE_MAX = 380;
+export const PARTIE_MAX = 700;
 
 /**
  * Ce que le produit ne dit jamais de lui-même (FR-086).

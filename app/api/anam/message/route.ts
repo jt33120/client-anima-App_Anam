@@ -124,21 +124,32 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // ══════════════════════════════════════════════════════════════════════════════════════════════
+  // LE MODÈLE DU TEST PRIVÉ — PLUS DE REFUS PAR COMPTE (2026-09-07)
+  // ══════════════════════════════════════════════════════════════════════════════════════════════
+  //
+  // ⚠️ IL Y AVAIT ICI UN SECOND `return` 503, ET IL A COÛTÉ UNE UTILISATRICE. Quand le mode était
+  // actif, tout compte dont l'UUID ne correspondait pas au testeur déclaré recevait « Service
+  // indisponible, réessaie » — sans avoir rien fait de mal, et sans qu'aucun journal ne parle de
+  // panne, puisqu'il n'y en avait pas. Anima, la première vraie utilisatrice, a vu ce message à
+  // chaque tour pendant que le même déploiement répondait normalement à Julian.
+  //
+  // Le modèle du test privé est désormais une propriété du DÉPLOIEMENT (voir `modele-faible-test`) :
+  // il n'y a plus de compte à comparer, donc plus de compte à refuser.
+  //
+  // ⚠️ LE `try` RESTE, ET IL DOIT RESTER. Une valeur de drapeau approximative ou une indexation
+  // publique ouverte en même temps que le mode faible sont des fautes de CONFIGURATION : elles
+  // lèvent, et elles doivent arrêter le tour plutôt que de retomber en silence sur un modèle que la
+  // clé refuse — ce qui donnerait la même page blanche, sans la cause.
   let autorisationModeleFaible;
   try {
-    autorisationModeleFaible = autorisationModeleFaibleTest(user.id);
+    autorisationModeleFaible = autorisationModeleFaibleTest();
   } catch (e) {
     console.error("anam/message : configuration du modèle faible invalide", {
       code: codeDErreur(e),
     });
     return NextResponse.json(
       { code: "configuration_ia_indisponible", message: "Service indisponible, réessaie." },
-      { status: 503, headers: ENTETES_ART9 },
-    );
-  }
-  if (autorisationModeleFaible === "refusee") {
-    return NextResponse.json(
-      { code: "service_indisponible", message: "Service indisponible, réessaie." },
       { status: 503, headers: ENTETES_ART9 },
     );
   }

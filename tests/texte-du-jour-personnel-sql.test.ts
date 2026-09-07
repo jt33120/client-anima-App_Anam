@@ -28,6 +28,16 @@ const EXPORT = readFileSync(
 );
 
 /**
+ * ⚠️ LES BORNES EFFECTIVES VIENNENT DE 0097, PAS DE 0094. Celles de 0094 étaient ESTIMÉES ; dix
+ * générations réelles les ont réfutées (parties de 500 à 780 signes, dix refus sur dix). Lire
+ * encore 0094 ici ferait passer la garde de parité sur des valeurs que la base n'applique plus.
+ */
+const BORNES = readFileSync(
+  resolve(process.cwd(), "supabase/migrations/0097_texte_du_jour_personnel_bornes.sql"),
+  "utf8",
+);
+
+/**
  * Le SQL sans ses commentaires.
  *
  * ⚠️ INDISPENSABLE POUR TOUT REFUS (`not.toMatch`), et pas seulement par propreté : les migrations
@@ -93,14 +103,14 @@ describe("[LE CŒUR] la forme des trois parties est tenue par la base, pas par l
     );
   });
 
-  it("[LE CŒUR] les bornes SQL et celles du verdict sont les MÊMES, à la valeur près", () => {
+  it("[LE CŒUR] les bornes SQL EFFECTIVES et celles du verdict sont les MÊMES", () => {
     // ⚠️ DEUX NOMBRES POUR UNE SEULE RÈGLE FINISSENT TOUJOURS PAR DIVERGER. Le jour où l'on
     // desserre `PARTIE_MAX` dans le domaine sans toucher au SQL, la base refusera un texte que le
     // verdict vient d'accepter — et le chemin d'échec sera « cache indisponible », c'est-à-dire un
     // message qui ne dit rien de la vraie cause. Cette ligne lie les deux.
     for (const colonne of ["ciel", "pour_toi", "gestes"]) {
       expect(
-        corpsTable,
+        BORNES,
         `la borne SQL de « ${colonne} » ne suit plus PARTIE_MIN/PARTIE_MAX`,
       ).toContain(`char_length(${colonne}) between ${PARTIE_MIN} and ${PARTIE_MAX}`);
     }

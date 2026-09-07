@@ -158,3 +158,39 @@ export function cleDeSignature(jour: JourCivil, signature: SignatureDuCiel): str
 export function signatureExploitable(signature: SignatureDuCiel): boolean {
   return signature.luneDistance !== null || signature.dominante !== null;
 }
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// LE CIEL DU JOUR, DIT EN SIGNES (2026-09-07)
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+/** Un corps du jour et le signe qu'il occupe. Aucun degré : le signe suffit à écrire une phrase. */
+export interface PositionDuJourDite {
+  readonly corps: Corps;
+  readonly signe: Signe;
+}
+
+/**
+ * ⚠️ CE N'EST PAS UN CHAMP DE `SignatureDuCiel`, ET C'EST DÉLIBÉRÉ. Cette signature-là est une liste
+ * CLOSE de quatre clés, tenue par `tests/signature-ciel.test.ts` pour qu'elle ne dure pas « jusqu'au
+ * premier champ ajouté pour personnaliser un peu plus ». Le ciel du jour n'est pas une
+ * personnalisation — il est le MÊME pour tout le monde sur Terre ce jour-là —, mais il n'a pas à
+ * entrer dans une clé de cache qui n'en a pas besoin : le JOUR est déjà dans cette clé, et il
+ * détermine entièrement ces positions. On le fait donc voyager à côté.
+ *
+ * ══ POURQUOI IL A FALLU L'ENVOYER : LE MODÈLE COMBLAIT ═════════════════════════════════════════
+ *
+ * On envoyait la DISTANCE (« la Lune du jour est à trois signes de ton Soleil ») sans jamais dire
+ * dans quel signe la Lune se trouve. Mesuré le 2026-09-07 sur cinq générations réelles : trois fois
+ * sur cinq, le modèle écrivait « la Lune du jour, en Lion » — un signe qu'il INVENTAIT, parce qu'une
+ * rubrique attendue manquait. `verdictHoroscope` les refusait toutes pour `fait_natal_invente`.
+ *
+ * C'est la troisième fois que ce dépôt rencontre la même loi, et la troisième fois qu'elle se règle
+ * de la même façon : « un jour calme est un vrai jour », « il n'y a pas d'Ascendant », et maintenant
+ * le signe de la Lune. Un modèle privé d'un fait qu'il attend ne laisse pas un blanc — il le
+ * remplit. On ne le lui interdit pas : on le lui donne.
+ */
+export function cielDuJourDit(ciel: HoroscopeDuJour["ciel"]): readonly PositionDuJourDite[] {
+  return Object.freeze(
+    ciel.positions.map((p) => Object.freeze({ corps: p.corps, signe: p.signe })),
+  );
+}

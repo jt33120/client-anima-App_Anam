@@ -119,9 +119,13 @@ export function socleNatalCanonique(socle: SocleNatalDit): string {
 export function signesAutorises(
   socle: SocleNatalDit,
   entreesDuJour: readonly Signe[] = [],
+  cielDuJour: readonly Signe[] = [],
 ): readonly Signe[] {
   const vus = new Set<Signe>();
   for (const s of [socle.soleil, socle.lune, socle.ascendant]) if (s) vus.add(s);
   for (const s of entreesDuJour) vus.add(s);
+  // Le ciel du jour est ENVOYÉ au modèle depuis le 2026-09-07 : sans lui ici, la garde refuserait
+  // le modèle pour avoir recopié exactement ce qu'on venait de lui dire.
+  for (const s of cielDuJour) vus.add(s);
   return Object.freeze([...vus]);
 }

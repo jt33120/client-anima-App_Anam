@@ -19,20 +19,33 @@ production en dessous de Pro). « Phase de test » décrit notre intention, pas 
 > peut la TROUVER. La différence compte : le produit n'est pas publiable, et être trouvé aujourd'hui,
 > ce serait être trouvé par quelqu'un qui cherche de l'aide.
 
-Dernière revue : **2026-09-06** (modèle faible privé temporaire). Revue précédente : **2026-08-26** (§9 ouverte — la facture Scale).
+Dernière revue : **2026-09-07** (modèle faible élargi à tous les comptes et à tous les consommateurs IA). Revue précédente : **2026-09-06** (modèle faible privé temporaire).
 
 
 ### 🔴 TEMPORAIRE — modèle faible réservé au compte de Julian
 
 Depuis le **6 septembre 2026**, `ANIMA_MODELE_FAIBLE_TEST=oui` autorise
-`ministral-14b-2512` pour les appels de la conversation, uniquement sur le
-compte dont l'UUID serveur correspond à `ANIMA_TESTEUR_MODELE_FAIBLE_ID`. Les autres comptes sont
-refusés avant tout envoi ; l'ordonnanceur et les autres consommateurs IA ne reçoivent pas cette
-autorisation.
+`ministral-14b-2512`. **Élargi le 7 septembre 2026** à TOUS les comptes et à TOUS les consommateurs
+IA — la conversation, le texte du jour et la synthèse de l'ordonnanceur.
 
-**Avant la première vraie utilisatrice :** obtenir l'accès à un modèle fort validé, supprimer les
-deux variables Vercel, vérifier un échange complet sur Large, puis seulement poser
-`ANIMA_INDEXABLE=oui`. Tant que le mode faible vaut `oui`, `robots.txt` et `X-Robots-Tag` restent
+Pourquoi : la restriction par UUID réservait le modèle qui répond au seul compte de Julian, et Anima
+— la première vraie utilisatrice — recevait « Service indisponible, réessaie » à chaque tour, sans
+panne et sans journal. Et les deux autres consommateurs, qui ne recevaient pas l'autorisation,
+appelaient un modèle refusé en silence.
+
+Mesuré le 7 septembre 2026 sur la clé de production, en requêtes réelles :
+`mistral-large-2512` → **403 `tier_not_allowed`** ; `mistral-small-2603` → **429 persistant** ;
+`ministral-14b-2512` → **200**. La clé n'ouvre qu'un modèle.
+
+⚠️ **CE QUE ÇA COÛTE** : la détection de détresse (AD-5, NFR-012 : « toujours au plus capable, en
+aucune circonstance au léger ») tourne désormais sur ce modèle POUR TOUT LE MONDE. Le tier logique
+reste « fort » et le modèle réel est enregistré dans `usage_ia` ; mais la garde qui décide si
+quelqu'un qui va mal reçoit autre chose qu'une conversation ordinaire s'appuie sur un modèle que
+l'abonnement n'a pas validé. C'est la raison d'être du verrou d'indexation ci-dessous.
+
+**Avant la première vraie utilisatrice :** obtenir l'accès à un modèle fort validé, supprimer
+`ANIMA_MODELE_FAIBLE_TEST` de Vercel (et `ANIMA_TESTEUR_MODELE_FAIBLE_ID`, désormais inerte),
+vérifier un échange complet sur Large, puis seulement poser `ANIMA_INDEXABLE=oui`. Tant que le mode faible vaut `oui`, `robots.txt` et `X-Robots-Tag` restent
 fermés même si la variable d'indexation est posée par erreur.
 
 

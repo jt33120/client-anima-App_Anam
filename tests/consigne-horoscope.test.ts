@@ -129,8 +129,13 @@ describe("[LE CŒUR] les faits partent en clair, et rien d’autre ne part", () 
 describe("[LE CŒUR] ce qu’on sait d’elle part à part, et sans compter", () => {
   const toi = faitsDeToi(CONTEXTE);
 
-  it("porte le prénom, l’arbre et ce qui a été retenu", () => {
-    expect(toi).toContain("Claire");
+  it("[LE CŒUR] porte l’arbre et ce qui a été retenu — mais JAMAIS le prénom", () => {
+    // ⚠️ LE PRÉNOM A ÉTÉ RETIRÉ LE 2026-09-07, ET C'EST UNE MESURE QUI L'A DÉCIDÉ. Cinq générations
+    // réelles ont ouvert la deuxième partie par « <Prénom>, tu sais ce que c'est que… ». Or la
+    // première utilisatrice s'appelle ANIMA, du même nom que le produit : `verdictHoroscope`
+    // refusait chacun de ces textes pour `signature` — la garde FR-086. Le prénom ne sert à rien
+    // ici (le texte tutoie déjà) ; la garde, elle, reste absolue.
+    expect(toi).not.toContain("Claire");
     expect(toi).toContain("le déménagement");
     expect(toi).toContain("la lettre à sa sœur");
     expect(toi).toContain("elle hésite à reprendre le chant");
@@ -165,7 +170,6 @@ describe("[LE CŒUR] ce qu’on sait d’elle part à part, et sans compter", ()
       premiereFois: true,
     });
     expect(vierge).toContain("Rien d’autre n’est connu d’elle");
-    expect(vierge).toContain("Tu ne connais pas son prénom");
   });
 
   it("[LE CŒUR] il n’écrit lui-même aucune prédiction", () => {

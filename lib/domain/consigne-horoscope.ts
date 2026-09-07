@@ -4,7 +4,7 @@ import { CORPS_LIBELLE, SIGNE_LIBELLE } from "./cartes-socle";
 import type { MatiereContexte } from "./contexte-anam";
 import { CONTEXTE_BRANCHES_MAX, CONTEXTE_RETENU_MAX } from "./contexte-anam";
 import type { SocleNatalDit } from "./socle-natal-dit";
-import type { SignatureDuCiel, TraitDuCiel } from "./signature-ciel";
+import type { PositionDuJourDite, SignatureDuCiel, TraitDuCiel } from "./signature-ciel";
 
 /**
  * consigne-horoscope.ts — LA CONSIGNE DU TEXTE DU JOUR (retour du fondateur du 2026-09-02, refondu
@@ -179,7 +179,7 @@ export function consigneHoroscope(): MessageIa {
       `[${ETIQUETTE_CIEL}]`,
       "Le factuel. Tu nommes son socle de naissance tel qu’il t’est donné, et tu décris au présent ce",
       "que le ciel d’aujourd’hui vient y toucher. C’est la partie où le lecteur doit reconnaître que",
-      "ce texte est le sien et celui de personne d’autre. Trois à cinq phrases.",
+      "ce texte est le sien et celui de personne d’autre. TROIS PHRASES AU PLUS.",
       "",
       `[${ETIQUETTE_TOI}]`,
       "Le personnalisé. Tu pars de ce que l’application sait d’elle et tu le relies à la première",
@@ -190,12 +190,14 @@ export function consigneHoroscope(): MessageIa {
       `[${ETIQUETTE_CONCRET}]`,
       "Le concret. Ici, et ici seulement, tu proposes : deux ou trois gestes tenables dans la journée,",
       "petits, précis, situés. Une chose qu’on peut faire en dix minutes vaut mieux qu’une intention.",
-      "Tu écris ces gestes à l’infinitif, à l’impératif, ou au présent. Deux à quatre phrases.",
+      "Tu écris ces gestes à l’infinitif, à l’impératif, ou au présent. TROIS PHRASES AU PLUS.",
       "",
       "Ce que tu fais partout :",
       "- tu décris au présent ce qui est, et tu proposes au présent ce qui se fait ;",
       "- tu nommes au moins un des éléments donnés, pour que le texte soit celui de ce jour-là ;",
-      "- tu tutoies, tu restes sobre, tu écris une prose continue.",
+      "- tu tutoies, tu restes sobre, tu écris une prose continue ;",
+      "- tu tiens CHAQUE partie sous quatre cents signes. C’est une contrainte dure, pas une",
+      "  indication : une partie plus longue est refusée en entier, et personne ne lit ton texte.",
       "",
       "Ce que tu ne fais jamais, dans aucune des trois parties :",
       "- tu restes au présent : rien de ce qui n’a pas eu lieu, aucun verbe au futur adressé à la personne ;",
@@ -203,7 +205,9 @@ export function consigneHoroscope(): MessageIa {
       "- tu n’emploies aucun vocabulaire de santé, de thérapie, de diagnostic ni de bien-être, et en",
       "  particulier tu n’écris jamais le mot « soin » ni le verbe « soulager » ;",
       "- tu ne te nommes pas, tu ne te décris pas, tu ne signes pas, tu ne t’adresses pas à toi-même ;",
-      "- tu ne poses aucune question et tu n’ajoutes ni titre, ni liste, ni guillemets, ni emoji ;",
+      "- tu ne poses aucune question, et tu n’écris jamais de point d’interrogation, même rhétorique ;",
+      "- tu n’écris aucun nom propre de personne, et tu n’appelles jamais quelqu’un par son prénom ;",
+      "- tu n’ajoutes ni titre, ni liste, ni guillemets, ni emoji, ni ligne de séparation ;",
       "- tu n’écris jamais un article suivi d’un chiffre seul, et tu écris les dates en toutes lettres.",
       "",
       "Le ciel forme une configuration ; il n’ordonne rien et ne promet rien. Une tension entre deux",
@@ -238,12 +242,19 @@ export function faitsDeToi(contexte: MatiereContexte): string {
     "Tu t’en sers pour la deuxième partie. Tu ne le récites pas, tu ne dis pas que tu le sais, tu n’ajoutes rien.",
   ];
 
-  if (contexte.prenom) {
-    lignes.push(`Elle s’appelle ${contexte.prenom}. Tu peux l’appeler par son prénom, une fois au plus.`);
-  } else {
-    lignes.push("Tu ne connais pas son prénom. Ne lui en invente pas et ne le lui demande pas.");
-  }
-
+  // ⚠️ LE PRÉNOM NE PART PLUS AU MODÈLE, ET C'EST UNE MESURE QUI L'A DÉCIDÉ (2026-09-07).
+  //
+  // La consigne disait « tu peux l'appeler par son prénom, une fois au plus ». Cinq générations
+  // réelles sur `ministral-14b-2512` ont ouvert la deuxième partie par « <Prénom>, tu sais ce que
+  // c'est que… » — cinq fois sur cinq. Or la première utilisatrice du produit s'appelle ANIMA, du
+  // même nom que le produit : `verdictHoroscope` refusait donc chacun de ces textes pour
+  // `signature`, la garde FR-086 qui empêche un modèle de signer sous le nom d'une personne réelle.
+  //
+  // Cette collision n'est pas un cas limite à contourner : c'est le nom du produit ET le sien. On
+  // pourrait exempter son prénom du refus, mais ce serait desserrer la seule garde qui empêche un
+  // texte fabriqué de paraître signé d'elle — pour gagner un mot. Le prénom ne sert à rien ici : le
+  // texte tutoie déjà, et la personnalisation vient de son arbre et de ce qui a été retenu, pas
+  // d'une apostrophe. On ne l'envoie plus, et la garde reste absolue.
   if (contexte.typePressenti) {
     lignes.push(
       `Une hypothèse de type a été posée avec elle : ${contexte.typePressenti}. C’est une hypothèse ` +
@@ -301,6 +312,7 @@ export function faitsDuCiel(
   signature: SignatureDuCiel,
   jour: JourCivil,
   socle: SocleNatalDit,
+  cielDuJour: readonly PositionDuJourDite[] = [],
 ): string {
   const lignes: string[] = [`Jour : ${jourEnMots(jour)}.`];
 
@@ -323,6 +335,18 @@ export function faitsDuCiel(
   }
 
   // ── Ce qui change aujourd'hui ──────────────────────────────────────────────────────────────
+  //
+  // ⚠️ LE CIEL DU JOUR EN SIGNES, AVANT LA DISTANCE — ET C'EST UNE MESURE QUI L'A EXIGÉ. On envoyait
+  // « la Lune du jour est à trois signes de ton Soleil » sans jamais dire OÙ est cette Lune. Trois
+  // générations réelles sur cinq inventaient « la Lune du jour, en Lion ». Un modèle privé d'un fait
+  // qu'il attend le comble ; on le lui donne plutôt que de le lui interdire.
+  if (cielDuJour.length > 0) {
+    lignes.push(
+      `Le ciel d’aujourd’hui : ${cielDuJour
+        .map((p) => `${nomDeCorps(p.corps)} en ${SIGNE_LIBELLE[p.signe]}`)
+        .join(" ; ")}.`,
+    );
+  }
   if (signature.luneDistance !== null) {
     lignes.push(`Position relative : ${luneEnMots(signature.luneDistance)}.`);
   }
@@ -368,9 +392,10 @@ export function messagesHoroscope(
   jour: JourCivil,
   socle: SocleNatalDit,
   contexte: MatiereContexte | null,
+  cielDuJour: readonly PositionDuJourDite[] = [],
 ): readonly MessageIa[] {
   const messages: MessageIa[] = [consigneHoroscope()];
   if (contexte) messages.push({ role: "system", content: faitsDeToi(contexte) });
-  messages.push({ role: "user", content: faitsDuCiel(signature, jour, socle) });
+  messages.push({ role: "user", content: faitsDuCiel(signature, jour, socle, cielDuJour) });
   return Object.freeze(messages);
 }
