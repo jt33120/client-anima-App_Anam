@@ -46,12 +46,14 @@ try {
         const assets = [];
         page.on("pageerror", (error) => errors.push(error.message));
         page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-        page.on("request", (request) => { if (request.url().includes("/marque/metamorphose/")) assets.push(new URL(request.url()).pathname); });
+        page.on("request", (request) => { if (/\/marque\/(metamorphose|croissance)\//.test(request.url())) assets.push(new URL(request.url()).pathname); });
         await page.route("**/api/**", (route) => { api.push(route.request().method() + " " + new URL(route.request().url()).pathname); return route.fulfill({ status: 503, body: "{}", contentType: "application/json" }); });
         await page.goto("http://127.0.0.1:4179/?tree=seed", { waitUntil: "domcontentloaded" });
         const region = page.getByRole("region", { name: "Mon évolution", exact: true });
         await region.waitFor();
         await page.getByRole("navigation", { name: "Régions" }).getByRole("button", { name: "Mon évolution", exact: true }).click();
+        await region.locator('[data-index-croissance] [data-planche] > img').waitFor({ state: "visible" });
+        await region.locator('[data-index-croissance] [data-planche] > img').evaluate((image) => image.decode());
         const cta = region.getByRole("button", { name: "Voir la graine éclore", exact: true });
         const ctaBounds = await cta.boundingBox();
         const assetsBeforeOpen = [...assets];
@@ -67,28 +69,35 @@ try {
         const advanced = await readImage(page);
         await dialog.getByRole("button", { name: "Image précédente", exact: true }).click();
         const returned = await readImage(page);
-        const buttons = dialog.getByRole("group", { name: "Choisir une illustration" }).getByRole("button");
+        const choices = dialog.getByLabel("Choisir une étape", { exact: true });
         const stages = [];
-        for (const position of quick ? [0, 7] : [0, 1, 2, 3, 4, 5, 6, 7]) {
-          await buttons.nth(position).click();
+        for (const position of quick ? [0, 31] : width === 390 ? Array.from({ length: 32 }, (_, index) => index) : [1, 15, 31]) {
+          await choices.selectOption(String(position));
           const illustration = await readImage(page);
-          const pressed = await buttons.nth(position).getAttribute("aria-pressed");
-          await capture(page, `${engine}-${width}-${position + 1}-${illustration.id}.png`);
-          stages.push({ position, ...illustration, pressed,
+          const selected = await choices.inputValue();
+          if (quick || [1, 15, 31].includes(position)) await capture(page, `${engine}-${width}-${position + 1}-${illustration.id}.png`);
+          stages.push({ position, ...illustration, selected,
             previousDisabled: await dialog.getByRole("button", { name: "Image précédente", exact: true }).isDisabled(),
             nextDisabled: await following.isDisabled() });
+        }
+        const families = [];
+        for (const [name, expected] of [["Éclosion", 0], ["Croissance", 4], ["Canopée", 16], ["Lumière", 24]]) {
+          const shortcut = dialog.getByRole("button", { name: `Voir la famille : ${name}`, exact: true });
+          await shortcut.click();
+          await readImage(page);
+          families.push({ name, expected, selected: Number(await choices.inputValue()), pressed: await shortcut.getAttribute("aria-pressed") });
         }
         await page.keyboard.press("Escape");
         await dialog.waitFor({ state: "hidden" });
         const focusRestored = await cta.evaluate((button) => document.activeElement === button);
-        const personalStage = await region.locator("canvas").getAttribute("data-etape-arbre");
+        const personalStage = await region.locator("[data-index-croissance]").getAttribute("data-etape-arbre");
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
-        const result = { engine, width, ctaBounds, navigationBounds, assetsBeforeOpen, entry, advanced, returned, stages, focusRestored, personalStage, assets: [...new Set(assets)], api, errors, overflow };
+        const result = { engine, width, ctaBounds, navigationBounds, assetsBeforeOpen, entry, advanced, returned, stages, families, focusRestored, personalStage, assets: [...new Set(assets)], api, errors, overflow };
         results.push(result);
         console.log(`${engine} ${width}: ${stages.length} stages, entry=${entry.id}, focus=${focusRestored}, errors=${errors.length}`);
         await page.close();
 
-        if (!quick) for (const context of [
+        if (!quick && width === 390) for (const context of [
           { tree: "seed", variant: "papier" }, { tree: "seed", variant: "contraste" },
           { tree: "mixed", variant: "branches" }, { tree: "dense", variant: "liste" },
           { tree: "seed", variant: "reserve" }, { tree: "error", variant: "erreur" },
@@ -109,13 +118,13 @@ try {
           if (context.variant === "papier") await sample.getByRole("button", { name: "Passer au thème papier" }).click();
           if (context.variant === "contraste") await sample.evaluate(() => { document.documentElement.dataset.a11y = "contraste"; });
           const beforeText = await personal.innerText();
-          const sourceStage = await personal.locator("canvas").count() ? await personal.locator("canvas").getAttribute("data-etape-arbre") : null;
+          const sourceStage = await personal.locator("[data-index-croissance]").count() ? await personal.locator("[data-index-croissance]").getAttribute("data-etape-arbre") : null;
           await capture(sample, `${engine}-${width}-${context.variant}-before.png`);
           const opener = personal.getByRole("button", { name: context.variant === "reserve" ? "Voir la graine éclore" : "Comprendre mon évolution", exact: true });
           await opener.click();
           const modal = sample.getByRole("dialog", { name: "Comprendre mon évolution", exact: true });
           await modal.waitFor();
-          await modal.getByRole("group", { name: "Choisir une illustration" }).getByRole("button").nth(6).click();
+          await modal.getByLabel("Choisir une étape", { exact: true }).selectOption("23");
           const illustration = await readImage(sample);
           const covered = await sample.evaluate(() => {
             const nav = document.querySelector('nav[aria-label="Régions"]');
@@ -144,7 +153,7 @@ try {
 }
 const after = await hashes();
 const sourceChanged = files.filter((file) => before[file] !== after[file]);
-const failures = results.filter((r) => r.errors.length || r.api.length || r.overflow || r.assetsBeforeOpen.length || !r.focusRestored || r.personalStage !== "graine" || r.entry.id !== "eclosion" || r.advanced.id !== "enracinement" || r.returned.id !== "eclosion");
+const failures = results.filter((r) => r.errors.length || r.api.length || r.overflow || !r.focusRestored || r.personalStage !== "graine" || r.entry.id !== "eclosion" || r.advanced.id !== "enracinement" || r.returned.id !== "eclosion" || r.families.some((family) => family.expected !== family.selected || family.pressed !== "true"));
 const contextFailures = contexts.filter((r) => r.errors.length || r.api.length || r.overflow || !r.covered || !r.focus || !r.unchanged);
 await writeFile(join(output, "metamorphose-results.json"), JSON.stringify({ before, after, sourceChanged, fatalError, results, contexts }, null, 2));
 console.log(JSON.stringify({ output, scenarios: results.length, contexts: contexts.length, sourceChanged, fatalError, failures: failures.length + contextFailures.length }));

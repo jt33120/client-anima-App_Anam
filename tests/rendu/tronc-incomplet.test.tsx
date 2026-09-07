@@ -76,6 +76,14 @@ function monter(projection: ProjectionScene) {
   );
 }
 
+/** A young tree can group the trunk and a nearby branch into one full-size touch target. */
+async function trouverTronc(u: ReturnType<typeof userEvent.setup>) {
+  const direct = screen.queryByRole("button", { name: ARIA_TRONC_A_COMPLETER });
+  if (direct) return direct;
+  await u.click(screen.getByRole("button", { name: "Voir les branches et le tronc proches" }));
+  return screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER });
+}
+
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 // AC5 — exactement deux actions
 // ══════════════════════════════════════════════════════════════════════════════════════════════
@@ -84,7 +92,7 @@ describe("[5.3 / AC5] la fiche du tronc porte EXACTEMENT deux actions", () => {
   it("[LE CŒUR] « Ajouter mon heure » et « Où la trouver », et rien d'autre", async () => {
     const u = userEvent.setup();
     monter(AVEC_BRANCHE_INCOMPLET);
-    await u.click(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER }));
+    await u.click(await trouverTronc(u));
 
     // PRÉSENCE D'ABORD : on prouve que la fiche est bien ouverte avant de compter ses actions.
     expect(screen.getByText(MESSAGE_SANS_HEURE)).toBeTruthy();
@@ -105,7 +113,7 @@ describe("[5.3 / AC5] la fiche du tronc porte EXACTEMENT deux actions", () => {
   it("« Ajouter mon heure » mène à la saisie — un chemin, pas un cul-de-sac", async () => {
     const u = userEvent.setup();
     monter(AVEC_BRANCHE_INCOMPLET);
-    await u.click(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER }));
+    await u.click(await trouverTronc(u));
     const lien = screen.getByRole("link", { name: ACTION_AJOUTER_HEURE });
     expect(lien.getAttribute("href")).toBe(URL_HEURE_NAISSANCE);
   });
@@ -113,7 +121,7 @@ describe("[5.3 / AC5] la fiche du tronc porte EXACTEMENT deux actions", () => {
   it("« Où la trouver » RÉVÈLE SUR PLACE — la mairie, et l'extrait simple qui ne suffit pas", async () => {
     const u = userEvent.setup();
     monter(AVEC_BRANCHE_INCOMPLET);
-    await u.click(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER }));
+    await u.click(await trouverTronc(u));
 
     // Avant le clic, l'indication n'est PAS là : sinon le bouton ne servirait à rien.
     expect(screen.queryByText(OU_TROUVER_SON_HEURE)).toBeNull();
@@ -124,7 +132,7 @@ describe("[5.3 / AC5] la fiche du tronc porte EXACTEMENT deux actions", () => {
   it("Échap referme la fiche, et le focus revient au tronc", async () => {
     const u = userEvent.setup();
     monter(AVEC_BRANCHE_INCOMPLET);
-    const tronc = screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER });
+    const tronc = await trouverTronc(u);
     await u.click(tronc);
     expect(screen.queryByText(MESSAGE_SANS_HEURE)).toBeTruthy();
     await u.keyboard("{Escape}");
@@ -154,7 +162,7 @@ describe("[5.3 / AC4 / DUR] quand rien ne manque, il n'y a RIEN à voir", () => 
     // manque ton heure » à quelqu'un qui vient précisément de la donner.
     const u = userEvent.setup();
     const vue = monter(AVEC_BRANCHE_INCOMPLET);
-    await u.click(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER }));
+    await u.click(await trouverTronc(u));
     expect(screen.queryByText(MESSAGE_SANS_HEURE)).toBeTruthy();
 
     vue.rerender(
@@ -171,6 +179,7 @@ describe("[5.3 / AC4 / DUR] quand rien ne manque, il n'y a RIEN à voir", () => 
       />,
     );
     expect(screen.queryByText(MESSAGE_SANS_HEURE), "la fiche survit à sa raison d'être").toBeNull();
+    expect(screen.queryByRole("button", { name: ARIA_TRONC_A_COMPLETER })).toBeNull();
   });
 });
 
@@ -184,7 +193,7 @@ describe("[5.3 / UX-DR-37] le tronc est atteignable dans les trois états, pas s
     // inatteignable pour elle — c'est-à-dire pour la cible exacte de cette story.
     const u = userEvent.setup();
     monter(VIDE_INCOMPLET);
-    const tronc = screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER });
+    const tronc = await trouverTronc(u);
     await u.click(tronc);
     expect(screen.getByText(MESSAGE_SANS_HEURE)).toBeTruthy();
   });
@@ -195,7 +204,7 @@ describe("[5.3 / UX-DR-37] le tronc est atteignable dans les trois états, pas s
     const u = userEvent.setup();
     monter(AVEC_BRANCHE_INCOMPLET);
     await u.click(screen.getByRole("button", { name: BASCULE_LISTE }));
-    const tronc = screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER });
+    const tronc = await trouverTronc(u);
     await u.click(tronc);
     expect(screen.getByText(MESSAGE_SANS_HEURE)).toBeTruthy();
   });
@@ -228,7 +237,7 @@ describe("[5.3 / AC3 / DUR] le mot « incomplet » n'est nulle part, aria compri
     const u = userEvent.setup();
     const vue = monter(AVEC_BRANCHE_INCOMPLET);
     expect(vue.container.innerHTML).not.toMatch(/incomplet/i);
-    await u.click(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER }));
+    await u.click(await trouverTronc(u));
     expect(vue.container.innerHTML, "le mot a fui dans la fiche").not.toMatch(/incomplet/i);
 
     // …et aucun des signaux qu'AC2 interdit. Le VOCABULAIRE est cherché dans tout le balisage
@@ -239,9 +248,10 @@ describe("[5.3 / AC3 / DUR] le mot « incomplet » n'est nulle part, aria compri
     expect(vue.container.textContent ?? "", "un pourcentage s'affiche").not.toMatch(/\d\s*%/);
   });
 
-  it("[NON-VACUITÉ] le DOM examiné contient bien ce qu'on croit examiner", () => {
+  it("[NON-VACUITÉ] le DOM examiné contient bien ce qu'on croit examiner", async () => {
     // Un composant qui rendrait `null` passerait toutes les absences ci-dessus.
     const vue = monter(AVEC_BRANCHE_INCOMPLET);
+    await trouverTronc(userEvent.setup());
     expect(vue.container.innerHTML).toContain(ARIA_TRONC_A_COMPLETER);
   });
 });
@@ -250,39 +260,40 @@ describe("[5.3 / AC3 / DUR] le mot « incomplet » n'est nulle part, aria compri
 // Story 5.6 (T9) — LE TRONC EST DESSINÉ MÊME QUAND L'ARBRE EST VIDE (FR-088, dette de la 3.3)
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-describe("[5.6/AC9 · FR-088] l'étape 0 vit dans le canevas lunaire", () => {
+describe("[5.6/AC9 · FR-088] l'étape 0 conserve la première illustration", () => {
   const VIDE: ProjectionScene = { tronc: { present: true }, branches: [] };
 
   it("[« OÙ EST SA GRAINE ? »] le premier jour rend l'étape graine dans le même ciel, jamais un SVG alternatif", () => {
     const { container } = monter(VIDE);
-    const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
-    expect(canvas.getAttribute("data-etape-arbre")).toBe("graine");
-    // ADAPTÉ : le seul SVG admis à l'étape 0 est la graine d'attente superposée au canevas (`GraineAttente`,
-    // crochet `data-graine-attente`) — ce n'est pas un dessin de secours, c'est la graine du même ciel.
+    const canvas = screen.getByRole("img", { name: new RegExp(`^${ARIA_CANEVAS}`) });
+    expect(canvas.closest("[data-index-croissance]")!.getAttribute("data-etape-arbre")).toBe("graine");
+    // La première image est conservée ; aucune graine supplémentaire ne la recouvre.
+    expect(new URL(canvas.getAttribute("src")!, "http://localhost").searchParams.get("url"))
+      .toBe("/marque/metamorphose/01-graine.webp");
     expect(
-      container.querySelector("svg:not([data-graine-attente])"),
+      container.querySelector("svg"),
       "l'ancien dessin de secours est revenu",
     ).toBeNull();
   });
 
   it("la matière du futur tronc reste marquée en réserve quand l'heure manque, sans changer d'asset", () => {
     const complet = monter(VIDE);
-    const canvasComplet = screen.getByRole("img", { name: ARIA_CANEVAS });
-    expect(canvasComplet.hasAttribute("data-tronc-reserve")).toBe(false);
+    const canvasComplet = screen.getByRole("img", { name: new RegExp(`^${ARIA_CANEVAS}`) });
+    expect(canvasComplet.closest("[data-index-croissance]")!.hasAttribute("data-tronc-reserve")).toBe(false);
     complet.unmount();
 
     monter(VIDE_INCOMPLET);
-    const canvasReserve = screen.getByRole("img", { name: ARIA_CANEVAS });
-    expect(canvasReserve.getAttribute("data-etape-arbre")).toBe("graine");
-    expect(canvasReserve.hasAttribute("data-tronc-reserve")).toBe(true);
+    const canvasReserve = screen.getByRole("img", { name: new RegExp(`^${ARIA_CANEVAS}`) });
+    expect(canvasReserve.closest("[data-index-croissance]")!.getAttribute("data-etape-arbre")).toBe("graine");
+    expect(canvasReserve.closest("[data-index-croissance]")!.hasAttribute("data-tronc-reserve")).toBe(true);
   });
 
   it("[5.3-AC3] le canevas n'ANNONCE jamais « incomplet » ; la fiche reste accessible par son bouton", () => {
     const { container } = monter(VIDE_INCOMPLET);
-    const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
-    expect((canvas.getAttribute("aria-label") ?? "").toLowerCase()).not.toContain("incomplet");
+    const canvas = screen.getByRole("img", { name: new RegExp(`^${ARIA_CANEVAS}`) });
+    expect((canvas.getAttribute("alt") ?? "").toLowerCase()).not.toContain("incomplet");
     expect(screen.getByRole("button", { name: ARIA_TRONC_A_COMPLETER })).toBeTruthy();
-    // ADAPTÉ : même exclusion que ci-dessus — la graine d'attente (SVG) est légitime à l'étape 0.
-    expect(container.querySelector("svg:not([data-graine-attente])")).toBeNull();
+    // Aucune seconde graine alternative ne se superpose à l'illustration conservée.
+    expect(container.querySelector("svg")).toBeNull();
   });
 });

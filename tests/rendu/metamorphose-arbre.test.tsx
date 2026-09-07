@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MetamorphoseArbre from "@/render/arbre/MetamorphoseArbre";
 import { PLANCHES_METAMORPHOSE } from "@/render/arbre/metamorphose-planches";
@@ -13,26 +13,25 @@ afterEach(() => {
 
 const precedente = () => screen.getByRole<HTMLButtonElement>("button", { name: "Image précédente" });
 const suivante = () => screen.getByRole<HTMLButtonElement>("button", { name: "Image suivante" });
-const repere = (index: number) => screen.getByRole("button", {
-  name: `Voir l’illustration ${String(index + 1).padStart(2, "0")} : ${PLANCHES_METAMORPHOSE[index].titre}`,
-});
+const selection = () => screen.getByRole<HTMLSelectElement>("combobox", { name: "Choisir une étape" });
+const choisir = (index: number) => fireEvent.change(selection(), { target: { value: String(index) } });
 
 function verifierPlanche(index: number) {
   const planche = PLANCHES_METAMORPHOSE[index];
-  expect(screen.getByText((texte) => texte === planche.titre || texte.endsWith(`— ${planche.titre}`))).toBeTruthy();
+  expect(within(screen.getByRole("figure")).getByText((texte) => texte === planche.titre || texte.endsWith(`— ${planche.titre}`))).toBeTruthy();
   expect(screen.getByText(planche.texte)).toBeTruthy();
   const image = screen.getByAltText<HTMLImageElement>(planche.alt);
   expect(decodeURIComponent(image.getAttribute("src") ?? "")).toContain(planche.src);
   expect(Number(image.getAttribute("width"))).toBeGreaterThan(0);
   expect(Number(image.getAttribute("height"))).toBeGreaterThan(0);
-  expect(repere(index).getAttribute("aria-pressed")).toBe("true");
+  expect(selection().value).toBe(String(index));
   expect(screen.getAllByRole("button", { pressed: true })).toHaveLength(1);
   return image;
 }
 
 describe("métamorphose de l’arbre — exploration illustrée", () => {
-  it("parcourt les huit planches et s’arrête réellement aux deux extrémités", () => {
-    expect(PLANCHES_METAMORPHOSE).toHaveLength(8);
+  it("parcourt les trente-deux planches et s’arrête réellement aux deux extrémités", () => {
+    expect(PLANCHES_METAMORPHOSE).toHaveLength(32);
     render(<MetamorphoseArbre />);
     verifierPlanche(0);
     expect(precedente().disabled).toBe(true);
@@ -45,16 +44,16 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
     }
     expect(suivante().disabled).toBe(true);
     fireEvent.click(suivante());
-    verifierPlanche(7);
+    verifierPlanche(31);
 
-    for (let index = 6; index >= 0; index--) {
+    for (let index = 30; index >= 0; index--) {
       fireEvent.click(precedente());
       verifierPlanche(index);
     }
     expect(precedente().disabled).toBe(true);
   });
 
-  it.each([[-12, 0], [200, 7]])("borne un index initial %s à la planche %s", (indexInitial, attendu) => {
+  it.each([[-12, 0], [200, 31]])("borne un index initial %s à la planche %s", (indexInitial, attendu) => {
     render(<MetamorphoseArbre indexInitial={indexInitial} />);
     verifierPlanche(attendu);
   });
@@ -63,9 +62,9 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
     const requetes = vi.fn();
     vi.stubGlobal("fetch", requetes);
     render(<MetamorphoseArbre />);
-    fireEvent.click(repere(7));
-    verifierPlanche(7);
-    fireEvent.click(repere(2));
+    choisir(31);
+    verifierPlanche(31);
+    choisir(2);
     verifierPlanche(2);
     expect(requetes).not.toHaveBeenCalled();
   });
@@ -84,13 +83,14 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
     precedente().focus();
     await user.keyboard(" ");
     verifierPlanche(1);
-    repere(7).focus();
-    await user.keyboard("{Enter}");
-    verifierPlanche(7);
+    selection().focus();
+    await user.selectOptions(selection(), "31");
+    verifierPlanche(31);
+    expect(document.activeElement).toBe(selection());
   });
 
   it.each([
-    { indexInitial: 6, attendu: 7, commande: "Image suivante" },
+    { indexInitial: 30, attendu: 31, commande: "Image suivante" },
     { indexInitial: 1, attendu: 0, commande: "Image précédente" },
   ])(
     "garde le focus utilisable lorsque $commande atteint la borne $attendu",
@@ -102,8 +102,20 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
       verifierPlanche(attendu);
       expect(container.contains(document.activeElement)).toBe(true);
       expect(document.activeElement?.matches(":disabled")).toBe(false);
+      expect(document.activeElement).toBe(selection());
     },
   );
+
+  it("propose quatre familles lisibles pour parcourir la série détaillée", () => {
+    render(<MetamorphoseArbre />);
+    expect(selection().options).toHaveLength(32);
+    for (const [famille, index] of [["Éclosion", 0], ["Croissance", 4], ["Canopée", 16], ["Lumière", 24]] as const) {
+      const bouton = screen.getByRole("button", { name: `Voir la famille : ${famille}` });
+      fireEvent.click(bouton);
+      verifierPlanche(index);
+      expect(bouton.getAttribute("aria-pressed")).toBe("true");
+    }
+  });
 
   it("annonce le chargement, puis affiche l’image et garde ses commandes disponibles", async () => {
     render(<MetamorphoseArbre />);

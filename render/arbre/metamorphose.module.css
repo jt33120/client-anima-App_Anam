@@ -40,7 +40,7 @@
 }
 .texte { margin: 0; color: var(--texte-doux); }
 .navigation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--esp-2); }
-.commande, .repere, .reessayer, .appel {
+.commande, .repere, .reessayer, .appel, .selecteur {
   min-height: var(--cible-tactile);
   min-width: var(--cible-tactile);
   border: 1px solid var(--bordure-forte);
@@ -63,7 +63,7 @@
   text-underline-offset: var(--metamorphose-soulignement);
 }
 .commande:focus-visible, .repere:focus-visible, .reessayer:focus-visible, .appel:focus-visible,
-.explication summary:focus-visible, .plateau:focus-visible {
+.explication summary:focus-visible, .plateau:focus-visible, .selecteur:focus-visible {
   outline: var(--metamorphose-focus-largeur) solid var(--accent);
   outline-offset: var(--metamorphose-focus-decalage);
 }
@@ -76,6 +76,8 @@
 .etapes h3, .etapes p { margin: 0; }
 .etapes p { margin-top: var(--esp-1); }
 .prechargement { display: none; }
-@media (min-width: 24rem) {
-  .reperes { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 0; }
-}
+.precision { margin: 0; color: var(--texte-doux); text-align: center; }
+.choixEtape { display: grid; gap: var(--esp-1); }
+.choixEtape label { color: var(--texte-doux); }
+.selecteur { width: 100%; padding: var(--esp-2) var(--esp-3); border-radius: var(--rayon-sm); }
+.repere { font-size: var(--carnet-petit); padding-inline: var(--esp-1); }

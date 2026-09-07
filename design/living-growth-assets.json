@@ -1,0 +1,307 @@
+{
+  "mode": "built-in imagegen",
+  "date": "2026-09-07",
+  "optimization": "New images only: WebP quality88 effort6, no crop or resize. First four files preserved byte-for-byte.",
+  "assets": [
+    {
+      "stage": 1,
+      "name": "graine",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-677ed7cd-c782-40bb-9c8a-933493b57e0b.png",
+      "target": "public/marque/metamorphose/01-graine.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 87650,
+      "sha256": "5e42cb4a2bc4f8d110af14b601b27f155c2d5bcfbbe2d268dcee348e2b619051",
+      "retainedUnchanged": true,
+      "promptSet": "design/metamorphosis-prompts.md"
+    },
+    {
+      "stage": 2,
+      "name": "eclosion",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-2f9cc335-24c7-4b65-a473-d472d309db4b.png",
+      "target": "public/marque/metamorphose/02-eclosion.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 76602,
+      "sha256": "d94ef5728eeea53809b9a77440b4e97e7c0233a693aaaac052fcb7edb258c198",
+      "retainedUnchanged": true,
+      "promptSet": "design/metamorphosis-prompts.md"
+    },
+    {
+      "stage": 3,
+      "name": "enracinement",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-7da4ce07-2e22-44f5-a432-83e8be50aa42.png",
+      "target": "public/marque/metamorphose/03-enracinement.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 77710,
+      "sha256": "32c6939531ba222eca8a6b16f28752d0644753f026c0e3ecd173374e08bab65e",
+      "retainedUnchanged": true,
+      "promptSet": "design/metamorphosis-prompts.md"
+    },
+    {
+      "stage": 4,
+      "name": "pousse",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-e00f2913-9b37-4fb5-80d4-d4d1e49907b3.png",
+      "target": "public/marque/metamorphose/04-pousse.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 86954,
+      "sha256": "7c5cb85343d05ad0c980bb64481baec08f6a63571bba69ce2ec2fb1ed5e142b8",
+      "retainedUnchanged": true,
+      "promptSet": "design/metamorphosis-prompts.md"
+    },
+    {
+      "stage": 5,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-35ccf778-a211-484f-a331-bcb98d18cd03.png",
+      "target": "public/marque/croissance/05.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 133714,
+      "sha256": "859a0d7a3d309ce99875c5879db938ea49ce681bf94248186ea5264df8f0f6e1"
+    },
+    {
+      "stage": 6,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-3fb9159e-7bc5-4c41-adec-72bc90c3b534.png",
+      "target": "public/marque/croissance/06.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 145464,
+      "sha256": "78d07211de7ace05eac957fa56ba30a3cbdf8e2e5415349566df87f0c2d80bd8"
+    },
+    {
+      "stage": 7,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-b3f2d78f-fb72-46d8-90b6-411ae9938092.png",
+      "target": "public/marque/croissance/07.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 130720,
+      "sha256": "f23f921b3109bf47960b51a4fb7ed3cf022830e06e809975bd0b8847b3c7d4cb"
+    },
+    {
+      "stage": 8,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-34f6e95e-cac9-48b8-8a97-92dcdb691cda.png",
+      "target": "public/marque/croissance/08.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 133964,
+      "sha256": "a4f35be64ecd15464ef3f8c34f0623119325ff3ade3fe11e4256838bf7477981"
+    },
+    {
+      "stage": 9,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-98f61138-fe09-4448-8d37-477bd258f894.png",
+      "target": "public/marque/croissance/09.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 142648,
+      "sha256": "e69cbb54fc650024f828fdf3ec39967f75b92f2899d05fd96a7d8e83c509fc9f"
+    },
+    {
+      "stage": 10,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-d4329993-0e38-4566-951e-c67390fd9bd7.png",
+      "target": "public/marque/croissance/10.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 130358,
+      "sha256": "e3b6fc429f5a9d0df9935bcd6c12ea7137e0df7b703f7a6c10a70ee905d3e50c"
+    },
+    {
+      "stage": 11,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-393716d2-8752-4481-b224-5efc6aa38427.png",
+      "target": "public/marque/croissance/11.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 152926,
+      "sha256": "35047c075b7483f465c748f2674311315558df3af7cd0407f60aac5af772c1aa"
+    },
+    {
+      "stage": 12,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-79dfbd20-45a2-41ba-be02-07a2df576ed8.png",
+      "target": "public/marque/croissance/12.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 152468,
+      "sha256": "912d46719fc6810d885babdbdf0c1cb0413c80c686e81fd9935b9bbdfcb0bb2a"
+    },
+    {
+      "stage": 13,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-2ff33c1b-44fe-412b-8364-de5a30ade7ce.png",
+      "target": "public/marque/croissance/13.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 173986,
+      "sha256": "e84c22c2fb057e99fffd76f0fe8599ebf4ba96a596734a7889746b24a27999c4"
+    },
+    {
+      "stage": 14,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-052c8e67-4c1b-41d5-b023-72caa90fbc2b.png",
+      "target": "public/marque/croissance/14.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 149008,
+      "sha256": "199a1e7281f127bfc5e9970ace45dd9d93fa06982ea5022f0f3056141ee700c8"
+    },
+    {
+      "stage": 15,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-53165389-26dc-44c5-ae55-e581b5b8c831.png",
+      "target": "public/marque/croissance/15.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 181898,
+      "sha256": "35d21c6ac98ef526edb45153f268b98b8f498dbabba79512b184158eeb892224"
+    },
+    {
+      "stage": 16,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-6b831b4c-80d6-44ab-8ddf-0f4d865f06bb.png",
+      "target": "public/marque/croissance/16.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 211172,
+      "sha256": "f2dad0435ca7f6f5bc4c13cfea45a2e488a883757a5e492eae3a38dd352c75fd"
+    },
+    {
+      "stage": 17,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-c607553c-5867-4885-832b-ef18b7305abc.png",
+      "target": "public/marque/croissance/17.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 231606,
+      "sha256": "f737c8e1cf75d0f0067bf3fe2a9a1b72a038fa229c85659437ff4d60c169a6c5"
+    },
+    {
+      "stage": 18,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-f7a22109-97c0-49d2-96e6-7566eb6eca17.png",
+      "target": "public/marque/croissance/18.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 290970,
+      "sha256": "83061dd8dd17e41b05fcce68b7948e7b25c11bf3eff9a4b020595a3262fd90d6"
+    },
+    {
+      "stage": 19,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-e98cfe70-74c7-42cf-9bee-da55771f31d1.png",
+      "target": "public/marque/croissance/19.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 281466,
+      "sha256": "49930409155d4802d7d72488df18f2794a1eab3719d363514569ad0cf12a6315"
+    },
+    {
+      "stage": 20,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-36204cfb-1d0b-4cd8-b3ed-5be38352f7eb.png",
+      "target": "public/marque/croissance/20.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 330808,
+      "sha256": "4bc85444e2905f7d09ffc563ada4c87ed28e78900879bdd90262fbe9740e8bcc"
+    },
+    {
+      "stage": 21,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-aaf163e8-616f-4db6-98f3-027ad90f4e22.png",
+      "target": "public/marque/croissance/21.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 306518,
+      "sha256": "8e15c8bedd48a60e5ff6adddfea9a7b1d9c5876aebff31177e9d47ba111a78c1"
+    },
+    {
+      "stage": 22,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-2db65d40-1b69-4461-96d7-591202c2c34b.png",
+      "target": "public/marque/croissance/22.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 334580,
+      "sha256": "fe9e7c5671ed55ab5090c25f145adac86ffe1e242437e26011a8da149e638c23"
+    },
+    {
+      "stage": 23,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-26999fa9-ea05-4ca3-9a7c-e6ece12386fc.png",
+      "target": "public/marque/croissance/23.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 380846,
+      "sha256": "29d51ee722e5514e165fa5602331b5064a61bbf01426d8b4f61f99a1e856aba2"
+    },
+    {
+      "stage": 24,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-478e4f7a-a5ff-4b22-b196-81edc1f9e5d1.png",
+      "target": "public/marque/croissance/24.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 400038,
+      "sha256": "4e565720c5eef1aa5305fab94ccbd2e37fa51591449bffcb32eb3417d51ef2a5"
+    },
+    {
+      "stage": 25,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-75b331a1-a1d2-4b3c-92af-07bec7b2c57d.png",
+      "target": "public/marque/croissance/25.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 383410,
+      "sha256": "a32d273e64a2b97b897d67dada04e2e720b8626dea0b63df96ec3852b1acd216"
+    },
+    {
+      "stage": 26,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-50cf8d92-2def-43a9-b479-b0ac9ca3ae11.png",
+      "target": "public/marque/croissance/26.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 398780,
+      "sha256": "d030f0f382828d5f0416906aa3f4620898d04ba6ca766f879962eb709852c118"
+    },
+    {
+      "stage": 27,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-302c89ad-9988-44fc-809a-0dddbb5304aa.png",
+      "target": "public/marque/croissance/27.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 339368,
+      "sha256": "ce25ced6bf59e19b78261c66dfef9965369f7906d9c71822a168189c0bff039f"
+    },
+    {
+      "stage": 28,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-0c0578f0-39c2-42cc-9165-21c4e3a25c77.png",
+      "target": "public/marque/croissance/28.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 379948,
+      "sha256": "bf0ec9c9b410452e2cb6810bead1a7b409048300f277891377c6565180f4d521"
+    },
+    {
+      "stage": 29,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-36551171-ad52-4beb-a996-9b2d16754943.png",
+      "target": "public/marque/croissance/29.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 369794,
+      "sha256": "ffe184b80b9888c5a50a01ff11ecaaec87ad5f41c3f28ea391e35b0f55fa2980"
+    },
+    {
+      "stage": 30,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-3408cbbd-e0eb-4687-b852-9b6057fc6c54.png",
+      "target": "public/marque/croissance/30.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 378720,
+      "sha256": "8c1d8c2ea933e59b99c5a6172880d890a9e9502640e156e90d81ea177db7829e"
+    },
+    {
+      "stage": 31,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-fabd4ca0-580a-4ff1-a29c-307bb5f310ea.png",
+      "target": "public/marque/croissance/31.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 349776,
+      "sha256": "9a0c3c5dde2c2f1d9bf9a8797b754c2425eaf3c0165badc331ba7540cdee3628"
+    },
+    {
+      "stage": 32,
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-5018259c-fa62-4ca4-a54e-9d3421094004.png",
+      "target": "public/marque/croissance/32.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 362580,
+      "sha256": "201078c162f33c1692e7b3422f378fffdf43246fe7f2446026d6b83b54fbeb04"
+    }
+  ]
+}

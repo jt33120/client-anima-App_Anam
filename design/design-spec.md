@@ -104,3 +104,8 @@ La refonte de l’arbre suit [la direction dédiée](tree-of-life-spec.md) : pro
 
 Le retour du 7 septembre précise la continuité graine→racines→arbre→lumière et sa découverte
 dès l'écran vide. [Direction et contrat de métamorphose](metamorphosis-spec.md).
+
+## 11. Croissance de l'arbre personnel
+
+Le correctif suivant rétablit la croissance sur le parcours réel et affine fortement les étapes :
+[direction et intégration](living-growth-spec.md). Il remplace le contrat de galerie seule.

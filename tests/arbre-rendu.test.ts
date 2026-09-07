@@ -178,10 +178,10 @@ describe("[AC3 DUR] les accroches et le dessin partagent le MÊME repère (fin d
     expect(arbre, "les deux dimensions du portrait pilotent la boîte du monde").toMatch(/largeur[\s\S]{0,80}hauteur/);
   });
 
-  it("le Canvas et les accroches vivent dans le MÊME conteneur `.monde` dimensionné en pixels", () => {
+  it("l’illustration et les accroches vivent dans le MÊME conteneur `.monde` dimensionné en pixels", () => {
     expect(arbre).toMatch(/width:\s*boite\.largeur/);
     expect(arbre).toMatch(/height:\s*boite\.hauteur/);
-    expect(arbre).toMatch(/<ArbreLunaire/);
+    expect(arbre).toMatch(/<ArbrePersonnel/);
   });
 
   it("le zoom part du CENTRE (au coin, l'arbre fuyait hors cadre en quelques clics)", () => {

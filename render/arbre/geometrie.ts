@@ -186,7 +186,7 @@ function bulbeSupplementaire(rang: number, precedents: readonly BulbeLunaire[]):
  * une date absente ou invalide vient après toutes les dates valides. À date égale — ou dans ce groupe
  * de repli — l'id départage en ordre binaire, stable quel que soit le navigateur ou la locale.
  */
-function ordonnerBranchesLunaires(
+export function ordonnerBranchesLunaires(
   branches: readonly BrancheProjetee[],
 ): readonly BrancheProjetee[] {
   const horodatage = (branche: BrancheProjetee): number | null => {

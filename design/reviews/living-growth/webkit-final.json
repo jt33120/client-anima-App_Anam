@@ -1,0 +1,678 @@
+{
+  "engine": "WebKit",
+  "mode": "32 drawings",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "errors": [],
+  "api": [
+    {
+      "method": "GET",
+      "path": "/api/anam/plan"
+    },
+    {
+      "method": "GET",
+      "path": "/api/anam/plan"
+    }
+  ],
+  "snapshots": [
+    {
+      "label": "main-00",
+      "index": "0",
+      "overflow": false,
+      "targets": [],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-03",
+      "index": "3",
+      "overflow": false,
+      "targets": [
+        {
+          "id": "visual-tree-1",
+          "name": "Branche : Me faire confiance",
+          "x": 171.9375,
+          "y": 376.21875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-04",
+      "index": "4",
+      "overflow": false,
+      "targets": [
+        {
+          "id": "visual-tree-1",
+          "name": "Branche : Me faire confiance",
+          "x": 169.890625,
+          "y": 368.703125,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-08",
+      "index": "8",
+      "overflow": false,
+      "targets": [
+        {
+          "id": "visual-tree-1",
+          "name": "Branche : Me faire confiance",
+          "x": 168.53125,
+          "y": 390.921875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-15",
+      "index": "15",
+      "overflow": false,
+      "targets": [
+        {
+          "id": "visual-tree-1",
+          "name": "Branche : Me faire confiance",
+          "x": 176.734375,
+          "y": 382.71875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        },
+        {
+          "id": "visual-tree-2",
+          "name": "Branche : Trouver mon rythme",
+          "x": 115.203125,
+          "y": 395.703125,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-23",
+      "index": "23",
+      "overflow": false,
+      "targets": [
+        {
+          "ids": "visual-tree-1 visual-tree-3",
+          "name": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.953125,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        },
+        {
+          "id": "visual-tree-2",
+          "name": "Branche : Trouver mon rythme",
+          "x": 103.578125,
+          "y": 374.515625,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-31",
+      "index": "31",
+      "overflow": false,
+      "targets": [
+        {
+          "ids": "visual-tree-1 visual-tree-3",
+          "name": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.953125,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        },
+        {
+          "ids": "visual-tree-2 visual-tree-4 visual-tree-8",
+          "name": "Voir les 3 branches proches",
+          "x": 89.453125,
+          "y": 365.171875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        },
+        {
+          "id": "visual-tree-5",
+          "name": "Branche : Prendre ma place",
+          "x": 233.46875,
+          "y": 319.828125,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        },
+        {
+          "id": "visual-tree-6",
+          "name": "Branche : Écouter mes besoins",
+          "x": 132.296875,
+          "y": 305.46875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        },
+        {
+          "id": "visual-tree-7",
+          "name": "Branche : Créer sans me comparer",
+          "x": 184.59375,
+          "y": 309.234375,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-03-after-zoom",
+      "index": "3",
+      "overflow": false,
+      "targets": [
+        {
+          "id": "visual-tree-1",
+          "name": "Branche : Me faire confiance",
+          "x": 171.9375,
+          "y": 376.21875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "DIV",
+        "label": "Zone de l’arbre : utilise les flèches pour te déplacer.",
+        "text": "−+"
+      }
+    },
+    {
+      "label": "group-centered-keyboard",
+      "index": "2",
+      "overflow": false,
+      "targets": [
+        {
+          "ids": "visual-tree-1 visual-tree-2",
+          "name": "Voir les 2 branches proches",
+          "x": 116.44999694824219,
+          "y": 479.10430908203125,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "DIV",
+        "label": "Zone de l’arbre : utilise les flèches pour te déplacer.",
+        "text": "−+2"
+      }
+    },
+    {
+      "label": "group-drag",
+      "index": "2",
+      "overflow": false,
+      "targets": [
+        {
+          "ids": "visual-tree-1 visual-tree-2",
+          "name": "Voir les 2 branches proches",
+          "x": 179.25,
+          "y": 588.140625,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "BUTTON",
+        "label": "Voir les 2 branches proches",
+        "text": "2"
+      }
+    },
+    {
+      "label": "main-error",
+      "index": "3",
+      "overflow": false,
+      "targets": [
+        {
+          "id": "visual-tree-1",
+          "name": "Branche : Me faire confiance",
+          "x": 171.9375,
+          "y": 376.21875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "H1",
+        "label": null,
+        "text": "Mon évolution"
+      }
+    },
+    {
+      "label": "main-retry",
+      "index": "3",
+      "overflow": false,
+      "targets": [
+        {
+          "id": "visual-tree-1",
+          "name": "Branche : Me faire confiance",
+          "x": 171.9375,
+          "y": 376.21875,
+          "width": 44,
+          "height": 44,
+          "reachable": true
+        }
+      ],
+      "overlaps": [],
+      "active": {
+        "tag": "DIV",
+        "label": "Ton arbre",
+        "text": ""
+      }
+    }
+  ],
+  "assets": [
+    {
+      "path": "/marque/metamorphose/01-graine.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/02-eclosion.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/03-enracinement.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/04-pousse.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/05.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/06.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/07.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/08.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/09.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/10.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/11.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/12.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/13.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/14.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/15.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/16.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/17.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/18.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/19.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/20.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/21.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/22.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/23.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/24.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/25.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/26.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/27.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/28.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/29.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/30.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/31.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/32.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/01-graine.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/02-eclosion.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/03-enracinement.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/04-pousse.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/05.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/06.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/07.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/08.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/09.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/10.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/11.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/12.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/13.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/14.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/15.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/16.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/17.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/18.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/19.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/20.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/21.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/22.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/23.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/24.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/25.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/26.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/27.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/28.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/29.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/30.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/31.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/32.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/04-pousse.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/05.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/03-enracinement.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/04-pousse.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/03-enracinement.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/04-pousse.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/metamorphose/04-pousse.webp",
+      "status": 200
+    },
+    {
+      "path": "/marque/croissance/05.webp",
+      "status": 200
+    }
+  ],
+  "assertions": [
+    "Cold personal tree requests only its current illustration and the immediately following preload.",
+    "Actual projected props change the main image on the same page through 32 stages.",
+    "Seed CTA opens index 1; native select lists 32 images; endpoint keyboard focus and Escape return correctly.",
+    "Real branch target opens its source actions, Escape restores it, zoom changes the camera without changing growth.",
+    "A grouped birth opens its real branch sheet; centering closes the panel, focuses the keyboard garden and arrow movement still works.",
+    "Dragging a grouped target pans without a false opening; subsequent Enter opens it and Escape restores focus.",
+    "Main image request failure exposes a retry; successful retry keeps focus on the stable personal-tree group."
+  ],
+  "coldAssets": [
+    "/marque/metamorphose/01-graine.webp",
+    "/marque/metamorphose/02-eclosion.webp"
+  ],
+  "groupSheetTargets": [
+    {
+      "name": "Voir dans la conversation",
+      "reachable": true,
+      "x": 41,
+      "y": 370.046875,
+      "width": 206.8125,
+      "height": 44
+    },
+    {
+      "name": "Renommer",
+      "reachable": true,
+      "x": 41,
+      "y": 422.046875,
+      "width": 103.734375,
+      "height": 44
+    },
+    {
+      "name": "Centrer sur cette branche",
+      "reachable": true,
+      "x": 41,
+      "y": 474.046875,
+      "width": 210.8125,
+      "height": 44
+    },
+    {
+      "name": "C’est devenu vrai en moi",
+      "reachable": true,
+      "x": 41,
+      "y": 526.046875,
+      "width": 202.46875,
+      "height": 44
+    },
+    {
+      "name": "Fermer",
+      "reachable": true,
+      "x": 321,
+      "y": 149.03125,
+      "width": 44,
+      "height": 44
+    }
+  ],
+  "groupDrag": {
+    "panelOpened": false,
+    "panChanged": true
+  }
+}

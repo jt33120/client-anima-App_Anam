@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import ArbreInteractif from "@/render/arbre/ArbreInteractif";
-import { ARIA_CANEVAS, VIDE_CE_QU_EST_L_ARBRE } from "@/render/arbre/copie-arbre";
+import { VIDE_CE_QU_EST_L_ARBRE } from "@/render/arbre/copie-arbre";
+import { PLANCHES_METAMORPHOSE } from "@/render/arbre/metamorphose-planches";
 import type { BrancheProjetee, ProjectionScene } from "@/lib/scene";
 import { dimensionnerTout } from "./_outils";
 
@@ -34,28 +35,30 @@ function monter(branches: readonly BrancheProjetee[], troncIncomplet = false) {
   return { ...render(<ArbreInteractif {...props} />), props };
 }
 
-describe("Mon arbre — port lunaire réel", () => {
-  it("l'étape 0 utilise le même Canvas transparent et aucun ancien SVG alternatif", () => {
+describe("Mon arbre — illustration personnelle et accès réels", () => {
+  it("l’étape 0 présente la graine illustrée seule dans le cadre personnel", () => {
     const { container } = monter([]);
-    const canvas = screen.getByRole("img", { name: ARIA_CANEVAS });
-    expect(canvas.tagName).toBe("CANVAS");
-    expect(canvas.getAttribute("data-etape-arbre")).toBe("graine");
-    // ADAPTÉ : la graine « qui n'attend que d'éclore » est un SVG superposé au canevas (`GraineAttente`,
-    // crochet `data-graine-attente`, tests/rendu/graine-integree.test.tsx) — le SEUL admis. L'ancien tronc
-    // SVG alternatif, lui, reste interdit : on l'exclut par son crochet, pas par le nom de balise.
-    expect(
-      container.querySelector("svg:not([data-graine-attente])"),
-      "l'ancien tronc SVG ne doit plus exister",
-    ).toBeNull();
-    expect(container.querySelector("[data-graine-attente]"), "la graine d'attente manque à l'étape 0").not.toBeNull();
+    const dessin = container.querySelector('[data-index-croissance="0"]');
+    expect(dessin?.getAttribute("data-etape-arbre")).toBe("graine");
+    expect(decodeURIComponent(dessin?.querySelector("img")?.getAttribute("src") ?? "")).toContain(PLANCHES_METAMORPHOSE[0].src);
+    expect(container.querySelector("canvas, svg, [data-graine-attente]")).toBeNull();
     expect(screen.getByText(VIDE_CE_QU_EST_L_ARBRE)).toBeTruthy();
   });
 
-  it("ne remplace pas le Canvas quand les branches apparaissent et rend les 20 actions DOM", () => {
+  it("conserve les 20 branches via les cibles individuelles, leurs groupes et la liste", () => {
     const { container } = monter(Array.from({ length: 20 }, (_, i) => branche(i)));
-    expect(screen.getByRole("img", { name: ARIA_CANEVAS }).tagName).toBe("CANVAS");
-    expect(container.querySelector("svg")).toBeNull();
-    expect(screen.getAllByRole("button", { name: /^Branche : / })).toHaveLength(20);
+    expect(container.querySelector("[data-index-croissance] img")).not.toBeNull();
+    const ids = [...container.querySelectorAll<HTMLElement>("[data-branche-arbre], [data-groupe-branches]")]
+      .flatMap((cible) => (cible.dataset.brancheArbre ?? cible.dataset.groupeBranches ?? "").split(" "));
+    expect(ids.sort()).toEqual(Array.from({ length: 20 }, (_, i) => `b-${i}`).sort());
+    const groupe = container.querySelector<HTMLButtonElement>("[data-groupe-branches]");
+    expect(groupe).not.toBeNull();
+    fireEvent.click(groupe!);
+    expect(within(screen.getByRole("group", { name: "Branches proches" })).getAllByRole("button", { name: /^Branche : / }))
+      .toHaveLength(groupe!.dataset.groupeBranches!.split(" ").length);
+    fireEvent.click(screen.getByRole("button", { name: "Fermer les branches proches" }));
+    fireEvent.click(screen.getByRole("button", { name: /vue liste/i }));
+    expect(screen.getAllByRole("button", { name: "Voir dans la conversation" })).toHaveLength(20);
   });
 
   it("conserve l'ouverture de fiche par le bouton DOM superposé", () => {

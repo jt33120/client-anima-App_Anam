@@ -2,3 +2,6 @@
 @font-face { font-family: PreviewInter; src: url('../../app/styles/fonts/inter-variable.woff2'); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: PreviewCaveat; src: url('../../app/styles/fonts/caveat-medium.woff2'); font-weight: 500; font-display: swap; }
 :root { --police-anam: PreviewFraunces; --police-ui: PreviewInter; --police-manuscrite: PreviewCaveat; }
+
+.fixture-controls { position: fixed; bottom: 0; left: 0; z-index: 100; background: var(--surface); color: var(--texte); padding: var(--esp-2); font-size: var(--carnet-petit); }
+.fixture-controls select { margin-left: var(--esp-2); min-height: var(--cible-tactile); background: var(--surface); color: var(--texte); }

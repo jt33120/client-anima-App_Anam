@@ -5,6 +5,13 @@ import Image from "next/image";
 import { PLANCHES_METAMORPHOSE, type PlancheMetamorphose } from "./metamorphose-planches";
 import s from "./metamorphose.module.css";
 
+const FAMILLES = [
+  { titre: "Éclosion", debut: 0, fin: 3 },
+  { titre: "Croissance", debut: 4, fin: 15 },
+  { titre: "Canopée", debut: 16, fin: 23 },
+  { titre: "Lumière", debut: 24, fin: 31 },
+] as const;
+
 const TAILLES_IMAGE = "(max-width: 48rem) 80vw, 32rem";
 
 function ImagePlanche({ planche, onChargee }: {
@@ -44,21 +51,22 @@ export default function MetamorphoseArbre({ indexInitial = 0 }: { readonly index
   const [index, setIndex] = useState(() => Number.isFinite(indexInitial)
     ? Math.max(0, Math.min(Math.trunc(indexInitial), PLANCHES_METAMORPHOSE.length - 1)) : 0);
   const [chargee, setChargee] = useState<string | null>(null);
-  const reperes = useRef<(HTMLButtonElement | null)[]>([]);
+  const choix = useRef<HTMLSelectElement>(null);
+  const choixId = useId();
   const imageId = useId();
   const planche = PLANCHES_METAMORPHOSE[index];
   const suivante = PLANCHES_METAMORPHOSE[index + 1];
   const parcourir = (position: number, commande: HTMLButtonElement) => {
     // WebKit drops focus when the activated command becomes disabled at an endpoint.
     if ((position === 0 || position === PLANCHES_METAMORPHOSE.length - 1) && document.activeElement === commande) {
-      reperes.current[position]?.focus();
+      choix.current?.focus();
     }
     setIndex(position);
   };
 
   return (
     <div className={s.galerie}>
-      <p className={s.annotation}>De la graine à la lumière</p>
+      <p className={s.annotation}>Explorer les formes de l’arbre</p>
       <figure className={s.figure}>
         <div id={imageId}>
           <ImagePlanche key={planche.id} planche={planche} onChargee={() => setChargee(planche.id)} />
@@ -80,16 +88,24 @@ export default function MetamorphoseArbre({ indexInitial = 0 }: { readonly index
           Suivante
         </button>
       </div>
-      <div className={s.reperes} role="group" aria-label="Choisir une illustration">
-        {PLANCHES_METAMORPHOSE.map((item, position) => (
-          <button key={item.id} type="button" ref={(bouton) => { reperes.current[position] = bouton; }}
-            className={s.repere} aria-pressed={index === position}
-            aria-label={`Voir l’illustration ${String(position + 1).padStart(2, "0")} : ${item.titre}`} title={item.titre} aria-controls={imageId}
-            onClick={() => setIndex(position)}>
-            {String(position + 1).padStart(2, "0")}
-          </button>
+      <div className={s.choixEtape}>
+        <label htmlFor={choixId} className="t-meta">Choisir une étape</label>
+        <select ref={choix} id={choixId} className={s.selecteur} value={index} aria-controls={imageId}
+          onChange={(event) => setIndex(Number(event.currentTarget.value))}>
+          {PLANCHES_METAMORPHOSE.map((item, position) => (
+            <option key={item.id} value={position}>{String(position + 1).padStart(2, "0")} — {item.titre}</option>
+          ))}
+        </select>
+      </div>
+      <div className={s.reperes} role="group" aria-label="Les familles de l’arbre">
+        {FAMILLES.map((famille) => (
+          <button key={famille.titre} type="button" className={s.repere}
+            aria-pressed={index >= famille.debut && index <= famille.fin}
+            aria-label={`Voir la famille : ${famille.titre}`} aria-controls={imageId}
+            onClick={() => setIndex(famille.debut)}>{famille.titre}</button>
         ))}
       </div>
+      <p className={`t-meta ${s.precision}`}>Ces illustrations se parcourent librement. Ton arbre personnel suit tes échanges et tes branches.</p>
       {chargee === planche.id && suivante && (
         <div className={s.prechargement} aria-hidden>
           <Image src={suivante.src} width={suivante.width} height={suivante.height}

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import SceneDom from "@/render/scene-dom";
 import FicheSocle, { type ProprietesFicheSocle } from "@/render/socle/FicheSocle";
@@ -86,10 +86,25 @@ const texteSocle: ProprietesFicheSocle["copie"] = {
   titreDetailPositions: copie.TITRE_DETAIL_POSITIONS,
   cielDuJourNonEcrit: copie.CIEL_DU_JOUR_NON_ECRIT,
 };
-const scene = <SceneDom
+function PreviewScene() {
+  const [projection, setProjection] = useState(() => treeProjectionFor(params));
+  return <>
+  {params.get("treeControls") === "1" && <aside className="fixture-controls" aria-label="Contrôles de fixture hors application">
+    <label>Projection synthétique
+      <select aria-label="Projection synthétique" defaultValue={params.get("treeStage") ?? "0"}
+        onChange={(event) => {
+          const next = new URLSearchParams(params);
+          next.set("treeStage", event.currentTarget.value);
+          setProjection(treeProjectionFor(next));
+        }}>
+        {Array.from({ length: 32 }, (_, index) => <option value={index} key={index}>{index}</option>)}
+      </select>
+    </label>
+  </aside>}
+  <SceneDom
   jourAccueil={daily.jour}
   bibliotheque={state === "error" ? null : daily}
-  projection={treeProjectionFor(params)}
+  projection={projection}
   seuilDejaFranchi={params.get("view") !== "seuil"}
   accueilAnam="Confie ici ce que tu portes en toi. Un espace pour te comprendre, évoluer, te dépasser et révéler la personne que tu es appelée à devenir."
   historique={state === "empty" ? [] : [
@@ -98,11 +113,13 @@ const scene = <SceneDom
   ]}
   menu={{ groupes: menu.GROUPES_MENU, libelleGlyphe: menu.LIBELLE_GLYPHE, titreFeuille: menu.TITRE_FEUILLE, libelleFermer: menu.LIBELLE_FERMER }}
   copieSeuil={{ titre: seuil.TITRE_SEUIL, tagline: seuil.TAGLINE_SEUIL, action: seuil.ACTION_SEUIL, altAvatar: seuil.ALT_AVATAR_SEUIL }}
-/>;
+/>
+  </>;
+}
 const isSocle = window.location.pathname === "/socle";
 const mode = params.get("univers") === "numerologie" ? "numerologie" : "astrologie";
 createRoot(document.getElementById("root")!).render(<>
   <ThemeCarnetDocument />
   <RequestedTree />
-  {isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : scene}
+  {isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : <PreviewScene/>}
 </>);

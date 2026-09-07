@@ -497,6 +497,15 @@ export default function SceneDom({
   const [echangeExtrait, setEchangeExtrait] = useState<string | null>(null);
   const router = useRouter();
 
+  // The saved foliage can change after a conversation response has finished streaming.
+  // Re-read it on entering the tree, including return navigation and swipe gestures.
+  const regionPrecedente = useRef(region);
+  useEffect(() => {
+    const precedente = regionPrecedente.current;
+    regionPrecedente.current = region;
+    if (region === "arbre" && precedente !== "arbre") router.refresh();
+  }, [region, router]);
+
   const voirDansConversation = (extraitSourceId: string) => {
     setEchangeExtrait(extraitSourceId);
     dispatch({ type: "voirDansConversation" }); // mémorise le cadrage de l'arbre (retour restaurable)

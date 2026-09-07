@@ -30,9 +30,9 @@ PNG captures and `home-results.json` are written to the operating system tempora
 
 This is a visual fixture, so Next routing, pending links and images use small local adapters. It does not validate production authentication, data loading, persistence, or delivery. Those checks remain separate from this harness.
 
-For the eight botanical illustrations, run `node tests/visual-carnet/capture-metamorphose.mjs /tmp/anima-metamorphose full`.
-It checks the direct seed entry, all eight stages, focus restoration and unchanged personal
-content at 390/768/1440 px in Chromium and 390 px in WebKit. The contexts include paper,
+For the 32 botanical illustrations, run `node tests/visual-carnet/capture-metamorphose.mjs /tmp/anima-metamorphose full`.
+It checks the direct seed entry, all 32 stages at 390 px and three representative stages at 768/1440 px, plus focus restoration and unchanged personal
+content in Chromium and 390 px in WebKit. The contexts include paper,
 reinforced contrast, branches, list, incomplete trunk and unavailable data. Results and captures
 are written to the selected directory. `quick` limits the run to seed/illumination in Chromium;
 `chromium` runs all contexts without WebKit.
@@ -48,3 +48,21 @@ The second pass reviewed paper, night and reinforced contrast at all three width
 Night is now the default, including before hydration. The theme switch is in the persistent header. The home header is compact; daily quotations keep a reading size even with the dense fixture. New captures are versioned in `design/reviews/celestial-night/`.
 
 Run `node tests/visual-carnet/verify-keyboard.mjs` to exercise the actual Chromium/WebKit engines with simulated iOS and Android keyboard geometry at 390/1024 px. It checks the visible message area, send control, draft persistence, keyboard closing and native zoom handoff. This does not reproduce a physical OS keyboard. The script blocks API requests and uses synthetic data. `CARNET_CAPTURE_DIR` and `CARNET_BASE_URL` can override output and harness locations.
+
+## Personal growth review
+
+`/?tree=seed&treeStage=0` through `treeStage=31` supply synthetic, persisted-style branch fields.
+The real frontend helper computes the displayed image; the fixture adds no global level field.
+Append `treeControls=1` to update these props in the same page with the separate
+“Projection synthétique” control. Advance in ascending order to preserve the real reconciliation contract.
+
+```sh
+node tests/visual-carnet/capture-croissance.mjs /tmp/anima-croissance full
+```
+
+This checks all 32 personal frames at 390 px and six representative frames at 768/1440 px, decoded dimensions, source hashes,
+real prop updates, target sizes and overlaps, branch access and zoom. `quick` samples
+indices 0/4/8/15/23/31. The full run requires every final image asset.
+Grouped targets open the actual named branches and their existing detail actions.
+The separate image viewer uses a native 32-option select and four family shortcuts;
+exploring it never changes the personal projection.

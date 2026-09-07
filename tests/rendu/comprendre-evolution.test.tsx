@@ -80,9 +80,7 @@ describe("[RC-I2] comprendre Mon évolution", () => {
     await user.click(ouverture);
     const dialogue = screen.getByRole("dialog");
     expect(within(dialogue).getByAltText(PLANCHES_METAMORPHOSE[1].alt)).toBeTruthy();
-    expect(within(dialogue).getByRole("button", {
-      name: `Voir l’illustration 02 : ${PLANCHES_METAMORPHOSE[1].titre}`,
-    }).getAttribute("aria-pressed")).toBe("true");
+    expect(within(dialogue).getByRole<HTMLSelectElement>("combobox", { name: "Choisir une étape" }).value).toBe("1");
     await user.click(within(dialogue).getByRole("button", { name: FERMER_COMPRENDRE_EVOLUTION }));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.activeElement).toBe(ouverture);
@@ -111,9 +109,7 @@ describe("[RC-I2] comprendre Mon évolution", () => {
     render(<ArbreInteractif {...proprietes} />);
     await user.click(screen.getByRole("button", { name: ACTION_COMPRENDRE_EVOLUTION }));
     const dialogue = screen.getByRole("dialog");
-    await user.click(within(dialogue).getByRole("button", {
-      name: `Voir l’illustration 08 : ${PLANCHES_METAMORPHOSE[7].titre}`,
-    }));
+    await user.selectOptions(within(dialogue).getByRole("combobox", { name: "Choisir une étape" }), "31");
     await user.keyboard("{Escape}");
     const branche = screen.getByRole("button", { name: "Branche : Ce qui revient" });
     expect(screen.getAllByRole("button", { name: /^Branche :/ })).toHaveLength(1);

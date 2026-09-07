@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 const project = resolve(fileURLToPath(new URL(".", import.meta.url)), "../..");
 const output = process.argv[2] ?? join(tmpdir(), "anima-tree-captures");
 const mode = process.argv[3] ?? "full";
-const haltes = ["La graine", "L’éclosion", "Les premières racines", "La première pousse", "Le jeune arbre", "Le déploiement", "L’arbre de vie", "La pleine lumière"];
+const haltes = [0, 1, 2, 3, 4, 15, 23, 31];
 const samples = ["seed", "birth", "leaf-low", "leaf-high", "leaf-full", "radiant", "mixed", "dense", "error", "reserved"];
 const sourceFiles = ["render/arbre/MoteurArbreLunaire.ts", "render/arbre/geometrie.ts", "render/arbre/ArbreLunaire.tsx", "render/arbre/ArbreInteractif.tsx", "render/arbre/ComprendreEvolution.tsx", "render/arbre/GraineAttente.tsx", "render/arbre/arbre.module.css", "render/monde.module.css"];
 const sourceHashes = async () => Object.fromEntries(await Promise.all(sourceFiles.map(async (file) => [file, createHash("sha256").update(await readFile(resolve(project, file))).digest("hex")])));
@@ -95,27 +95,30 @@ try {
       }
       if (scenario.variant === "contrast") await page.evaluate(() => { document.documentElement.dataset.a11y = "contraste"; });
       let exploration = null;
-      if (scenario.halte) {
+      if (scenario.halte !== undefined) {
         await region.getByRole("button", { name: "Comprendre mon évolution", exact: true }).click();
         const dialog = page.getByRole("dialog", { name: "Comprendre mon évolution", exact: true });
         await dialog.waitFor();
-        const group = dialog.getByRole("group", { name: "Choisir une illustration" });
-        const label = `Voir l’illustration ${String(haltes.indexOf(scenario.halte) + 1).padStart(2, "0")} : ${scenario.halte}`;
-        await group.getByRole("button", { name: label, exact: true }).click();
+        const choice = dialog.getByLabel("Choisir une étape", { exact: true });
+        await choice.selectOption(String(scenario.halte));
         await dialog.locator("[data-planche] img").waitFor({ state: "visible" });
         await dialog.locator("[data-planche] img").evaluate((image) => image.decode());
         exploration = {
-          selected: await group.getByRole("button", { pressed: true }).getAttribute("aria-label"),
+          selected: await choice.inputValue(),
           illustration: await dialog.getByRole("img").first().getAttribute("alt"),
         };
-        exploration.passed = exploration.selected === label;
+        exploration.passed = exploration.selected === String(scenario.halte);
+      }
+      if (!scenario.halte && await region.locator('[data-index-croissance] [data-planche] > img').count()) {
+        await region.locator('[data-index-croissance] [data-planche] > img').waitFor({ state: "visible" });
+        await region.locator('[data-index-croissance] [data-planche] > img').evaluate((image) => image.decode());
       }
       await page.evaluate(() => document.fonts.ready);
       await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
       if (scenario.variant === "motion") await page.waitForTimeout(900);
       let zoom = null;
       if (scenario.variant === "zoom") {
-        const transform = () => region.locator("canvas").evaluate((canvas) => getComputedStyle(canvas.parentElement).transform);
+        const transform = () => region.locator("[data-index-croissance]").evaluate((canvas) => getComputedStyle(canvas.parentElement).transform);
         const targetSizes = () => region.locator('button[aria-label^="Branche :"]').evaluateAll((buttons) => buttons.map((button) => {
           const bounds = button.getBoundingClientRect(); return { width: bounds.width, height: bounds.height };
         }));
@@ -147,11 +150,11 @@ try {
       }
       const metrics = await region.evaluate((element) => {
         const rect = (node) => { const r = node?.getBoundingClientRect(); return r ? { x: r.x, y: r.y, width: r.width, height: r.height } : null; };
-        const canvas = [...element.querySelectorAll("canvas")].find((node) => !node.closest('[role="dialog"], dialog'));
+        const canvas = [...element.querySelectorAll("[data-index-croissance]")].find((node) => !node.closest('[role="dialog"], dialog'));
         return {
           stage: canvas?.getAttribute("data-etape-arbre") ?? null,
           canvas: rect(canvas),
-          bitmap: canvas ? { width: canvas.width, height: canvas.height } : null,
+          bitmap: canvas ? { width: canvas.querySelector("img")?.naturalWidth, height: canvas.querySelector("img")?.naturalHeight } : null,
           targets: element.querySelectorAll('button[aria-label^="Branche :"]').length,
           targetMetrics: [...element.querySelectorAll('button[aria-label^="Branche :"]')].map((button) => {
             const bounds = button.getBoundingClientRect();
@@ -172,7 +175,7 @@ try {
         focusRestored = await page.evaluate(() => document.activeElement?.getAttribute("aria-label") === "Branche : Me faire confiance");
         const branch = region.getByRole("button", { name: "Branche : Me faire confiance", exact: true });
         const bounds = await branch.boundingBox();
-        const transform = () => region.locator("canvas").evaluate((canvas) => getComputedStyle(canvas.parentElement).transform);
+        const transform = () => region.locator("[data-index-croissance]").evaluate((canvas) => getComputedStyle(canvas.parentElement).transform);
         const initial = await transform();
         await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
         await page.mouse.down();
@@ -182,7 +185,7 @@ try {
         const ficheVisible = await region.getByRole("group", { name: "Fiche de branche" }).isVisible();
         drag = { initial, after, ficheVisible, passed: initial !== after && !ficheVisible };
       }
-      if (scenario.halte) {
+      if (scenario.halte !== undefined) {
         const dialog = page.getByRole("dialog", { name: "Comprendre mon évolution", exact: true });
         exploration.navigationHits = await dialog.evaluate(() => {
           const nav = document.querySelector('nav[aria-label="Régions"]');

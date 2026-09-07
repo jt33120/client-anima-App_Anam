@@ -102,7 +102,7 @@
   outline-offset: 2px;
 }
 /* Le portrait effectif : left/top/width/height sont posés en pixels par ResizeObserver pour que le
-   Canvas 1408×2503 et les accroches DOM partagent exactement le même repère. */
+   L’illustration 1024×1536 et les accroches DOM partagent exactement le même repère. */
 .monde {
   position: absolute;
   transform-origin: 50% 50%; /* le zoom part du CENTRE (au coin, l'arbre fuyait hors cadre en 4 clics) */
@@ -117,43 +117,16 @@
   height: 100%;
   background: transparent;
 }
-/* ── LA GRAINE QUI N'ATTEND QUE D'ÉCLORE (étape 0) ──────────────────────────────────────────────
-   Le sprite botanique `GraineAttente` (render/arbre/GraineAttente.tsx), posé SUR le canevas, dans le repère de
-   `.monde` — celui de `.cibleTronc` et des accroches : `left` = CENTRE_ARBRE.x / CANEVAS.largeur
-   (704 / 1408), `top` = (CENTRE_ARBRE.solY + 7) / CANEVAS.hauteur (1767 / 2503), soit le centre
-   exact de l'ellipse que `peindreGraine` posait dans le bitmap (le test compare aux constantes de
-   geometrie.ts). `--taille-graine` fait rendre la boîte de 48 unités à 48 px : les « 3 px » du
-   soulèvement (graine-attente.module.css) sont alors 3 px à l'écran au zoom 1. Pas de
-   contre-échelle : la graine grandit avec le monde au zoom, comme la graine peinte le faisait —
-   c'est un objet du dessin, pas une cible tactile.
-   ⚠️ SEULEMENT DU PLACEMENT ICI. L'animation vit dans graine-attente.module.css et nulle part
-   ailleurs ; une `animation`, une `transition` ou une promotion de couche posées ici feraient un
-   second endroit où le mouvement peut naître, hors de portée des gardes de
-   tests/rendu/graine-attente.test.tsx. Une classe, jamais un `style=` : le composant se garde sans
-   style inline, et le bloc reduced-motion de cette feuille ne doit jamais la masquer (elle sait
-   se figer toute seule). Gardé par tests/rendu/graine-integree.test.tsx. */
-.graineAttente {
-  position: absolute;
-  left: 50%;
-  top: 70.60%;
-  transform: translate(-50%, -50%);
-  --taille-graine: var(--arbre-graine-taille);
-}
+/* The unchanged first illustration already contains its seed. Only its caption and action overlay it. */
 .canevas .graineMessage {
-  position: absolute;
-  left: 50%;
-  top: calc(70.60% + var(--arbre-graine-taille) / 2);
-  width: min(calc(100% - 2 * var(--esp-5)), var(--mesure));
   margin: 0;
-  transform: translateX(-50%);
-  color: var(--carnet-jardin-encre);
-  text-align: center;
-  pointer-events: none;
+  padding: 0 var(--esp-4) var(--esp-4);
+  color: var(--texte-doux);
 }
 .graineDecouverte {
   position: absolute;
   left: 50%;
-  top: calc(70.60% + var(--arbre-graine-taille) / 2 + var(--metamorphose-cta-decalage));
+  top: calc(81% + var(--metamorphose-cta-decalage));
   width: max-content;
   max-width: calc(100% - 2 * var(--esp-3));
   transform-origin: top center;
@@ -684,3 +657,75 @@
   .canevas, .apercuJardin { background: var(--carnet-jardin); }
   .canevas::before, .apercuJardin::before { background: none; }
 }
+
+/* Only saved branches get a visible marker, placed within this stage’s painted ramure. */
+.accroche[data-branche-arbre]::after {
+  content: "";
+  position: absolute;
+  inset: calc((var(--cible-tactile) - var(--esp-2)) / 2);
+  border: 1px solid var(--carnet-jardin-encre);
+  border-radius: var(--rayon-full);
+  background: var(--carnet-jardin);
+  box-shadow: 0 0 0 var(--esp-1) color-mix(in srgb, var(--carnet-jardin-encre) 12%, transparent);
+  pointer-events: none;
+}
+.accroche[data-etat-branche="rayonnement"]::after { background: var(--carnet-jardin-encre); }
+.accroche[data-branche-arbre]:hover::after { background: var(--accent); }
+
+.groupeAccroches {
+  display: grid;
+  place-items: center;
+  color: var(--carnet-jardin-encre);
+  background: transparent;
+  border: none;
+  font: var(--carnet-poids) var(--carnet-petit) / var(--metamorphose-interligne) var(--pile-ui);
+}
+.groupeAccroches::before {
+  content: "";
+  position: absolute;
+  inset: calc((var(--cible-tactile) - var(--esp-5)) / 2);
+  border-radius: var(--rayon-full);
+  border: 1px solid var(--carnet-jardin-encre);
+  background: var(--carnet-jardin);
+  pointer-events: none;
+}
+.groupeAccroches span { position: relative; }
+
+.groupePanneau {
+  position: absolute;
+  z-index: 3;
+  left: var(--esp-3);
+  right: var(--esp-3);
+  bottom: var(--esp-3);
+  max-height: 60%;
+  display: grid;
+  gap: var(--esp-2);
+  padding: var(--esp-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--carnet-rayon);
+  background: var(--surface);
+  color: var(--texte);
+}
+.groupeEntete { display: flex; justify-content: space-between; gap: var(--esp-2); align-items: center; }
+.groupeEntete p { margin: 0; }
+.groupeChoix {
+  min-height: var(--cible-tactile);
+  width: 100%;
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon-sm);
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--surface-elevee);
+  color: var(--texte);
+  font: var(--carnet-texte) / var(--metamorphose-interligne) var(--pile-ui);
+  text-align: left;
+  cursor: pointer;
+}
+.groupePanneau:focus-visible, .groupeChoix:focus-visible {
+  outline: var(--metamorphose-focus-largeur) solid var(--accent);
+  outline-offset: var(--metamorphose-focus-decalage);
+}
+
+.groupePanneau[aria-hidden="true"] { visibility: hidden; }

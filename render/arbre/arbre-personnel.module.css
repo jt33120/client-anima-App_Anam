@@ -1,0 +1,36 @@
+.personnel, .support { width: 100%; height: 100%; position: relative; }
+.personnel { pointer-events: none; }
+.support { background: var(--carnet-jardin); }
+.image { display: block; width: 100%; height: 100%; object-fit: contain; }
+.prete { visibility: visible; }
+.attente { visibility: hidden; }
+.etat {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  color: var(--carnet-jardin-encre);
+  text-align: center;
+}
+.etat p { color: inherit; margin: 0; }
+.reessayer {
+  pointer-events: auto;
+  min-width: var(--cible-tactile);
+  min-height: var(--cible-tactile);
+  padding: var(--esp-2) var(--esp-4);
+  background: var(--surface);
+  color: var(--texte);
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--rayon-full);
+  font: var(--carnet-texte) / var(--metamorphose-interligne) var(--pile-ui);
+  cursor: pointer;
+}
+.support:focus-visible, .reessayer:focus-visible {
+  outline: var(--metamorphose-focus-largeur) solid var(--accent);
+  outline-offset: var(--metamorphose-focus-decalage);
+}
+.prechargement { display: none; }

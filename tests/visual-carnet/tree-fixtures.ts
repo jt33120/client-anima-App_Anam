@@ -26,6 +26,17 @@ function branch(index: number, etat: BrancheProjetee["etat"], intensite: number)
   };
 }
 
+/** Staged samples of actual branch fields; no invented global growth field enters the app. */
+export function branchesAtVisualStage(stage: number): readonly BrancheProjetee[] {
+  if (stage === 0) return [];
+  if (stage <= 11) return [branch(0, stage === 1 ? "naissance" : "feuillaison", (stage - 1) / 10)];
+  if (stage <= 22) return [branch(0, "feuillaison", 1), branch(1, stage === 12 ? "naissance" : "feuillaison", (stage - 12) / 10)];
+  const rayonnantes = Math.max(0, stage - 23);
+  return Array.from({ length: Math.max(3, rayonnantes) }, (_, index) =>
+    branch(index, index < rayonnantes ? "rayonnement" : index < 2 ? "feuillaison" : "naissance",
+      index < rayonnantes || index < 2 ? 1 : 0));
+}
+
 export function treeProjectionFor(params: URLSearchParams): ProjectionScene {
   const requested = params.get("tree");
   const sample = TREE_CASES.includes(requested as TreeCase)
@@ -35,6 +46,11 @@ export function treeProjectionFor(params: URLSearchParams): ProjectionScene {
     ? { present: true as const, incomplet: { phrase: MESSAGE_SANS_HEURE, ouTrouver: OU_TROUVER_SON_HEURE } }
     : { present: true as const } };
   if (sample === "error") return { ...base, branches: [], indisponible: true };
+  const stage = Number(params.get("treeStage"));
+  if (params.has("treeStage") && Number.isInteger(stage) && stage >= 0 && stage <= 31) {
+    return { ...base, branches: branchesAtVisualStage(stage) };
+  }
+
   if (sample === "seed") return { ...base, branches: [] };
   const requestedCount = Number(params.get("treeBranches"));
   const defaultCount = sample === "dense" ? 24 : sample === "mixed" || sample === "reserved" ? 3 : 1;
