@@ -1,0 +1,1514 @@
+{
+  "before": {
+    "render/arbre/MetamorphoseArbre.tsx": "73594201651672bdb0f13dc231b4a7126daf77180ead28174fd945b37cf5eec6",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/metamorphose.module.css": "afe9ab5e1bbcbd51e1dbe1fbb59d948827b39fa927ae1a7ff3928a13b5ceda5c",
+    "render/arbre/ArbreInteractif.tsx": "800ce78fee0587842a59e2c8a2d326840afee6922ed06f35df7edaf6e85af490",
+    "render/arbre/arbre.module.css": "0f105c442ce43df7116d457bd12041d3f85ca6fadfd2b53cb3925e4565d5f9e8",
+    "render/arbre/metamorphose-planches.ts": "3954a2558b5e1d62b8ee97a89f3d612596f2fbb99c1380943d3ffc0d2fc81455",
+    "app/styles/carnet-tokens.css": "29339f502e1311bb6072e6e503a5a1c2c7b8df0188eb843c4f406eb05e878cf7"
+  },
+  "after": {
+    "render/arbre/MetamorphoseArbre.tsx": "73594201651672bdb0f13dc231b4a7126daf77180ead28174fd945b37cf5eec6",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/metamorphose.module.css": "afe9ab5e1bbcbd51e1dbe1fbb59d948827b39fa927ae1a7ff3928a13b5ceda5c",
+    "render/arbre/ArbreInteractif.tsx": "800ce78fee0587842a59e2c8a2d326840afee6922ed06f35df7edaf6e85af490",
+    "render/arbre/arbre.module.css": "0f105c442ce43df7116d457bd12041d3f85ca6fadfd2b53cb3925e4565d5f9e8",
+    "render/arbre/metamorphose-planches.ts": "3954a2558b5e1d62b8ee97a89f3d612596f2fbb99c1380943d3ffc0d2fc81455",
+    "app/styles/carnet-tokens.css": "29339f502e1311bb6072e6e503a5a1c2c7b8df0188eb843c4f406eb05e878cf7"
+  },
+  "sourceChanged": [],
+  "fatalError": null,
+  "results": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "ctaBounds": {
+        "x": 108.4140625,
+        "y": 686.34375,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 199,
+        "y": 716.453125,
+        "width": 179,
+        "height": 44
+      },
+      "assetsBeforeOpen": [
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/02-eclosion.webp"
+      ],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "stages": [
+        {
+          "position": 0,
+          "id": "graine",
+          "src": "/marque/metamorphose/01-graine.webp",
+          "alt": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "0",
+          "previousDisabled": true,
+          "nextDisabled": false
+        },
+        {
+          "position": 1,
+          "id": "eclosion",
+          "src": "/marque/metamorphose/02-eclosion.webp",
+          "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "1",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 2,
+          "id": "enracinement",
+          "src": "/marque/metamorphose/03-enracinement.webp",
+          "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "2",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 3,
+          "id": "pousse",
+          "src": "/marque/metamorphose/04-pousse.webp",
+          "alt": "Une jeune tige porte ses premières feuilles pastel au-dessus d’un petit réseau de racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "3",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 4,
+          "id": "nouvelles-feuilles",
+          "src": "/marque/croissance/05.webp",
+          "alt": "La même pousse gagne deux petites feuilles et conserve sa graine nacrée.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "4",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 5,
+          "id": "tige-vivante",
+          "src": "/marque/croissance/06.webp",
+          "alt": "La tige s’épaissit légèrement et porte de nouvelles feuilles bleu-lilas.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "5",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 6,
+          "id": "premier-rameau",
+          "src": "/marque/croissance/07.webp",
+          "alt": "Un court rameau naît du jeune tronc nacré, au-dessus des racines fines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "6",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 7,
+          "id": "ramification",
+          "src": "/marque/croissance/08.webp",
+          "alt": "Une seconde ramification équilibre la jeune pousse et son feuillage pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "7",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 8,
+          "id": "premier-bois",
+          "src": "/marque/croissance/09.webp",
+          "alt": "Une première fourche apparaît sur un très jeune tronc à l’écorce claire.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "8",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 9,
+          "id": "branches-ouvertes",
+          "src": "/marque/croissance/10.webp",
+          "alt": "Les deux premières branches s’allongent et portent davantage de feuilles.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "9",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 10,
+          "id": "equilibre",
+          "src": "/marque/croissance/11.webp",
+          "alt": "La jeune ramure s’équilibre sur un tronc souple relié à des racines plus fines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "10",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 11,
+          "id": "jeune-tronc",
+          "src": "/marque/croissance/12.webp",
+          "alt": "L’écorce nacrée forme un petit tronc continu, du collet aux premières branches.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "11",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 12,
+          "id": "racines-etendues",
+          "src": "/marque/croissance/13.webp",
+          "alt": "Le petit arbre développe son réseau de racines et plusieurs rameaux feuillus.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "12",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 13,
+          "id": "elan",
+          "src": "/marque/croissance/14.webp",
+          "alt": "Un arbre encore fin gagne en hauteur et déploie trois branches maîtresses.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "13",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 14,
+          "id": "ramure-arrondie",
+          "src": "/marque/croissance/15.webp",
+          "alt": "La jeune couronne prend une forme arrondie et naturellement asymétrique.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "14",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 15,
+          "id": "jeune-arbre",
+          "src": "/marque/croissance/16.webp",
+          "alt": "Un jeune arbre à l’écorce ivoire-lilas porte une couronne aérée de feuilles pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "15",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 16,
+          "id": "bouquets",
+          "src": "/marque/croissance/17.webp",
+          "alt": "Des bouquets bleu ciel et lavande se multiplient sur la jeune ramure.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "16",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 17,
+          "id": "couronne",
+          "src": "/marque/croissance/18.webp",
+          "alt": "La couronne gagne en densité tandis que le tronc vivant se renforce.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "17",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 18,
+          "id": "ramure-liee",
+          "src": "/marque/croissance/19.webp",
+          "alt": "Les bouquets de feuilles rejoignent peu à peu les branches voisines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "18",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 19,
+          "id": "abri",
+          "src": "/marque/croissance/20.webp",
+          "alt": "Une couronne généreuse forme un abri au-dessus d’un tronc nacré.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "19",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 20,
+          "id": "canopee-ouverte",
+          "src": "/marque/croissance/21.webp",
+          "alt": "La canopée élargie laisse passer une lumière céleste entre ses feuilles.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "20",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 21,
+          "id": "ancrage",
+          "src": "/marque/croissance/22.webp",
+          "alt": "Le tronc et les racines se renforcent sous une large ramure pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "21",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 22,
+          "id": "ampleur",
+          "src": "/marque/croissance/23.webp",
+          "alt": "Un arbre presque mature déploie une canopée généreuse aux contours souples.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "22",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 23,
+          "id": "canopee",
+          "src": "/marque/croissance/24.webp",
+          "alt": "Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "23",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 24,
+          "id": "lumiere-racines",
+          "src": "/marque/croissance/25.webp",
+          "alt": "Une douce lueur nacrée apparaît dans les racines du même arbre mature.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "24",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 25,
+          "id": "seve",
+          "src": "/marque/croissance/26.webp",
+          "alt": "Une fine lumière chaude relie les racines au bas du tronc vivant.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "25",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 26,
+          "id": "lien-interieur",
+          "src": "/marque/croissance/27.webp",
+          "alt": "La sève lumineuse traverse le tronc jusqu’à sa première fourche.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "26",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 27,
+          "id": "branches-rayonnantes",
+          "src": "/marque/croissance/28.webp",
+          "alt": "La lumière se prolonge dans les trois branches maîtresses de l’arbre.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "27",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 28,
+          "id": "courants",
+          "src": "/marque/croissance/29.webp",
+          "alt": "Des courants nacrés parcourent les rameaux, reliés aux racines lumineuses.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "28",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 29,
+          "id": "feuilles-lumineuses",
+          "src": "/marque/croissance/30.webp",
+          "alt": "De petits points de lumière apparaissent dans les feuilles bleu ciel et lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "29",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 30,
+          "id": "couronne-lumineuse",
+          "src": "/marque/croissance/31.webp",
+          "alt": "La couronne entière s’éclaire doucement au-dessus du tronc et des racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "30",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 31,
+          "id": "illumination",
+          "src": "/marque/croissance/32.webp",
+          "alt": "Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "31",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 32,
+          "id": "descente-celeste",
+          "src": "/marque/croissance/33.webp",
+          "alt": "Un faisceau nacré descend du ciel bleu-lilas et rejoint la couronne lumineuse du même arbre.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "32",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 33,
+          "id": "lumiere-incarnee",
+          "src": "/marque/croissance/34.webp",
+          "alt": "La lumière céleste traverse la canopée et se prolonge dans les branches et le tronc nacré.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "33",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 34,
+          "id": "ciel-et-racines",
+          "src": "/marque/croissance/35.webp",
+          "alt": "Un arbre pastel relie un faisceau de lumière venu du ciel à ses racines rayonnantes, dans un mouvement continu.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "selected": "34",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "families": [
+        {
+          "name": "Éclosion",
+          "expected": 0,
+          "selected": 0,
+          "pressed": "true"
+        },
+        {
+          "name": "Croissance",
+          "expected": 4,
+          "selected": 4,
+          "pressed": "true"
+        },
+        {
+          "name": "Canopée",
+          "expected": 16,
+          "selected": 16,
+          "pressed": "true"
+        },
+        {
+          "name": "Lumière",
+          "expected": 24,
+          "selected": 24,
+          "pressed": "true"
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/croissance/05.webp",
+        "/marque/croissance/06.webp",
+        "/marque/croissance/07.webp",
+        "/marque/croissance/08.webp",
+        "/marque/croissance/09.webp",
+        "/marque/croissance/10.webp",
+        "/marque/croissance/11.webp",
+        "/marque/croissance/12.webp",
+        "/marque/croissance/13.webp",
+        "/marque/croissance/14.webp",
+        "/marque/croissance/15.webp",
+        "/marque/croissance/16.webp",
+        "/marque/croissance/17.webp",
+        "/marque/croissance/18.webp",
+        "/marque/croissance/19.webp",
+        "/marque/croissance/20.webp",
+        "/marque/croissance/21.webp",
+        "/marque/croissance/22.webp",
+        "/marque/croissance/23.webp",
+        "/marque/croissance/24.webp",
+        "/marque/croissance/25.webp",
+        "/marque/croissance/26.webp",
+        "/marque/croissance/27.webp",
+        "/marque/croissance/28.webp",
+        "/marque/croissance/29.webp",
+        "/marque/croissance/30.webp",
+        "/marque/croissance/31.webp",
+        "/marque/croissance/32.webp",
+        "/marque/croissance/33.webp",
+        "/marque/croissance/34.webp",
+        "/marque/croissance/35.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "ctaBounds": {
+        "x": 297.3984375,
+        "y": 816.984375,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 388,
+        "y": 765.796875,
+        "width": 291,
+        "height": 44
+      },
+      "assetsBeforeOpen": [
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/02-eclosion.webp"
+      ],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "stages": [
+        {
+          "position": 1,
+          "id": "eclosion",
+          "src": "/marque/metamorphose/02-eclosion.webp",
+          "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "1",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 15,
+          "id": "jeune-arbre",
+          "src": "/marque/croissance/16.webp",
+          "alt": "Un jeune arbre à l’écorce ivoire-lilas porte une couronne aérée de feuilles pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "15",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 31,
+          "id": "illumination",
+          "src": "/marque/croissance/32.webp",
+          "alt": "Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "31",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 32,
+          "id": "descente-celeste",
+          "src": "/marque/croissance/33.webp",
+          "alt": "Un faisceau nacré descend du ciel bleu-lilas et rejoint la couronne lumineuse du même arbre.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "32",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 33,
+          "id": "lumiere-incarnee",
+          "src": "/marque/croissance/34.webp",
+          "alt": "La lumière céleste traverse la canopée et se prolonge dans les branches et le tronc nacré.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "33",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 34,
+          "id": "ciel-et-racines",
+          "src": "/marque/croissance/35.webp",
+          "alt": "Un arbre pastel relie un faisceau de lumière venu du ciel à ses racines rayonnantes, dans un mouvement continu.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "34",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "families": [
+        {
+          "name": "Éclosion",
+          "expected": 0,
+          "selected": 0,
+          "pressed": "true"
+        },
+        {
+          "name": "Croissance",
+          "expected": 4,
+          "selected": 4,
+          "pressed": "true"
+        },
+        {
+          "name": "Canopée",
+          "expected": 16,
+          "selected": 16,
+          "pressed": "true"
+        },
+        {
+          "name": "Lumière",
+          "expected": 24,
+          "selected": 24,
+          "pressed": "true"
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/croissance/16.webp",
+        "/marque/croissance/17.webp",
+        "/marque/croissance/32.webp",
+        "/marque/croissance/33.webp",
+        "/marque/croissance/34.webp",
+        "/marque/croissance/35.webp",
+        "/marque/croissance/05.webp",
+        "/marque/croissance/06.webp",
+        "/marque/croissance/18.webp",
+        "/marque/croissance/25.webp",
+        "/marque/croissance/26.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "ctaBounds": {
+        "x": 753.3984375,
+        "y": 871.859375,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 724,
+        "y": 765.796875,
+        "width": 291,
+        "height": 44
+      },
+      "assetsBeforeOpen": [
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/02-eclosion.webp"
+      ],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "stages": [
+        {
+          "position": 1,
+          "id": "eclosion",
+          "src": "/marque/metamorphose/02-eclosion.webp",
+          "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "1",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 15,
+          "id": "jeune-arbre",
+          "src": "/marque/croissance/16.webp",
+          "alt": "Un jeune arbre à l’écorce ivoire-lilas porte une couronne aérée de feuilles pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "15",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 31,
+          "id": "illumination",
+          "src": "/marque/croissance/32.webp",
+          "alt": "Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "31",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 32,
+          "id": "descente-celeste",
+          "src": "/marque/croissance/33.webp",
+          "alt": "Un faisceau nacré descend du ciel bleu-lilas et rejoint la couronne lumineuse du même arbre.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "32",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 33,
+          "id": "lumiere-incarnee",
+          "src": "/marque/croissance/34.webp",
+          "alt": "La lumière céleste traverse la canopée et se prolonge dans les branches et le tronc nacré.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "33",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 34,
+          "id": "ciel-et-racines",
+          "src": "/marque/croissance/35.webp",
+          "alt": "Un arbre pastel relie un faisceau de lumière venu du ciel à ses racines rayonnantes, dans un mouvement continu.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "selected": "34",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "families": [
+        {
+          "name": "Éclosion",
+          "expected": 0,
+          "selected": 0,
+          "pressed": "true"
+        },
+        {
+          "name": "Croissance",
+          "expected": 4,
+          "selected": 4,
+          "pressed": "true"
+        },
+        {
+          "name": "Canopée",
+          "expected": 16,
+          "selected": 16,
+          "pressed": "true"
+        },
+        {
+          "name": "Lumière",
+          "expected": 24,
+          "selected": 24,
+          "pressed": "true"
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/croissance/16.webp",
+        "/marque/croissance/17.webp",
+        "/marque/croissance/32.webp",
+        "/marque/croissance/33.webp",
+        "/marque/croissance/34.webp",
+        "/marque/croissance/35.webp",
+        "/marque/croissance/05.webp",
+        "/marque/croissance/06.webp",
+        "/marque/croissance/18.webp",
+        "/marque/croissance/25.webp",
+        "/marque/croissance/26.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    }
+  ],
+  "contexts": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "seed",
+      "variant": "papier",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/croissance/24.webp",
+        "alt": "Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "seed",
+      "variant": "contraste",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/croissance/24.webp",
+        "alt": "Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "mixed",
+      "variant": "branches",
+      "sourceStage": "branches",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/croissance/24.webp",
+        "alt": "Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "dense",
+      "variant": "liste",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/croissance/24.webp",
+        "alt": "Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "seed",
+      "variant": "reserve",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/croissance/24.webp",
+        "alt": "Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "error",
+      "variant": "erreur",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/croissance/24.webp",
+        "alt": "Un arbre majestueux à l’écorce claire et vivante relie ses racines à une canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    }
+  ]
+}

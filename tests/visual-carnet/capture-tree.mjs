@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 const project = resolve(fileURLToPath(new URL(".", import.meta.url)), "../..");
 const output = process.argv[2] ?? join(tmpdir(), "anima-tree-captures");
 const mode = process.argv[3] ?? "full";
-const haltes = [0, 1, 2, 3, 4, 15, 23, 31];
+const haltes = [0, 1, 2, 3, 4, 15, 23, 31, 32, 33, 34];
 const samples = ["seed", "birth", "leaf-low", "leaf-high", "leaf-full", "radiant", "mixed", "dense", "error", "reserved"];
 const sourceFiles = ["render/arbre/MoteurArbreLunaire.ts", "render/arbre/geometrie.ts", "render/arbre/ArbreLunaire.tsx", "render/arbre/ArbreInteractif.tsx", "render/arbre/ComprendreEvolution.tsx", "render/arbre/GraineAttente.tsx", "render/arbre/arbre.module.css", "render/monde.module.css"];
 const sourceHashes = async () => Object.fromEntries(await Promise.all(sourceFiles.map(async (file) => [file, createHash("sha256").update(await readFile(resolve(project, file))).digest("hex")])));

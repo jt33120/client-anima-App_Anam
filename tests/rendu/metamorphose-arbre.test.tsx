@@ -30,8 +30,8 @@ function verifierPlanche(index: number) {
 }
 
 describe("métamorphose de l’arbre — exploration illustrée", () => {
-  it("parcourt les trente-deux planches et s’arrête réellement aux deux extrémités", () => {
-    expect(PLANCHES_METAMORPHOSE).toHaveLength(32);
+  it("parcourt les trente-cinq planches et s’arrête réellement aux deux extrémités", () => {
+    expect(PLANCHES_METAMORPHOSE).toHaveLength(35);
     render(<MetamorphoseArbre />);
     verifierPlanche(0);
     expect(precedente().disabled).toBe(true);
@@ -44,16 +44,16 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
     }
     expect(suivante().disabled).toBe(true);
     fireEvent.click(suivante());
-    verifierPlanche(31);
+    verifierPlanche(34);
 
-    for (let index = 30; index >= 0; index--) {
+    for (let index = 33; index >= 0; index--) {
       fireEvent.click(precedente());
       verifierPlanche(index);
     }
     expect(precedente().disabled).toBe(true);
   });
 
-  it.each([[-12, 0], [200, 31]])("borne un index initial %s à la planche %s", (indexInitial, attendu) => {
+  it.each([[-12, 0], [200, 34]])("borne un index initial %s à la planche %s", (indexInitial, attendu) => {
     render(<MetamorphoseArbre indexInitial={indexInitial} />);
     verifierPlanche(attendu);
   });
@@ -62,8 +62,8 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
     const requetes = vi.fn();
     vi.stubGlobal("fetch", requetes);
     render(<MetamorphoseArbre />);
-    choisir(31);
-    verifierPlanche(31);
+    choisir(34);
+    verifierPlanche(34);
     choisir(2);
     verifierPlanche(2);
     expect(requetes).not.toHaveBeenCalled();
@@ -84,13 +84,13 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
     await user.keyboard(" ");
     verifierPlanche(1);
     selection().focus();
-    await user.selectOptions(selection(), "31");
-    verifierPlanche(31);
+    await user.selectOptions(selection(), "34");
+    verifierPlanche(34);
     expect(document.activeElement).toBe(selection());
   });
 
   it.each([
-    { indexInitial: 30, attendu: 31, commande: "Image suivante" },
+    { indexInitial: 33, attendu: 34, commande: "Image suivante" },
     { indexInitial: 1, attendu: 0, commande: "Image précédente" },
   ])(
     "garde le focus utilisable lorsque $commande atteint la borne $attendu",
@@ -108,7 +108,7 @@ describe("métamorphose de l’arbre — exploration illustrée", () => {
 
   it("propose quatre familles lisibles pour parcourir la série détaillée", () => {
     render(<MetamorphoseArbre />);
-    expect(selection().options).toHaveLength(32);
+    expect(selection().options).toHaveLength(35);
     for (const [famille, index] of [["Éclosion", 0], ["Croissance", 4], ["Canopée", 16], ["Lumière", 24]] as const) {
       const bouton = screen.getByRole("button", { name: `Voir la famille : ${famille}` });
       fireEvent.click(bouton);

@@ -71,11 +71,11 @@ try {
         const returned = await readImage(page);
         const choices = dialog.getByLabel("Choisir une étape", { exact: true });
         const stages = [];
-        for (const position of quick ? [0, 31] : width === 390 ? Array.from({ length: 32 }, (_, index) => index) : [1, 15, 31]) {
+        for (const position of quick ? [0, 31, 32, 33, 34] : width === 390 ? Array.from({ length: 35 }, (_, index) => index) : [1, 15, 31, 32, 33, 34]) {
           await choices.selectOption(String(position));
           const illustration = await readImage(page);
           const selected = await choices.inputValue();
-          if (quick || [1, 15, 31].includes(position)) await capture(page, `${engine}-${width}-${position + 1}-${illustration.id}.png`);
+          if (quick || [1, 15, 31, 32, 33, 34].includes(position)) await capture(page, `${engine}-${width}-${position + 1}-${illustration.id}.png`);
           stages.push({ position, ...illustration, selected,
             previousDisabled: await dialog.getByRole("button", { name: "Image précédente", exact: true }).isDisabled(),
             nextDisabled: await following.isDisabled() });

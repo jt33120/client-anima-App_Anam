@@ -9,7 +9,7 @@ const FAMILLES = [
   { titre: "Éclosion", debut: 0, fin: 3 },
   { titre: "Croissance", debut: 4, fin: 15 },
   { titre: "Canopée", debut: 16, fin: 23 },
-  { titre: "Lumière", debut: 24, fin: 31 },
+  { titre: "Lumière", debut: 24, fin: 34 },
 ] as const;
 
 const TAILLES_IMAGE = "(max-width: 48rem) 80vw, 32rem";

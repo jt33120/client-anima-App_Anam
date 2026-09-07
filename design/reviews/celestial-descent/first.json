@@ -1,0 +1,386 @@
+{
+  "before": {
+    "render/arbre/ArbrePersonnel.tsx": "444fc69d5a4087a212e59b6a4f9c73e1b23a3c9272741b459dd3437d0f05cb1e",
+    "render/arbre/ArbreInteractif.tsx": "800ce78fee0587842a59e2c8a2d326840afee6922ed06f35df7edaf6e85af490",
+    "render/arbre/ancres-arbre-personnel.ts": "808fca66c9f71a725b9439b1d8766b869cbd1695cac23fb9cf3088a0d1b8d354",
+    "render/arbre/croissance-personnelle.ts": "5395b7a3441a29fe178f0d8a613aecffde4c7454ff9be4ca221df9dacad13716",
+    "render/arbre/arbre-personnel.module.css": "85410bd9db6ab24037928ffd2f718f46b120e12259e4a0beac4d7823e558c640",
+    "render/arbre/arbre.module.css": "0f105c442ce43df7116d457bd12041d3f85ca6fadfd2b53cb3925e4565d5f9e8",
+    "render/arbre/metamorphose-planches.ts": "3954a2558b5e1d62b8ee97a89f3d612596f2fbb99c1380943d3ffc0d2fc81455"
+  },
+  "after": {
+    "render/arbre/ArbrePersonnel.tsx": "444fc69d5a4087a212e59b6a4f9c73e1b23a3c9272741b459dd3437d0f05cb1e",
+    "render/arbre/ArbreInteractif.tsx": "800ce78fee0587842a59e2c8a2d326840afee6922ed06f35df7edaf6e85af490",
+    "render/arbre/ancres-arbre-personnel.ts": "808fca66c9f71a725b9439b1d8766b869cbd1695cac23fb9cf3088a0d1b8d354",
+    "render/arbre/croissance-personnelle.ts": "5395b7a3441a29fe178f0d8a613aecffde4c7454ff9be4ca221df9dacad13716",
+    "render/arbre/arbre-personnel.module.css": "85410bd9db6ab24037928ffd2f718f46b120e12259e4a0beac4d7823e558c640",
+    "render/arbre/arbre.module.css": "0f105c442ce43df7116d457bd12041d3f85ca6fadfd2b53cb3925e4565d5f9e8",
+    "render/arbre/metamorphose-planches.ts": "3954a2558b5e1d62b8ee97a89f3d612596f2fbb99c1380943d3ffc0d2fc81455"
+  },
+  "sourceChanged": [],
+  "results": [
+    {
+      "width": 390,
+      "stage": 31,
+      "image": {
+        "src": "/marque/croissance/32.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime."
+      },
+      "index": 31,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 89.453125,
+          "y": 365.1875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Prendre ma place",
+          "x": 233.46875,
+          "y": 319.84375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 132.296875,
+          "y": 305.484375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 184.59375,
+          "y": 309.25,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 390,
+      "stage": 32,
+      "image": {
+        "src": "/marque/croissance/33.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un faisceau nacré descend du ciel bleu-lilas et rejoint la couronne lumineuse du même arbre."
+      },
+      "index": 32,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 228,
+          "y": 371.96875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 89.453125,
+          "y": 365.1875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Prendre ma place",
+          "x": 233.46875,
+          "y": 319.84375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 132.296875,
+          "y": 305.484375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 184.59375,
+          "y": 309.25,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Me faire confiance · 9",
+          "x": 285.421875,
+          "y": 382.390625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 31,
+      "image": {
+        "src": "/marque/croissance/32.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime."
+      },
+      "index": 31,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 430.15625,
+          "y": 375.234375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 251.109375,
+          "y": 413.296875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 450.28125,
+          "y": 447.375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 307.796875,
+          "y": 334.296875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 377,
+          "y": 339.265625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 768,
+      "stage": 32,
+      "image": {
+        "src": "/marque/croissance/33.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un faisceau nacré descend du ciel bleu-lilas et rejoint la couronne lumineuse du même arbre."
+      },
+      "index": 32,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 430.15625,
+          "y": 375.234375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 251.109375,
+          "y": 413.296875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 450.28125,
+          "y": 447.375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 307.796875,
+          "y": 334.296875,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 377,
+          "y": 339.265625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Me faire confiance · 9",
+          "x": 510.453125,
+          "y": 436.0625,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 31,
+      "image": {
+        "src": "/marque/croissance/32.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime."
+      },
+      "index": 31,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 890.796875,
+          "y": 404.15625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 699.375,
+          "y": 444.859375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 912.3125,
+          "y": 481.28125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 759.984375,
+          "y": 360.390625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 833.96875,
+          "y": 365.703125,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    },
+    {
+      "width": 1440,
+      "stage": 32,
+      "image": {
+        "src": "/marque/croissance/33.webp",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "alt": "Ton arbre : chaque branche est une prise de conscience que tu as nommée. Un faisceau nacré descend du ciel bleu-lilas et rejoint la couronne lumineuse du même arbre."
+      },
+      "index": 32,
+      "overflow": false,
+      "targets": [
+        {
+          "id": "Voir les 2 branches proches",
+          "x": 890.796875,
+          "y": 404.15625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Voir les 3 branches proches",
+          "x": 699.375,
+          "y": 444.859375,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Oser dire non",
+          "x": 912.3125,
+          "y": 481.28125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Écouter mes besoins",
+          "x": 759.984375,
+          "y": 360.390625,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Créer sans me comparer",
+          "x": 833.96875,
+          "y": 365.703125,
+          "width": 44,
+          "height": 44
+        },
+        {
+          "id": "Branche : Me faire confiance · 9",
+          "x": 976.640625,
+          "y": 469.1875,
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overlaps": [],
+      "tooSmall": [],
+      "errors": [],
+      "api": [],
+      "failedAssets": []
+    }
+  ],
+  "interactions": [
+    {
+      "width": 390,
+      "kind": "group",
+      "names": [
+        "Me faire confiance",
+        "Trouver mon rythme"
+      ],
+      "branchFocus": true,
+      "groupFocus": true,
+      "errors": [],
+      "api": [
+        "GET /api/anam/plan"
+      ]
+    }
+  ],
+  "fatalError": null,
+  "failures": 0
+}

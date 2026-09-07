@@ -97,7 +97,7 @@ function PreviewScene() {
           next.set("treeStage", event.currentTarget.value);
           setProjection(treeProjectionFor(next));
         }}>
-        {Array.from({ length: 32 }, (_, index) => <option value={index} key={index}>{index}</option>)}
+        {Array.from({ length: 35 }, (_, index) => <option value={index} key={index}>{index}</option>)}
       </select>
     </label>
   </aside>}

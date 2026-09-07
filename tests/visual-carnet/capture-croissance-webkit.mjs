@@ -3,11 +3,11 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { mkdir, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-// Local synthetic fixtures only. Run with --full after all 32 assets are available.
+// Local synthetic fixtures only. Run with --full after all 35 assets are available.
 const full = process.argv.includes('--full');
 const output = join(tmpdir(), full ? 'anima-growth-webkit-full' : 'anima-growth-webkit-first-four');
-const stages = Array.from({length: full ? 32 : 4}, (_,index) => index);
-const result = { engine:'WebKit', mode:full?'32 drawings':'preserved first four', viewport:{width:390,height:844}, errors:[],api:[],snapshots:[],assets:[],assertions:[] };
+const stages = Array.from({length: full ? 35 : 4}, (_,index) => index);
+const result = { engine:'WebKit', mode:full?'35 drawings':'preserved first four', viewport:{width:390,height:844}, errors:[],api:[],snapshots:[],assets:[],assertions:[] };
 await mkdir(output,{recursive:true});
 const browser = await webkit.launch({headless:true});
 let page;
@@ -48,27 +48,27 @@ try{
  result.assertions.push('Cold personal tree requests only its current illustration and the immediately following preload.');
  for(const stage of stages){
   if(stage)await page.getByLabel('Projection synthétique',{exact:true}).selectOption(String(stage));
-  await ready(page,stage);if(!full||[0,3,4,8,15,23,31].includes(stage))await snapshot(page,`main-${String(stage).padStart(2,'0')}`);
+  await ready(page,stage);if(!full||[0,3,4,8,15,23,31,32,33,34].includes(stage))await snapshot(page,`main-${String(stage).padStart(2,'0')}`);
  }
  result.assertions.push(`Actual projected props change the main image on the same page through ${stages.length} stages.`);
  await page.close();
  page=await setup('treeStage=0');await ready(page,0);
  const trigger=page.getByRole('button',{name:'Voir la graine éclore',exact:true});await trigger.tap();
  const dialog=page.getByRole('dialog');const select=dialog.getByLabel('Choisir une étape',{exact:true});
- assert.equal(await select.inputValue(),'1');assert.equal(await select.locator('option').count(),32);
+ assert.equal(await select.inputValue(),'1');assert.equal(await select.locator('option').count(),35);
  for(const index of stages){
   await select.selectOption(String(index));
   const image=dialog.locator('[data-planche] > img');await image.waitFor({state:'visible'});await image.evaluate(img=>img.decode());
   assert.equal(await image.evaluate(img=>img.naturalWidth),1024);
   assert.equal(await dialog.getByRole('button',{name:'Image précédente',exact:true}).isDisabled(),index===0);
-  assert.equal(await dialog.getByRole('button',{name:'Image suivante',exact:true}).isDisabled(),index===31);
+  assert.equal(await dialog.getByRole('button',{name:'Image suivante',exact:true}).isDisabled(),index===34);
  }
  await select.selectOption('1');
  await dialog.getByRole('button',{name:'Image précédente',exact:true}).focus();await page.keyboard.press('Enter');
  assert.equal(await select.inputValue(),'0');assert(await select.evaluate(el=>el===document.activeElement));
- if(full){await select.selectOption('30');await dialog.getByRole('button',{name:'Image suivante',exact:true}).focus();await page.keyboard.press('Enter');assert.equal(await select.inputValue(),'31');assert(await select.evaluate(el=>el===document.activeElement));await dialog.locator('[data-planche] > img').evaluate(img=>img.decode());}
+ if(full){await select.selectOption('33');await dialog.getByRole('button',{name:'Image suivante',exact:true}).focus();await page.keyboard.press('Enter');assert.equal(await select.inputValue(),'34');assert(await select.evaluate(el=>el===document.activeElement));await dialog.locator('[data-planche] > img').evaluate(img=>img.decode());}
  await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});assert(await trigger.evaluate(el=>el===document.activeElement));
- result.assertions.push('Seed CTA opens index 1; native select lists 32 images; endpoint keyboard focus and Escape return correctly.');
+ result.assertions.push('Seed CTA opens index 1; native select lists 35 images; endpoint keyboard focus and Escape return correctly.');
  await page.close();
  page=await setup('treeStage=3');await ready(page,3);
  const region=page.getByRole('region',{name:'Mon évolution',exact:true});

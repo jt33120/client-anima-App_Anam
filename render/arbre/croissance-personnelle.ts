@@ -3,7 +3,7 @@ import type { BrancheProjetee } from "@/lib/scene/projection";
 type BrancheDeCroissance = Pick<BrancheProjetee, "id" | "etat" | "intensite">;
 
 const DERNIERE_STRUCTURE = 23;
-const NUANCES_LUMIERE = 8;
+const NUANCES_LUMIERE = 11;
 // The persisted intensity uses SQL real. Ignore its tiny float rounding around a tenth.
 const TOLERANCE_DIXIEME = 0.000001;
 
@@ -11,7 +11,8 @@ const TOLERANCE_DIXIEME = 0.000001;
  * Selects an illustration from the reconciled branches, without writing personal data.
  * One distinct birth contributes one drawing unit; its foliage contributes up to ten more.
  * The tenths describe drawing precision, not the backend's unchanged 0.2 progression step.
- * Once the structure reaches 23, each declared radiant branch adds one light variant (up to 8).
+ * Once the structure reaches 23, each declared radiant branch adds one light variant (up to 11).
+ * The first eight variants keep their original indices; three celestial variants follow them.
  * No clock, connection count, personal text or persisted visual index participates.
  */
 export function indexCroissancePersonnelle(branches: readonly BrancheDeCroissance[]): number {

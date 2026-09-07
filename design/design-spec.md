@@ -109,3 +109,12 @@ dès l'écran vide. [Direction et contrat de métamorphose](metamorphosis-spec.m
 
 Le correctif suivant rétablit la croissance sur le parcours réel et affine fortement les étapes :
 [direction et intégration](living-growth-spec.md). Il remplace le contrat de galerie seule.
+
+## 12. Lumière du ciel, prolongement de l’illumination
+
+Trois nouvelles planches suivent les 32 existantes, toutes conservées : la lumière descend
+du ciel vers la couronne, traverse le bois vivant, puis rejoint les racines. La silhouette,
+le cadrage et les matières pastel de la planche 32 restent les repères communs. La référence
+utilisateur guide la lumière rose nacrée, sans reprendre son interface ni ses textes.
+Les trois étapes prolongent la même famille Lumière et la croissance personnelle existante,
+sans rééchelonner les états déjà atteints.

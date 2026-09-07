@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 // Synthetic branch projections only. The app computes every rendered stage itself.
 const output = process.argv[2] ?? join(tmpdir(), 'anima-croissance');
 const quick = process.argv[3] === 'quick';
-const stages = quick ? [0, 4, 8, 15, 23, 31] : Array.from({ length: 32 }, (_, index) => index);
+const stages = quick ? [0, 4, 8, 15, 23, 31, 32, 33, 34] : Array.from({ length: 35 }, (_, index) => index);
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const sourceFiles = ['render/arbre/ArbrePersonnel.tsx', 'render/arbre/ArbreInteractif.tsx', 'render/arbre/ancres-arbre-personnel.ts', 'render/arbre/croissance-personnelle.ts', 'render/arbre/arbre-personnel.module.css', 'render/arbre/arbre.module.css', 'render/arbre/metamorphose-planches.ts'];
@@ -49,7 +49,7 @@ try {
     await page.route('**/api/**', (route) => { api.push(route.request().method() + ' ' + new URL(route.request().url()).pathname); return route.request().method() === 'GET' && new URL(route.request().url()).pathname === '/api/anam/plan'
       ? route.fulfill({ status: 200, contentType: 'application/json', body: '{"plan":[]}' })
       : route.fulfill({ status: 503, body: '{}' }); });
-    for (const stage of width === 390 ? stages : [0, 4, 8, 15, 23, 31]) {
+    for (const stage of width === 390 ? stages : [0, 4, 8, 15, 23, 31, 32, 33, 34]) {
       await page.goto(`http://127.0.0.1:4179/?tree=seed&treeStage=${stage}`, { waitUntil: 'domcontentloaded' });
       const image = await loaded(page);
       const metrics = await measure(page);
@@ -82,7 +82,7 @@ try {
       await page.goto('http://127.0.0.1:4179/?tree=seed&treeStage=0&treeControls=1', { waitUntil: 'domcontentloaded' });
       await loaded(page);
       const live = [];
-      for (const stage of [1, 3, 11, 12, 22, 23, 24, 25, 31]) {
+      for (const stage of [1, 3, 11, 12, 22, 23, 24, 25, 31, 32, 33, 34]) {
         await page.getByLabel('Projection synthétique', { exact: true }).selectOption(String(stage));
         await page.waitForFunction((expected) => Number(document.querySelector('[data-index-croissance]')?.dataset.indexCroissance) === expected, stage);
         await loaded(page); live.push((await measure(page)).index);

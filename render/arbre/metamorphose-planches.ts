@@ -170,4 +170,19 @@ export const PLANCHES_METAMORPHOSE: readonly PlancheMetamorphose[] = [
     src: "/marque/croissance/32.webp", width: 1024, height: 1536,
     alt: "Un arbre vivant aux teintes ivoire, lilas et bleu ciel rayonne doucement des racines à la cime.",
   },
+  {
+    id: "descente-celeste", titre: "Descente céleste", texte: "Une lumière descend du ciel et vient rencontrer la cime.",
+    src: "/marque/croissance/33.webp", width: 1024, height: 1536,
+    alt: "Un faisceau nacré descend du ciel bleu-lilas et rejoint la couronne lumineuse du même arbre.",
+  },
+  {
+    id: "lumiere-incarnee", titre: "Lumière incarnée", texte: "La clarté du ciel trouve un chemin dans le bois vivant.",
+    src: "/marque/croissance/34.webp", width: 1024, height: 1536,
+    alt: "La lumière céleste traverse la canopée et se prolonge dans les branches et le tronc nacré.",
+  },
+  {
+    id: "ciel-et-racines", titre: "Ciel et racines", texte: "Du ciel aux racines, une même lumière habite l’arbre.",
+    src: "/marque/croissance/35.webp", width: 1024, height: 1536,
+    alt: "Un arbre pastel relie un faisceau de lumière venu du ciel à ses racines rayonnantes, dans un mouvement continu.",
+  },
 ];

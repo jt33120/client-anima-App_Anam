@@ -47,7 +47,7 @@ export function treeProjectionFor(params: URLSearchParams): ProjectionScene {
     : { present: true as const } };
   if (sample === "error") return { ...base, branches: [], indisponible: true };
   const stage = Number(params.get("treeStage"));
-  if (params.has("treeStage") && Number.isInteger(stage) && stage >= 0 && stage <= 31) {
+  if (params.has("treeStage") && Number.isInteger(stage) && stage >= 0 && stage <= 34) {
     return { ...base, branches: branchesAtVisualStage(stage) };
   }
 

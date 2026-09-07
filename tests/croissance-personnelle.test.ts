@@ -30,10 +30,17 @@ describe("croissance personnelle — choix de dessin depuis les branches réelle
     expect(indexCroissancePersonnelle([...jeunes(22), branche("a", 0, "rayonnement")])).toBe(24);
   });
 
-  it("les huit nuances lumineuses demandent huit branches distinctes réellement rayonnantes", () => {
-    for (let compte = 0; compte <= 12; compte++) {
+  it("conserve les huit nuances lumineuses existantes aux mêmes indices", () => {
+    for (let compte = 0; compte <= 8; compte++) {
       const rayonnantes = Array.from({ length: compte }, (_, i) => branche(`r-${i}`, 0, "rayonnement"));
-      expect(indexCroissancePersonnelle([...jeunes(23), ...rayonnantes])).toBe(23 + Math.min(8, compte));
+      expect(indexCroissancePersonnelle([...jeunes(23), ...rayonnantes])).toBe(23 + compte);
+    }
+  });
+
+  it("ajoute les trois états célestes avec neuf, dix et onze branches rayonnantes, puis reste au dernier dessin", () => {
+    for (let compte = 9; compte <= 15; compte++) {
+      const rayonnantes = Array.from({ length: compte }, (_, i) => branche(`r-${i}`, 1, "rayonnement"));
+      expect(indexCroissancePersonnelle(rayonnantes)).toBe(23 + Math.min(11, compte));
     }
   });
 

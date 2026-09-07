@@ -302,6 +302,39 @@
       "height": 1536,
       "bytes": 362580,
       "sha256": "201078c162f33c1692e7b3422f378fffdf43246fe7f2446026d6b83b54fbeb04"
+    },
+    {
+      "stage": 33,
+      "name": "descente-celeste",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-7ed9e831-c143-439f-a4e3-0527478b0d42.png",
+      "target": "public/marque/croissance/33.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 369000,
+      "sha256": "3c89a1f540b8c93ef402dbba39bff0e80037d0322db6a864accdbce70bf932ff",
+      "promptSet": "design/celestial-descent-prompts.md"
+    },
+    {
+      "stage": 34,
+      "name": "lumiere-incarnee",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-ce0b726b-c208-4422-99d6-cc8a0a4ce974.png",
+      "target": "public/marque/croissance/34.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 342570,
+      "sha256": "0b14b88b60ecfd351a199bc0f13d99356c1947daaa6e262607db02d1b6d35c8f",
+      "promptSet": "design/celestial-descent-prompts.md"
+    },
+    {
+      "stage": 35,
+      "name": "ciel-et-racines",
+      "source": "/Users/juliantalou/.codex/generated_images/01a07821-31cc-7a03-a058-6612851224db/exec-58d5e12c-42b2-46ee-ae17-128fc47ecf2c.png",
+      "target": "public/marque/croissance/35.webp",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 330844,
+      "sha256": "78e1546e6b7675b7909b9bf2dc64292d6976eba1324c288fb996c5b9fffa5aaf",
+      "promptSet": "design/celestial-descent-prompts.md"
     }
   ]
 }

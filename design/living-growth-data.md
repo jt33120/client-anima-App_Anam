@@ -24,18 +24,26 @@ elle peut arriver dès la naissance sans feuillaison préalable. Le tronc incomp
 l’absence d’heure de naissance, sans rapport avec une maturité.
 
 Le retour utilisateur actuel autorise une croissance personnelle du dessin. La règle validée
-pour les 32 illustrations vit uniquement dans `render/arbre/croissance-personnelle.ts` :
+pour les 35 illustrations vit uniquement dans `render/arbre/croissance-personnelle.ts` :
 
 - Une branche distincte apporte une unité ; sa feuillaison ajoute `floor(10 × intensité)` unités.
 - L’addition est plafonnée à l’indice 23. L’indice 0 reste la graine ; les images 0–3 sont conservées.
 - À structure 23 seulement, chaque branche réellement rayonnante ajoute une nuance lumineuse,
-  dans la limite de huit : indices 24–31. Une déclaration précoce ne saute pas directement
+  dans la limite de onze : indices 24–34. Les huit premières nuances conservent leurs indices
+  24–31 ; neuf, dix puis onze branches rayonnantes ouvrent les trois ajouts célestes, aux indices
+  32–34. Les 32 illustrations précédentes restent identiques. Une déclaration précoce ne saute pas directement
   à l’arbre adulte ; son état reste accessible dans la fiche et les repères personnels.
 - Les doublons d’ID fusionnent leurs maxima ; une naissance ignore une intensité incohérente.
   Intensité non finie → 0, valeurs finies bornées à 0–1, identifiants ou états invalides ignorés.
   Une tolérance de `0.000001` après multiplication par dix absorbe l’arrondi du type SQL `real`.
 - Ces dixièmes sont une précision du dessin. Le pas backend de `0.2` reste inchangé. Aucun
   temps écoulé, nombre de connexions, texte, score affiché ou stockage local n’intervient.
+
+Les trois ajouts sont accessibles au dessin personnel : la création d’une branche
+(`0037_branche_naissance_premium.sql:85`) ne fixe aucun plafond de nombre, et le chargement
+(`0025_branche_cycle_vie.sql:350`) sert toutes les branches possédées sans `LIMIT`.
+La déclaration de rayonnement (`0025_branche_cycle_vie.sql:308`) n’a pas de quota de branches.
+Cette vérification porte sur le code et les migrations versionnés, sans consulter de compte réel.
 
 Une moyenne ferait rétrécir l’arbre lors d’une nouvelle naissance : elle est écartée. La règle
 consomme les branches déjà réconciliées par `ArbreInteractif`, conserve les IDs et ne remplace

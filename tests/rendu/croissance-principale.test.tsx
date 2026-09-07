@@ -87,6 +87,22 @@ describe("croissance de l’arbre principal", () => {
     await waitFor(() => expect(screen.queryByText("Chargement de ton arbre…")).toBeNull());
   });
 
+  it("prolonge le même arbre avec les trois lumières célestes tout en conservant les accès aux branches", () => {
+    dimensionnerTout(390, 620);
+    const rayonnantes = (nombre: number) => Array.from({ length: nombre }, (_, i) => branche(`lumiere-${i}`, 1, "rayonnement"));
+    const { container, rerender } = render(<ArbreInteractif {...gestes} projection={projection(rayonnantes(8))} />);
+    verifierDessin(container, 31);
+
+    for (const nombre of [9, 10, 11, 12]) {
+      const branches = rayonnantes(nombre);
+      rerender(<ArbreInteractif {...gestes} projection={projection(branches)} />);
+      verifierDessin(container, 23 + Math.min(nombre, 11));
+      const ids = [...container.querySelectorAll<HTMLElement>("[data-branche-arbre], [data-groupe-branches]")]
+        .flatMap((cible) => (cible.dataset.brancheArbre ?? cible.dataset.groupeBranches ?? "").split(" "));
+      expect(ids.sort()).toEqual(branches.map(({ id }) => id).sort());
+    }
+  });
+
   it("désambiguïse deux naissances proches et garde la fiche et le retour au groupe accessibles", async () => {
     dimensionnerTout(390, 620);
     const user = userEvent.setup();

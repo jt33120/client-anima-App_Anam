@@ -14,6 +14,14 @@ const CONSERVEES = [
 ] as const;
 
 describe("illustrations conservées à la demande de l’utilisateur", () => {
+  it("conserve intégralement les 32 dessins précédents et leurs textes avant les trois ajouts célestes", () => {
+    const existantes = PLANCHES_METAMORPHOSE.slice(0, 32);
+    const empreinte = (valeur: string | Buffer) => createHash("sha256").update(valeur).digest("hex");
+    expect(empreinte(JSON.stringify(existantes))).toBe("8e4fed8550ea69f808c3b2b143cbcf78a2f4f651d8d8479d47be04542f4e50ed");
+    const dessins = existantes.map((planche) => empreinte(readFileSync(join(process.cwd(), "public", planche.src))));
+    expect(empreinte(dessins.join("\n"))).toBe("095bca986b59233f82509c32793a8459177836da5311303c331783cd5eb60e5d");
+  });
+
   it.each(CONSERVEES)("garde %s et son emplacement dans les quatre premiers dessins", (fichier, empreinte) => {
     const position = CONSERVEES.findIndex(([nom]) => nom === fichier);
     const chemin = `public/marque/metamorphose/${fichier}`;
