@@ -12,6 +12,7 @@ import { texteDe } from "@/lib/corpus/numerologie";
 import { texteDuTypeRetenu } from "@/lib/corpus/enneagramme";
 import type { TexteCorpus } from "@/lib/corpus/port";
 import type { EcritureModele } from "./bibliotheque";
+import type { EcritureTroisParties } from "./verdict-horoscope";
 import type { TypeEnneagramme } from "./enneagramme";
 import { MESSAGE_TYPE_SANS_TEXTE, MESSAGE_TYPE_ABSENT, URL_PASSER_LE_TEST } from "./enneagramme-items";
 import { CORPS_LIBELLE, NOMBRE_LIBELLE, SIGNE_LIBELLE, carteHoroscope, enSigne } from "./cartes-socle";
@@ -578,10 +579,10 @@ function aspectsDuTheme(theme: ThemeNatal, avecDegre: boolean): readonly AspectF
  */
 function horoscopeFiche(
   horoscope: HoroscopeDuJour | null,
-  texteDuModele: string | null,
+  ecritureDuModele: EcritureTroisParties | null,
 ): HoroscopeFiche | null {
   if (horoscope === null) return null;
-  const carte = carteHoroscope(horoscope, texteDuModele);
+  const carte = carteHoroscope(horoscope, ecritureDuModele);
   return Object.freeze({
     titre: carte.titre,
     texte: carte.texte,
@@ -593,7 +594,7 @@ export function sectionCiel(
   theme: ThemeNatal | null,
   indisponible: string | null,
   horoscope: HoroscopeDuJour | null = null,
-  texteDuModele: string | null = null,
+  ecritureDuModele: EcritureTroisParties | null = null,
 ): SectionCiel {
   if (theme === null) {
     return Object.freeze({
@@ -725,7 +726,7 @@ export function sectionCiel(
           reparation: { libelle: URL_AJOUTER_SON_HEURE.libelle, url: URL_AJOUTER_SON_HEURE.url },
         })
       : null,
-    horoscope: horoscopeFiche(horoscope, texteDuModele),
+    horoscope: horoscopeFiche(horoscope, ecritureDuModele),
   });
 }
 
@@ -863,14 +864,14 @@ export function ficheSocle(
    */
   horoscope: HoroscopeDuJour | null = null,
   /**
-   * Le texte du jour écrit par le modèle (2026-09-02), produit par `texteDuJourGenere` côté serveur.
-   * `null` partout ailleurs qu'en mode astrologie : les autres modes ne montrent pas l'horoscope, et
-   * un texte qu'on ne montre pas ne se paie pas.
+   * Le texte du jour écrit par le modèle (2026-09-02), en TROIS parties depuis le 2026-09-07,
+   * produit par `paroleDuJourGeneree` côté serveur. `null` partout ailleurs qu'en mode astrologie :
+   * les autres modes ne montrent pas l'horoscope, et un texte qu'on ne montre pas ne se paie pas.
    */
-  texteDuModele: string | null = null,
+  ecritureDuModele: EcritureTroisParties | null = null,
 ): FicheSocle {
   const nombres = sectionNombres(numerologie, indisponibles.nombres, entreesNumerologie);
-  const ciel = sectionCiel(theme, indisponibles.ciel, horoscope, texteDuModele);
+  const ciel = sectionCiel(theme, indisponibles.ciel, horoscope, ecritureDuModele);
   const sectionDuType = sectionType(type);
   return Object.freeze({
     nombres,

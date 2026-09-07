@@ -50,7 +50,14 @@ const daily: BibliothequeVue = {
     { ...card("horoscope", "Ton ciel du jour", "La Lune ralentit le rythme."),
       faits: [{ intitule: "Lune", valeur: "Gémeaux" }, { intitule: "Soleil", valeur: "Vierge" }],
       texte: { statut: "non_ecrit" },
-      ecritureModele: { texte: "Une journée pour laisser respirer tes idées. Si tout semble aller vite autour de toi, tu peux choisir un seul point d’attention et lui donner de la place. Observe ce qui éveille ta curiosité, sans avoir à en faire quelque chose tout de suite.", mention: "Lecture symbolique rédigée avec l’aide d’une IA." },
+      ecritureModele: {
+        parties: [
+          { intitule: "Le ciel, aujourd’hui", texte: "La Lune du jour marche à trois signes de ton Soleil de naissance, et Vénus vient s’y poser." },
+          { intitule: "Ce que ça touche chez toi", texte: "Si tout semble aller vite autour de toi, un seul point d’attention suffit à tenir la journée." },
+          { intitule: "Le rendre concret", texte: "Poser une chose sur la table avant midi, une seule. Écrire trois lignes le soir, sans les relire." },
+        ],
+        mention: "Lecture symbolique rédigée avec l’aide d’une IA.",
+      },
     },
   ],
   univers: universMoi("absent", true),

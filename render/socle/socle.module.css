@@ -746,6 +746,29 @@
   font-style: italic;
 }
 
+/* LES TROIS PARTIES DU TEXTE DU JOUR (2026-09-07).
+
+   ⚠️ ELLES SONT DÉCLARÉES APRÈS `.mentionModele`, ET C'EST DÉLIBÉRÉ. `tests/carte-du-jour.test.ts`
+   découpe ce fichier entre `.carteJour {` et `\n.mentionModele {` pour mesurer le bloc de la carte :
+   des classes insérées ENTRE les deux auraient déplacé la borne du découpage, et la garde aurait
+   mesuré autre chose sans que rien ne rougisse.
+
+   L'intitulé est un repère, pas un titre : il se lit avant le paragraphe et ne lui prend pas la
+   vedette. D'où le registre de surtitre et l'encre douce, qui est celle déjà mesurée sur cet aplat. */
+.partieModele {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.intitulePartie {
+  margin: 0;
+}
+
+.carteJour .intitulePartie {
+  color: var(--sur-jour-doux);
+}
+
 @media (min-width: 640px) {
   .boutonPrincipal {
     width: auto;

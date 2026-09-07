@@ -46,6 +46,13 @@ const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
   { ou: "rendu · BibliothequeVue", corps: corpsInterface(RENDU, "BibliothequeVue") },
   { ou: "domaine · UniversMoi", corps: corpsInterface(UNIVERS, "UniversMoi") },
   { ou: "rendu · UniversVue", corps: corpsInterface(RENDU, "UniversVue") },
+  // ⚠️ AJOUTÉES LE 2026-09-07, ET ELLES MANQUAIENT DEPUIS LE 2026-09-02. L'écriture d'un modèle
+  // traverse cette frontière comme les autres, et ni la garde de mesure ni l'appariement ne la
+  // regardaient : les deux côtés pouvaient diverger en silence.
+  { ou: "domaine · EcritureModele", corps: corpsInterface(DOMAINE, "EcritureModele") },
+  { ou: "domaine · PartieEcriture", corps: corpsInterface(DOMAINE, "PartieEcriture") },
+  { ou: "rendu · EcritureModeleVue", corps: corpsInterface(RENDU, "EcritureModeleVue") },
+  { ou: "rendu · PartieEcritureVue", corps: corpsInterface(RENDU, "PartieEcritureVue") },
 ];
 
 /**
@@ -56,13 +63,16 @@ const DECLARATIONS: ReadonlyArray<{ ou: string; corps: string }> = [
 const MESURES = ["badge", "compte", "compteur", "total", "nouveau", "verrouille", "cadenas", "restant", "quantite"];
 
 describe("[5.6/AC2 DUR] aucune des deux déclarations ne peut porter une mesure", () => {
-  it("[CONTRÔLE DU CONTRÔLE] les quatre déclarations ont bien été extraites", () => {
+  it("[CONTRÔLE DU CONTRÔLE] les dix déclarations ont bien été extraites", () => {
     // Sans ce témoin, tous les refus ci-dessous seraient vrais sur des chaînes vides — le mode
     // d'échec exact d'une garde dont l'extracteur casse (leçon `arbitrage-frontiere`).
     for (const d of DECLARATIONS) {
-      expect(d.corps.length, `déclaration introuvable : ${d.ou}`).toBeGreaterThan(80);
+      // ⚠️ SEUIL BAISSÉ À 40 LE 2026-09-07 : `PartieEcriture` ne fait que deux champs, et 80 signes
+      // l'auraient déclarée « introuvable » alors qu'elle est là. Le témoin doit prouver que
+      // l'extracteur MARCHE, pas que les interfaces sont longues.
+      expect(d.corps.length, `déclaration introuvable : ${d.ou}`).toBeGreaterThan(40);
     }
-    expect(DECLARATIONS).toHaveLength(6);
+    expect(DECLARATIONS).toHaveLength(10);
   });
 
   for (const d of DECLARATIONS) {
@@ -123,6 +133,28 @@ describe("[5.6/AD-10] le rendu ne connaît pas le domaine, et c'est ce qui impos
       "texte",
       "titre",
     ]);
+  });
+
+  it("[LE CŒUR] l’écriture d’un modèle coïncide des deux côtés, champ pour champ", () => {
+    // ⚠️ TROIS DÉCLARATIONS POUR UNE SEULE FORME, et c'est ce qui la rendait fragile : le domaine,
+    // la vue de l'accueil, la vue de la halte. `tests/socle-frontiere.test.ts` apparie les deux
+    // premières à la troisième ; celle-ci ferme le côté accueil. Un champ ajouté d'un seul côté
+    // compile, et le rendu cesse simplement d'afficher quelque chose — la panne la plus silencieuse
+    // d'une frontière redéclarée.
+    for (const [domaine, rendu] of [
+      ["EcritureModele", "EcritureModeleVue"],
+      ["PartieEcriture", "PartieEcritureVue"],
+    ] as const) {
+      // ⚠️ LE MÊME EXTRACTEUR QUE CI-DESSUS, RECOPIÉ PARCE QU'IL EST LOCAL À L'AUTRE `it`. Il ne
+      // retire PAS les commentaires : ne jamais écrire « readonly xxx : » dans un commentaire à
+      // l'intérieur du corps d'une de ces interfaces, la garde le compterait comme un champ.
+      const champsDe = (corps: string) =>
+        [...corps.matchAll(/readonly\s+(\w+)\s*[?:]/g)].map((m) => m[1]).sort();
+      expect(
+        champsDe(corpsInterface(RENDU, rendu)),
+        `${domaine} et ${rendu} ont divergé`,
+      ).toEqual(champsDe(corpsInterface(DOMAINE, domaine)));
+    }
   });
 
   it("[7.8 · FR-031 DUR] aucune VALEUR d'`etat` ne porte de mesure", () => {

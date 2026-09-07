@@ -52,18 +52,28 @@ export function tierPour(capacite: CapaciteIa, niveauSecurite: NiveauSecurite = 
   // il produit une hypothèse fausse que le modèle relira comme un acquis, tous les jours.
   if (capacite === "compactage") return "fort";
   if (niveauSecurite >= 1) return "fort"; // AD-5 : détresse → le plus capable, jamais le léger
-  // LE TEXTE DU JOUR (2026-09-02) part au LÉGER par un raisonnement de CONTENU, pas de prix. Sa
-  // charge utile ne contient aucun mot d'elle : des aspects, une distance en signes, des passages de
-  // signe. Il n'y a donc rien à comprendre de travers sur quelqu'un, alors que c'est exactement le
-  // risque que les quatre lignes ci-dessus écartent. Et ce qu'il rend passe par `verdictHoroscope`
-  // avant d'être montré : un texte qui prédit ou qui glisse au vocabulaire clinique est refusé, pas
-  // rattrapé. Le fort n'ajouterait ici que du coût.
+  // ══════════════════════════════════════════════════════════════════════════════════════════════
+  // LE TEXTE DU JOUR EST PASSÉ AU FORT LE 2026-09-07, ET LES TROIS ARGUMENTS D'HIER SONT TOMBÉS.
+  // ══════════════════════════════════════════════════════════════════════════════════════════════
+  //
+  // Cette ligne rendait « leger », et le raisonnement écrit ici disait : « sa charge utile ne
+  // contient aucun mot d'elle », « il n'y a rien à comprendre de travers sur quelqu'un », « le fort
+  // n'ajouterait ici que du coût ». Les trois étaient vrais. Aucun ne l'est plus :
+  //
+  //   • la charge utile porte maintenant son prénom, ses signes natals, le nom des branches de son
+  //     arbre et ce qu'Anam a retenu d'elle ;
+  //   • il y a donc quelque chose à comprendre de travers sur quelqu'un — c'est le prédicat exact
+  //     qui met `lecture` au fort, deux blocs plus haut ;
+  //   • et la sortie est PERSISTÉE pour quarante-huit heures puis re-servie telle quelle, ce qui est
+  //     le prédicat qui met `compactage` au fort.
+  //
+  // ⚠️ ÉCRIT EXPLICITEMENT, ET NON OBTENU EN SUPPRIMANT LA LIGNE. Retirer ce `if` donnerait « fort »
+  // par le repli final, et le dépôt refuse le tier hérité : un fort par héritage se lit comme un
+  // fort par décision, et personne ne saurait plus lequel des deux il relit.
   //
   // ⚠️ APRÈS la barrière de détresse, et non avant : la barrière est inconditionnelle, et une
-  // capacité qui la court-circuiterait serait la première brèche d'AD-5. Elle ne mord jamais ici
-  // (ce chemin n'a pas de niveau de sécurité à porter), et c'est justement pourquoi la laisser
-  // devant ne coûte rien.
-  if (capacite === "horoscope") return "leger";
+  // capacité qui la court-circuiterait serait la première brèche d'AD-5.
+  if (capacite === "horoscope") return "fort";
   // Tout le reste (reconceptualisation, synthèse, retour_theme) est du travail de schéma : FORT.
   return capacite === "echange" ? "leger" : "fort";
 }

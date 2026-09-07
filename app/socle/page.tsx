@@ -155,10 +155,19 @@ export default async function Page({
   // ⚠️ IL NE PEUT PAS FAIRE ÉCHOUER LA PAGE. `texteDuJourGenere` ne jette jamais et rend `null` sur
   // tous ses chemins d'échec (pas de consentement art. 9, panne, quota, texte refusé) ; la carte
   // retombe alors sur le corpus, qui est écrit et relu. Le `catch` ici est une ceinture de plus.
+  //
+  // ⚠️ C'EST LA HALTE QUI GÉNÈRE, ET ELLE ATTEND (2026-09-07). Le texte est passé à trois parties et
+  // au modèle fort : il demande plusieurs secondes. Cette page est une visite DÉLIBÉRÉE — on y vient
+  // pour lire son ciel —, donc c'est ici qu'on paie l'attente, une fois par jour. L'accueil, lui,
+  // relit ce que cette page a figé.
   const ecritureDuJour =
-    horoscope === null
+    horoscope === null || theme?.statut !== "calcule"
       ? null
-      : await texteDuJourGenere(supabase, auth.user.id, horoscope).catch(() => null);
+      : await texteDuJourGenere(supabase, auth.user.id, {
+          horoscope,
+          theme: theme.theme,
+          attente: "halte",
+        }).catch(() => null);
 
   // ⚠️ « JE N'ARRIVE PAS À LIRE » N'EST PAS « TU N'AS RIEN » (leçon 4.6 puis 4.9). Les deux raisons
   // d'indisponibilité ne se disent pas pareil : « naissance_absente » est un parcours inachevé,

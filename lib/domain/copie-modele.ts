@@ -21,3 +21,21 @@
  */
 export const MENTION_ECRITURE_MODELE =
   "Texte écrit par un modèle, à partir du ciel calculé.";
+
+/**
+ * LES TROIS INTITULÉS DU TEXTE DU JOUR (2026-09-07).
+ *
+ * Le fondateur a demandé trois parties : « une partie factuelle », « un deuxième paragraphe
+ * personnalisé », « un troisième paragraphe sur les actions ». Ce sont ces trois-là, dits dans la
+ * voix du produit plutôt qu'en jargon de gabarit.
+ *
+ * ⚠️ ILS SONT ICI, DANS LE FICHIER FEUILLE, ET PAS DANS `cartes-socle.ts`. Même raison que la
+ * mention juste au-dessus : ce fichier n'importe RIEN, et c'est ce qui garde fermé le cycle
+ * d'imports qu'un build de production a déjà refusé une fois, à froid, sur une page sans rapport.
+ *
+ * ⚠️ AUCUN NE COMPTE (FR-031). Ni « partie 1 sur 3 », ni « enfin ». Un intitulé qui numérote
+ * transforme une lecture en progression, et le produit ne mesure jamais ce qu'une personne a lu.
+ */
+export const INTITULE_PARTIE_CIEL = "Le ciel, aujourd’hui";
+export const INTITULE_PARTIE_POUR_TOI = "Ce que ça touche chez toi";
+export const INTITULE_PARTIE_GESTES = "Le rendre concret";

@@ -178,6 +178,16 @@ export const INVENTAIRE_EXPORT: readonly EntreeInventaire[] = [
     motif: "preuve transactionnelle éphémère supprimée avant la fin de la rectification, sans renseignement durable sur elle",
   },
   {
+    table: "texte_du_jour_personnel",
+    verdict: "inclus",
+    titre: "Ton texte du jour",
+    motif:
+      "les trois parties écrites pour toi à partir de ton ciel et de ce qui a été retenu de toi " +
+      "(0094). C’est un contenu produit SUR toi : il relève du droit d’accès au même titre qu’une " +
+      "lecture. Il ne vit que quarante-huit heures, ce qui est une raison de le servir tant qu’il " +
+      "existe, pas une raison de le taire.",
+  },
+  {
     table: "texte_du_jour_stable",
     verdict: "exclu",
     motif: "cache éditorial partagé sans identité ni donnée brute de naissance, commun à toutes les personnes de même signature minimisée",

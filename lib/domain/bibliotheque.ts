@@ -56,14 +56,38 @@ export interface LigneFait {
 }
 
 /**
- * Un texte écrit par un modèle, indissociable de ce qui le dit (2026-09-02).
+ * Une partie d'un texte de modèle : son intitulé, et ce qu'elle dit.
+ *
+ * ⚠️ L'INTITULÉ VOYAGE AVEC LA PARTIE, IL N'EST PAS DEVINÉ À L'AFFICHAGE. Deux rendus montrent cette
+ * écriture (l'accueil et la halte du socle) ; si chacun nommait les parties dans son JSX, les deux
+ * auraient divergé au premier renommage, et la divergence serait invisible puisque les deux
+ * intitulés seraient plausibles. Les mots vivent dans `copie-modele.ts`, une seule fois.
+ */
+export interface PartieEcriture {
+  readonly intitule: string;
+  readonly texte: string;
+}
+
+/**
+ * Un texte écrit par un modèle, indissociable de ce qui le dit (2026-09-02, mis en parties le
+ * 2026-09-07).
  *
  * La mention voyage AVEC le texte parce que le produit n'a pas le droit d'afficher l'un sans
  * l'autre (FR-054, FR-086) : tout ce qu'il montre paraît sous le nom d'une personne réelle, et
  * seule cette ligne empêche un texte fabriqué à l'instant de passer pour le sien.
+ *
+ * ⚠️ LE CHAMP `texte` A DISPARU AU PROFIT DE `parties`, ET CE N'EST PAS UN DÉTAIL DE MISE EN PAGE.
+ * Le fondateur a demandé un texte STRUCTURÉ — le factuel, le personnalisé, le concret — et une
+ * structure qu'on aplatit en une chaîne à la frontière est une structure qui n'existe que dans le
+ * prompt. Elle se serait perdue au premier rendu, et le produit aurait affiché trois paragraphes
+ * indistincts en promettant trois registres différents.
+ *
+ * ⚠️ ET LES PARTIES NE SONT JAMAIS VIDES QUAND L'OBJET EXISTE. `verdictHoroscope` refuse en bloc un
+ * texte dont une partie manque : il n'y a donc pas d'état « une partie sur trois », et aucun rendu
+ * n'a à traiter ce cas.
  */
 export interface EcritureModele {
-  readonly texte: string;
+  readonly parties: readonly PartieEcriture[];
   readonly mention: string;
 }
 

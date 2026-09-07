@@ -86,6 +86,15 @@ export const INVENTAIRE_EFFACEMENT: readonly EntreeEffacement[] = [
     motif: "preuve rattachée à son identifiant mais confinée à la transaction de rectification, supprimée avant chaque retour et annulée avec tout rollback",
   },
 
+  {
+    table: "texte_du_jour_personnel",
+    verdict: "efface",
+    motif:
+      "les trois parties du texte du jour écrites POUR ELLE (0094). Sa sœur partagée n’a pas " +
+      "d’identité ; celle-ci en a une, et son contenu nomme son socle de naissance et une branche " +
+      "de son arbre. Elle part par la cascade d’`utilisatrice`, comme les autres.",
+  },
+
   // ── Rien à effacer : aucune colonne ne rattache ces lignes à quelqu'un ─────────────────────────
   { table: "environnement", verdict: "sans_objet", motif: "une seule ligne pour tout le déploiement" },
   { table: "probe", verdict: "sans_objet", motif: "témoin d’isolation RLS, sans propriétaire" },

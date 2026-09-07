@@ -246,7 +246,17 @@ function CielDuJour({
           qu'Anima a écrit. La règle du choix, elle, ne vit pas ici mais dans `texteMontre`. */}
       {horoscope.ecritureModele !== null ? (
         <>
-          <p className={`t-corps ${s.texte}`}>{horoscope.ecritureModele.texte}</p>
+          {/* ⚠️ TROIS PARTIES INTITULÉES, ET LES INTITULÉS VIENNENT DE LA DONNÉE (2026-09-07).
+              Le fondateur a demandé un texte structuré : le factuel, le personnalisé, le concret.
+              Sans les intitulés, trois paragraphes se lisent comme un seul texte long et la
+              structure ne vit que dans le prompt. Les mots eux-mêmes ne sont pas écrits ici : ils
+              viennent de `copie-modele.ts`, pour que l'accueil et cette halte les disent pareil. */}
+          {horoscope.ecritureModele.parties.map((partie) => (
+            <div key={partie.intitule} className={s.partieModele}>
+              <h4 className={`t-surtitre ${s.intitulePartie}`}>{partie.intitule}</h4>
+              <p className={`t-corps ${s.texte}`}>{partie.texte}</p>
+            </div>
+          ))}
           <p className={`t-meta ${s.mentionModele}`}>{horoscope.ecritureModele.mention}</p>
         </>
       ) : horoscope.texte.statut === "ecrit" ? (

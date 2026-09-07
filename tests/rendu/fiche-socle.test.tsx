@@ -438,12 +438,19 @@ const HOROSCOPE_NON_ECRIT: HoroscopeVue = {
   ecritureModele: null,
 };
 
-/** Le même jour, mis en mots par un modèle : le texte ET la mention qui dit d'où il vient. */
+/**
+ * Le même jour, mis en mots par un modèle : les TROIS parties, leurs intitulés, ET la mention qui
+ * dit d'où tout cela vient (2026-09-07).
+ */
 const HOROSCOPE_MODELE: HoroscopeVue = {
   titre: "Ton ciel du jour",
   texte: { statut: "ecrit", texte: "Le ciel du jour, tel qu’il est écrit dans le corpus." },
   ecritureModele: {
-    texte: "La Lune du jour marche à trois signes de ton Soleil de naissance, et Vénus vient s’y poser.",
+    parties: [
+      { intitule: "Le ciel, aujourd’hui", texte: "La Lune du jour marche à trois signes de ton Soleil de naissance." },
+      { intitule: "Ce que ça touche chez toi", texte: "Le sujet que tu remets depuis quelques semaines revient là." },
+      { intitule: "Le rendre concret", texte: "Poser une chose sur la table avant midi, une seule." },
+    ],
     mention: "Texte écrit par un modèle, à partir du ciel calculé.",
   },
 };
@@ -546,16 +553,32 @@ describe("[retour 2026-09-01] l'horoscope d'abord", () => {
     expect(carte.querySelector(".t-anam, [class*='t-anam']")).toBeNull();
   });
 
-  it("[LE CŒUR] écrit par un modèle : le texte, sa mention, et JAMAIS la voix d'Anam", () => {
+  it("[LE CŒUR] écrit par un modèle : les trois parties, leurs intitulés, la mention, et JAMAIS la voix d'Anam", () => {
     // Retour du 2026-09-02 : « génère-le par IA, en ajoutant à côté un petit avertissement ».
-    // Trois choses tiennent ensemble, et c'est leur ensemble qui rend la carte honnête.
+    // Retour du 2026-09-07 : trois parties — le factuel, le personnalisé, le concret.
+    // Quatre choses tiennent ensemble, et c'est leur ensemble qui rend la carte honnête.
+    const ecriture = HOROSCOPE_MODELE.ecritureModele!;
     const { container } = dessiner(avecCielDuJour(complete, HOROSCOPE_MODELE), "astrologie");
     const carte = carteJour(container)!;
     const paragraphes = [...carte.querySelectorAll("p")];
 
-    expect(paragraphes).toHaveLength(2);
-    expect(paragraphes[0].textContent).toBe(HOROSCOPE_MODELE.ecritureModele!.texte);
-    expect(paragraphes[1].textContent).toBe(HOROSCOPE_MODELE.ecritureModele!.mention);
+    // Trois parties + la mention. ⚠️ MUTATION-CIBLE : n'afficher que la première partie. Le rendu
+    // resterait plausible — un paragraphe et sa mention, exactement comme avant le 2026-09-07 — et
+    // les deux tiers du texte payé disparaîtraient sans qu'une seule autre ligne rougisse.
+    expect(paragraphes).toHaveLength(ecriture.parties.length + 1);
+    for (const [i, partie] of ecriture.parties.entries()) {
+      expect(paragraphes[i].textContent).toBe(partie.texte);
+    }
+    expect(paragraphes.at(-1)!.textContent).toBe(ecriture.mention);
+
+    // ⚠️ ET LES INTITULÉS SONT LÀ. Sans eux, trois paragraphes se lisent comme un seul texte long :
+    // la structure ne vivrait que dans l'invite, et le fondateur a demandé qu'elle se VOIE.
+    const intitules = [...carte.querySelectorAll("h4")].map((h) => h.textContent);
+    expect(intitules).toEqual(ecriture.parties.map((p) => p.intitule));
+
+    // ⚠️ ET L'ORDRE EST CELUI DE LA DONNÉE, jamais un tri du JSX : le factuel, puis elle, puis les
+    // gestes. Deux rendus montrent cette carte ; un ordre décidé dans chacun aurait divergé.
+    expect(intitules[0]).toContain("ciel");
 
     // Mutation-cible n° 1 : rendre le texte de modèle en `t-anam`. Il paraîtrait alors sous la
     // plume d'une personne réelle, et aucune mention ne rattrape un style qui affirme.

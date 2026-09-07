@@ -138,12 +138,18 @@ export function creerDepotRetention(): DepotRetention {
     },
 
     async purgerTextesDuJour() {
-      const { data, error } = await borne(
-        supabase.rpc("purger_textes_du_jour_expires"),
-        "purger_textes_du_jour_expires",
-      );
-      if (error) throw new Error(`purger_textes_du_jour_expires: ${error.code ?? "echec"}`);
-      return typeof data === "number" ? data : 0;
+      // ⚠️ DEUX PURGES, ET LA SECONDE EST CELLE QUI COMPTE DÉSORMAIS. La table partagée (0091) ne
+      // reçoit plus d'écriture depuis le 2026-09-07 : ses lignes finissent d'expirer et elle se
+      // vide. C'est la table PAR PERSONNE (0094) qui grossit maintenant — une ligne par personne et
+      // par jour —, et c'est elle que cette fenêtre doit tenir. Purger l'ancienne et oublier la
+      // neuve aurait laissé croître en silence la seule des deux qui porte de la donnée art. 9.
+      let retires = 0;
+      for (const rpc of ["purger_textes_du_jour_expires", "purger_textes_du_jour_personnels_expires"]) {
+        const { data, error } = await borne(supabase.rpc(rpc), rpc);
+        if (error) throw new Error(`${rpc}: ${error.code ?? "echec"}`);
+        retires += typeof data === "number" ? data : 0;
+      }
+      return retires;
     },
   };
 }

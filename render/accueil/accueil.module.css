@@ -286,3 +286,9 @@
 .nonEcrit { color: var(--sur-jour-doux); font-style: italic; }
 .etatProduit { margin: 0; color: var(--sur-jour); }
 .mentionModele { margin: 0; color: var(--sur-jour-doux); font-style: italic; }
+
+/* Les trois parties du texte du jour (2026-09-07) : mêmes règles que dans la halte du socle, parce
+   que c'est la MÊME carte à deux endroits. L'intitulé est un repère et non un titre — encre douce,
+   déjà mesurée sur cet aplat par `tests/contraste.test.ts`. */
+.partieModele { display: flex; flex-direction: column; gap: var(--esp-1); }
+.intitulePartie { margin: 0; color: var(--sur-jour-doux); }

@@ -36,6 +36,7 @@ export const TABLES_SEMEES: readonly string[] = Object.freeze([
   "big_five", "big_five_tentative", "carte_contexte", "lecture", "seance", "usage_ia",
   "reservation_quota_ia", "ouverture_jour_anam", "episode_detresse", "audit_securite",
   "audit_correction_naissance", "pause_rythme", "invitation_integration", "notification_envoyee", "abonnement",
+  "texte_du_jour_personnel",
   "remboursement", "information_reconduction", "preference_socle", "preference_courriel",
   "abonnement_poussee", "art9_temoin", "execution_job",
 ]);
@@ -188,6 +189,28 @@ export async function semerTout(admin: SupabaseClient, id: string, marqueur: str
     statut: "corrigee",
     version_contrat: 1,
   });
+  // ⚠️ `texte_du_jour_personnel` SE SÈME PAR LA RPC, PAS PAR UN `insert` — même règle que les deux
+  // tables ci-dessus. 0094 a RÉVOQUÉ toute écriture, y compris à `service_role` : la table est murée
+  // et `figer_texte_du_jour_personnel` est la seule porte. Lui rendre un `insert` pour la commodité d'un semis ouvrirait le second
+  // chemin d'écriture que la migration a été écrite pour interdire.
+  //
+  // Les trois parties portent le marqueur ET dépassent le plancher de soixante signes de la
+  // contrainte `char_length` : un semis trop court échouerait sur la base, pas sur l'assertion.
+  const partie = (quoi: string) =>
+    `${quoi} — ${marqueur}. Trois phrases qui tiennent debout, pour que la contrainte de longueur de 0094 soit satisfaite sans tricher.`;
+  const { error: eTexte } = await admin.rpc("figer_texte_du_jour_personnel", {
+    p_utilisatrice_id: id,
+    p_jour: jourCivilParisIso(),
+    p_version_editoriale: "semis-test-v1",
+    p_condensat_signature: "a".repeat(64),
+    p_condensat_matiere: "b".repeat(64),
+    p_ciel: partie("le ciel"),
+    p_pour_toi: partie("ce que ça touche"),
+    p_gestes: partie("le rendre concret"),
+    p_provenance: "modele",
+  });
+  if (eTexte) throw new Error(`semis texte_du_jour_personnel: ${eTexte.message}`);
+
   await poser(admin, "pause_rythme", { utilisatrice_id: id, seances: 6, minutes: 70 });
   await poser(admin, "invitation_integration", { utilisatrice_id: id });
   await poser(admin, "notification_envoyee", {
