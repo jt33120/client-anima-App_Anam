@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
+import sharp from "sharp";
 
 /**
  * Story 1.7 — identité discrète des routes (AC7, NFR-015). Le <title> vaut « Anam »
- * partout ; le favicon est un fragment abstrait tronc/branche (aucun symbole ésotérique) ;
+ * partout ; le favicon utilise le portrait pastel approuvé ;
  * l'og reste neutre. La garde interdit la réintroduction d'un titre parlant sur une route.
  */
 
@@ -44,22 +45,16 @@ describe("Titre — « Anam » sur toutes les routes (AC7)", () => {
   });
 });
 
-describe("Favicon — fragment abstrait tronc/branche (AC7)", () => {
-  const cheminIcone = resolve(racine, "app/icon.svg");
+describe("Favicon — approved Anam pastel portrait", () => {
+  const cheminIcone = resolve(racine, "app/icon.png");
 
-  it("app/icon.svg existe", () => {
-    expect(existsSync(cheminIcone)).toBe(true);
-  });
-
-  it("n'emploie AUCUN symbole interdit (lune, étoile, lotus, œil, main, visage, chiffre…)", () => {
-    const svg = readFileSync(cheminIcone, "utf-8").toLowerCase();
-    const interdits = [
-      "lune", "moon", "étoile", "etoile", "star", "lotus", "constellation",
-      "croissant", "soleil", "roue", "wheel", "œil", "oeil", "visage", "tarot",
-    ];
-    for (const mot of interdits) {
-      expect(svg, `symbole interdit « ${mot} » dans le favicon`).not.toContain(mot);
-    }
+  it("ships a valid square PNG through the Next.js icon convention", async () => {
+    const metadata = await sharp(cheminIcone).metadata();
+    expect(metadata.format).toBe("png");
+    expect(metadata.width).toBe(64);
+    expect(metadata.height).toBe(64);
+    expect(existsSync(resolve(racine, "app/icon.svg"))).toBe(false);
+    expect(layout).not.toContain('icon: "/icon.svg"');
   });
 });
 

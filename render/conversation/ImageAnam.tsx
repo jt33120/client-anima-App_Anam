@@ -14,8 +14,8 @@ import s from "./conversation.module.css";
  * est porté par `role="img"` + `aria-label` sur l'enveloppe (valable dans les DEUX cas) ; l'`<img>`
  * interne est donc décoratif (`alt=""`) pour ne pas doubler l'annonce.
  *
- * Le personnage n'apparaît JAMAIS dans l'icône, l'aperçu de notification ni la vignette multitâche
- * (ce composant n'est utilisé que dans la scène ; `app/icon.svg` reste un fragment abstrait).
+ * This component is used only in the scene. The app icon uses the approved static pastel
+ * portrait; notification previews and the multitasking cover keep their discreet treatment.
  */
 
 export type FormatAnam = "seuil" | "presence" | "veille";
