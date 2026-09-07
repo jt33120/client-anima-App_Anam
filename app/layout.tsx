@@ -31,6 +31,7 @@ export const metadata: Metadata = {
   // violation par défaut, et invisible tant que personne n'installe l'app.
   appleWebApp: { capable: true, title: "Anam", statusBarStyle: "black-translucent" },
   icons: {
+    icon: { url: "/icon.png?v=anam-pastel-1", type: "image/png", sizes: "64x64" },
     apple: "/marque/icone-apple-180.png?v=anam-pastel-1",
   },
 };
