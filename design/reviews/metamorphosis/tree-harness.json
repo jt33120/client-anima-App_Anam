@@ -1,0 +1,1751 @@
+{
+  "generatedAt": "2026-09-07T15:56:50.715Z",
+  "before": {
+    "render/arbre/MoteurArbreLunaire.ts": "1b0905c84964f1b2d0a2d2b9555b2463886252f7ba86d270bf1d98317ea9df98",
+    "render/arbre/geometrie.ts": "ed22f29897f6a0bd8eba5e90248aeb78dd58e15dca4c52322f298a7bbcc22171",
+    "render/arbre/ArbreLunaire.tsx": "48412afd6e507bb63d5a4870ef91a81f8a6e79f6735627eddc971219998c3af2",
+    "render/arbre/ArbreInteractif.tsx": "da51f3beba27ff809d435e7cbfdb45d6951a27d26342986e915b9315c7c82c13",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/GraineAttente.tsx": "0194e1f01756d4c059d550df5133f73d7c03f0bb05ed3984253c3eede9b9ab88",
+    "render/arbre/arbre.module.css": "9e25b2e3e939ebebcce7689158c40de36bb5bf89d8f92c3e22b98bad28a0b371",
+    "render/monde.module.css": "fb7dc524acc433b7312b1a02bfb821a25990b2a9e022e58ebe731cfeedf8257e"
+  },
+  "after": {
+    "render/arbre/MoteurArbreLunaire.ts": "1b0905c84964f1b2d0a2d2b9555b2463886252f7ba86d270bf1d98317ea9df98",
+    "render/arbre/geometrie.ts": "ed22f29897f6a0bd8eba5e90248aeb78dd58e15dca4c52322f298a7bbcc22171",
+    "render/arbre/ArbreLunaire.tsx": "48412afd6e507bb63d5a4870ef91a81f8a6e79f6735627eddc971219998c3af2",
+    "render/arbre/ArbreInteractif.tsx": "da51f3beba27ff809d435e7cbfdb45d6951a27d26342986e915b9315c7c82c13",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/GraineAttente.tsx": "0194e1f01756d4c059d550df5133f73d7c03f0bb05ed3984253c3eede9b9ab88",
+    "render/arbre/arbre.module.css": "9e25b2e3e939ebebcce7689158c40de36bb5bf89d8f92c3e22b98bad28a0b371",
+    "render/monde.module.css": "fb7dc524acc433b7312b1a02bfb821a25990b2a9e022e58ebe731cfeedf8257e"
+  },
+  "sourceChanged": [],
+  "fatalError": null,
+  "results": [
+    {
+      "width": 390,
+      "tree": "seed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-seed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nVoir la graine éclore\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "zoom",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-zoom.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlarged": "matrix(1.2, 0, 0, 1.2, 0, 0)",
+        "restored": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlargedTargets": [
+          {
+            "width": 44.00001525878906,
+            "height": 44
+          },
+          {
+            "width": 43.99999237060547,
+            "height": 44
+          },
+          {
+            "width": 44.00001525878906,
+            "height": 44
+          }
+        ],
+        "restoredTargets": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "passed": true
+      },
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-0",
+      "halte": "La graine",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-0.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 01 : La graine",
+        "illustration": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-0-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 1 sur 8 — La graine\n\nTout l’arbre tient déjà dans ce petit commencement.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-1",
+      "halte": "L’éclosion",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-1.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 02 : L’éclosion",
+        "illustration": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-1-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 2 sur 8 — L’éclosion\n\nLa coque s’entrouvre. La vie trouve son passage.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-2",
+      "halte": "Les premières racines",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-2.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 03 : Les premières racines",
+        "illustration": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-2-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 3 sur 8 — Les premières racines\n\nAvant de s’élever, quelque chose apprend à s’ancrer.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-3",
+      "halte": "La première pousse",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-3.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 04 : La première pousse",
+        "illustration": "Une jeune tige porte ses premières feuilles pastel au-dessus d’un petit réseau de racines.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-3-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 4 sur 8 — La première pousse\n\nUn élan vers le ciel, relié à ce qui grandit en profondeur.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-4",
+      "halte": "Le jeune arbre",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-4.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 05 : Le jeune arbre",
+        "illustration": "Le jeune arbre déploie ses premières branches, reliées à son tronc torsadé et à ses racines.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-4-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 5 sur 8 — Le jeune arbre\n\nLa tige devient tronc. Les premiers chemins se dessinent.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-5",
+      "halte": "Le déploiement",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-5.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 06 : Le déploiement",
+        "illustration": "Le même arbre développe un tronc plus puissant et une ramure ouverte de feuilles bleu-lavande.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-5-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 6 sur 8 — Le déploiement\n\nLes racines s’étendent. Les branches prennent leur ampleur.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-6",
+      "halte": "L’arbre de vie",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-6.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 07 : L’arbre de vie",
+        "illustration": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-6-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 7 sur 8 — L’arbre de vie\n\nRacines, tronc et couronne : un seul mouvement vivant.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 390,
+      "tree": "mixed",
+      "variant": "explore-7",
+      "halte": "La pleine lumière",
+      "reducedMotion": "reduce",
+      "filename": "tree-390-mixed-explore-7.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 08 : La pleine lumière",
+        "illustration": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "BUTTON",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "BUTTON",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-390-mixed-explore-7-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 44.4375,
+        "y": 210.1875,
+        "width": 303.09375,
+        "height": 538.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 168.34375,
+            "y": 372.046875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 124.328125,
+            "y": 394.53125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 223.640625,
+            "y": 367.28125,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 8 sur 8 — La pleine lumière\n\nLa lumière traverse l’arbre, des racines jusqu’aux feuilles.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "seed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-seed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "graine",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 0,
+      "targetMetrics": [],
+      "text": "Mon évolution\n\nComprendre mon évolution\n\nUne graine est plantée. Tu peux t’en remercier.\n\nVoir la graine éclore\n\nTout commence ici.\n\nCet arbre symbolise ton évolution. Son tronc représente ton socle, et chaque branche une prise de conscience que tu as choisi de nommer. Il grandit au fil de tes échanges avec Anam, lorsque certains thèmes reviennent et prennent leur place.\n\nLes branches se posent en conversation avec Anam, et elles font partie de l’abonnement.",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "base",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-base.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "zoom",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-zoom.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": null,
+      "exploration": null,
+      "zoom": {
+        "initial": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlarged": "matrix(1.2, 0, 0, 1.2, 0, 0)",
+        "restored": "matrix(1, 0, 0, 1, 0, 0)",
+        "enlargedTargets": [
+          {
+            "width": 44,
+            "height": 44.000030517578125
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44.000030517578125
+          }
+        ],
+        "restoredTargets": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "passed": true
+      },
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": true
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-0",
+      "halte": "La graine",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-0.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 01 : La graine",
+        "illustration": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-0-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 1 sur 8 — La graine\n\nTout l’arbre tient déjà dans ce petit commencement.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-1",
+      "halte": "L’éclosion",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-1.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 02 : L’éclosion",
+        "illustration": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-1-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 2 sur 8 — L’éclosion\n\nLa coque s’entrouvre. La vie trouve son passage.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-2",
+      "halte": "Les premières racines",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-2.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 03 : Les premières racines",
+        "illustration": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-2-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 3 sur 8 — Les premières racines\n\nAvant de s’élever, quelque chose apprend à s’ancrer.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-3",
+      "halte": "La première pousse",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-3.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 04 : La première pousse",
+        "illustration": "Une jeune tige porte ses premières feuilles pastel au-dessus d’un petit réseau de racines.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-3-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 4 sur 8 — La première pousse\n\nUn élan vers le ciel, relié à ce qui grandit en profondeur.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-4",
+      "halte": "Le jeune arbre",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-4.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 05 : Le jeune arbre",
+        "illustration": "Le jeune arbre déploie ses premières branches, reliées à son tronc torsadé et à ses racines.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-4-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 5 sur 8 — Le jeune arbre\n\nLa tige devient tronc. Les premiers chemins se dessinent.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-5",
+      "halte": "Le déploiement",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-5.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 06 : Le déploiement",
+        "illustration": "Le même arbre développe un tronc plus puissant et une ramure ouverte de feuilles bleu-lavande.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-5-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 6 sur 8 — Le déploiement\n\nLes racines s’étendent. Les branches prennent leur ampleur.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-6",
+      "halte": "L’arbre de vie",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-6.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 07 : L’arbre de vie",
+        "illustration": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-6-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 7 sur 8 — L’arbre de vie\n\nRacines, tronc et couronne : un seul mouvement vivant.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    },
+    {
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "explore-7",
+      "halte": "La pleine lumière",
+      "reducedMotion": "reduce",
+      "filename": "tree-1440-mixed-explore-7.png",
+      "errors": [],
+      "requests": [],
+      "focusRestored": true,
+      "exploration": {
+        "selected": "Voir l’illustration 08 : La pleine lumière",
+        "illustration": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+        "passed": true,
+        "navigationHits": [
+          {
+            "button": "Aujourd’hui",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Anam",
+            "hit": "DIV",
+            "covered": true
+          },
+          {
+            "button": "Mon évolution",
+            "hit": "DIV",
+            "covered": true
+          }
+        ],
+        "navigationCovered": true,
+        "lastTextVisible": true,
+        "detailFilename": "tree-1440-mixed-explore-7-text.png"
+      },
+      "zoom": null,
+      "drag": null,
+      "profile": null,
+      "stage": "branches",
+      "canvas": {
+        "x": 632.0625,
+        "y": 226.1875,
+        "width": 417.84375,
+        "height": 742.8125
+      },
+      "bitmap": {
+        "width": 986,
+        "height": 1753
+      },
+      "targets": 3,
+      "targetMetrics": [
+        {
+          "name": "Branche : Me faire confiance",
+          "bounds": {
+            "x": 811.203125,
+            "y": 457.65625,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Trouver mon rythme",
+          "bounds": {
+            "x": 750.53125,
+            "y": 488.671875,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        },
+        {
+          "name": "Branche : Oser dire non",
+          "bounds": {
+            "x": 887.453125,
+            "y": 451.09375,
+            "width": 44,
+            "height": 44
+          },
+          "centerHit": false
+        }
+      ],
+      "text": "Mon évolution\n\nComprendre mon évolution\nComprendre mon évolution\nRevenir à mon évolution\n\nDe la graine à la lumière\n\nIllustration 8 sur 8 — La pleine lumière\n\nLa lumière traverse l’arbre, des racines jusqu’aux feuilles.\n\nPrécédente\nSuivante\n01\n02\n03\n04\n05\n06\n07\n08\nCe que raconte mon arbre\nVue liste\n−\n+",
+      "viewportOverflow": false
+    }
+  ]
+}

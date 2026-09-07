@@ -150,6 +150,15 @@
   text-align: center;
   pointer-events: none;
 }
+.graineDecouverte {
+  position: absolute;
+  left: 50%;
+  top: calc(70.60% + var(--arbre-graine-taille) / 2 + var(--metamorphose-cta-decalage));
+  width: max-content;
+  max-width: calc(100% - 2 * var(--esp-3));
+  transform-origin: top center;
+  text-align: center;
+}
 /* La cible du tronc : même taille de touche que les accroches (≥44 px), sans point dessiné —
    le tronc EST son propre repère visuel, un pastille de plus ferait un objet qui n'existe pas. */
 .cibleTronc {

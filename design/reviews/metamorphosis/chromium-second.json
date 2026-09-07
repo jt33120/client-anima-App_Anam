@@ -1,0 +1,1274 @@
+{
+  "before": {
+    "render/arbre/MetamorphoseArbre.tsx": "82abd138aced768b92eb069cd557ec31f015c676a88f78179266a2e2fac2ef29",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/metamorphose.module.css": "cd972c204ac006d23014df923af9f10994029c98122245831ab0f063759e50a2",
+    "render/arbre/ArbreInteractif.tsx": "da51f3beba27ff809d435e7cbfdb45d6951a27d26342986e915b9315c7c82c13",
+    "render/arbre/arbre.module.css": "9e25b2e3e939ebebcce7689158c40de36bb5bf89d8f92c3e22b98bad28a0b371",
+    "render/arbre/metamorphose-planches.ts": "a22ae3a6ae031380123b1218c932c2527bdcc04066808bc6e3e6902fc2894340",
+    "app/styles/carnet-tokens.css": "29339f502e1311bb6072e6e503a5a1c2c7b8df0188eb843c4f406eb05e878cf7"
+  },
+  "after": {
+    "render/arbre/MetamorphoseArbre.tsx": "82abd138aced768b92eb069cd557ec31f015c676a88f78179266a2e2fac2ef29",
+    "render/arbre/ComprendreEvolution.tsx": "88578cfcc8e200a54d6c8357474f5c3e7c484ffe1145f7b33c9e6a9674b01b60",
+    "render/arbre/metamorphose.module.css": "cd972c204ac006d23014df923af9f10994029c98122245831ab0f063759e50a2",
+    "render/arbre/ArbreInteractif.tsx": "da51f3beba27ff809d435e7cbfdb45d6951a27d26342986e915b9315c7c82c13",
+    "render/arbre/arbre.module.css": "9e25b2e3e939ebebcce7689158c40de36bb5bf89d8f92c3e22b98bad28a0b371",
+    "render/arbre/metamorphose-planches.ts": "a22ae3a6ae031380123b1218c932c2527bdcc04066808bc6e3e6902fc2894340",
+    "app/styles/carnet-tokens.css": "29339f502e1311bb6072e6e503a5a1c2c7b8df0188eb843c4f406eb05e878cf7"
+  },
+  "sourceChanged": [],
+  "fatalError": null,
+  "results": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "ctaBounds": {
+        "x": 108.3984375,
+        "y": 690.578125,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 199,
+        "y": 716.453125,
+        "width": 179,
+        "height": 44
+      },
+      "assetsBeforeOpen": [],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "stages": [
+        {
+          "position": 0,
+          "id": "graine",
+          "src": "/marque/metamorphose/01-graine.webp",
+          "alt": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": true,
+          "nextDisabled": false
+        },
+        {
+          "position": 1,
+          "id": "eclosion",
+          "src": "/marque/metamorphose/02-eclosion.webp",
+          "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 2,
+          "id": "enracinement",
+          "src": "/marque/metamorphose/03-enracinement.webp",
+          "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 3,
+          "id": "pousse",
+          "src": "/marque/metamorphose/04-pousse.webp",
+          "alt": "Une jeune tige porte ses premières feuilles pastel au-dessus d’un petit réseau de racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 4,
+          "id": "jeune-arbre",
+          "src": "/marque/metamorphose/05-jeune-arbre.webp",
+          "alt": "Le jeune arbre déploie ses premières branches, reliées à son tronc torsadé et à ses racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 5,
+          "id": "deploiement",
+          "src": "/marque/metamorphose/06-deploiement.webp",
+          "alt": "Le même arbre développe un tronc plus puissant et une ramure ouverte de feuilles bleu-lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 6,
+          "id": "canopee",
+          "src": "/marque/metamorphose/07-canopee.webp",
+          "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 7,
+          "id": "illumination",
+          "src": "/marque/metamorphose/08-illumination.webp",
+          "alt": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 13,
+            "y": 243.5625,
+            "width": 364,
+            "height": 369.359375
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/05-jeune-arbre.webp",
+        "/marque/metamorphose/06-deploiement.webp",
+        "/marque/metamorphose/07-canopee.webp",
+        "/marque/metamorphose/08-illumination.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "ctaBounds": {
+        "x": 297.3984375,
+        "y": 800.71875,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 388,
+        "y": 765.796875,
+        "width": 291,
+        "height": 44
+      },
+      "assetsBeforeOpen": [],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "stages": [
+        {
+          "position": 0,
+          "id": "graine",
+          "src": "/marque/metamorphose/01-graine.webp",
+          "alt": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": true,
+          "nextDisabled": false
+        },
+        {
+          "position": 1,
+          "id": "eclosion",
+          "src": "/marque/metamorphose/02-eclosion.webp",
+          "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 2,
+          "id": "enracinement",
+          "src": "/marque/metamorphose/03-enracinement.webp",
+          "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 3,
+          "id": "pousse",
+          "src": "/marque/metamorphose/04-pousse.webp",
+          "alt": "Une jeune tige porte ses premières feuilles pastel au-dessus d’un petit réseau de racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 4,
+          "id": "jeune-arbre",
+          "src": "/marque/metamorphose/05-jeune-arbre.webp",
+          "alt": "Le jeune arbre déploie ses premières branches, reliées à son tronc torsadé et à ses racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 5,
+          "id": "deploiement",
+          "src": "/marque/metamorphose/06-deploiement.webp",
+          "alt": "Le même arbre développe un tronc plus puissant et une ramure ouverte de feuilles bleu-lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 6,
+          "id": "canopee",
+          "src": "/marque/metamorphose/07-canopee.webp",
+          "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 7,
+          "id": "illumination",
+          "src": "/marque/metamorphose/08-illumination.webp",
+          "alt": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 90,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/05-jeune-arbre.webp",
+        "/marque/metamorphose/06-deploiement.webp",
+        "/marque/metamorphose/07-canopee.webp",
+        "/marque/metamorphose/08-illumination.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "ctaBounds": {
+        "x": 753.3984375,
+        "y": 850.609375,
+        "width": 175.171875,
+        "height": 44
+      },
+      "navigationBounds": {
+        "x": 724,
+        "y": 765.796875,
+        "width": 291,
+        "height": 44
+      },
+      "assetsBeforeOpen": [],
+      "entry": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "advanced": {
+        "id": "enracinement",
+        "src": "/marque/metamorphose/03-enracinement.webp",
+        "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "returned": {
+        "id": "eclosion",
+        "src": "/marque/metamorphose/02-eclosion.webp",
+        "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "stages": [
+        {
+          "position": 0,
+          "id": "graine",
+          "src": "/marque/metamorphose/01-graine.webp",
+          "alt": "Une graine nacrée aux reflets bleu ciel et lilas repose dans la nuit.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": true,
+          "nextDisabled": false
+        },
+        {
+          "position": 1,
+          "id": "eclosion",
+          "src": "/marque/metamorphose/02-eclosion.webp",
+          "alt": "La même graine s’ouvre délicatement et laisse apparaître un premier germe.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 2,
+          "id": "enracinement",
+          "src": "/marque/metamorphose/03-enracinement.webp",
+          "alt": "Des racines fines naissent de la graine entrouverte et se ramifient sous elle.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 3,
+          "id": "pousse",
+          "src": "/marque/metamorphose/04-pousse.webp",
+          "alt": "Une jeune tige porte ses premières feuilles pastel au-dessus d’un petit réseau de racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 4,
+          "id": "jeune-arbre",
+          "src": "/marque/metamorphose/05-jeune-arbre.webp",
+          "alt": "Le jeune arbre déploie ses premières branches, reliées à son tronc torsadé et à ses racines.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 5,
+          "id": "deploiement",
+          "src": "/marque/metamorphose/06-deploiement.webp",
+          "alt": "Le même arbre développe un tronc plus puissant et une ramure ouverte de feuilles bleu-lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 6,
+          "id": "canopee",
+          "src": "/marque/metamorphose/07-canopee.webp",
+          "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": false
+        },
+        {
+          "position": 7,
+          "id": "illumination",
+          "src": "/marque/metamorphose/08-illumination.webp",
+          "alt": "Une lumière bleu ciel parcourt l’écorce du même arbre et illumine sa couronne lavande.",
+          "naturalWidth": 1024,
+          "naturalHeight": 1536,
+          "opacity": "1",
+          "visibility": "visible",
+          "objectFit": "contain",
+          "bounds": {
+            "x": 426,
+            "y": 234.796875,
+            "width": 588,
+            "height": 438
+          },
+          "pressed": "true",
+          "previousDisabled": false,
+          "nextDisabled": true
+        }
+      ],
+      "focusRestored": true,
+      "personalStage": "graine",
+      "assets": [
+        "/marque/metamorphose/02-eclosion.webp",
+        "/marque/metamorphose/03-enracinement.webp",
+        "/marque/metamorphose/04-pousse.webp",
+        "/marque/metamorphose/01-graine.webp",
+        "/marque/metamorphose/05-jeune-arbre.webp",
+        "/marque/metamorphose/06-deploiement.webp",
+        "/marque/metamorphose/07-canopee.webp",
+        "/marque/metamorphose/08-illumination.webp"
+      ],
+      "api": [],
+      "errors": [],
+      "overflow": false
+    }
+  ],
+  "contexts": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "seed",
+      "variant": "papier",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "seed",
+      "variant": "contraste",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "mixed",
+      "variant": "branches",
+      "sourceStage": "branches",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "dense",
+      "variant": "liste",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "seed",
+      "variant": "reserve",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "tree": "error",
+      "variant": "erreur",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 13,
+          "y": 243.5625,
+          "width": 364,
+          "height": 369.359375
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "tree": "seed",
+      "variant": "papier",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "tree": "seed",
+      "variant": "contraste",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "tree": "mixed",
+      "variant": "branches",
+      "sourceStage": "branches",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "tree": "dense",
+      "variant": "liste",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "tree": "seed",
+      "variant": "reserve",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 768,
+      "tree": "error",
+      "variant": "erreur",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 90,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "tree": "seed",
+      "variant": "papier",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "tree": "seed",
+      "variant": "contraste",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "tree": "mixed",
+      "variant": "branches",
+      "sourceStage": "branches",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "tree": "dense",
+      "variant": "liste",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "tree": "seed",
+      "variant": "reserve",
+      "sourceStage": "graine",
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "tree": "error",
+      "variant": "erreur",
+      "sourceStage": null,
+      "illustration": {
+        "id": "canopee",
+        "src": "/marque/metamorphose/07-canopee.webp",
+        "alt": "Un arbre majestueux à l’écorce nacrée relie de puissantes racines à une large canopée pastel.",
+        "naturalWidth": 1024,
+        "naturalHeight": 1536,
+        "opacity": "1",
+        "visibility": "visible",
+        "objectFit": "contain",
+        "bounds": {
+          "x": 426,
+          "y": 234.796875,
+          "width": 588,
+          "height": 438
+        }
+      },
+      "covered": true,
+      "focus": true,
+      "unchanged": true,
+      "overflow": false,
+      "errors": [],
+      "api": []
+    }
+  ]
+}

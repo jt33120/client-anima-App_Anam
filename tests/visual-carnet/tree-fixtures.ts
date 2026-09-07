@@ -31,7 +31,9 @@ export function treeProjectionFor(params: URLSearchParams): ProjectionScene {
   const sample = TREE_CASES.includes(requested as TreeCase)
     ? requested as TreeCase
     : params.get("state") === "empty" ? "seed" : "mixed";
-  const base = { tronc: { present: true as const } };
+  const base = { tronc: params.get("treeReserve") === "1"
+    ? { present: true as const, incomplet: { phrase: MESSAGE_SANS_HEURE, ouTrouver: OU_TROUVER_SON_HEURE } }
+    : { present: true as const } };
   if (sample === "error") return { ...base, branches: [], indisponible: true };
   if (sample === "seed") return { ...base, branches: [] };
   const requestedCount = Number(params.get("treeBranches"));

@@ -30,6 +30,13 @@ PNG captures and `home-results.json` are written to the operating system tempora
 
 This is a visual fixture, so Next routing, pending links and images use small local adapters. It does not validate production authentication, data loading, persistence, or delivery. Those checks remain separate from this harness.
 
+For the eight botanical illustrations, run `node tests/visual-carnet/capture-metamorphose.mjs /tmp/anima-metamorphose full`.
+It checks the direct seed entry, all eight stages, focus restoration and unchanged personal
+content at 390/768/1440 px in Chromium and 390 px in WebKit. The contexts include paper,
+reinforced contrast, branches, list, incomplete trunk and unavailable data. Results and captures
+are written to the selected directory. `quick` limits the run to seed/illumination in Chromium;
+`chromium` runs all contexts without WebKit.
+
 ## Review performed on 2026-09-06
 
 The first desktop pass found that the global display size made the daily quotation and the universe section compete with the page title, and that global CSS overrode the handwritten annotation font. Dedicated citation/section tokens and more specific annotation selectors fixed both issues. Universe cards switch to a glyph/title composition on medium widths to preserve the text measure; the final full-width psychology card retains a horizontal arrangement.

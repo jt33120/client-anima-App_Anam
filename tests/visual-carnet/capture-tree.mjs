@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 const project = resolve(fileURLToPath(new URL(".", import.meta.url)), "../..");
 const output = process.argv[2] ?? join(tmpdir(), "anima-tree-captures");
 const mode = process.argv[3] ?? "full";
-const haltes = ["Graine", "Premier élan", "Feuillaison", "Pleine lumière"];
+const haltes = ["La graine", "L’éclosion", "Les premières racines", "La première pousse", "Le jeune arbre", "Le déploiement", "L’arbre de vie", "La pleine lumière"];
 const samples = ["seed", "birth", "leaf-low", "leaf-high", "leaf-full", "radiant", "mixed", "dense", "error", "reserved"];
 const sourceFiles = ["render/arbre/MoteurArbreLunaire.ts", "render/arbre/geometrie.ts", "render/arbre/ArbreLunaire.tsx", "render/arbre/ArbreInteractif.tsx", "render/arbre/ComprendreEvolution.tsx", "render/arbre/GraineAttente.tsx", "render/arbre/arbre.module.css", "render/monde.module.css"];
 const sourceHashes = async () => Object.fromEntries(await Promise.all(sourceFiles.map(async (file) => [file, createHash("sha256").update(await readFile(resolve(project, file))).digest("hex")])));
@@ -99,13 +99,16 @@ try {
         await region.getByRole("button", { name: "Comprendre mon évolution", exact: true }).click();
         const dialog = page.getByRole("dialog", { name: "Comprendre mon évolution", exact: true });
         await dialog.waitFor();
-        const group = dialog.getByRole("group", { name: "Explorer les étapes de l’arbre" });
-        await group.getByRole("button", { name: scenario.halte, exact: true }).click();
+        const group = dialog.getByRole("group", { name: "Choisir une illustration" });
+        const label = `Voir l’illustration ${String(haltes.indexOf(scenario.halte) + 1).padStart(2, "0")} : ${scenario.halte}`;
+        await group.getByRole("button", { name: label, exact: true }).click();
+        await dialog.locator("[data-planche] img").waitFor({ state: "visible" });
+        await dialog.locator("[data-planche] img").evaluate((image) => image.decode());
         exploration = {
-          selected: await group.getByRole("button", { pressed: true }).allTextContents(),
-          illustration: await dialog.getByRole("img").first().getAttribute("aria-label"),
+          selected: await group.getByRole("button", { pressed: true }).getAttribute("aria-label"),
+          illustration: await dialog.getByRole("img").first().getAttribute("alt"),
         };
-        exploration.passed = exploration.selected.length === 1 && exploration.selected[0].trim() === scenario.halte;
+        exploration.passed = exploration.selected === label;
       }
       await page.evaluate(() => document.fonts.ready);
       await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
@@ -191,6 +194,7 @@ try {
           });
         });
         exploration.navigationCovered = exploration.navigationHits.length > 0 && exploration.navigationHits.every(({ covered }) => covered);
+        await dialog.locator("summary").filter({ hasText: "Ce que raconte mon arbre" }).click();
         const lastParagraph = dialog.locator("p").last();
         await lastParagraph.scrollIntoViewIfNeeded();
         exploration.lastTextVisible = await lastParagraph.evaluate((element) => {

@@ -44,6 +44,13 @@
   --arbre-ciel-brume: #273459;
   --arbre-sol-brume: #273854;
   --arbre-commande-taille: 0.8125rem;
+  --metamorphose-hauteur-image: clamp(21rem, 44dvh, 33rem);
+  --metamorphose-hauteur-legende: 4.25rem;
+  --metamorphose-cta-decalage: 2.75rem;
+  --metamorphose-focus-largeur: 2px;
+  --metamorphose-focus-decalage: 3px;
+  --metamorphose-soulignement: 0.2em;
+  --metamorphose-interligne: 1.45;
   --arbre-bois-clair: #B6B6D0;
   --arbre-bois: #858AA8;
   --arbre-bois-ombre: #4D5274;

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import carnetTokens from "@/design/tokens.json";
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { sansCommentaires } from "./_absence";
@@ -48,7 +49,10 @@ describe("[QA 19/08] il n'existe qu'un seul anneau de focus", () => {
     const fautives: string[] = [];
     for (const f of fichiers(".module.css")) {
       for (const m of lire(f).matchAll(/outline:\s*([^;]+);/g)) {
-        const valeur = m[1].trim();
+        const valeur = m[1].trim().replace(/^var\(--([a-z-]+)\)/, (reference, role: string) => {
+          const largeur = carnetTokens.shared[role as keyof typeof carnetTokens.shared];
+          return typeof largeur === "string" && /^\d+px$/.test(largeur) ? largeur : reference;
+        });
         const anneau = /^(?:2px|calc\(var\(--esp-1\) \/ 2\)) solid var\(--(?:bordure-forte|accent)\)$/.test(valeur);
         const enveloppe = f === "render/conversation/conversation.module.css" && valeur === "none" &&
           /\.champ:focus-visible\s*\{[^}]*outline:\s*none;/.test(lire(f)) &&

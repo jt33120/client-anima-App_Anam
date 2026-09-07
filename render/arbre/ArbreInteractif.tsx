@@ -51,7 +51,7 @@ import {
 import FicheBranche, { type ResultatGeste } from "./FicheBranche";
 import FicheTronc from "./FicheTronc";
 import VueListe from "./VueListe";
-import ComprendreEvolution from "./ComprendreEvolution";
+import ComprendreEvolution, { DialogueEvolution } from "./ComprendreEvolution";
 import s from "./arbre.module.css";
 
 /** Préférence d'AFFICHAGE seulement (aucune donnée art. 9) → localStorage acceptable. */
@@ -105,6 +105,8 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
   /** Texte de la région live persistante (voir le rendu). Aucune donnée art. 9 : des libellés statiques. */
   const [annonce, setAnnonce] = useState("");
+  const [explorationGraine, setExplorationGraine] = useState(false);
+  const declencheurExploration = useRef<HTMLButtonElement>(null);
 
   // ── AC8 : bascule vue liste / vue arbre, persistée (préférence d'affichage, sans art. 9) ──
   const [vueListe, setVueListe] = useState(false);
@@ -393,6 +395,11 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
 
       </div>
 
+      {explorationGraine && (
+        <DialogueEvolution indexInitial={1} declencheur={declencheurExploration}
+          onFermer={() => setExplorationGraine(false)} />
+      )}
+
       {indisponible ? (
         <div className={s.vide}>
           <p className={s.videTitre}>{INDISPONIBLE_TITRE}</p>
@@ -471,6 +478,13 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
               <>
                 <GraineAttente className={s.graineAttente} />
                 <p className={`${s.graineMessage} t-meta`}>{MESSAGE_GRAINE_PLANTEE}</p>
+                <div className={s.graineDecouverte} data-commandes-arbre
+                  style={{ transform: `translateX(-50%) scale(${1 / p.camera.zoom})` }}>
+                  <ComprendreEvolution variante="graine" onOuvrir={(declencheur) => {
+                    declencheurExploration.current = declencheur;
+                    setExplorationGraine(true);
+                  }} />
+                </div>
               </>
             )}
 

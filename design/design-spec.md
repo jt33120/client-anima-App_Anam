@@ -99,3 +99,8 @@ backend. La branche reste séparée de main pour le test.
 ## 9. Arbre de vie céleste
 
 La refonte de l’arbre suit [la direction dédiée](tree-of-life-spec.md) : proportions botaniques, matières nacrées, canopée pastel, lumière issue des seuls états réels. L’exploration illustrée des étapes reste explicitement pédagogique.
+
+## 10. Métamorphose botanique en planches fixes
+
+Le retour du 7 septembre précise la continuité graine→racines→arbre→lumière et sa découverte
+dès l'écran vide. [Direction et contrat de métamorphose](metamorphosis-spec.md).
