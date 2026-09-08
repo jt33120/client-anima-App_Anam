@@ -1,6 +1,7 @@
 import Link from "next/link";
 import GlypheUnivers from "@/render/GlypheUnivers";
 import CarteNatale from "./CarteNatale";
+import LectureCiel from "@/render/LectureCiel";
 import s from "./socle.module.css";
 import type {
   ApercuUniversVue,
@@ -251,12 +252,14 @@ function CielDuJour({
               Sans les intitulés, trois paragraphes se lisent comme un seul texte long et la
               structure ne vit que dans le prompt. Les mots eux-mêmes ne sont pas écrits ici : ils
               viennent de `copie-modele.ts`, pour que l'accueil et cette halte les disent pareil. */}
+          <LectureCiel>
           {horoscope.ecritureModele.parties.map((partie) => (
             <div key={partie.intitule} className={s.partieModele}>
               <h4 className={`t-surtitre ${s.intitulePartie}`}>{partie.intitule}</h4>
               <p className={`t-corps ${s.texte}`}>{partie.texte}</p>
             </div>
           ))}
+          </LectureCiel>
           <p className={`t-meta ${s.mentionModele}`}>{horoscope.ecritureModele.mention}</p>
         </>
       ) : horoscope.texte.statut === "ecrit" ? (

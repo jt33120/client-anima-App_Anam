@@ -1,0 +1,28 @@
+
+.lectureCiel { display: flex; flex-direction: column; gap: var(--esp-3); }
+.toggleCiel { display: none; }
+
+@media (max-width: 639px) {
+  .lectureCiel[data-deplie="false"] > :not(:first-child) { display: none; }
+  .lectureCiel[data-deplie="false"] > :first-child p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+  .toggleCiel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    gap: var(--esp-2);
+    min-height: 44px;
+    padding: var(--esp-2) var(--esp-3);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon-lg);
+    background: transparent;
+    color: var(--sur-jour);
+    cursor: pointer;
+  }
+  .toggleCiel:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+}

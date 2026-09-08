@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { etatDuPortail, momentDuDepart, portailFini } from "@/lib/scene/portail";
-import LotusAttente from "../conversation/LotusAttente";
 import s from "./portail.module.css";
 
 /**
@@ -30,11 +29,11 @@ import s from "./portail.module.css";
  * qui peut lever, se démonter, ou changer de forme. Un signal du navigateur ne se perd pas, et le
  * plafond couvre le cas où il arriverait trop tard de toute façon.
  *
- * ══ LE MOUVEMENT : UN FONDU DE SORTIE, PAS UNE BOUCLE ══════════════════════════════════════════
+ * ══ LE MOUVEMENT : UNE APPARITION FINIE ═══════════════════════════════════════════════════════
  *
- * La respiration reste le seul mouvement en boucle du produit. Le portail s'efface dans un sens et
- * s'arrête. Sous `prefers-reduced-motion`, il part après un battement : on retire le MOUVEMENT,
- * jamais l'image.
+ * Le portrait et sa lumière apparaissent une seule fois, puis le portail s'efface. La séquence
+ * CSS n'ajoute aucun délai au cycle de vie. Sous `prefers-reduced-motion`, la composition reste
+ * immobile et part après le bref séjour existant.
  */
 export default function PortailAnam({
   copie,
@@ -46,6 +45,7 @@ export default function PortailAnam({
 }) {
   const [retrait, setRetrait] = useState(false);
   const [parti, setParti] = useState(false);
+  const [portraitAbsent, setPortraitAbsent] = useState(false);
   /** L'instant où la scène s'est déclarée prête. `null` tant qu'elle ne l'a pas fait — et le
    *  plafond décide alors seul (voir `momentDuDepart`). */
   const scenePreteRef = useRef<number | null>(null);
@@ -102,12 +102,30 @@ export default function PortailAnam({
       aria-live="polite"
       aria-label={copie.annonce}
     >
+      <div className={s.atmosphere} aria-hidden="true" />
       <div className={s.scene}>
-        {/* Le PNG est volontairement servi directement : c'est le premier visuel du document et
-            il doit rester fiable sur Safari/iOS, sans négociation AVIF ni CSS d'un autre écran. */}
-        <img
+        <div className={s.apparition} aria-hidden="true">
+          <div className={s.halo} />
+          <div className={s.etoiles}>
+            {Array.from({ length: 22 }, (_, rang) => (
+              <span
+                key={rang}
+                className={s.etoile}
+                style={{
+                  "--etoile-x": (rang * 37 + 11) % 100,
+                  "--etoile-y": (rang * 23 + 7) % 100,
+                  "--etoile-rang": rang % 5,
+                } as CSSProperties}
+              />
+            ))}
+          </div>
+        {/* The launch export preserves the source detail; the existing PNG remains a fallback. */}
+        {!portraitAbsent && <picture className={s.portrait}>
+          <source type="image/webp" srcSet="/scene/portail/anam-portail.webp" />
+          <img
           src="/scene/veille/anam-veille.png"
-          srcSet="/scene/veille/anam-veille@2x.png 2x"
+          srcSet="/scene/veille/anam-veille.png 180w, /scene/veille/anam-veille@2x.png 360w"
+          sizes="(max-height: 600px) 26svh, (min-height: 940px) 290px, 31svh"
           width="360"
           height="537"
           alt=""
@@ -115,14 +133,15 @@ export default function PortailAnam({
           loading="eager"
           fetchPriority="high"
           decoding="sync"
-          className={s.portrait}
-        />
-        {/* Le nom porte le scintillement de `globals.css` — le halo derrière la lettre, jamais une
-            ombre portée sur le texte (leçon de `tests/voile.test.ts`). */}
-        <p className={`${s.nom} t-titre scintillement`}>{copie.nom}</p>
-        {/* Le lotus est un emblème, pas un indicateur d'attente. Il reste décoratif pour les
-            technologies d'assistance puisque l'annonce du portail est portée par le voile. */}
-        <LotusAttente taille={52} className={s.lotus} />
+          onError={() => setPortraitAbsent(true)}
+          />
+        </picture>}
+          <div className={s.brume} />
+        </div>
+        <div className={s.signature}>
+          <p className={s.marque} aria-hidden="true">anam<span>.</span></p>
+          <p className={`${s.nom} t-meta`}>{copie.nom}</p>
+        </div>
       </div>
     </div>
   );

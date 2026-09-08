@@ -207,14 +207,15 @@ describe("[LE CŒUR] ce que le portail montre", () => {
     expect(portail.getAttribute("aria-label")).toBe(ANNONCE_PORTAIL);
   });
 
-  it("le nom porte le scintillement de la feuille commune, jamais une ombre à lui", () => {
-    // `tests/voile.test.ts` bannit `text-shadow` de tout le produit : ce qui brille est un halo
-    // DERRIÈRE la lettre. Le portail réutilise cette classe plutôt que d'inventer sa lueur.
+  it("la signature accompagne l’accueil, sans animation perpétuelle ni ombre de texte", () => {
     const t = horloge();
     const { getByText } = render(<PortailAnam copie={COPIE} />);
     t.avancer(100);
-    expect(getByText(NOM_PORTAIL).className).toContain("scintillement");
-    expect(lire("render/portail/portail.module.css")).not.toContain("text-shadow");
+    expect(getByText(NOM_PORTAIL)).toBeTruthy();
+    expect(getByText("anam")).toBeTruthy();
+    const css = lire("render/portail/portail.module.css");
+    expect(css).not.toContain("text-shadow");
+    expect(css).not.toContain("infinite");
   });
 
   it("montre le profil officiel d’Anam de dos, chargé en priorité, et aucun arbre", () => {

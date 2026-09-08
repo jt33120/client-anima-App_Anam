@@ -124,3 +124,17 @@ sans rééchelonner les états déjà atteints.
 Use the current stage artwork as the stationary page background for the seed. Remove nested garden and text frames. Keep the region title and a small Comprendre control in one row, a short introduction, and a stage caption. Seed caption: « Une graine a été plantée, tu peux te féliciter ». Preserve branch access, list view, image retry and birth-time actions.
 
 Validation: 390/768/1440 px, Nuit and Papier, seed/mixed/dense/unavailable states. First pass found blank announcement spacing, a cropped seed on wide viewports, and controls competing with the caption; corrected with a full region composition, contained wide artwork, and separate control placement. Final captures show no horizontal overflow or browser errors; Comprendre restores focus. WebKit mobile also verifies the seed and dialog.
+
+## Launch portal — 2026-09-08
+
+The founder authorizes an animated Anam launch screen. Reuse the official transparent
+`public/scene/veille/anam-veille{,@2x}.png` portrait, with a shorter composition, an atmospheric
+celestial glow and small points of light. A single slow camera approach lifts Anam into view;
+the lowercase brand settles below her, followed by the welcome. No generated likeness or video.
+The launch sequence is a scoped exception to static decorative surfaces: transform and opacity
+animate for one finite appearance, with no new loop, loading percentage or added minimum wait.
+The existing 2.2-second minimum, 6-second ceiling, 700ms exit and document-only trigger stay in place.
+Reduced motion keeps a composed still image and the existing short stay. Paper and reinforced
+contrast retain their own readable palette. If the portrait fails, the brand and light remain.
+Launch-only dimensions, gradients and timing live in `design/tokens.json` and its generated CSS.
+Review at 390/768/1440, short landscape, reduced motion, missing image and delayed resources.

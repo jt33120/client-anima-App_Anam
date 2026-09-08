@@ -281,7 +281,7 @@ export default function CarteNatale({ ciel }: { readonly ciel: SectionCielVue })
     <figure className={s.figure} aria-labelledby={`${identifiant}-titre`}>
       <div className={s.enteteInstrument}>
         <div>
-          <p className={`t-surtitre ${s.surtitre}`}>Thème natal tropical</p>
+          <p className={`t-surtitre ${s.surtitre}`}>Le ciel à ta naissance</p>
           <h3 id={`${identifiant}-titre`} className="t-titre-sm">Ta carte du ciel</h3>
         </div>
         <div className={s.commandes} aria-label="Commandes de la carte natale">
@@ -298,6 +298,24 @@ export default function CarteNatale({ ciel }: { readonly ciel: SectionCielVue })
           <button type="button" className={s.commande} aria-label="Réduire la carte" disabled={zoom <= 1} onClick={() => setZoom((valeur) => Math.max(1, valeur - 0.25))}>−</button>
           <button type="button" className={s.commande} aria-label="Agrandir la carte" disabled={zoom >= 3} onClick={() => setZoom((valeur) => Math.min(3, valeur + 0.25))}>+</button>
         </div>
+      </div>
+
+      <div className={s.guide}>
+        <p className="t-corps">
+          Cette carte représente la position du Soleil, de la Lune et des planètes au moment
+          de ta naissance. En astrologie, on l’appelle ton « thème natal ». Dans Anam, elle
+          sert de point de départ à une lecture symbolique de tes façons de ressentir et d’agir.
+        </p>
+        <p className="t-corps">Touche une planète sur la roue pour découvrir son nom et sa position juste en dessous.</p>
+        <details className={s.guideDetails}>
+          <summary className="t-bouton">Comment lire cette carte ?</summary>
+          <div className={s.guideContenu}>
+            <p className="t-corps">Autour de la roue, les douze signes du zodiaque servent de repères. Chaque planète se trouve dans l’un de ces signes.</p>
+            <p className="t-corps">Les traits entre les planètes sont les « aspects » : ils indiquent les angles qui les séparent. L’astrologie leur donne une signification symbolique.</p>
+            <p className="t-corps">Quand ton heure de naissance est connue, les douze « maisons » situent ces positions dans des domaines de vie, comme les relations ou le travail.</p>
+            <p className="t-corps">Ta carte natale reste la même. « Ton ciel du jour » met les positions du jour en regard de ces repères de naissance pour proposer une piste de réflexion.</p>
+          </div>
+        </details>
       </div>
 
       <div

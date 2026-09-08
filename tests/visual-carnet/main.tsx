@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import SceneDom from "@/render/scene-dom";
 import FicheSocle, { type ProprietesFicheSocle } from "@/render/socle/FicheSocle";
 import RetourScene from "@/render/RetourScene";
+import PortailAnam from "@/render/portail/PortailAnam";
+import { NOM_PORTAIL, ANNONCE_PORTAIL } from "@/lib/domain/copie-portail";
 import { ThemeCarnetDocument } from "@/render/carnet/ThemeCarnet";
 import type { BibliothequeVue, CarteVue } from "@/render/accueil/types";
 import type { FicheSocleVue } from "@/render/socle/types";
@@ -66,13 +68,18 @@ if (state === "empty") {
   daily.cartes.forEach((c) => { Object.assign(c, { texte: { statut: "non_ecrit" }, ecritureModele: null, faits: [] }); });
 }
 
-const fiche = ficheSocle(
+const ficheBase = ficheSocle(
   calculerNumerologie({ date: "1990-06-15", nomComplet: "Marie Claire Dubois" }, 2026),
   calculerThemeNatal({ date: "1990-06-15", heure: "07:15", fuseau: "Europe/Paris", latitude: 48.8566, longitude: 2.3522 }, ephemerideAstronomyEngine()),
   4,
   { nombres: null, ciel: null },
   { date: "1990-06-15", nomComplet: "Marie Claire Dubois" },
 ) as unknown as FicheSocleVue;
+// Keep the astrology preview aligned with the home page's synthetic daily reading.
+const fiche: FicheSocleVue = {
+  ...ficheBase,
+  ciel: { ...ficheBase.ciel, horoscope: daily.cartes.find((carte) => carte.cle === "horoscope") ?? null },
+};
 const texteSocle: ProprietesFicheSocle["copie"] = {
   introduction: copie.INTRODUCTION,
   titreApercu: copie.TITRE_APERCU,
@@ -126,6 +133,7 @@ function PreviewScene() {
 const isSocle = window.location.pathname === "/socle";
 const mode = params.get("univers") === "numerologie" ? "numerologie" : "astrologie";
 createRoot(document.getElementById("root")!).render(<>
+  {params.has("portail") && <PortailAnam copie={{ nom: NOM_PORTAIL, annonce: ANNONCE_PORTAIL }} />}
   <ThemeCarnetDocument />
   <RequestedTree />
   {isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : <PreviewScene/>}

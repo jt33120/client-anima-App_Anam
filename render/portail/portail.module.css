@@ -1,111 +1,140 @@
-/* ══════════════════════════════════════════════════════════════════════════════════════════════
-   portail.module.css — LE PORTAIL D'ENTRÉE VERS L'UNIVERS D'ANAM (2026-09-03)
-
-   Le voile qui couvre le lancement, le portrait de dos d'Anam, et ce qui se lit sous lui.
-
-   ⚠️ AUCUNE COULEUR EN DUR. Tout vient des jetons (`app/styles/globals.css`), y compris le fond du
-   voile : le portail est la PREMIÈRE image du produit, et une couleur écrite ici serait la première
-   à mentir le jour où la palette bouge. C'est la règle posée le 2026-09-03 (« toutes les couleurs
-   dans des fichiers de design qu'il suffit de modifier »), et `tests/design-centralise.test.ts` la
-   tient.
-
-   ⚠️ AUCUNE BARRE, AUCUN ANNEAU, AUCUN POURCENTAGE (FR-031). Il n'y a volontairement AUCUNE classe
-   de progression dans ce fichier : ce qui n'existe pas ne se rajoute pas « juste pour aider ». Ce
-   le portail n'annonce pas où il en est.
-   ══════════════════════════════════════════════════════════════════════════════════════════════ */
-
+/* Launch-only, finite motion. Portrait: official /scene/veille assets.
+   Visual values are generated from design/tokens.json. */
 .portail {
   position: fixed;
   inset: 0;
   z-index: 60;
   display: grid;
   place-items: center;
-  padding: var(--esp-4) var(--marge-mobile);
-  background:
-    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--lueur) 12%, transparent), transparent 42%),
-    linear-gradient(to top, color-mix(in srgb, var(--aube) 8%, var(--fond)), var(--fond) 38%);
-  /* ⚠️ LA PROPRIÉTÉ QUI FAIT QUE CE VOILE NE PEUT PIÉGER PERSONNE. La scène est déjà montée
-     dessous : un doigt posé pendant le portail l'atteint. Un plein écran qui INTERCEPTE, même une
-     seconde, est un plein écran dont il faut prouver qu'il part — ici il n'y a rien à prouver. */
+  padding: max(var(--esp-4), env(safe-area-inset-top)) var(--marge-mobile) max(var(--esp-4), env(safe-area-inset-bottom));
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--portail-ciel);
+  color: var(--texte);
   pointer-events: none;
   opacity: 1;
   visibility: visible;
-  /* ⚠️ `visibility` EST DIFFÉRÉE DE TOUTE LA DURÉE DU FONDU, ET C'EST UN DÉFAUT CORRIGÉ PLUTÔT
-     QU'UNE SUBTILITÉ. La première version posait `visibility: hidden` avec l'opacité : la
-     propriété n'est pas interpolable, elle bascule donc à la première frame — le voile
-     disparaissait d'un coup et la transition d'opacité ne se voyait JAMAIS. Le fondu de sortie
-     était mort-né, et rien ne l'aurait dit : l'écran est correct, juste brutal.
-     `0s linear var(--duree-longue)` la fait basculer à la FIN. Elle sert à ce que rien ne
-     subsiste dans l'arbre d'accessibilité une fois le voile transparent. */
   transition:
     opacity var(--duree-longue) var(--courbe),
     visibility 0s linear var(--duree-longue);
 }
-
-.retrait {
-  opacity: 0;
-  visibility: hidden;
+.retrait { opacity: 0; visibility: hidden; }
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  background: var(--portail-halo);
+  opacity: 0.65;
+  animation: lumiere var(--portail-duree-apparition) var(--courbe) both;
 }
-
-/* ── LA COMPOSITION ────────────────────────────────────────────────────────────────────────────
-   Anam, le mot et le lotus. Dans cet ordre, et centrés : c'est une porte, pas un tableau
-   de bord. Les espacements suivent l'échelle du produit. */
 .scene {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--esp-3);
+  gap: var(--esp-5);
   width: 100%;
-  max-width: calc(var(--mesure) + var(--esp-8));
+  max-width: var(--portail-largeur-scene);
   text-align: center;
 }
-
-/* Le profil de dos est autonome dans le portail : aucun style du fil de conversation ne peut
-   désormais réduire ou masquer sa boîte. */
+.apparition {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: var(--portail-hauteur-portrait);
+}
+.halo {
+  position: absolute;
+  inset: -15% -12%;
+  background: var(--portail-halo);
+  animation: lumiere var(--portail-duree-apparition) var(--courbe) both;
+}
 .portrait {
   display: block;
-  width: auto;
-  height: min(68svh, 36rem);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   object-fit: contain;
+  mask-image: var(--portail-masque-portrait);
+  animation: apparition var(--portail-duree-apparition) var(--courbe) both;
 }
-
-/* ── CE QUI SE LIT SOUS LE PORTRAIT ────────────────────────────────────────────────────────────
-   Le nom porte `.scintillement` (globals.css) : un halo derrière la lettre dont l'opacité respire,
-   jamais une ombre portée sur le texte. Le contraste mesuré du nom vaut à toute seconde ce qu'il
-   vaut à l'arrêt — c'est la leçon de `tests/voile.test.ts`, et elle vaut ici aussi. */
+.portrait img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.brume {
+  position: absolute;
+  inset: 80% 5% -12%;
+  background: var(--portail-brume);
+  animation: lumiere var(--portail-duree-apparition) var(--courbe) both;
+}
+.etoiles { position: absolute; inset: -12% 0; }
+.etoile {
+  position: absolute;
+  left: calc(var(--etoile-x) * 1%);
+  top: calc(var(--etoile-y) * 1%);
+  width: var(--portail-etoile);
+  height: var(--portail-etoile);
+  border-radius: var(--rayon-full);
+  background: var(--portail-etoile-fond);
+  animation: eveil var(--portail-duree-apparition) var(--courbe) both;
+  animation-delay: calc(var(--etoile-rang) * var(--duree-courte));
+}
+.etoile:nth-child(4n) { width: var(--portail-etoile-forte); height: var(--portail-etoile-forte); }
+.signature { position: relative; display: grid; gap: var(--esp-3); }
+.marque {
+  margin: 0;
+  font-family: var(--pile-anam);
+  font-size: var(--portail-logo);
+  font-weight: var(--carnet-poids);
+  line-height: var(--carnet-line);
+  letter-spacing: var(--portail-logo-tracking);
+  color: var(--texte);
+  animation: signature var(--duree-longue) var(--courbe) var(--portail-delai-signature) both;
+}
+.marque span { color: var(--accent); }
 .nom {
   margin: 0;
-  color: var(--texte);
+  color: var(--texte-doux);
+  font-size: var(--portail-soustitre);
+  letter-spacing: var(--carnet-tracking);
+  animation: signature var(--duree-longue) var(--courbe) var(--portail-delai-accueil) both;
 }
-
-.lotus {
-  margin-top: var(--esp-1);
-  color: var(--lueur);
+@keyframes apparition {
+  from { opacity: 0; transform: translateY(var(--portail-derive)) scale(var(--portail-echelle-entree)); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
-
-@media (max-height: 700px) {
-  .portail {
-    padding-block: var(--esp-2);
-  }
-
-  .scene {
-    gap: var(--esp-2);
-  }
-
-  .portrait {
-    height: min(60svh, 26rem);
-  }
+@keyframes lumiere {
+  from { opacity: 0; transform: scale(var(--portail-echelle-halo)); }
+  to { opacity: 1; transform: scale(1); }
 }
-
-/* ── prefers-reduced-motion ────────────────────────────────────────────────────────────────────
-   Le portrait est immobile. Ce qui reste à couper, c'est le FONDU du voile — un plein
-   écran qui s'efface en sept dixièmes de seconde est encore du mouvement plein écran. Il part
-   d'un coup. Le lotus et le scintillement s'arrêtent par leurs propres feuilles. */
+@keyframes eveil {
+  from { opacity: 0; transform: translateY(var(--portail-derive)); }
+  to { opacity: 0.8; transform: translateY(0); }
+}
+@keyframes signature {
+  from { opacity: 0; transform: translateY(var(--esp-2)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-height: 600px) {
+  .scene { gap: var(--esp-2); }
+  .apparition { height: var(--portail-hauteur-courte); }
+  .marque { font-size: var(--carnet-logo); }
+  .signature { gap: var(--esp-1); }
+}
+:global([data-a11y="contraste"]) .portail { background: var(--fond); }
+:global([data-a11y="contraste"]) .atmosphere,
+:global([data-a11y="contraste"]) .halo,
+:global([data-a11y="contraste"]) .etoiles,
+:global([data-a11y="contraste"]) .brume { display: none; }
+@media (prefers-contrast: more) {
+  .portail { background: var(--fond); }
+  .atmosphere, .halo, .etoiles, .brume { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .portail {
     transition:
       opacity var(--duree-courte) var(--courbe),
       visibility 0s linear var(--duree-courte);
   }
+  .atmosphere, .halo, .portrait, .brume, .etoile, .marque, .nom { animation: none; }
 }

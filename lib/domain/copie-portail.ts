@@ -1,7 +1,7 @@
 /**
  * copie-portail.ts — LES MOTS DU PORTAIL D'ENTRÉE (2026-09-03).
  *
- * Trois chaînes, et c'est délibérément tout. Un écran de lancement est le seul endroit du produit
+ * Deux chaînes, et c'est délibérément tout. Un écran de lancement est le seul endroit du produit
  * que personne n'a demandé à lire : chaque mot de plus y est un péage payé à chaque ouverture.
  *
  * ⚠️ CE N'EST PAS DU CORPUS. Ces phrases disent l'ÉTAT DU PRODUIT (« ça arrive »), jamais ce que
@@ -10,7 +10,7 @@
  * de forme — la même règle qui tient les haltes (`app/enneagramme/resultat.tsx`).
  */
 
-/** Le seul mot visible. C'est lui qui porte le scintillement (`globals.css`). */
+/** L'accueil sous la signature de marque. */
 export const NOM_PORTAIL = "Bienvenue";
 
 /**

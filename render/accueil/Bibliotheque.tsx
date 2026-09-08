@@ -1,6 +1,7 @@
 "use client";
 
 import Link, { useLinkStatus } from "next/link";
+import LectureCiel from "@/render/LectureCiel";
 import GlypheUnivers from "@/render/GlypheUnivers";
 import type { BibliothequeVue, CarteVue, UniversVue } from "./types";
 import s from "./accueil.module.css";
@@ -162,12 +163,14 @@ function CarteCiel({ carte }: { readonly carte: CarteVue }) {
               l'ordre ni les intitulés ne sont décidés ici : ils viennent de la carte, donc de
               `cartes-socle.ts`. Deux JSX qui nommeraient chacun les parties auraient divergé au
               premier renommage, et la divergence serait invisible — les deux seraient plausibles. */}
+          <LectureCiel>
           {carte.ecritureModele.parties.map((partie) => (
             <div key={partie.intitule} className={s.partieModele}>
               <h4 className={`t-surtitre ${s.intitulePartie}`}>{partie.intitule}</h4>
               <p className="t-corps">{partie.texte}</p>
             </div>
           ))}
+          </LectureCiel>
           <p className={`t-meta ${s.mentionModele}`}>{carte.ecritureModele.mention}</p>
         </>
       ) : carte.texte.statut === "ecrit" ? (

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
+import { execFileSync } from "node:child_process";
 
 /**
  * design-centralise.test.ts — UNE SEULE SOURCE POUR TOUT LE STYLE (2026-09-03).
@@ -99,11 +100,13 @@ describe("[LE CŒUR] une seule feuille porte des couleurs, toutes les autres n'o
   });
 
   it("aucune couleur brute hors du fichier de design", () => {
+    // The Carnet overlay is generated from its JSON source, with exact parity checked first.
+    execFileSync(process.execPath, ["scripts/build-carnet-tokens.mjs", "--check"], { cwd: RACINE });
     // Mutation-cible : `color: #C9C6BD` dans n'importe quelle feuille. C'est la copie d'un jeton
     // prise un jour donné, et elle restera juste-en-apparence après la prochaine retouche.
     const fautives: string[] = [];
     for (const f of toutes) {
-      if (f === FICHIER_DE_DESIGN) continue;
+      if (f === FICHIER_DE_DESIGN || f === "app/styles/carnet-tokens.css") continue;
       codeSeul(lire(f))
         .split("\n")
         .forEach((ligne, i) => {
@@ -148,7 +151,7 @@ describe("[LE BORD] aucune décision de design ne redescend dans une page", () =
     // Mutation-cible : `themeColor: "#1C2740"`. Vrai le jour où on l'écrit, faux au premier
     // changement de fond — et personne ne regarde la barre d'état en relisant une palette.
     const layout = lire("app/layout.tsx");
-    expect(layout).toContain("themeColor: couleursNuit.fond");
+    expect(layout).toContain("themeColor: carnetTokens.dark.fond");
     expect(layout, "une couleur écrite à la main est revenue dans le layout").not.toMatch(
       /themeColor:\s*"#/,
     );
