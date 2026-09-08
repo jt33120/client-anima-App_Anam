@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { jourCivilParisIso } from "./_dates-paris";
 
@@ -36,7 +37,7 @@ export const TABLES_SEMEES: readonly string[] = Object.freeze([
   "big_five", "big_five_tentative", "carte_contexte", "lecture", "seance", "usage_ia",
   "reservation_quota_ia", "ouverture_jour_anam", "episode_detresse", "audit_securite",
   "audit_correction_naissance", "pause_rythme", "invitation_integration", "notification_envoyee", "abonnement",
-  "texte_du_jour_personnel",
+  "texte_du_jour_personnel", "lecture_numerologie",
   "remboursement", "information_reconduction", "preference_socle", "preference_courriel",
   "abonnement_poussee", "art9_temoin", "execution_job",
 ]);
@@ -55,7 +56,8 @@ export async function poser(
  * Sème une ligne dans chacune des 32 tables qui portent une colonne la nommant. L'ordre suit les
  * clés étrangères ; le consentement passe en premier parce que le write-gate art. 9 borne la suite.
  */
-export async function semerTout(admin: SupabaseClient, id: string, marqueur: string): Promise<void> {
+export async function semerTout(admin: SupabaseClient, id: string, marqueur: string, client: SupabaseClient): Promise<void> {
+  await declarerMajorite(admin, id);
   const { error: eNom } = await admin.from("utilisatrice").update({ prenom: marqueur }).eq("id", id);
   if (eNom) throw new Error(`semis utilisatrice: ${eNom.message}`);
 
@@ -65,6 +67,24 @@ export async function semerTout(admin: SupabaseClient, id: string, marqueur: str
     ia_reconnue: true,
     cgu_acceptees: true,
   });
+
+  const annee = Number(new Intl.DateTimeFormat("fr-FR", {timeZone:"Europe/Paris",year:"numeric"}).format(new Date()));
+  const {data: reservation, error: eReservation} = await client.rpc("commencer_lecture_numerologie", {
+    p_source: createHash("md5").update("1990-01-01|").digest("hex"), p_annee: annee,
+  });
+  if (eReservation || !reservation?.jeton) throw new Error("semis lecture_numerologie: reservation");
+  const {error: eLecture} = await admin.rpc("terminer_lecture_numerologie", {
+    p_utilisatrice_id:id, p_jeton:reservation.jeton,
+    p_guidance: `${marqueur} — Tu pourrais essayer un geste concret pour explorer ton année.`,
+    p_vision: `${marqueur} — À long terme, tu pourrais chercher ce qui te ressemble vraiment.`,
+    p_portrait: `${marqueur} — Une hypothèse symbolique à confronter librement à ton propre vécu.`,
+  });
+  if (eLecture) throw new Error("semis lecture_numerologie: finalisation");
+  const {data: lectureSemee, error: eLectureSemee} = await client.from("lecture_numerologie")
+    .select("id,portrait").eq("utilisatrice_id", id).single();
+  if (eLectureSemee || !lectureSemee?.portrait?.includes(marqueur)) {
+    throw new Error("semis lecture_numerologie: contenu absent après finalisation");
+  }
 
   const journal = await poser(admin, "entree_journal", {
     utilisatrice_id: id,

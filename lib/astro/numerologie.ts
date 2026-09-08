@@ -40,11 +40,11 @@ export type NomNombre =
 /** Ordre de lecture du socle. Source unique : on itère dessus, jamais sur une copie. */
 export const NOMBRES: readonly NomNombre[] = Object.freeze([
   "chemin_de_vie",
+  "annee_personnelle",
   "expression",
   "intime",
   "personnalite",
   "jour_de_naissance",
-  "annee_personnelle",
 ]);
 
 /** Les trois nombres qui exigent le nom complet de naissance. */

@@ -18,7 +18,7 @@ import { ouvrirUnCompteNeuf } from "./_entrer";
 const dialogue = (page: Page) => page.getByRole("dialog");
 
 /** La graine de l'étape 0 de l'arbre — même sélecteur que la cible du tour (`copie-guide.ts`). */
-const GRAINE = "[class*='graineAttente']";
+const GRAINE = "[data-etape-arbre='graine']";
 
 /** Le rectangle du trou de projecteur, et celui de l'élément qu'il prétend désigner. */
 const coincidence = (page: Page, selecteurCible: string) =>

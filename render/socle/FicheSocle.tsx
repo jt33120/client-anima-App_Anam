@@ -2,6 +2,7 @@ import Link from "next/link";
 import GlypheUnivers from "@/render/GlypheUnivers";
 import CarteNatale from "./CarteNatale";
 import LectureCiel from "@/render/LectureCiel";
+import LectureNumerologie from "./LectureNumerologie";
 import s from "./socle.module.css";
 import type {
   ApercuUniversVue,
@@ -86,6 +87,26 @@ function SectionNumerologie({
 
       {nombres.indisponible && <p className={`t-corps ${s.panne}`}>{nombres.indisponible}</p>}
 
+      {nombres.nombres.length > 0 && (
+        <>
+          <div className={s.reperesNombres} aria-label="Tes deux repères essentiels">
+            {nombres.nombres.filter((nombre) => nombre.cle === "chemin_de_vie" || nombre.cle === "annee_personnelle").map((nombre) => (
+              <div key={nombre.cle} className={s.repereNombre}>
+                <h3 className="t-titre-sm">{nombre.intitule}</h3>
+                <p className={`t-display ${s.nombreFort}`}>{nombre.valeur}</p>
+                <p className={`t-meta ${s.etiquette}`}>{nombre.cle === "chemin_de_vie" ? "Un fil conducteur à explorer au long de ta vie." : "Une piste de réflexion pour l’année en cours."}</p>
+              </div>
+            ))}
+          </div>
+          <LectureNumerologie />
+        </>
+      )}
+
+      <details className={s.devoilement}>
+        <summary className="t-corps">Tes autres nombres et le détail des lectures</summary>
+        <div className={s.contenuDevoilement}>
+          <p className={`t-meta ${s.etiquette}`}>Expression, Intime et Personnalité viennent des lettres de tous tes prénoms et de ton nom de naissance. Ce champ est facultatif. Seuls les nombres calculés, sans ton nom ni ta date de naissance, sont envoyés à l’IA pour cette lecture.</p>
+          <Link className={s.reparation} href="/reglages">Renseigner ou modifier mes prénoms et mon nom</Link>
       {nombres.lecturesSymboliques.length > 0 ? (
         <div className={s.grilleLectures} aria-label={copie.titreLectureNumerologie}>
           {nombres.lecturesSymboliques.map((lecture) => (
@@ -127,6 +148,17 @@ function SectionNumerologie({
         </ul>
       )}
 
+      {nombres.manquants.map((manque) => (
+        <div key={manque.cle} className={s.manque}>
+          <p className={`t-meta ${s.etiquette}`}>{manque.intitule}</p>
+          <p className={`t-corps ${s.raison}`}>{manque.raison}</p>
+          <Lien reparation={manque.reparation} />
+        </div>
+      ))}
+
+        </div>
+      </details>
+
       {(nombres.entrees.length > 0 || nombres.conventions.length > 0) && (
         <details className={s.devoilement}>
           <summary className="t-corps">{copie.titreMethodeNumerologie}</summary>
@@ -144,13 +176,6 @@ function SectionNumerologie({
         </details>
       )}
 
-      {nombres.manquants.map((manque) => (
-        <div key={manque.cle} className={s.manque}>
-          <p className={`t-meta ${s.etiquette}`}>{manque.intitule}</p>
-          <p className={`t-corps ${s.raison}`}>{manque.raison}</p>
-          <Lien reparation={manque.reparation} />
-        </div>
-      ))}
 
     </section>
   );
@@ -288,13 +313,9 @@ function SectionAstrologie({
 
       {ciel.indisponible && <p className={`t-corps ${s.panne}`}>{ciel.indisponible}</p>}
 
-      {/* L'ORDRE EST LE SUJET (retour du 2026-09-01), et il est gardé par
-          `tests/rendu/fiche-socle.test.tsx` : l'appel à l'heure quand elle manque, PUIS l'horoscope
-          du jour, PUIS la carte, PUIS le détail replié, PUIS les manques. Avant : carte, positions,
-          angles, maisons, et seulement ensuite l'aveu et son lien. */}
+      {/* Daily reading, then three familiar references before the full birth chart. */}
       {ciel.sansHeure && <AppelHeure sansHeure={ciel.sansHeure} copie={copie} />}
       {ciel.horoscope && <CielDuJour horoscope={ciel.horoscope} copie={copie} />}
-      <CarteNatale ciel={ciel} />
 
       {ciel.reperesPrincipaux.length > 0 && (
         <div className={s.reperesPrincipaux} aria-labelledby="socle-reperes-principaux">
@@ -312,6 +333,8 @@ function SectionAstrologie({
           </Link>
         </div>
       )}
+
+      <CarteNatale ciel={ciel} />
 
       {/* ⚠️ TOUT LE TABLEAU D'ÉPHÉMÉRIDES SOUS UN SEUL PLI, FERMÉ (2026-09-01 : « Toggle et cache
           les positions en texte, on s'en fout, mets l'accent sur l'horoscope »). Les positions,
@@ -361,18 +384,6 @@ function SectionAstrologie({
         </details>
       )}
 
-      {ciel.manques.length > 0 && (
-        <div className={s.sousSection}>
-          <h3 className="t-titre-sm">{copie.titreManques}</h3>
-          {ciel.manques.map((manque) => (
-            <div key={manque.intitule} className={s.manque}>
-              <p className={`t-meta ${s.etiquette}`}>{manque.intitule}</p>
-              <p className={`t-corps ${s.raison}`}>{manque.raison}</p>
-              <Lien reparation={manque.reparation} />
-            </div>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

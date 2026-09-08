@@ -27,10 +27,10 @@ export const TITRE_HALTE = "Réglages";
  */
 export const SECTION_NOM = "Ton nom";
 export const NOM_DESCRIPTION =
-  "Le prénom est celui qu’Anam emploie en te parlant. Le nom complet, lui, ne sert qu’au calcul des nombres : il n’est affiché nulle part et rien ne t’oblige à le donner.";
+  "Le prénom est celui qu’Anam emploie en te parlant. Tes prénoms et ton nom de naissance sont facultatifs : ils servent au calcul de tes nombres et restent consultables dans tes données. Le nom complet n’est pas envoyé à l’IA pour créer ta lecture.";
 export const LABEL_PRENOM = "Prénom";
-export const LABEL_NOM_COMPLET = "Nom complet";
-export const AIDE_NOM_COMPLET = "Facultatif. Le laisser vide retire simplement les nombres qui en dépendent.";
+export const LABEL_NOM_COMPLET = "Prénoms et nom de naissance";
+export const AIDE_NOM_COMPLET = "Tous tes prénoms suivis de ton nom de naissance, une seule fois. Tu peux laisser ce champ vide ou l’effacer.";
 export const ACTION_ENREGISTRER = "Enregistrer";
 export const NOM_ENREGISTRE = "C’est enregistré.";
 export const NOM_VIDE = "Il faut un prénom, même un surnom, même une initiale.";
@@ -43,7 +43,7 @@ export const NOM_ECHEC = "Je n’ai pas réussi à enregistrer. Réessaie dans u
  * faute de frappe verrait trois cartes changer sans comprendre pourquoi — et croirait à une panne.
  */
 export const NOM_PREVIENT_LES_NOMBRES =
-  "Changer le nom complet recalcule les nombres qui en viennent. Ta date de naissance, elle, ne bouge pas.";
+  "Changer ou effacer le nom complet recalcule les nombres concernés et retire la lecture IA précédente, sa note et son partage avec Anam.";
 
 /**
  * ⚠️ LA LISTE D'ENTRÉES A ÉTÉ RETIRÉE D'ICI LE 2026-08-25 (Story 7.2), ET C'EST UNE SUPPRESSION,

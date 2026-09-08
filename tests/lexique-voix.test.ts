@@ -72,6 +72,11 @@ const EXCLUS = new Set([
   // applique `chercherInterdits` À L'EXÉCUTION, avant l'affichage — c'est le seul texte du produit
   // qui n'a pas de test possible, puisqu'il n'existe qu'au moment où il est montré.
   "lib/domain/consigne-horoscope.ts",
+  // Numerology prompts and output rejection patterns name forbidden claims to prohibit them.
+  // Generated prose is validated before persistence; none of these instructions is UI copy.
+  "lib/domain/lecture-numerologie.ts",
+  // System-only context instructs Anam not to treat the shared symbolic portrait as a diagnosis.
+  "lib/domain/contexte-anam.ts",
   "lib/domain/lexique-interdit.ts", // la source des interdits — s'auto-matcherait
 ]);
 

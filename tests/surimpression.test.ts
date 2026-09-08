@@ -51,13 +51,14 @@ function composer(fgHex: string, alpha: number, bgHex: string): string {
   return `#${hh(mix(fr, br))}${hh(mix(fg, bg))}${hh(mix(fb, bb))}`;
 }
 
-describe("Surimpression — flottante, SANS BORD ni fond barré (AC1)", () => {
-  it("AUCUNE règle .surimpression/.surimpressionVoile (média inclus) ne pose fond --surface, bordure (même -bottom) ni ombre de barre", () => {
+describe("Surimpression — en-tête du carnet", () => {
+  it("l’en-tête consomme les tokens du carnet et ne porte aucune ombre", () => {
     // On concatène TOUS les blocs, override desktop compris, et on attrape border/-top/-bottom
     // (revue 1.8, trouvaille [5] : la garde ne voyait que `border:` sur le 1er bloc).
     const b = tousBlocs("surimpression") + tousBlocs("surimpressionVoile");
     expect(b).not.toMatch(/background:\s*var\(--surface/);
-    expect(b).not.toMatch(/border(-[a-z]+)?\s*:/);
+    expect(b).toMatch(/background:\s*var\(--carnet-gradient-carte\)/);
+    expect(b).toMatch(/border-bottom:\s*1px solid var\(--bordure\)/);
     expect(b).not.toMatch(/box-shadow/);
   });
 
@@ -102,7 +103,7 @@ describe("Porte de secours — un mot discret « Aide », jamais alarmant (AC4)"
 
   it("jamais en majuscule (text-transform interdit)", () => {
     expect(b).toMatch(/text-transform:\s*none/);
-    expect(css).not.toMatch(/\.porteSecours[\s\S]*?text-transform:\s*uppercase/);
+    expect(tousBlocs("porteSecours")).not.toMatch(/text-transform:\s*uppercase/);
   });
 
   it("ne réduit jamais la taille (repose sur t-meta = 13px, aucun font-size local)", () => {

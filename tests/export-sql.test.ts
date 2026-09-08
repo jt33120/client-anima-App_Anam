@@ -54,7 +54,7 @@ async function creerCompte(suffixe: string): Promise<Compte> {
   const { error: eConnexion } = await client.auth.signInWithPassword({ email, password: MDP });
   if (eConnexion) throw new Error(`signIn: ${eConnexion.message}`);
 
-  await semerTout(admin, id, marqueur);
+  await semerTout(admin, id, marqueur, client);
   return { id, marqueur, client };
 }
 

@@ -16,7 +16,7 @@
     justify-content: center;
     align-self: flex-start;
     gap: var(--esp-2);
-    min-height: 44px;
+    min-height: var(--cible-tactile);
     padding: var(--esp-2) var(--esp-3);
     border: 1px solid var(--bordure);
     border-radius: var(--rayon-lg);
@@ -24,5 +24,5 @@
     color: var(--sur-jour);
     cursor: pointer;
   }
-  .toggleCiel:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  .toggleCiel:focus-visible { outline: 2px solid var(--bordure-forte); outline-offset: 2px; }
 }

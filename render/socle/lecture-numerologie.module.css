@@ -1,0 +1,49 @@
+.lectures, .bloc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  min-width: 0;
+}
+.lectures { gap: var(--esp-5); }
+.bloc {
+  padding-block: var(--esp-5);
+  border-top: 1px solid var(--bordure);
+}
+.bloc :is(h3, h4, p) { margin: 0; }
+.texte { white-space: pre-line; overflow-wrap: anywhere; }
+.mention, .statut { color: var(--sur-papier-doux); }
+.statut:empty { display: none; }
+.bouton {
+  align-self: flex-start;
+  min-height: var(--cible-tactile);
+  padding: var(--esp-3) var(--esp-4);
+  border: 1px solid var(--bordure-forte);
+  border-radius: var(--carnet-rayon);
+  background: var(--papier);
+  color: var(--sur-papier);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.bouton:disabled { cursor: wait; color: var(--sur-papier-doux); }
+.bouton:focus-visible, .etoile:has(input:focus-visible) {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: var(--esp-1);
+}
+.questionnaire { margin: 0; padding: 0; border: 0; min-width: 0; }
+.questionnaire legend { margin-bottom: var(--esp-2); padding: 0; }
+.etoiles { display: flex; flex-wrap: wrap; gap: var(--esp-1); }
+.etoile {
+  display: grid;
+  place-items: center;
+  position: relative;
+  min-width: var(--cible-tactile);
+  min-height: var(--cible-tactile);
+  border-radius: var(--carnet-rayon);
+  color: var(--sur-papier-doux);
+  font-size: var(--carnet-section);
+  cursor: pointer;
+}
+.etoile input { min-height: var(--cible-tactile); position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.choisie span { text-decoration: underline; text-underline-offset: var(--esp-1); }
+.remplie { color: var(--sur-papier); }

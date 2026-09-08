@@ -35,6 +35,7 @@ export interface EntreeEffacement {
 }
 
 export const INVENTAIRE_EFFACEMENT: readonly EntreeEffacement[] = [
+  { table: "lecture_numerologie", verdict: "efface", motif: "lectures IA et choix de partage, effacés avec le compte" },
   // ── Tout ce qui la nomme part. La cascade du schéma le fait ; l'inventaire le DÉCLARE, et le
   //    test le MESURE ligne à ligne après un effacement réel.
   { table: "utilisatrice", verdict: "efface", motif: "l’identité elle-même, jusqu’à la ligne d’auth" },

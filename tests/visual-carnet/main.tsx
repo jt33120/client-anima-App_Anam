@@ -81,7 +81,7 @@ const fiche: FicheSocleVue = {
   ciel: { ...ficheBase.ciel, horoscope: daily.cartes.find((carte) => carte.cle === "horoscope") ?? null },
 };
 const texteSocle: ProprietesFicheSocle["copie"] = {
-  introduction: copie.INTRODUCTION,
+  introduction: params.get("univers") === "numerologie" ? copie.INTRODUCTION_NUMEROLOGIE : copie.INTRODUCTION_ASTROLOGIE,
   titreApercu: copie.TITRE_APERCU,
   titreNombres: copie.TITRE_NOMBRES,
   titreEntreesNumerologie: copie.TITRE_ENTREES_NUMEROLOGIE,

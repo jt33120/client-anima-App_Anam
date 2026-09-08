@@ -1,5 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { lireLectureNumerologie } from "@/lib/data/depot-lecture-numerologie";
 import { creerDepotBranche } from "@/lib/data/depot-branche";
 import { lireFaitsRetenus } from "@/lib/data/lire-memoire";
 import type { FaitRetenu } from "@/lib/domain/memoire-retenue";
@@ -134,7 +135,11 @@ export async function lireContexteAnam(
   supabase: SupabaseClient,
   utilisatriceId: string,
 ): Promise<MatiereContexte> {
-  return lireMatiere(supabase, utilisatriceId, lireSocle(supabase, utilisatriceId));
+  const [matiere, lecture] = await Promise.all([
+    lireMatiere(supabase, utilisatriceId, lireSocle(supabase, utilisatriceId)),
+    lireLectureNumerologie(supabase, utilisatriceId).catch(() => null),
+  ]);
+  return { ...matiere, portraitNumerologie: lecture?.note === 5 && lecture.partageAnam ? lecture.portrait : null };
 }
 
 /**

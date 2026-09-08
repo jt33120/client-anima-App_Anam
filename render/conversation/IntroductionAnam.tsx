@@ -32,21 +32,19 @@ export default function IntroductionAnam({
     }
 
     setLongueurVisible(0);
-    let intervalle: ReturnType<typeof setInterval> | undefined;
-    const depart = window.setTimeout(() => {
-      intervalle = setInterval(() => {
-        setLongueurVisible((longueur) => {
-          const suivante = Math.min(longueur + 1, texte.length);
-          if (suivante === texte.length && intervalle) clearInterval(intervalle);
-          return suivante;
-        });
-      }, RYTHME_FRAPPE_MS);
-    }, DELAI_AVANT_FRAPPE_MS);
-
-    return () => {
-      window.clearTimeout(depart);
-      if (intervalle) clearInterval(intervalle);
+    let longueur = 0;
+    let prochaine: number;
+    const debut = performance.now() + DELAI_AVANT_FRAPPE_MS;
+    const avancer = (instant: number) => {
+      const suivante = Math.min(texte.length, Math.max(0, Math.floor((instant - debut) / RYTHME_FRAPPE_MS)));
+      if (suivante !== longueur) {
+        longueur = suivante;
+        setLongueurVisible(longueur);
+      }
+      if (longueur < texte.length) prochaine = window.requestAnimationFrame(avancer);
     };
+    prochaine = window.requestAnimationFrame(avancer);
+    return () => window.cancelAnimationFrame(prochaine);
   }, [texte]);
 
   return (

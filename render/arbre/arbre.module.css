@@ -613,6 +613,7 @@
   background: var(--carnet-jardin);
 }
 .zoomBoutons .zoomBouton {
+  min-height: var(--cible-tactile);
   color: var(--carnet-jardin-encre);
   background: transparent;
 }

@@ -159,9 +159,9 @@ export const ETAPES: readonly EtapeGuide[] = Object.freeze([
        C'était donc toujours `.canevas` — `flex: 1`, 70 à 81 % de la hauteur — qui était désigné.
        Il ne restait alors pas la place d'une bulle ni dessous ni dessus, et le repli
        `Math.max(16, …)` de `render/guide/Guide.tsx` la collait en haut : PAR-DESSUS le projecteur.
-       On vise la graine elle-même (`render/arbre/ArbreInteractif.tsx`, `.graineAttente`), qui est
+       On vise la graine elle-même (`render/arbre/ArbrePersonnel.tsx`, `data-etape-arbre`), qui est
        ce que le titre et le texte annoncent. Un seul sélecteur, pour qu'il n'y ait rien à départager. */
-    cible: "[class*='graineAttente']",
+    cible: "[data-etape-arbre='graine']",
     titre: "Ta graine",
     /* La seconde phrase est celle du fondateur (« au fur et à mesure que tu as des compréhensions,
        l'arbre grandit et évolue avec toi »), reformulée juste assez pour la grammaire. Elle

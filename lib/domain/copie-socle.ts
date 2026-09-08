@@ -77,7 +77,7 @@ export const INTRODUCTION_ASTROLOGIE =
   "Ce ciel est calculé à partir de ta date, de ton lieu et de ton heure lorsqu’elle est connue.";
 
 export const INTRODUCTION_NUMEROLOGIE =
-  "Tes nombres, calculés à partir de ta naissance et de ton nom. L’année personnelle suit l’année civile indiquée.";
+  "Ta date de naissance donne tes deux premiers repères : chemin de vie et année personnelle. Tes prénoms et ton nom de naissance, facultatifs, ajoutent d’autres nombres.";
 
 export const TITRE_NOMBRES = "Tes nombres";
 export const TITRE_CIEL = "Ton ciel de naissance";

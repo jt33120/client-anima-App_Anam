@@ -918,3 +918,20 @@
     max-width: calc(var(--mesure) / 3);
   }
 }
+
+/* The two references remain visible before the generated reading and optional details. */
+.reperesNombres {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
+}
+.repereNombre {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+}
+.repereNombre h3, .repereNombre p { margin: 0; }
+.repereNombre > .etiquette { grid-column: 1 / -1; }
+
+.section .devoilement > summary { min-height: var(--cible-tactile); }

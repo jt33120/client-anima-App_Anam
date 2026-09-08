@@ -17,10 +17,10 @@
 .guideDetails summary {
   display: list-item;
   align-content: center;
-  min-height: 44px;
+  min-height: var(--cible-tactile);
   cursor: pointer;
 }
-.guideDetails summary:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.guideDetails summary:focus-visible { outline: 2px solid var(--bordure-forte); outline-offset: var(--esp-1); }
 .guideContenu { padding-block: var(--esp-3); }
 
 .enteteInstrument,

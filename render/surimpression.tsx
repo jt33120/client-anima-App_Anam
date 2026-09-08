@@ -33,7 +33,6 @@ import {
 } from "@/lib/scene";
 import MenuCompte, { type GroupeMenuVue } from "./menu/MenuCompte";
 import s from "./monde.module.css";
-import ThemeCarnet from "./carnet/ThemeCarnet";
 
 /**
  * Fragment abstrait tronc/branche — PLACEHOLDER du signe d'Anam (l'asset peint final viendra).
@@ -120,7 +119,6 @@ export default function Surimpression({
           désormais sur `.groupeDroite`, une fois, et elle pousse le groupe entier au bord quels que
           soient les éléments qui le composent ce jour-là. */}
       <div className={s.groupeDroite}>
-        <ThemeCarnet className={s.carnetTheme} />
         {/* Story 3.5 (FR-060) — LA SORTIE.
             ⚠️ JE L'AVAIS RETIRÉE, ET C'ÉTAIT AFFAIBLIR UN ENGAGEMENT EN SILENCE. En déplaçant
             l'abonnement dans le profil (2026-08-23), ce lien devenait un doublon — sauf que FR-060

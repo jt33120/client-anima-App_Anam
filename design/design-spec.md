@@ -6,7 +6,7 @@ Date : 2026-09-06. Mandat : carte blanche sur le front, expérience Vercel réve
 
 Un carnet céleste nocturne : bleu nuit, lumière bleu ciel et violet, lotus et étoiles sur une matière aquarellée. Le manuscrit ponctue les moments calmes ; les contenus longs retrouvent une taille de lecture. L'écran mobile montre du contenu utile dès son ouverture.
 
-La correction explicite du fondateur du 6 septembre (« mode nuit par défaut », « trop terre », captures accueil et clavier refusées) remplace la première direction papier. Nuit est aussi le rendu serveur et le repli sans stockage. Un choix Papier explicite reste respecté ; le contraste renforcé garde la priorité.
+La correction explicite du fondateur du 6 septembre (« mode nuit par défaut », « trop terre », captures accueil et clavier refusées) remplace la première direction papier. Nuit est aussi le rendu serveur et le repli sans stockage. Depuis le 8 septembre, Nuit est le seul mode : un ancien choix Papier est ignoré. Le contraste renforcé garde la priorité.
 
 ## 2. Palette et typographie
 
@@ -32,7 +32,7 @@ préservé. La surcouche carnet a pour source unique `design/tokens.json`; un sc
 `app/styles/carnet-tokens.css`, importé après la feuille historique. Ne jamais corriger à la main
 une sortie générée. Toute valeur nouvelle entre dans les tokens de la surcouche.
 
-Un sélecteur Papier/Nuit contrôle `data-carnet-theme`. Une règle locale de page ne doit pas
+Le document fixe `data-carnet-theme` à `nuit`, sans sélecteur. Une règle locale de page ne doit pas
 outrepasser cette préférence ni l'accessibilité. La séparation de la surcouche rend la direction
 facile à retirer sans reconstituer l'ancien design.
 

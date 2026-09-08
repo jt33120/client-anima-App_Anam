@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import FicheSocle from "@/render/socle/FicheSocle";
 import type { FicheSocleVue, HoroscopeVue } from "@/render/socle/types";
@@ -99,6 +99,8 @@ const corpusNumerologieVide: FicheSocleVue = {
 
 const dessiner = (fiche: FicheSocleVue, mode: "tout" | "astrologie" | "numerologie" = "tout") =>
   render(<FicheSocle fiche={fiche} copie={COPIE} mode={mode} />);
+
+vi.mock("@/render/socle/LectureNumerologie", () => ({ default: () => <div data-testid="lecture-numerologie" /> }));
 
 afterEach(cleanup);
 
@@ -216,10 +218,15 @@ describe("[2026-09-03] les six nombres, et plus une seule preuve à l'écran", (
     }
   });
 
-  it("[ANTI-REDONDANCE] l'ancienne grille numérique a disparu", () => {
+  it("les deux repères essentiels précèdent les détails repliés", () => {
     const { container } = dessiner(complete, "numerologie");
     expect(container.querySelector("ul[class*='grilleNombres']")).toBeNull();
-    expect(container.querySelector("[class*='nombreFort']")).toBeNull();
+    const principaux = container.querySelector('[aria-label="Tes deux repères essentiels"]')!;
+    expect(principaux.querySelectorAll("h3")).toHaveLength(2);
+    expect([...principaux.querySelectorAll("h3")].map((h) => h.textContent)).toEqual(["Chemin de vie", "Année personnelle"]);
+    expect(principaux.closest("details")).toBeNull();
+    const autres = container.querySelector("details[class*='uniteNombre']")!.parentElement!.closest("details")!;
+    expect(autres.hasAttribute("open")).toBe(false);
   });
 
   it("[ANTI-VACUITÉ] sans nom, les lectures restantes portent leur nombre et aucune parenthèse n'est vide", () => {
@@ -672,4 +679,13 @@ describe("[retour 2026-09-01] les positions, repliées", () => {
     // Le pli des positions vient APRÈS l'appel à l'heure et l'horoscope.
     expect(precede(carteJour(container)!, detail!)).toBe(true);
   });
+});
+
+
+it("places the three references before the birth chart and removes the standalone missing block", () => {
+  const { container } = dessiner(complete, "astrologie");
+  const references = container.querySelector("#socle-reperes-principaux")!;
+  const chart = container.querySelector("svg[role='img']")!;
+  expect(Boolean(references.compareDocumentPosition(chart) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+  expect(container.textContent).not.toContain(TITRE_MANQUES);
 });

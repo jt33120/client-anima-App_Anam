@@ -21,7 +21,11 @@ export class AdaptateurFactice implements AiPort {
   private preparer(req: RequeteIa) {
     const tier = tierPour(req.capacite, req.niveauSecurite);
     const dernier = req.messages.at(-1)?.content ?? "";
-    const texte = reponseFactice(req.messages.length);
+    const texte = req.capacite === "numerologie" ? JSON.stringify({
+      guidanceAnnee: "[factice] Tu pourrais choisir un geste simple pour explorer le rythme symbolique de ton année personnelle.",
+      visionLongTerme: "[factice] À long terme, tu pourrais construire un cap qui laisse de la place à tes envies et à tes engagements.",
+      portrait: "[factice] Cette hypothèse symbolique suggère un goût possible pour les liens. Est-ce que cela rejoint ton vécu ?",
+    }) : reponseFactice(req.messages.length);
     return { tier, texte, usage: { tokensEntree: dernier.length, tokensSortie: texte.length } };
   }
 

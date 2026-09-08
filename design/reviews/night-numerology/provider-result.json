@@ -1,0 +1,14 @@
+{
+  "modele": "ministral-14b-2512",
+  "validation": true,
+  "caracteres": {
+    "guidanceAnnee": 566,
+    "visionLongTerme": 678,
+    "portrait": 752
+  },
+  "usage": {
+    "tokensEntree": 462,
+    "tokensSortie": 474
+  },
+  "donnees": "Nombres fictifs uniquement; clé locale, modèle configuré en production"
+}

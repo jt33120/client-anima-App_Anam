@@ -219,6 +219,7 @@
   box-shadow: none;
 }
 
+.champ,
 .composeur .champ {
   flex: 1 1 auto;
   min-height: var(--cible-tactile);

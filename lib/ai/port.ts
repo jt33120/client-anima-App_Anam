@@ -47,7 +47,8 @@ export type CapaciteIa =
    * art. 9. Ce qui la borne n'est plus l'absence, ce sont trois types clos — `SignatureDuCiel`,
    * `SocleNatalDit` et `MatiereContexte`.
    */
-  | "horoscope";
+  | "horoscope"
+  | "numerologie";
 export type TierIa = "leger" | "fort";
 /** Niveau de détresse (Story 2.3 le PRODUIT ; ici, la politique le CONSOMME — défaut 0). */
 export type NiveauSecurite = 0 | 1 | 2 | 3;

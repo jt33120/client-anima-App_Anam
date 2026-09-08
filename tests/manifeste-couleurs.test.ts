@@ -65,7 +65,7 @@ describe("[QA tour 2] le système peint la même nuit que l'application", () => 
     // par construction — et ce qui se garde n'est plus l'égalité, c'est l'absence de copie.
     const layout = lire("app/layout.tsx");
     expect(layout, "`viewport.themeColor` doit exister — il n'y en avait aucune").toContain(
-      "themeColor: couleursNuit.fond",
+      "themeColor: carnetTokens.dark.fond",
     );
     expect(layout, "une couleur écrite à la main est revenue").not.toMatch(/themeColor:\s*"#/);
     // Le jeton lu est bien celui que la feuille de design déclare : `tokens.ts` et `globals.css`

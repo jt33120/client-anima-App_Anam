@@ -51,7 +51,7 @@ export const viewport: Viewport = {
 // UX-DR-36 : lang="fr" sur le document.
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr" className={`${policeAnam.variable} ${policeUi.variable} ${policeManuscrite.variable}`}>
+    <html lang="fr" data-carnet-theme="nuit" className={`${policeAnam.variable} ${policeUi.variable} ${policeManuscrite.variable}`}>
       {/* suppressHydrationWarning : des extensions (Grammarly…) injectent des attributs
           dans <body> avant l'hydratation — mitigation recommandée par Next/React. */}
       <body suppressHydrationWarning>

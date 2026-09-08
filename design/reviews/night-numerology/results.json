@@ -1,0 +1,242 @@
+[
+  {
+    "engine": "chromium",
+    "width": 390,
+    "height": 844,
+    "targets": [
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      }
+    ],
+    "calls": [
+      "GET",
+      "POST",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH"
+    ],
+    "overflow": false,
+    "errors": [],
+    "sharing": "4 excluded, 5 explicit, withdraw and lower rating revoke"
+  },
+  {
+    "engine": "chromium",
+    "width": 768,
+    "height": 1024,
+    "targets": [
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      }
+    ],
+    "calls": [
+      "GET",
+      "POST",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH"
+    ],
+    "overflow": false,
+    "errors": [],
+    "sharing": "4 excluded, 5 explicit, withdraw and lower rating revoke"
+  },
+  {
+    "engine": "chromium",
+    "width": 1440,
+    "height": 900,
+    "targets": [
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      }
+    ],
+    "calls": [
+      "GET",
+      "POST",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH"
+    ],
+    "overflow": false,
+    "errors": [],
+    "sharing": "4 excluded, 5 explicit, withdraw and lower rating revoke"
+  },
+  {
+    "engine": "webkit",
+    "width": 390,
+    "height": 844,
+    "targets": [
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      }
+    ],
+    "calls": [
+      "GET",
+      "POST",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH"
+    ],
+    "overflow": false,
+    "errors": [],
+    "sharing": "4 excluded, 5 explicit, withdraw and lower rating revoke"
+  },
+  {
+    "engine": "webkit",
+    "width": 768,
+    "height": 1024,
+    "targets": [
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      }
+    ],
+    "calls": [
+      "GET",
+      "POST",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH"
+    ],
+    "overflow": false,
+    "errors": [],
+    "sharing": "4 excluded, 5 explicit, withdraw and lower rating revoke"
+  },
+  {
+    "engine": "webkit",
+    "width": 1440,
+    "height": 900,
+    "targets": [
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      },
+      {
+        "width": 44,
+        "height": 52.796875
+      }
+    ],
+    "calls": [
+      "GET",
+      "POST",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH",
+      "PATCH"
+    ],
+    "overflow": false,
+    "errors": [],
+    "sharing": "4 excluded, 5 explicit, withdraw and lower rating revoke"
+  }
+]

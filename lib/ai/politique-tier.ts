@@ -74,6 +74,7 @@ export function tierPour(capacite: CapaciteIa, niveauSecurite: NiveauSecurite = 
   // ⚠️ APRÈS la barrière de détresse, et non avant : la barrière est inconditionnelle, et une
   // capacité qui la court-circuiterait serait la première brèche d'AD-5.
   if (capacite === "horoscope") return "fort";
+  if (capacite === "numerologie") return "fort";
   // Tout le reste (reconceptualisation, synthèse, retour_theme) est du travail de schéma : FORT.
   return capacite === "echange" ? "leger" : "fort";
 }

@@ -14,6 +14,7 @@ import type { CapaciteIa, TierIa } from "@/lib/ai/port";
  * personne ne s'aperçoit de la différence tant que le repli ne bouge pas.
  */
 const TIER_ATTENDU: Record<CapaciteIa, TierIa> = {
+  numerologie: "fort",
   echange: "leger",
   reconceptualisation: "fort",
   synthese: "fort",

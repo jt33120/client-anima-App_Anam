@@ -73,7 +73,7 @@ export default function MetamorphoseArbre({ indexInitial = 0 }: { readonly index
         </div>
         <figcaption className={s.legende}>
           <p className={s.position} role="status" aria-atomic="true">
-            Illustration {index + 1} sur {PLANCHES_METAMORPHOSE.length} — <strong>{planche.titre}</strong>
+            Illustration {index + 1} sur {PLANCHES_METAMORPHOSE.length} : <strong>{planche.titre}</strong>
           </p>
           <p className={`t-corps ${s.texte}`}>{planche.texte}</p>
         </figcaption>
@@ -93,7 +93,7 @@ export default function MetamorphoseArbre({ indexInitial = 0 }: { readonly index
         <select ref={choix} id={choixId} className={s.selecteur} value={index} aria-controls={imageId}
           onChange={(event) => setIndex(Number(event.currentTarget.value))}>
           {PLANCHES_METAMORPHOSE.map((item, position) => (
-            <option key={item.id} value={position}>{String(position + 1).padStart(2, "0")} — {item.titre}</option>
+            <option key={item.id} value={position}>{String(position + 1).padStart(2, "0")} : {item.titre}</option>
           ))}
         </select>
       </div>

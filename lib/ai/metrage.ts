@@ -30,7 +30,8 @@ export type OperationIa =
   | "restitution_lecture"
   | "bilan_seance"
   | "synthese_periodique"
-  | "texte_du_jour";
+  | "texte_du_jour"
+  | "analyse_numerologie";
 
 /** Compteurs techniques rendus par un appel modèle, sans identité ni dimension produit. */
 export interface UsageModeleIa {

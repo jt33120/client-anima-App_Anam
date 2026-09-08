@@ -18,7 +18,7 @@ Open `http://127.0.0.1:4179/`. The regular scene navigation opens Anam and Mon Ã
 - `/?state=dense` for a long daily quotation
 - `/?state=loading` for visible pending-link indicators
 
-The real theme button switches between paper and night. The capture script also applies the existing reinforced-contrast preference.
+The app now uses night only, including when a former paper preference was saved. The capture script also applies the existing reinforced-contrast preference.
 
 To capture the home screen and the bottom of its universe section at 390, 768 and 1440 pixels:
 
