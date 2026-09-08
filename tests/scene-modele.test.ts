@@ -76,7 +76,7 @@ describe("projectionInitiale — projection serveur en lecture seule, STUB (AC2)
     expect(Object.isFrozen(projectionInitiale.branches)).toBe(true);
   });
 
-  it("aucun scalaire de progression globale (FR-031 : l'arbre n'est pas une jauge)", () => {
+  it("aucun score global ; seule l’illustration reconnue du suivi peut être projetée", () => {
     // 4.6 a retiré `eveil`. Revue 4.6 : tester `eveil === undefined` était une assertion VIDE — elle
     // n'interdisait pas de réintroduire `progression`, `niveau` ou `score` sous un autre nom. On interdit
     // désormais TOUT champ numérique d'ensemble à la racine de la projection.
@@ -85,7 +85,11 @@ describe("projectionInitiale — projection serveur en lecture seule, STUB (AC2)
     expect(numeriques, `un scalaire d'ensemble est une jauge déguisée : ${JSON.stringify(numeriques)}`).toEqual([]);
     // Et le TYPE lui-même ne doit nommer aucune mesure globale.
     const src = readFileSync(resolve(process.cwd(), "lib/scene/projection.ts"), "utf-8");
-    const bloc = src.match(/export interface ProjectionScene\s*\{[\s\S]*?\n\}/)?.[0] ?? "";
+    const blocComplet = src.match(/export interface ProjectionScene\s*\{[\s\S]*?\n\}/)?.[0] ?? "";
+    // Direction du 8 septembre : Anam déclenche la prochaine illustration par outil serveur.
+    // Cette exception nominative n’autorise aucun score, pourcentage ni autre mesure personnelle.
+    expect(blocComplet).toContain("readonly niveauSuivi?: number;");
+    const bloc = blocComplet.replace("readonly niveauSuivi?: number;", "");
     for (const mot of ["eveil", "progression", "niveau", "score", "pourcentage", "total"]) {
       expect(bloc.toLowerCase(), `« ${mot} » dans ProjectionScene`).not.toContain(mot);
     }

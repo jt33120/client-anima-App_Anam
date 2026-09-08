@@ -37,7 +37,7 @@ export const TABLES_SEMEES: readonly string[] = Object.freeze([
   "big_five", "big_five_tentative", "carte_contexte", "lecture", "seance", "usage_ia",
   "reservation_quota_ia", "ouverture_jour_anam", "episode_detresse", "audit_securite",
   "audit_correction_naissance", "pause_rythme", "invitation_integration", "notification_envoyee", "abonnement",
-  "texte_du_jour_personnel", "lecture_numerologie",
+  "texte_du_jour_personnel", "lecture_numerologie", "suivi_anam", "suivi_evenement",
   "remboursement", "information_reconduction", "preference_socle", "preference_courriel",
   "abonnement_poussee", "art9_temoin", "execution_job",
 ]);
@@ -92,6 +92,16 @@ export async function semerTout(admin: SupabaseClient, id: string, marqueur: str
     contenu: `${marqueur} — ce que j'ai déposé`,
     cle_tour: `${marqueur}-tour`,
   });
+  const { error: eSuivi } = await admin.rpc("appliquer_outil_suivi_anam", {
+    p_utilisatrice_id: id, p_cle_tour: `${marqueur}-tour`, p_revision: 0,
+    p_commande: { type: "ajuster", cap: `Explorer ${marqueur}`, synthese: `Ce qui compte pour ${marqueur}`,
+      preuve: `${marqueur} — ce que j'ai déposé`, etapes: [{ titre: "Prendre un moment", pratiqueId: null }] },
+  });
+  if (eSuivi) throw new Error(`semis suivi_anam: ${eSuivi.code ?? "echec"}`);
+  for (const table of ["suivi_anam", "suivi_evenement"]) {
+    const semisSuivi = await admin.from(table).select("utilisatrice_id").eq("utilisatrice_id", id);
+    if (semisSuivi.error || semisSuivi.data?.length !== 1) throw new Error(`semis ${table}: ligne absente`);
+  }
   const branche = await poser(admin, "branche", {
     utilisatrice_id: id,
     extrait_source_id: journal.id,

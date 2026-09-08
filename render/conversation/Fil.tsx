@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useRef } from "react";
 import TourAnam from "./TourAnam";
 import CartePratique from "./CartePratique";
+import CarteParcours from "./CarteParcours";
 import TourUtilisatrice from "./TourUtilisatrice";
 import BlocRessources from "./BlocRessources";
 import BlocDocument from "./BlocDocument";
@@ -247,6 +248,8 @@ export default function Fil({
           </div>
         ) : t.role === "pratique" ? (
           <CartePratique pratique={t.pratique} />
+        ) : t.role === "parcours" ? (
+          <CarteParcours action={t.action} />
         ) : t.role === "bilan" ? (
           <BlocDocument key={t.id} titre={t.titre} points={t.points} />
         ) : t.role === "paywall" ? (

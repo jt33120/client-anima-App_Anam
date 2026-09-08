@@ -35,10 +35,10 @@ describe("[7.2/AC1] l'ordre est invariable, et il est vérifié POSITION PAR POS
       "Compte",
       "Confidentialité",
     ]);
-    expect(GROUPES_MENU.map((groupe) => groupe.entrees.length)).toEqual([1, 4, 2, 2]);
+    expect(GROUPES_MENU.map((groupe) => groupe.entrees.length)).toEqual([1, 5, 2, 2]);
   });
 
-  it("[LE CŒUR] dérive les neuf entrées dans l'ordre visuel des groupes", () => {
+  it("[LE CŒUR] dérive les entrées dans l'ordre visuel des groupes", () => {
     // ⚠️ `toEqual` SUR UN TABLEAU, PAS `toContain` NEUF FOIS. L'appartenance à un ensemble serait
     // vraie sur n'importe quel tri — alphabétique, par fréquence, par récence — et c'est
     // précisément ce qu'« invariable » interdit : atteindre une entrée sans la lire, au bout de
@@ -46,6 +46,7 @@ describe("[7.2/AC1] l'ordre est invariable, et il est vérifié POSITION PAR POS
     expect(ENTREES_MENU.map((e: EntreeMenu) => e.titre)).toEqual([
       "Aide et ressources",
       "Ton socle",
+      "Mon parcours",
       "Ce qu’Anam retient",
       "La synthèse",
       "Mes lectures",

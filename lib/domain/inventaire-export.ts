@@ -43,6 +43,8 @@ export interface EntreeInventaire {
  * compteurs de jetons lui apprend que le produit s'intéresse d'abord à ça.
  */
 export const INVENTAIRE_EXPORT: readonly EntreeInventaire[] = [
+  { table: "suivi_anam", verdict: "inclus", titre: "Ton parcours avec Anam", motif: "cap, contexte partagé, repères personnels, prochaines étapes et pause" },
+  { table: "suivi_evenement", verdict: "inclus", titre: "Les étapes de ton parcours", motif: "ajustements et bilans rattachés aux échanges", retraits: ["cle_tour", "empreinte"] },
   { table: "lecture_numerologie", verdict: "inclus", titre: "Tes lectures de numérologie", motif: "interprétations IA, note et partage choisi", retraits: ["jeton"] },
   // ── Qui elle est ────────────────────────────────────────────────────────────────────────────
   { table: "utilisatrice", verdict: "inclus", titre: "Toi", motif: "état civil, naissance, lieu" },

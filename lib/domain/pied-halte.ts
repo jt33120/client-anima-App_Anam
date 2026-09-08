@@ -46,6 +46,7 @@ export type IdHalte =
   | "psychologie"
   | "pratiques"
   | "pratiques/[id]"
+  | "parcours"
   | "reglages"
   | "reperes"
   | "socle"
@@ -135,6 +136,7 @@ const MENTION_DUE: Readonly<Record<IdHalte, { readonly mention: boolean; readonl
         "le type retenu peut venir d’une hypothèse formulée par Anam ; les modules futurs restent explicitement séparés de cette origine",
     },
     pratiques: { mention: false, motif: "un catalogue éditorial fixe de pratiques sourcées ; aucun contenu personnalisé produit par un modèle" },
+    parcours: { mention: true, motif: "le cap, la synthèse et les étapes du parcours sont proposés par Anam ; les repères personnels restent rédigés par l’utilisatrice" },
     "pratiques/[id]": { mention: false, motif: "des consignes éditoriales fixes et une note éphémère écrite par l’utilisatrice ; aucune génération" },
     abonnement: { mention: false, motif: "un état de contrat ; aucun texte produit" },
     "heure-naissance": { mention: false, motif: "un formulaire ; aucun texte produit" },

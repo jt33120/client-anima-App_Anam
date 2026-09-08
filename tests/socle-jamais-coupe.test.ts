@@ -204,6 +204,10 @@ describe("[T6-1 / AC4] les items FR-055 qui EXISTENT : aucun chemin premium ne l
     // Le client répond donc PAR RPC, et l'assertion `indisponible` est ce qui prouve qu'on est bien
     // sur le chemin nominal. Mutation-cible : conditionner `tronc: { present: true }` à quoi que ce soit.
     const compteGratuit = {
+      from: () => ({ select: () => ({
+        eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }),
+        maybeSingle: async () => ({ data: null, error: null }),
+      }) }),
       rpc: async (nom: string) => {
         if (nom === "charger_branches_arbre") return { data: [], error: null };
         return { data: false, error: null }; // ni premium, ni fenêtre de détresse

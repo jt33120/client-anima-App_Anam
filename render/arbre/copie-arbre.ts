@@ -126,6 +126,11 @@ export const ETAPES_EVOLUTION = Object.freeze([
       "Une branche s’étoffe lorsque ce thème revient réellement dans la conversation. Les feuilles rendent visible cette continuité, sans la mesurer.",
   }),
   Object.freeze({
+    titre: "Les passages avec Anam",
+    corps:
+      "Les passages reconnus avec Anam dans ton suivi peuvent aussi faire évoluer l’illustration. Ils gardent la trace de ce que tu as vécu, à ton rythme, sans note ni échéance imposée.",
+  }),
+  Object.freeze({
     titre: "Le rayonnement",
     corps:
       "Une branche entre en pleine lumière seulement lorsque tu déclares que ce qu’elle porte est devenu vrai en toi. Anam ne le déduit pas à ta place.",

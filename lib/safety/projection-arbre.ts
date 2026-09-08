@@ -6,7 +6,7 @@ import { manqueLHeure } from "@/lib/domain/socle-incomplet";
 import { MESSAGE_SANS_HEURE, OU_TROUVER_SON_HEURE } from "@/lib/domain/message-sans-heure";
 import { journaliserIncidentSecurite } from "@/lib/safety/rpc-repli";
 import { premiumSousJwt } from "@/lib/safety/entitlement-premium";
-import { intensiteBornee, type ProjectionScene, type BrancheProjetee } from "@/lib/scene/projection";
+import { intensiteBornee, niveauSuiviBorne, type ProjectionScene, type BrancheProjetee } from "@/lib/scene/projection";
 
 /**
  * Story 4.6 (T4) — l'orchestrateur de la PROJECTION de l'arbre : charge les branches possédées et construit la
@@ -122,6 +122,21 @@ async function troncIncomplet(
   }
 }
 
+/** Une panne du suivi ne permet pas de connaître l'illustration déjà atteinte. */
+async function lireNiveauSuivi(supabase: SupabaseClient, utilisatriceId: string): Promise<number | undefined> {
+  try {
+    const { data, error } = await supabase.from("suivi_anam").select("niveau_arbre")
+      .eq("utilisatrice_id", utilisatriceId).maybeSingle<{ niveau_arbre: number }>();
+    if (error) throw error;
+    if (data === null) return 0;
+    if (!data || niveauSuiviBorne(data.niveau_arbre) !== data.niveau_arbre) throw new Error("niveau_suivi_invalide");
+    return data.niveau_arbre;
+  } catch (e) {
+    journaliserIncidentSecurite("projection_arbre_suivi", e);
+    return undefined;
+  }
+}
+
 export async function chargerProjectionArbre(
   supabase: SupabaseClient,
   utilisatriceId: string,
@@ -129,6 +144,11 @@ export async function chargerProjectionArbre(
 ): Promise<ProjectionScene> {
   try {
     const branches = await creerDepotBranche(supabase).chargerBranches();
+    const niveauSuivi = await lireNiveauSuivi(supabase, utilisatriceId);
+    // Sans maximum durable connu, une nouvelle scène afficherait une graine ou des branches
+    // moins avancées. Le rendu conserve sa projection précédente quand elle existe ; au premier
+    // chargement, il annonce l'indisponibilité au lieu d'inventer une régression.
+    if (niveauSuivi === undefined) return ARBRE_INDISPONIBLE;
     const suspendus = await gestesSuspendus(supabase);
     const gerable = await abonnementGerable(supabase);
     const incomplet = await troncIncomplet(supabase, utilisatriceId, themeDejaLu);
@@ -158,6 +178,7 @@ export async function chargerProjectionArbre(
         ? { present: true, incomplet: { phrase: MESSAGE_SANS_HEURE, ouTrouver: OU_TROUVER_SON_HEURE } }
         : { present: true },
       branches: projetees,
+      niveauSuivi,
       // `undefined` plutôt que `false` : la projection ne porte que ce qui est VRAI, comme partout
       // ailleurs ici (`indisponible`, `gestesSuspendus`). Un champ absent ne se lit pas de travers.
       ...(suspendus ? { gestesSuspendus: true as const } : {}),

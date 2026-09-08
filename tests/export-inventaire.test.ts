@@ -200,6 +200,12 @@ describe("[6.6] Les retraits sont déclarés des DEUX côtés, et nulle part ail
     // Une capacité, c'est de quoi agir en son nom. Le jour où quelqu'un ajoute `contenu` ou
     // `restitution` ici, il aura fabriqué un export incomplet en croyant protéger quelque chose.
     for (const c of COLONNES_RETIREES) {
+      // The command digest protects replay collision checks, not a personal document.
+      // This exception is table-specific: no other fingerprint may silently disappear.
+      if (c === "empreinte") {
+        expect(INVENTAIRE_EXPORT.filter((e) => e.retraits?.includes(c)).map((e) => e.table)).toEqual(["suivi_evenement"]);
+        continue;
+      }
       expect(c, `${c} n'est pas une capacité — un retrait de contenu est un export incomplet`).toMatch(
         /jeton|cle_|_key|secret/,
       );

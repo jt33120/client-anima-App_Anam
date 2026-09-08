@@ -142,3 +142,15 @@ Review at 390/768/1440, short landscape, reduced motion, missing image and delay
 ## Text actions and waiting (2026-09-08)
 
 Reuse the existing water lotus from `render/conversation/LotusAttente.tsx` for text actions. A compact blue lotus sits beside the label in a light, transparent action: no oversized filled pill. Keep its footprint stable while the petals light up during a request. Reduced motion keeps the flower still. Waiting and retry cooldown are neutral status, separate from errors; one bounded status read follows an existing generation, never another automatic creation.
+
+## Parcours piloté par Anam (2026-09-08)
+
+La halte « Mon parcours » reprend le carnet nocturne et les lignes de lecture de Pratiques.
+Le cap et le prochain pas ouvrent la page ; trois étapes au plus gardent une direction lisible.
+Les repères rédigés par l’utilisatrice sont une section distincte des propositions d’Anam.
+Une pause volontaire suspend l’évolution du parcours. Les changements enregistrés restent
+consultables avec leur date et un lien vers l’arbre personnel, sans score ni série quotidienne.
+Les actions vers la conversation ouvrent un brouillon modifiable, jamais un envoi automatique.
+Le formulaire des repères conserve ses mots en cas de refus ou de conflit, sans stockage navigateur.
+Réutiliser les tokens, BoutonLotus et les liens existants ; aucun nouvel asset. Vérifier les états
+vide, chargé, indisponible et dense à 390, 768 et 1440 pixels, puis recapturer après critique.

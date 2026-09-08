@@ -34,6 +34,7 @@ import {
 } from "@/lib/scene";
 import { CADRE_ARBRE_PERSONNEL, ancreTroncPersonnel, placerAccrochesPersonnelles, regrouperAccrochesPersonnelles } from "./ancres-arbre-personnel";
 import { indexCroissancePersonnelle } from "./croissance-personnelle";
+import { niveauSuiviBorne } from "@/lib/scene/projection";
 import ArbrePersonnel from "./ArbrePersonnel";
 import EtatVideArbre from "./EtatVideArbre";
 import {
@@ -80,6 +81,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   //    cliente durable, aucune contamination entre comptes). La monotonie d'ÉCRITURE reste le SQL (4.7). ──
   const repere = useRef<ProjectionScene>({ tronc: { present: true }, branches: [] });
   const [affichees, setAffichees] = useState<readonly BrancheProjetee[]>(p.projection.branches);
+  const [niveauSuivi, setNiveauSuivi] = useState(() => niveauSuiviBorne(p.projection.niveauSuivi));
 
   useEffect(() => {
     const { projection, incidents } = reconcilierProjection(repere.current, p.projection);
@@ -87,8 +89,9 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
       // On FUSIONNE (jamais on n'écrase) : une absence ponctuelle n'efface pas un maximum connu.
       const parId = new Map(repere.current.branches.map((b) => [b.id, b]));
       for (const b of projection.branches) parId.set(b.id, b);
-      repere.current = { tronc: { present: true }, branches: [...parId.values()] };
+      repere.current = { tronc: { present: true }, branches: [...parId.values()], niveauSuivi: projection.niveauSuivi };
       setAffichees(projection.branches);
+      setNiveauSuivi(niveauSuiviBorne(projection.niveauSuivi));
     }
     // UN seul signalement par réconciliation, portant les types constatés. Une requête PAR incident
     // faisait qu'une régression touchant plusieurs branches franchissait à elle seule le plafond de la
@@ -127,7 +130,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
     });
   };
 
-  const indexCroissance = useMemo(() => indexCroissancePersonnelle(affichees), [affichees]);
+  const indexCroissance = useMemo(() => indexCroissancePersonnelle(affichees, niveauSuivi), [affichees, niveauSuivi]);
   const placees = useMemo(() => placerAccrochesPersonnelles(affichees, indexCroissance), [affichees, indexCroissance]);
   const centreTronc = useMemo(() => ancreTroncPersonnel(indexCroissance), [indexCroissance]);
   const etapeGraine = indexCroissance === 0;
@@ -387,7 +390,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
   }, [troncIncomplet]);
 
   return (
-    <div className={s.arbre} data-evolution-fond={canevasVisible ? "" : undefined} data-evolution-graine={vide ? "" : undefined}>
+    <div className={s.arbre} data-evolution-fond={canevasVisible ? "" : undefined} data-evolution-graine={!indisponible && etapeGraine ? "" : undefined}>
       {/* Région d'annonce a11y PERSISTANTE (même patron que la conversation). Elle vit ICI, et pas dans le
           champ de renommage, parce que ce champ est DÉMONTÉ au moment même où il aurait quelque chose à
           annoncer : le succès du renommage restait donc entièrement muet (re-revue). */}
@@ -452,7 +455,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-        {!vueListe && !vide && !indisponible && (
+        {(!vueListe || vide) && !etapeGraine && !indisponible && (
           <div className={s.zoomBoutons} data-commandes-arbre>
             <button type="button" className={s.zoomBouton} onClick={() => zoomer(1 / 1.2)} aria-label={ZOOM_MOINS}>
               <span aria-hidden>−</span>
@@ -481,7 +484,7 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             {/* Story 5.3 — la cible du TRONC, dans la même couche et le même repère que les accroches.
                 Elle n'existe que s'il manque quelque chose : un tronc complet n'a AUCUNE affordance,
                 rien à fermer, rien à découvrir (AC4). */}
-            {troncIncomplet && !vide && !troncGroupe && (
+            {troncIncomplet && !etapeGraine && !troncGroupe && (
               <button
                 type="button"
                 ref={declencheurTronc}
@@ -564,9 +567,9 @@ export default function ArbreInteractif(p: ProprietesArbreInteractif) {
             </div>
           )}
 
-          <p className={s.legendeEtape}>{vide ? MESSAGE_GRAINE_PLANTEE : PLANCHES_METAMORPHOSE[indexCroissance].texte}</p>
+          <p className={s.legendeEtape}>{etapeGraine ? MESSAGE_GRAINE_PLANTEE : PLANCHES_METAMORPHOSE[indexCroissance].texte}</p>
 
-          {vide && (
+          {etapeGraine && (
             <div className={s.videSuperposition} data-couche-vide="">
               <EtatVideArbre
                 direOuNaissentLesBranches={direOuNaissentLesBranches}

@@ -16,6 +16,10 @@ import {
 import { jetonTourValide } from "@/lib/ai/jeton-tour";
 import { ligneNdjson } from "@/lib/ai/flux-ndjson";
 import { OUTIL_PROPOSER_PRATIQUE, consignePratiques, resoudrePratiqueProposee } from "@/lib/ai/outils-pratiques";
+import { OUTILS_PARCOURS, consigneParcours, estAppelParcours, resoudreOutilParcours } from "@/lib/ai/outils-parcours";
+import { appliquerOutilSuiviAnam, ErreurSuiviAnam, lireRecuSuiviAnam, lireSuiviAnam } from "@/lib/data/depot-suivi-anam";
+import type { CommandeOutilSuivi } from "@/lib/domain/suivi-anam";
+import { texteRecuParcours } from "@/lib/domain/recu-parcours";
 import type { Pratique } from "@/lib/domain/pratiques";
 import { signerRecommandationPratique } from "@/lib/data/recommandation-pratique";
 import { evaluerSecuriteDuTour, type ResultatSecurite } from "@/lib/safety/pipeline";
@@ -115,6 +119,30 @@ const DELAI_PREMIUM_MS = 2_000;
 const DELAI_RESERVATION_QUOTA_MS = 1_500;
 const attendre = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+  /** Émet une suite de trames et clôt. Aucun appel modèle : ce chemin ne génère rien. */
+  const fluxDeTrames = (trames: readonly Parameters<typeof ligneNdjson>[0][]) =>
+    new Response(
+      new ReadableStream<Uint8Array>({
+        start(controller) {
+          const encoder = new TextEncoder();
+          for (const trame of trames) {
+            try {
+              controller.enqueue(encoder.encode(ligneNdjson(trame)));
+            } catch {
+              /* client déjà parti */
+            }
+          }
+          try {
+            controller.close();
+          } catch {
+            /* déjà fermé */
+          }
+        },
+      }),
+      { headers: { ...ENTETES_ART9, "Content-Type": "application/x-ndjson; charset=utf-8" } },
+    );
+
+
 export async function POST(request: NextRequest) {
   const supabase = await createSupabaseServerClient();
   const {
@@ -125,6 +153,13 @@ export async function POST(request: NextRequest) {
       { code: "non_authentifie", message: "Session requise." },
       { status: 401, headers: ENTETES_ART9 },
     );
+  }
+
+  // Bind the mounted conversation to its account before reading or journalling its text.
+  const compteAttendu = request.headers.get("x-anam-compte");
+  if (compteAttendu !== null && compteAttendu !== user.id) {
+    return NextResponse.json({ code: "session_modifiee", message: "La session a changé. Recharge la page pour poursuivre." },
+      { status: 409, headers: ENTETES_ART9 });
   }
 
   // ══════════════════════════════════════════════════════════════════════════════════════════════
@@ -296,6 +331,24 @@ export async function POST(request: NextRequest) {
   const horsDetresse = niveauSecurite === 0 && !securite.limitesLevees;
   const clotureAutorisee = horsDetresse;
 
+  // Recover a committed turn before quota, arc, lectures or background growth can reinterpret it.
+  const recuSuivi = await (horsDetresse && dernierMessage?.role === "user"
+      ? lireRecuSuiviAnam(supabase, cleIdempotence, dernierMessage.content)
+        .catch((e: unknown) => e instanceof ErreurSuiviAnam && e.code === "conflit" ? { type: "conflit" as const } : undefined)
+      : Promise.resolve(undefined));
+  if (recuSuivi?.type === "conflit") {
+    return fluxDeTrames([{ t: "delta", c: "Ce tour ne correspond plus au message enregistré. Écris un nouveau message pour poursuivre." }, { t: "fin" }]);
+  }
+  if (recuSuivi) {
+    // The state may now be paused or have a different first step. Recover the real receipt
+    // before asking the model again; a reconnect cannot reinterpret a committed passage.
+    const texte = texteRecuParcours(recuSuivi.type);
+    try { await consignerTourAnam(user.id, cleIdempotence, texte); }
+    catch { console.error("anam/message : reçu de parcours non gravé"); }
+    return fluxDeTrames([{ t: "delta", c: texte }, { t: "parcours", action: recuSuivi.type }, { t: "fin" }]);
+  }
+
+
   // Trace de séance chargée UNE fois (Story 2.7) — sert au GATE d'allocation (3.4) PUIS à l'étage arc
   // (une seule lecture, jamais deux). `charger` LÈVE sur panne (jamais un état initial qu'un `ecrire`
   // écraserait, 2.7) → repli : arc null ET gate d'allocation neutralisé (seanceClose=false).
@@ -417,8 +470,12 @@ export async function POST(request: NextRequest) {
   // le gate d'allocation, sur le même client JWT, métré `:retour_theme`. Un échec journalise un
   // incident sans art. 9 ; JAMAIS un 500 : l'arbre qui ne feuille pas ce tour-ci feuillera au prochain
   // retour, alors qu'une réponse d'Anam qui casse ne se rattrape pas.
+  let progressionParcoursTentee = recuSuivi === undefined;
   if (dernierMessage?.role === "user") {
     after(async () => {
+      // One passage has one growth authority. This also covers a committed operation whose
+      // confirmation read failed: running the old +0.2 pipeline could skip the next artwork.
+      if (progressionParcoursTentee) return;
       try {
         const depot = creerDepotBranche(supabase);
         const retour = await evaluerRetourThemeDuTour(
@@ -662,28 +719,6 @@ export async function POST(request: NextRequest) {
   // partager ferait dépendre une garde de sécurité (AD-17) d'une décision de produit (2.9). Les deux
   // vivent séparément et sont testées séparément — la leçon de la 5.5.
 
-  /** Émet une suite de trames et clôt. Aucun appel modèle : ce chemin ne génère rien. */
-  const fluxDeTrames = (trames: readonly Parameters<typeof ligneNdjson>[0][]) =>
-    new Response(
-      new ReadableStream<Uint8Array>({
-        start(controller) {
-          const encoder = new TextEncoder();
-          for (const trame of trames) {
-            try {
-              controller.enqueue(encoder.encode(ligneNdjson(trame)));
-            } catch {
-              /* client déjà parti */
-            }
-          }
-          try {
-            controller.close();
-          } catch {
-            /* déjà fermé */
-          }
-        },
-      }),
-      { headers: { ...ENTETES_ART9, "Content-Type": "application/x-ndjson; charset=utf-8" } },
-    );
 
   let lectureOuverte: Lecture | null = null;
   if (dernierMessage?.role === "user" && niveauSecurite === 0) {
@@ -872,11 +907,13 @@ export async function POST(request: NextRequest) {
    * sur ce chemin-ci l'absence de carte n'est qu'un tour moins renseigné, donc on rattrape ; sur le
    * chemin du COMPACTAGE, rattraper ferait écrire une carte reconstruite de rien par-dessus la vraie,
    * donc on ne rattrape pas. La même panne, deux conduites, et c'est délibéré. */
-  const [matiereContexte, cartePersistee] = await Promise.all([
+  const [matiereContexte, cartePersistee, suiviPersiste] = await Promise.all([
     lireContexteAnam(supabase, user.id).catch(() => null),
     creerDepotCarte(user.id)
       .charger()
       .catch(() => CARTE_ABSENTE),
+    lireSuiviAnam(supabase, user.id).catch(() => undefined),
+
   ]);
   const contexte = matiereContexte ? consigneContexte(matiereContexte) : null;
   // `null` quand la carte est vide — une consigne qui dit « tu ne sais rien » est du bruit.
@@ -894,10 +931,15 @@ export async function POST(request: NextRequest) {
   // grant tools, and the same grant is checked when their untrusted results are resolved.
   const pratiquesAutorisees = horsDetresse && capaciteGeneration === "echange" && !doitProduireBilan && dernierMessage?.role === "user";
   const consigneOutils = pratiquesAutorisees ? consignePratiques() : null;
+  const parcoursAutorise = compteAttendu === user.id && pratiquesAutorisees && recuSuivi === null && suiviPersiste !== undefined && !suiviPersiste?.pause;
+  const consigneSuivi = horsDetresse ? consigneParcours(suiviPersiste) : null;
+  const outilsDuTour = pratiquesAutorisees
+    ? [OUTIL_PROPOSER_PRATIQUE, ...(parcoursAutorise ? OUTILS_PARCOURS : [])]
+    : [];
   // ⚠️ LA CARTE SE PLACE APRÈS LE CONTEXTE ET AVANT LA PHASE, ET CETTE PLACE EST UNE GARDE — la même
   // que celle du contexte, pour la même raison : ce qu'on lui APPREND ne peut jamais primer sur ce
   // qu'on lui INTERDIT. La détresse reste au plus près des messages, la voix reste en tête.
-  const prefixes = [consigneVoix, contexte, carte, consigneOutils, consignePhase, consigneDetresse].filter(
+  const prefixes = [consigneVoix, contexte, carte, consigneSuivi, consigneOutils, consignePhase, consigneDetresse].filter(
     (c): c is MessageIa => c !== null,
   );
   const messagesReponse = prefixes.length ? [...prefixes, ...messages] : messages;
@@ -922,7 +964,7 @@ export async function POST(request: NextRequest) {
   try {
     const requete: RequeteIa = {
       capacite: capaciteGeneration, messages: messagesReponse, contientArt9: true, niveauSecurite,
-      ...(pratiquesAutorisees ? { outils: [OUTIL_PROPOSER_PRATIQUE] } : {}),
+      ...(outilsDuTour.length ? { outils: outilsDuTour } : {}),
     };
     egress = await diffuserSousEgressArt9({ supabase, adaptateur, requete });
   } catch (e) {
@@ -961,7 +1003,7 @@ export async function POST(request: NextRequest) {
     aProduit: false,
     charsSortie: 0,
     charsEntree: messagesReponse.reduce((n, m) => n + m.content.length, 0)
-      + (pratiquesAutorisees ? JSON.stringify(OUTIL_PROPOSER_PRATIQUE).length : 0),
+      + (outilsDuTour.length ? JSON.stringify(outilsDuTour).length : 0),
     tierServeur,
     modeleServeur,
   };
@@ -980,7 +1022,15 @@ export async function POST(request: NextRequest) {
       // boucle garantit aussi qu'un futur chemin d'émission de delta y tombera sans qu'on y pense.
       let ditParAnam = "";
       let pratiqueProposee: Pratique | null = null;
+      let commandeParcours: CommandeOutilSuivi | null = null;
+      let appelParcoursRecu = false;
+      let tentativeOutilRecue = false;
+      // A native mutator may arrive after prose. Hold that prose until the finished stream
+      // reveals whether it is an ordinary reply or an operation awaiting a real commit.
+      let retenirParoles = parcoursAutorise;
+      const parolesEnAttente: string[] = [];
       const emettre = (trame: Parameters<typeof ligneNdjson>[0]) => {
+        if (trame.t === "delta" && retenirParoles) { parolesEnAttente.push(trame.c); return; }
         if (trame.t === "delta") ditParAnam += trame.c;
         try {
           controller.enqueue(encoder.encode(ligneNdjson(trame)));
@@ -1051,11 +1101,16 @@ export async function POST(request: NextRequest) {
               if (r.tronque) voixTronquee = true;
             }
           } else if (ev.type === "outil_delta") {
+            tentativeOutilRecue = true;
             etat.charsSortie += ev.caracteres; // no arguments or provider metadata are emitted
           } else {
             const fin: FinFlux = { tier: ev.tier, modele: ev.modele, usage: ev.usage };
             etat.finRecu = fin; // source AUTORITAIRE du métrage (tier/modele/usage réels)
+            tentativeOutilRecue ||= Boolean(ev.appelsOutils?.length);
             pratiqueProposee = resoudrePratiqueProposee(ev.appelsOutils, pratiquesAutorisees);
+            appelParcoursRecu = ev.appelsOutils?.some(estAppelParcours) ?? false;
+            commandeParcours = resoudreOutilParcours(ev.appelsOutils, parcoursAutorise, dernierMessage?.content ?? "", suiviPersiste);
+            if (appelParcoursRecu) pratiqueProposee = null;
           }
         }
         if (!request.signal.aborted) {
@@ -1085,6 +1140,32 @@ export async function POST(request: NextRequest) {
           // FR-084 : « au-delà de trois phrases, c'est un défaut de génération » → manquement journalisé
           // (serveur uniquement, aucun art. 9 ni verbatim — patron du log d'erreur qui ne porte que `e.name`).
           if (voixTronquee) console.warn("anam/message : voix tronquée à 3 phrases (manquement de voix, FR-084)");
+          retenirParoles = false;
+          if (appelParcoursRecu || (parcoursAutorise && tentativeOutilRecue && !pratiqueProposee)) {
+            // Untrusted model prose cannot announce a mutation. Only a confirmed result does.
+            if (commandeParcours && etat.finRecu && !request.signal.aborted) {
+              try {
+                progressionParcoursTentee = commandeParcours.type === "avancer";
+                await appliquerOutilSuiviAnam({
+                  utilisatriceId: user.id, cleTour: cleIdempotence,
+                  revision: suiviPersiste?.revision ?? 0, commande: commandeParcours,
+                });
+                emettre({ t: "delta", c: texteRecuParcours(commandeParcours.type) });
+                emettre({ t: "parcours", action: commandeParcours.type });
+              } catch (e) {
+                const conflit = e instanceof ErreurSuiviAnam && e.code === "conflit";
+                emettre({ t: "delta", c: conflit
+                  ? "Ton parcours a changé entre-temps. Retrouve sa version actuelle dans Mon parcours, puis nous pourrons reprendre."
+                  : "Je n’ai pas pu confirmer cet enregistrement. Tu peux vérifier Mon parcours avant que nous reprenions." });
+              }
+            } else {
+              emettre({ t: "delta", c: "Je n’ai pas modifié ton parcours. Nous pouvons préciser ensemble le prochain pas." });
+            }
+          } else if (!(parcoursAutorise && tentativeOutilRecue)) {
+            // Even a valid practice may accompany a second, filtered mutator. Native calls
+            // receive canonical receipts, so their prose cannot claim an unconfirmed write.
+            for (const c of parolesEnAttente) emettre({ t: "delta", c });
+          }
           if (pratiqueProposee) {
             // Native function calls can contain no prose. Keep a readable, journalled answer,
             // and send only the trusted catalogue id through the public transport.

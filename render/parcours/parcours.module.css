@@ -1,0 +1,24 @@
+.halte { max-width: calc(var(--contenu-max) + var(--esp-9)); margin: 0 auto; padding: var(--esp-7) var(--marge-mobile) var(--esp-8); display: flex; flex-direction: column; gap: var(--esp-6); color: var(--texte); }
+.halte h1, .halte h2, .halte h3, .halte p, .corps h2, .corps h3, .corps p { margin: 0; }
+.entete, .corps, .section, .groupeRepere, .formulaire, .etape { display: flex; flex-direction: column; min-width: 0; gap: var(--esp-3); }
+.corps { gap: var(--esp-7); }
+.entete h1 { text-wrap: balance; }
+.section { scroll-margin-block-start: var(--esp-5); }
+.secondaire { color: var(--texte-doux); }
+.cap { padding: var(--esp-5); border: calc(var(--esp-1) / 4) solid var(--bordure); border-radius: var(--carnet-rayon-lg); background: var(--surface); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--esp-2) var(--esp-5); align-items: center; }
+.lien, .commande { display: inline-flex; align-items: center; gap: var(--esp-2); min-height: var(--cible-tactile); padding: var(--esp-2) 0; font: inherit; color: var(--accent); background: transparent; border: 0; text-align: start; cursor: pointer; text-decoration: underline; text-underline-offset: var(--esp-1); }
+.lien:hover, .commande:hover { color: var(--texte); }
+.commande:disabled { cursor: wait; color: var(--texte-doux); }
+.lien:focus-visible, .commande:focus-visible, .texte:focus-visible, .titreSection:focus-visible { outline: calc(var(--esp-1) / 2) solid var(--bordure-forte); outline-offset: var(--esp-1); }
+.etapes, .historique, .reperes { margin: 0; padding: 0; list-style: none; }
+.etape, .evenement, .repere { padding-block: var(--esp-4); border-bottom: calc(var(--esp-1) / 4) solid var(--bordure); }
+.etape:first-child { padding-block-start: 0; }
+.evenement, .repere { display: flex; flex-direction: column; gap: var(--esp-2); }
+.repere dd { margin: 0; }
+.mots { white-space: pre-wrap; overflow-wrap: anywhere; text-wrap: pretty; }
+.texte { display: block; width: 100%; min-height: calc(var(--cible-tactile) * 3); resize: vertical; box-sizing: border-box; padding: var(--esp-3); border: calc(var(--esp-1) / 4) solid var(--bordure-forte); border-radius: var(--rayon-md); background: var(--fond); color: var(--texte); font: inherit; }
+.groupeRepere { gap: var(--esp-2); }
+.comparaison { display: flex; flex-direction: column; gap: var(--esp-2); padding: var(--esp-3); border-inline-start: calc(var(--esp-1) / 2) solid var(--bordure-forte); background: var(--surface); }
+.formulaire { gap: var(--esp-5); }
+.message { padding-inline-start: var(--esp-3); border-inline-start: calc(var(--esp-1) / 2) solid var(--bordure-forte); }

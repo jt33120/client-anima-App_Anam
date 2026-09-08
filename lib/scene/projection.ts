@@ -83,6 +83,8 @@ export interface ProjectionScene {
   };
   /** Les branches projetées (état persisté). Vide = arbre sans branche (« rien n'a encore été nommé »). */
   readonly branches: readonly BrancheProjetee[];
+  /** Illustration durable reconnue dans le suivi avec Anam, distincte de l'état des branches. */
+  readonly niveauSuivi?: number;
   /**
    * Vrai UNIQUEMENT quand la lecture serveur a échoué (repli sûr). Distingue « elle n'a pas encore de
    * branche » (vide légitime) de « je n'arrive pas à lire son arbre » (panne) — sans cette distinction, une
@@ -197,6 +199,12 @@ export function intensiteBornee(v: number): number {
   return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0;
 }
 
+/** Miroir de la borne SQL du suivi. Une donnée invalide ne fabrique aucune évolution. */
+export const NIVEAU_SUIVI_MAX = 34;
+export function niveauSuiviBorne(v: number | undefined): number {
+  return v !== undefined && Number.isInteger(v) && v >= 0 && v <= NIVEAU_SUIVI_MAX ? v : 0;
+}
+
 /**
  * Faut-il ADOPTER la projection qui arrive, ou garder celle qu'on affiche déjà ?
  *
@@ -209,7 +217,11 @@ export function intensiteBornee(v: number): number {
  * Cette décision vit ICI et pas dans le rendu : le rendu dessine, il ne tranche pas (AD-7).
  */
 export function adopterProjection(affichee: ProjectionScene, arrivee: ProjectionScene): ProjectionScene {
-  if (arrivee.indisponible && affichee.branches.length > 0 && !affichee.indisponible) return affichee;
+  if (arrivee.indisponible && (affichee.branches.length > 0 || niveauSuiviBorne(affichee.niveauSuivi) > 0)
+    && !affichee.indisponible) return affichee;
+  if (niveauSuiviBorne(affichee.niveauSuivi) > niveauSuiviBorne(arrivee.niveauSuivi)) {
+    return { ...arrivee, niveauSuivi: niveauSuiviBorne(affichee.niveauSuivi) };
+  }
   return arrivee;
 }
 
@@ -234,7 +246,9 @@ export function reconcilierProjection(
   // Une lecture INDISPONIBLE n'est pas une régression : c'est une absence d'information. On la propage
   // telle quelle (le rendu dira « je n'arrive pas à afficher ton arbre », jamais « rien n'a été nommé »)
   // et SURTOUT on ne conclut rien — sinon la panne se lirait comme un effacement de toutes les branches.
-  if (nouvelle.indisponible) return { projection: nouvelle, incidents: [] };
+  const niveauSuivi = Math.max(niveauSuiviBorne(precedente.niveauSuivi), niveauSuiviBorne(nouvelle.niveauSuivi));
+  const suivi = precedente.niveauSuivi !== undefined || nouvelle.niveauSuivi !== undefined ? { niveauSuivi } : {};
+  if (nouvelle.indisponible) return { projection: { ...nouvelle, ...suivi }, incidents: [] };
 
   const parId = new Map(precedente.branches.map((b) => [b.id, b]));
   const incidents: IncidentRegression[] = [];
@@ -268,5 +282,5 @@ export function reconcilierProjection(
     if (!servies.has(id)) incidents.push({ id, champ: "disparition" });
   }
 
-  return { projection: { tronc: nouvelle.tronc, branches }, incidents };
+  return { projection: { tronc: nouvelle.tronc, branches, ...suivi }, incidents };
 }

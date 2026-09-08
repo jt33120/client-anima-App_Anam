@@ -15,6 +15,7 @@ export default function PratiquesHub({ pratiques }: { readonly pratiques: readon
   }
   return (
     <div className={s.catalogue}>
+      <p className="t-corps"><Link className={s.lien} href="/parcours">Mon parcours</Link> pour retrouver le cap et les prochains pas proposés avec Anam.</p>
       <nav aria-label="Choisir une intention" className={s.intentions}>
         {Object.entries(INTENTIONS).filter(([id]) => pratiques.some((p) => p.intention === id)).map(([id, titre]) => (
           <a className={s.lien} key={id} href={`#${id}`}>{titre}</a>

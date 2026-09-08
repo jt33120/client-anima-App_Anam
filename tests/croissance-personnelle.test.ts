@@ -8,6 +8,22 @@ const branche = (id: string, intensite = 0, etat: Branche["etat"] = intensite > 
 const jeunes = (nombre: number) => Array.from({ length: nombre }, (_, index) => branche(`jeune-${index}`));
 
 describe("croissance personnelle — choix de dessin depuis les branches réelles", () => {
+  it("un passage du suivi avance le dessin sans inventer de branche ni de rayonnement", () => {
+    expect(indexCroissancePersonnelle([], 1)).toBe(1);
+    expect(indexCroissancePersonnelle([], 24)).toBe(24);
+    expect(indexCroissancePersonnelle([], 34)).toBe(34);
+  });
+
+  it("le suivi conserve le dessin déjà atteint par les branches et ne s’y additionne pas", () => {
+    const branches = [branche("a", 1), branche("b", 1)];
+    expect(indexCroissancePersonnelle(branches, 1)).toBe(22);
+    expect(indexCroissancePersonnelle(branches, 23)).toBe(23);
+    for (const niveau of [undefined, -1, 1.5, 35, NaN, Infinity]) {
+      expect(indexCroissancePersonnelle(branches, niveau)).toBe(22);
+      expect(indexCroissancePersonnelle([], niveau)).toBe(0);
+    }
+  });
+
   it("conserve graine, éclosion, racines et pousse aux quatre premiers indices", () => {
     expect(indexCroissancePersonnelle([])).toBe(0);
     expect(indexCroissancePersonnelle([branche("a")])).toBe(1);

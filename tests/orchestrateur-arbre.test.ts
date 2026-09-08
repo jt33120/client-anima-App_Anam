@@ -25,16 +25,67 @@ const { lireThemeNatal } = vi.hoisted(() => ({ lireThemeNatal: vi.fn() }));
 vi.mock("@/lib/data/depot-theme-natal", () => ({ lireThemeNatal }));
 
 import { chargerProjectionArbre } from "@/lib/safety/projection-arbre";
+import { adopterProjection, type ProjectionScene } from "@/lib/scene/projection";
 import { codeJournalisable } from "@/lib/safety/rpc-repli";
 import { POST as incident } from "@/app/api/incident/route";
 
-const supa = {} as SupabaseClient;
+const tablesVides = {
+  from: () => ({ select: () => ({
+    eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }),
+    maybeSingle: async () => ({ data: null, error: null }),
+  }) }),
+};
+const supa = { ...tablesVides } as unknown as SupabaseClient;
 /** Client JWT factice qui répond à `branche_bloquee_par_detresse` — hors fenêtre par défaut. */
 const supaFenetre = (bloquee: boolean) =>
-  ({ rpc: async () => ({ data: bloquee, error: null }) }) as unknown as SupabaseClient;
+  ({ ...tablesVides, rpc: async () => ({ data: bloquee, error: null }) }) as unknown as SupabaseClient;
 
 describe("chargerProjectionArbre — composition & repli sûr", () => {
   beforeEach(() => chargerBranches.mockReset());
+
+  it("lit uniquement le niveau du suivi possédé sous le client JWT, y compris sans branche", async () => {
+    chargerBranches.mockResolvedValue([]);
+    const id = "11111111-1111-4111-8111-111111111111";
+    const filtre = vi.fn(() => ({ maybeSingle: async () => ({ data: { niveau_arbre: 7 }, error: null }) }));
+    const selection = vi.fn(() => ({ eq: filtre }));
+    const client = {
+      rpc: async () => ({ data: false, error: null }),
+      from: (table: string) => table === "suivi_anam" ? { select: selection } : {
+        select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }),
+      },
+    } as unknown as SupabaseClient;
+    const projection = await chargerProjectionArbre(client, id);
+    expect(projection.niveauSuivi).toBe(7);
+    expect(projection.branches).toEqual([]);
+    expect(selection).toHaveBeenCalledExactlyOnceWith("niveau_arbre");
+    expect(filtre).toHaveBeenCalledExactlyOnceWith("utilisatrice_id", id);
+  });
+
+  it("une panne ou une valeur invalide du suivi marque la projection indisponible ; une absence confirmée vaut zéro", async () => {
+    chargerBranches.mockResolvedValue([]);
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      for (const [data, error, attendu] of [
+        [null, null, 0],
+        [null, { code: "PGRST000" }, undefined],
+        [undefined, null, undefined],
+        [{ niveau_arbre: 35 }, null, undefined],
+      ] as const) {
+        const client = {
+          rpc: async () => ({ data: false, error: null }),
+          from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data, error }) }) }) }),
+        } as unknown as SupabaseClient;
+        const projection = await chargerProjectionArbre(client, "11111111-1111-4111-8111-111111111111");
+        expect(projection.niveauSuivi).toBe(attendu);
+        expect(projection.indisponible).toBe(attendu === undefined ? true : undefined);
+        if (attendu === undefined) {
+          const dejaAffichee: ProjectionScene = { tronc: { present: true }, branches: [], niveauSuivi: 7 };
+          expect(adopterProjection(dejaAffichee, projection)).toBe(dejaAffichee);
+          expect(adopterProjection({ tronc: { present: true }, branches: [] }, projection).indisponible).toBe(true);
+        }
+      }
+    } finally { spy.mockRestore(); }
+  });
 
   it("mappe les branches chargées en ProjectionScene (verbatim + date pour la fiche)", async () => {
     chargerBranches.mockResolvedValue([
@@ -90,9 +141,9 @@ describe("chargerProjectionArbre — composition & repli sûr", () => {
     // l'autre sens lui fait vivre un refus juste après un engagement irréversible. L'asymétrie tranche.
     chargerBranches.mockResolvedValue([]);
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    const enPanne = { rpc: async () => ({ data: null, error: { code: "42501" } }) } as unknown as SupabaseClient;
+    const enPanne = { ...tablesVides, rpc: async () => ({ data: null, error: { code: "42501" } }) } as unknown as SupabaseClient;
     expect((await chargerProjectionArbre(enPanne, "11111111-1111-4111-8111-111111111111")).gestesSuspendus).toBe(true);
-    const quiLeve = { rpc: async () => { throw new Error("réseau"); } } as unknown as SupabaseClient;
+    const quiLeve = { ...tablesVides, rpc: async () => { throw new Error("réseau"); } } as unknown as SupabaseClient;
     expect((await chargerProjectionArbre(quiLeve, "11111111-1111-4111-8111-111111111111")).gestesSuspendus).toBe(true);
     spy.mockRestore();
   });

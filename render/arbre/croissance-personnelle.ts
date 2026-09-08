@@ -1,4 +1,4 @@
-import type { BrancheProjetee } from "@/lib/scene/projection";
+import { niveauSuiviBorne, type BrancheProjetee } from "@/lib/scene/projection";
 
 type BrancheDeCroissance = Pick<BrancheProjetee, "id" | "etat" | "intensite">;
 
@@ -13,9 +13,10 @@ const TOLERANCE_DIXIEME = 0.000001;
  * The tenths describe drawing precision, not the backend's unchanged 0.2 progression step.
  * Once the structure reaches 23, each declared radiant branch adds one light variant (up to 11).
  * The first eight variants keep their original indices; three celestial variants follow them.
- * No clock, connection count, personal text or persisted visual index participates.
+ * A passage retained in the follow-up can raise this drawing independently, without changing a branch.
+ * No clock, connection count or personal text participates.
  */
-export function indexCroissancePersonnelle(branches: readonly BrancheDeCroissance[]): number {
+export function indexCroissancePersonnelle(branches: readonly BrancheDeCroissance[], niveauSuivi?: number): number {
   const uniques = new Map<string, { intensite: number; rayonnante: boolean }>();
 
   for (const branche of branches) {
@@ -40,5 +41,5 @@ export function indexCroissancePersonnelle(branches: readonly BrancheDeCroissanc
     if (branche.rayonnante) rayonnantes = Math.min(NUANCES_LUMIERE, rayonnantes + 1);
   }
 
-  return structure + (structure === DERNIERE_STRUCTURE ? rayonnantes : 0);
+  return Math.max(structure + (structure === DERNIERE_STRUCTURE ? rayonnantes : 0), niveauSuiviBorne(niveauSuivi));
 }

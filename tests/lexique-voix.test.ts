@@ -51,6 +51,7 @@ function fichiersTs(dir: string): string[] {
 // ajoutée ici doit PROUVER qu'elle protège d'un vrai match.
 const EXCLUS = new Set([
   "lib/ai/outils-pratiques.ts", // instructions système inverses, jamais texte affiché
+  "lib/ai/outils-parcours.ts", // consigne de suivi : interdits nommés pour les refuser
 
   "lib/safety/consigne-detresse.ts",
   "lib/domain/consigne-voix.ts",

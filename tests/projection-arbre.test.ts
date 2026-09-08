@@ -24,6 +24,17 @@ const br = (id: string, etat: BrancheProjetee["etat"], intensite: number): Branc
 const scene = (branches: BrancheProjetee[]): ProjectionScene => ({ tronc: { present: true }, branches });
 
 describe("reconcilierProjection — l'arbre ne régresse jamais au rendu (AC2)", () => {
+  it("conserve le passage du suivi pendant une lecture absente, inférieure ou indisponible", () => {
+    const precedente = { ...scene([]), niveauSuivi: 8 };
+    for (const nouvelle of [scene([]), { ...scene([]), niveauSuivi: 3 }, { ...scene([]), indisponible: true as const }]) {
+      const { projection, incidents } = reconcilierProjection(precedente, nouvelle);
+      expect(projection.niveauSuivi).toBe(8);
+      expect(projection.branches).toEqual([]);
+      expect(incidents).toEqual([]);
+    }
+    expect(reconcilierProjection(precedente, { ...scene([]), niveauSuivi: 9 }).projection.niveauSuivi).toBe(9);
+  });
+
   it("un état serveur INFÉRIEUR au max connu est remonté au supérieur + un incident est listé", () => {
     const precedente = scene([br("a", "feuillaison", 0.6)]);
     const nouvelle = scene([br("a", "naissance", 0.6)]); // régression d'état
@@ -107,6 +118,15 @@ describe("[HAUTE / re-revue] adopterProjection — une panne n'efface pas un arb
   const br = (id: string) => ({ id, etat: "naissance" as const, intensite: 0, extraitSourceId: `s-${id}` });
   const AFFICHE = { tronc: { present: true as const }, branches: [br("a"), br("b")] };
   const PANNE = { tronc: { present: true as const }, branches: [], indisponible: true as const };
+
+  it("protège également un passage du suivi sans branche lors des rafraîchissements de scène", () => {
+    const affichee = { ...scene([]), niveauSuivi: 4 };
+    expect(adopterProjection(affichee, PANNE)).toBe(affichee);
+    expect(adopterProjection(affichee, scene([])).niveauSuivi).toBe(4);
+    expect(adopterProjection(affichee, { ...scene([]), niveauSuivi: 5 }).niveauSuivi).toBe(5);
+    // Aucun état global : une nouvelle scène après effacement ne reçoit pas le maximum précédent.
+    expect(adopterProjection(scene([]), { ...scene([]), niveauSuivi: 0 }).niveauSuivi).toBe(0);
+  });
 
   it("une lecture INDISPONIBLE est IGNORÉE quand des branches sont déjà à l'écran", () => {
     // Le rafraîchissement serveur part à chaque entrée dans la région arbre. Un hoquet réseau y

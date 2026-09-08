@@ -201,7 +201,8 @@ export class AdaptateurMistral implements AiPort {
           if (nom !== courant.nom) courant.nom += nom;
           if (typeof args === "string") courant.arguments += args;
           else if (args && typeof args === "object" && !courant.arguments) courant.arguments = JSON.stringify(args);
-          if (courant.nom.length > 128 || courant.arguments.length > 4096) {
+          // Valid follow-up fields can exceed 4096 UTF-16 units when their code points use pairs.
+          if (courant.nom.length > 128 || courant.arguments.length > 8192) {
             courant.invalide = true;
             courant.nom = "";
             courant.arguments = "";

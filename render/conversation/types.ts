@@ -34,6 +34,7 @@ export interface RepereJour {
 
 export type Tour = (
   | { readonly id: string; readonly role: "pratique"; readonly ancreId: string; readonly pratique: PratiqueProposeeVue }
+  | { readonly id: string; readonly role: "parcours"; readonly ancreId: string; readonly action: "ajuster" | "avancer" }
   | { readonly id: string; readonly role: "utilisatrice"; readonly texte: string }
   | { readonly id: string; readonly role: "anam"; readonly texte: string; readonly etat: EtatAnam }
   | {

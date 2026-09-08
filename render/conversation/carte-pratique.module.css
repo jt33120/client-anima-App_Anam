@@ -23,3 +23,5 @@
   text-decoration: none;
 }
 .action:focus-visible { outline: calc(var(--esp-1) / 2) solid var(--bordure-forte); outline-offset: var(--esp-1); }
+.secondaire { display: inline-flex; align-items: center; min-height: var(--cible-tactile); color: var(--texte); }
+.secondaire:focus-visible { outline: calc(var(--esp-1) / 2) solid var(--bordure-forte); outline-offset: var(--esp-1); }

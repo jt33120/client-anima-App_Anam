@@ -253,6 +253,7 @@ export function fusionnerEntreeDuJour(
 }
 
 export default function Conversation({
+  compteAttendu,
   pratiques = AUCUNE_PRATIQUE,
   messageInitial,
   introduction,
@@ -270,6 +271,7 @@ export default function Conversation({
 }: {
   /** Copie statique du journal vide, fournie par la page et jamais persistée. */
   pratiques?: readonly PratiqueProposeeVue[];
+  compteAttendu?: string;
   messageInitial?: string;
   introduction?: string;
   /** Permet à la scène de focaliser le composeur dans le geste de navigation au pointeur. */
@@ -370,7 +372,7 @@ export default function Conversation({
   const rearmementJour = useRef<ReturnType<typeof setTimeout> | null>(null);
   const regionActiveRef = useRef(regionActive);
   regionActiveRef.current = regionActive;
-  const { prepare, enCours, envoyer } = useFluxAnam();
+  const { prepare, enCours, envoyer } = useFluxAnam(compteAttendu);
 
   useEffect(
     () => () => {
@@ -738,6 +740,12 @@ export default function Conversation({
             id, role: "pratique", ancreId: idAnam, pratique,
           }));
         },
+        onParcours: (action) => {
+          const id = `parcours:${idAnam}`;
+          setTours((prev) => prev.some((t) => t.id === id) ? prev : insererTour(prev, idAnam, "apres", {
+            id, role: "parcours", ancreId: idAnam, action,
+          }));
+        },
         onQuota: () => {
           setTours((prev) => prev.filter((t) => t.id !== idAnam));
           setQuotaEpuise(true);
@@ -860,6 +868,7 @@ export default function Conversation({
 
   return (
     <div className={s.conversation}>
+      <a className={`${s.accesParcours} t-bouton`} href="/parcours?de=anam">Mon parcours</a>
       {/* À l'ouverture, le portrait accompagne désormais la bulle d'accueil dans le fil. Les
           apparitions plein format restent réservées aux autres temps forts. */}
       <ApparitionAnam beat={beat === "ouverture" ? null : beat} />

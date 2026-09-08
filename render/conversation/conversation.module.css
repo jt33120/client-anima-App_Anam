@@ -19,6 +19,20 @@
   --lignes-composeur: 6;
 }
 
+.accesParcours {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--cible-tactile);
+  padding-inline: var(--esp-3);
+  color: var(--texte-doux);
+  flex-shrink: 0;
+}
+.accesParcours:focus-visible {
+  outline: calc(var(--esp-1) / 2) solid var(--bordure-forte);
+  outline-offset: var(--esp-1);
+}
+
 /* ── Le fil : flux vertical UNIQUE, sans bulles opposées (AC1). Gap = respiration. ── */
 .fil {
   flex: 1 1 auto;

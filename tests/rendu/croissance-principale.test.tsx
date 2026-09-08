@@ -42,6 +42,40 @@ function verifierDessin(container: HTMLElement, index: number) {
 }
 
 describe("croissance de l’arbre principal", () => {
+  it("une première lecture indisponible ne montre pas de graine, une panne ultérieure garde l’illustration connue", async () => {
+    dimensionnerTout(390, 620);
+    const user = userEvent.setup();
+    const panne: ProjectionScene = { ...projection([]), indisponible: true };
+    const { container, rerender } = render(<SceneDom {...scene} projection={panne} />);
+    await user.click(within(screen.getByRole("navigation", { name: "Régions" })).getByRole("button", { name: "Mon évolution" }));
+    expect(container.querySelector("[data-index-croissance]")).toBeNull();
+    expect(screen.getByText("Je n’arrive pas à afficher ton arbre pour l’instant.")).toBeTruthy();
+    rerender(<SceneDom {...scene} projection={{ ...projection([]), niveauSuivi: 8 }} />);
+    verifierDessin(container, 8);
+    rerender(<SceneDom {...scene} projection={panne} />);
+    verifierDessin(container, 8);
+    expect(screen.queryByText("Je n’arrive pas à afficher ton arbre pour l’instant.")).toBeNull();
+  });
+
+  it("fait éclore puis évoluer l’arbre sans branche et garde le passage pendant une panne du suivi", () => {
+    dimensionnerTout(390, 620);
+    const { container, rerender, unmount } = render(<ArbreInteractif {...gestes} projection={projection([])} />);
+    verifierDessin(container, 0);
+    rerender(<ArbreInteractif {...gestes} projection={{ ...projection([]), niveauSuivi: 1 }} />);
+    verifierDessin(container, 1);
+    expect(screen.queryByText("Tout commence ici.")).toBeNull();
+    expect(container.querySelector("[data-evolution-graine]")).toBeNull();
+    expect(container.querySelector("[data-branche-arbre]")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Vue liste" })).toBeNull();
+    rerender(<ArbreInteractif {...gestes} projection={{ ...projection([]), niveauSuivi: 34 }} />);
+    verifierDessin(container, 34);
+    rerender(<ArbreInteractif {...gestes} projection={projection([])} />);
+    verifierDessin(container, 34);
+    unmount();
+    const neuve = render(<ArbreInteractif {...gestes} projection={projection([])} />);
+    verifierDessin(neuve.container, 0);
+  });
+
   it("change réellement d’image quand les branches projetées avancent, tout en gardant leurs accès", async () => {
     dimensionnerTout(390, 620);
     const requetes = vi.fn();

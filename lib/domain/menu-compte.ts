@@ -100,6 +100,11 @@ export const GROUPES_MENU: readonly GroupeMenu[] = Object.freeze([
         url: "/socle",
       },
       {
+        titre: "Mon parcours",
+        quoi: "Ton cap, tes prochains pas et tes repères pour Anam.",
+        url: "/parcours",
+      },
+      {
         titre: "Ce qu’Anam retient",
         quoi: "Relire, corriger ou effacer ses souvenirs.",
         url: "/memoire",

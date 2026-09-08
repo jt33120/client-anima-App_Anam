@@ -114,7 +114,9 @@ const client = (opts: { enDetresse: boolean; abonnement: string | null }) =>
       if (nom === "est_premium_courante") return { data: true, error: null };
       return { data: null, error: null };
     },
-    from: () => ({
+    from: (table: string) => table === "suivi_anam" ? {
+      select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }),
+    } : ({
       select: () => ({
         maybeSingle: async () => ({
           data: opts.abonnement ? { stripe_subscription_id: opts.abonnement } : null,
@@ -165,7 +167,9 @@ describe("[AC3] le CHEMIN vers /abonnement survit à un épisode de détresse", 
         if (nom === "est_premium_courante") return { data: false, error: null };
         return { data: null, error: null };
       },
-      from: () => ({
+      from: (table: string) => table === "suivi_anam" ? {
+        select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }),
+      } : ({
         select: () => ({ maybeSingle: async () => ({ data: { stripe_subscription_id: "sub_impaye" }, error: null }) }),
       }),
     } as unknown as SupabaseClient;

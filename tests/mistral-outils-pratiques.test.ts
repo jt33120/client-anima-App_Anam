@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AdaptateurMistral } from "@/lib/ai/adapters/mistral";
 import { OUTIL_PROPOSER_PRATIQUE } from "@/lib/ai/outils-pratiques";
+import { OUTIL_AJUSTER_PARCOURS, resoudreOutilParcours } from "@/lib/ai/outils-parcours";
 import type { EvenementIa, RequeteIa } from "@/lib/ai/port";
 
 const { stream } = vi.hoisted(() => ({ stream: vi.fn() }));
@@ -17,7 +18,7 @@ async function collecter(req = requete) {
 }
 async function* fluxOutil(finishReason = "tool_calls", tropLong = false) {
   yield { data: { choices: [{ delta: { toolCalls: [{ index: 0, id: "change-1", function: { name: "proposer_pratique", arguments: '{"pratiqueId":' } }] } }] } };
-  yield { data: { choices: [{ delta: { toolCalls: [{ index: 0, id: "change-2", function: { name: "", arguments: tropLong ? "x".repeat(5000) : '"respiration-douce"}' } }] } }] } };
+  yield { data: { choices: [{ delta: { toolCalls: [{ index: 0, id: "change-2", function: { name: "", arguments: tropLong ? "x".repeat(8193) : '"respiration-douce"}' } }] } }] } };
   yield { data: { choices: [{ delta: {}, finishReason }], usage: { promptTokens: 101, completionTokens: 23 } } };
 }
 beforeEach(() => {
@@ -69,6 +70,29 @@ describe("native streamed practice tools", () => {
     const fin = (await collecter()).at(-1);
     expect(fin).not.toHaveProperty("appelsOutils");
     expect(fin).toMatchObject({ usage: { tokensEntree: 101, tokensSortie: 23 } });
+  });
+
+  it("assembles Unicode follow-up fields at their valid domain bounds without dropping the native call", async () => {
+    const lettre = "𐐀";
+    const commande = {
+      cap: lettre.repeat(160), synthese: lettre.repeat(1200),
+      etapes: Array.from({ length: 3 }, () => ({ titre: lettre.repeat(160), pratiqueId: "respiration-douce" })),
+      preuve: lettre.repeat(500),
+    };
+    const arguments_ = JSON.stringify(commande);
+    expect(arguments_.length).toBeGreaterThan(4096);
+    stream.mockResolvedValueOnce((async function* () {
+      for (let i = 0; i < arguments_.length; i += 701) {
+        yield { data: { choices: [{ delta: { toolCalls: [{ index: 0,
+          function: { name: i === 0 ? "ajuster_parcours" : "", arguments: arguments_.slice(i, i + 701) },
+        }] } }] } };
+      }
+      yield { data: { choices: [{ delta: {}, finishReason: "tool_calls" }], usage: { promptTokens: 101, completionTokens: 3000 } } };
+    })());
+    const fin = (await collecter({ ...requete, outils: [OUTIL_AJUSTER_PARCOURS] })).at(-1);
+    expect(fin?.type).toBe("fin");
+    if (fin?.type !== "fin") throw new Error("fin_absente");
+    expect(resoudreOutilParcours(fin.appelsOutils, true, commande.preuve, null)).toEqual({ type: "ajuster", ...commande });
   });
 
   it("never publishes buffered calls or retries when the upstream stream dies", async () => {

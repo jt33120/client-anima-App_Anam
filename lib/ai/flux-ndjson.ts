@@ -14,6 +14,7 @@
 export type TrameClient =
   | { t: "delta"; c: string }
   | { t: "pratique"; pratiqueId: string }
+  | { t: "parcours"; action: "ajuster" | "avancer" }
   | { t: "fin" }
   | { t: "erreur" }
   /**

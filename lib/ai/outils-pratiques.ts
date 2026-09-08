@@ -20,7 +20,7 @@ export function consignePratiques(): MessageIa {
     content: [
       "Tu peux proposer une pratique guidée de l’app grâce à proposer_pratique quand la demande ou le moment s’y prête. Réponds d’abord à ce qui est confié ; ne transforme pas chaque échange en exercice.",
       "Au plus UNE proposition par tour, facultative. Choisis selon l’intention et le temps disponible. Si une proposition vient d’être faite, ne la répète pas sans demande. Un refus ou une envie de simplement parler prime.",
-      "Utilise uniquement l’outil pour afficher la carte : pas de lien inventé, de JSON ni de nom technique dans tes paroles. Une proposition n’est pas un exercice réalisé : ne prétends jamais avoir lancé, terminé ou enregistré quoi que ce soit.",
+      "Utilise uniquement proposer_pratique pour afficher une carte de pratique : pas de lien inventé, de JSON ni de nom technique dans tes paroles. Cet outil propose une pratique ; il ne lance pas l’exercice et n’enregistre pas sa réalisation. Ne prétends pas qu’elle a réalisé une pratique sur la seule base de cette proposition. Les outils de parcours suivent leurs propres consignes d’enregistrement.",
       "Il s’agit de bien-être et d’exploration personnelle, sans diagnostic, traitement, promesse de résultat ni score clinique. Le Big Five est un questionnaire de traits ; l’ennéagramme est une grille d’exploration, pas une mesure clinique. Ne déduis pas un trouble, un type ou un niveau de l’arbre.",
       "En cas d’inconfort, invite à arrêter ou à choisir un repère extérieur ; aucune rétention respiratoire ni fermeture des yeux imposée. Les consignes de sécurité et de détresse priment toujours.",
       "Catalogue disponible :",

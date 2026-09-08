@@ -30,6 +30,7 @@ export interface MessageEnvoi {
 
 export interface RappelsFlux {
   onPratique?: (pratiqueId: string) => void;
+  onParcours?: (action: "ajuster" | "avancer") => void;
   /** Incrément de texte révélé (un ou plusieurs mots complets). Jamais caractère par caractère. */
   onMotsReveles: (mots: string) => void;
   /** Fin propre : le message complet, à annoncer UNE fois au lecteur d'écran (aria-atomic). */
@@ -53,7 +54,7 @@ export interface RappelsFlux {
   onLecture?: (lectureId: string, texte: string) => void;
 }
 
-export function useFluxAnam() {
+export function useFluxAnam(compteAttendu?: string) {
   /** « Anam prépare » : vrai entre l'envoi et le 1er MOT révélé → épaissit le signe (AC2). */
   const [prepare, setPrepare] = useState(false);
   const [enCours, setEnCours] = useState(false);
@@ -81,6 +82,7 @@ export function useFluxAnam() {
       let revele = ""; // texte déjà révélé (= message complet à la fin)
       let finPropre = false;
       let pratiqueProposee: string | null = null;
+      let parcoursConfirme: "ajuster" | "avancer" | null = null;
       let quotaRecu = false; // allocation épuisée (3.4) : terminal, mais ni succès ni échec re-tentable
       let premierMot = true;
       let lecteur: ReadableStreamDefaultReader<Uint8Array> | null = null;
@@ -112,7 +114,7 @@ export function useFluxAnam() {
       try {
         const reponse = await fetch("/api/anam/message", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...(compteAttendu ? { "X-Anam-Compte": compteAttendu } : {}) },
           // `jetonTour` : identité STABLE du tour logique (Story 3.4, AC1) → clé d'idempotence serveur.
           // Réutilisé au « Réessayer » → un retry ne recompte pas les tokens ni l'allocation résiduelle.
           body: JSON.stringify({ messages, jetonTour }),
@@ -136,6 +138,8 @@ export function useFluxAnam() {
               reveler(false);
             } else if (trame.t === "pratique") {
               pratiqueProposee ??= trame.pratiqueId;
+            } else if (trame.t === "parcours") {
+              parcoursConfirme ??= trame.action;
             } else if (trame.t === "ressources") {
               // Bloc de détresse (2.6), NON terminal : on l'insère et on CONTINUE de lire les deltas.
               // Ne vole jamais le focus (le composeur reste au focus, AC2) — l'insertion est passive.
@@ -203,11 +207,12 @@ export function useFluxAnam() {
       if (issue === "avorte" || issue === "quota") return;
       if (issue === "fin") {
         if (pratiqueProposee) rappels.onPratique?.(pratiqueProposee);
+        if (parcoursConfirme) rappels.onParcours?.(parcoursConfirme);
         rappels.onFin(revele);
       }
       else rappels.onEchec(revele);
     },
-    [interrompre],
+    [interrompre, compteAttendu],
   );
 
   return { prepare, enCours, envoyer, interrompre };
