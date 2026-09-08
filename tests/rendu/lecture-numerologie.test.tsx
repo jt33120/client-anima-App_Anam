@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LectureNumerologie from "@/render/socle/LectureNumerologie";
 
@@ -107,4 +107,65 @@ it("discards a stale portrait and its sharing controls", async () => {
   expect(screen.queryByText(lecture.portrait)).toBeNull();
   expect(screen.queryByRole("radio")).toBeNull();
   expect(screen.getByRole("button", { name: "Recharger ma lecture" })).toBeTruthy();
+});
+
+it("shows the lotus during creation without a second creation request", async () => {
+  let finir!: (value: unknown) => void;
+  const fetcher = vi.fn().mockResolvedValueOnce(reponse({lecture:null}))
+    .mockImplementationOnce(() => new Promise(resolve => { finir = resolve; }));
+  vi.stubGlobal("fetch",fetcher);
+  const user=userEvent.setup(); render(<LectureNumerologie/>);
+  await user.click(await screen.findByRole("button",{name:"Créer ma lecture"}));
+  const bouton=screen.getByRole("button",{name:"Ta lecture prend forme…"}) as HTMLButtonElement;
+  expect(bouton.disabled).toBe(true); expect(bouton.getAttribute("aria-busy")).toBe("true");
+  expect(bouton.querySelector('svg')).not.toBeNull();
+  expect(screen.queryByRole('alert')).toBeNull();
+  finir(reponse({lecture})); await screen.findByText(lecture.portrait);
+  expect(fetcher.mock.calls.map(c=>c[1].method)).toEqual(['GET','POST']);
+});
+
+it("reads an active generation instead of presenting it as an error", async () => {
+  const fetcher=vi.fn().mockResolvedValueOnce(reponse({lecture:null,statut:'en_cours'},200))
+    .mockResolvedValueOnce(reponse({lecture}));
+  vi.stubGlobal('fetch',fetcher); render(<LectureNumerologie/>);
+  await screen.findByRole('button',{name:'Ta lecture prend forme…'});
+  expect(screen.queryByRole('alert')).toBeNull();
+  await screen.findByText(lecture.portrait,{}, {timeout:4500});
+  expect(fetcher.mock.calls.map(c=>c[1].method)).toEqual(['GET','GET']);
+});
+
+it("waits through cooldown without claiming a generation is still running", async () => {
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(reponse({lecture:null,statut:'patience',reessaiApres:1})));
+  render(<LectureNumerologie/>);
+  const bouton=await screen.findByRole('button',{name:'Créer ma lecture'}) as HTMLButtonElement;
+  expect(bouton.disabled).toBe(true); expect(bouton.getAttribute('aria-busy')).toBe('false');
+  expect(screen.queryByRole('alert')).toBeNull();
+  await waitFor(()=>expect(bouton.disabled).toBe(false),{timeout:2000});
+});
+
+
+it("bounds status polling without ever automatically creating again", async () => {
+  vi.useFakeTimers();
+  const fetcher=vi.fn().mockResolvedValue(reponse({lecture:null,statut:"en_cours"},202));
+  vi.stubGlobal("fetch",fetcher);
+  try {
+    render(<LectureNumerologie/>);
+    await act(async()=>{ await vi.advanceTimersByTimeAsync(61000); });
+    expect(fetcher).toHaveBeenCalledTimes(20);
+    expect(fetcher.mock.calls.every(c=>c[1].method==="GET")).toBe(true);
+    expect(screen.getByRole("button",{name:"Recharger ma lecture"})).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+  } finally { cleanup(); vi.useRealTimers(); }
+});
+it("stops watching a pending generation when the screen is left", async () => {
+  vi.useFakeTimers();
+  const fetcher=vi.fn().mockResolvedValue(reponse({lecture:null,statut:"en_cours"},202));
+  vi.stubGlobal("fetch",fetcher);
+  try {
+    const view=render(<LectureNumerologie/>);
+    await act(async()=>{ await vi.advanceTimersByTimeAsync(1); });
+    view.unmount();
+    await act(async()=>{ await vi.advanceTimersByTimeAsync(10000); });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  } finally { cleanup(); vi.useRealTimers(); }
 });

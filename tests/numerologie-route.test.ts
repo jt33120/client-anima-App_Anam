@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
-  user: vi.fn(), droits: vi.fn(), lire: vi.fn(), generer: vi.fn(), noter: vi.fn(),
+  user: vi.fn(), droits: vi.fn(), lire: vi.fn(), generer: vi.fn(), noter: vi.fn(), etat: vi.fn(),
 }));
 vi.mock("@/lib/data/supabase/server", () => ({createSupabaseServerClient: async () => ({auth:{getUser:mocks.user}})}));
 vi.mock("@/lib/ai/egress-guard", () => ({verifierDroitsArt9:mocks.droits}));
-vi.mock("@/lib/data/depot-lecture-numerologie", () => ({lireLectureNumerologie:mocks.lire,noterLectureNumerologie:mocks.noter}));
+vi.mock("@/lib/data/depot-lecture-numerologie", () => ({lireLectureNumerologie:mocks.lire,noterLectureNumerologie:mocks.noter,lireEtatLectureNumerologie:mocks.etat}));
 vi.mock("@/lib/ai/lecture-numerologie", () => ({genererLectureNumerologie:mocks.generer}));
 import { GET, POST, PATCH } from "@/app/api/numerologie/route";
 const id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
 const requete = (method:string,body:unknown={},origin="https://anam.test") => new Request("https://anam.test/api/numerologie",{method,headers:{origin,"content-type":"application/json"},body:JSON.stringify(body)});
 beforeEach(() => {
   vi.clearAllMocks(); mocks.user.mockResolvedValue({data:{user:{id}}}); mocks.droits.mockResolvedValue(null);
-  mocks.lire.mockResolvedValue(null); mocks.generer.mockResolvedValue({statut:"prete",lecture:{id}}); mocks.noter.mockResolvedValue(undefined);
+  mocks.etat.mockResolvedValue({statut:"absente"}); mocks.lire.mockResolvedValue(null); mocks.generer.mockResolvedValue({statut:"prete",lecture:{id}}); mocks.noter.mockResolvedValue(undefined);
 });
 describe("frontière numérologie", () => {
   it("GET lit sans générer et interdit le cache public", async () => {
@@ -37,7 +37,7 @@ describe("frontière numérologie", () => {
     expect(mocks.generer).not.toHaveBeenCalled();
   });
   it("génère seulement après un POST valide", async () => {expect((await POST(requete("POST"))).status).toBe(200); expect(mocks.generer).toHaveBeenCalledTimes(1);});
-  it.each([["en_cours",409],["limite",429]])("rend %s sans faux texte", async (statut,status) => {
+  it.each([["en_cours",202],["patience",429],["limite",429]])("rend %s sans faux texte", async (statut,status) => {
     mocks.generer.mockResolvedValue({statut}); expect((await POST(requete("POST"))).status).toBe(status);
   });
   it("une notation périmée invite à recharger sans annoncer une panne serveur", async () => {

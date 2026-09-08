@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
-import { lireLectureNumerologie, noterLectureNumerologie } from "@/lib/data/depot-lecture-numerologie";
+import { lireLectureNumerologie, noterLectureNumerologie, lireEtatLectureNumerologie } from "@/lib/data/depot-lecture-numerologie";
 import { genererLectureNumerologie } from "@/lib/ai/lecture-numerologie";
 import { verifierDroitsArt9 } from "@/lib/ai/egress-guard";
 import { ENTETES_ART9 } from "@/lib/ai/entetes-art9";
@@ -43,24 +43,32 @@ export async function GET() {
   try {
     const courant = await session();
     if (courant.refus) return courant.refus;
-    return repondre({lecture: await lireLectureNumerologie(courant.supabase!, courant.user!.id)});
+    const lecture = await lireLectureNumerologie(courant.supabase!, courant.user!.id);
+    return repondre({lecture, ...(lecture ? {statut: "prete"} : await lireEtatLectureNumerologie(courant.supabase!))});
   } catch { return erreur("lecture_indisponible", "Ta lecture n’a pas pu être chargée. Réessaie.", 503); }
 }
 export async function POST(request: Request) {
   if (!originePermise(request)) return erreur("origine_refusee", "Ouvre cette action depuis l’app.", 403);
+  let base: Awaited<ReturnType<typeof createSupabaseServerClient>> | undefined;
   try {
     const courant = await session();
     if (courant.refus) return courant.refus;
+    base = courant.supabase;
     const corps = await corpsBorne(request).catch(() => null);
     if (!corps || typeof corps !== "object" || Array.isArray(corps) || Object.keys(corps).length) return erreur("requete_invalide", "La demande est invalide.", 400);
     const resultat = await genererLectureNumerologie(courant.supabase!, courant.user!.id);
-    if (resultat.statut === "en_cours") return erreur("en_cours", "Ta lecture est en préparation. Réessaie dans un instant.", 409);
+    if (resultat.statut === "en_cours") return repondre({statut: "en_cours", reessaiApres: 3, lecture: null}, 202);
+    if (resultat.statut === "patience") return repondre({code: "patience", statut: "patience", reessaiApres: resultat.reessaiApres, lecture: null}, 429);
     if (resultat.statut === "limite") return erreur("limite", "Plusieurs essais ont déjà eu lieu. Réessaie demain.", 429);
     if (!("lecture" in resultat) || !resultat.lecture) return erreur("lecture_perimee", "Tes repères ont changé. Recharge la page.", 409);
     return repondre({lecture: resultat.lecture});
   } catch (e) {
     if (e instanceof Error && e.message === "numerologie_lecture_perimee") return erreur("lecture_perimee", "Tes repères ont changé. Recharge la page.", 409);
-    return erreur("generation_indisponible", "La lecture n’a pas pu être créée. Réessaie dans deux minutes.", 503); }
+    const code = e instanceof Error && /^(?:numerologie_|ecriture_numerologie_|reservation_numerologie_)[a-z_]+$/.test(e.message) ? e.message : "numerologie_indisponible";
+    const statut = e && typeof e === "object" && "statusCode" in e ? e.statusCode : undefined;
+    console.error("numérologie : création interrompue", {code, statutFournisseur: typeof statut === "number" ? statut : null});
+    const attente = base ? await lireEtatLectureNumerologie(base).catch(() => null) : null;
+    return repondre({code: "generation_indisponible", message: "La lecture n’a pas abouti cette fois. Tu peux réessayer après une courte pause.", ...attente}, 503); }
 }
 export async function PATCH(request: Request) {
   if (!originePermise(request)) return erreur("origine_refusee", "Ouvre cette action depuis l’app.", 403);

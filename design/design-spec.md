@@ -138,3 +138,7 @@ Reduced motion keeps a composed still image and the existing short stay. Paper a
 contrast retain their own readable palette. If the portrait fails, the brand and light remain.
 Launch-only dimensions, gradients and timing live in `design/tokens.json` and its generated CSS.
 Review at 390/768/1440, short landscape, reduced motion, missing image and delayed resources.
+
+## Text actions and waiting (2026-09-08)
+
+Reuse the existing water lotus from `render/conversation/LotusAttente.tsx` for text actions. A compact blue lotus sits beside the label in a light, transparent action: no oversized filled pill. Keep its footprint stable while the petals light up during a request. Reduced motion keeps the flower still. Waiting and retry cooldown are neutral status, separate from errors; one bounded status read follows an existing generation, never another automatic creation.

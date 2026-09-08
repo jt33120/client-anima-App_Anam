@@ -66,7 +66,12 @@ export function validerLectureNumerologie(texte: string): TexteLectureNumerologi
     if (typeof valeur !== "string" || valeur.trim().length < 40 || valeur.length > 1600) return null;
     if (/[<>\u0000-\u0008]/u.test(valeur)) return null;
     objet[cle] = valeur;
-    const affirmations = valeur.replace(/\b(?:pas un|pas de|sans|aucun)\s+diagnostic\b/giu, "");
+    const affirmations = valeur
+      .replace(/\b(?:pas un|pas de|sans|aucun)\s+diagnostic\b/giu, "")
+      // Remove only explicit disclaimers, never the rest of their sentence.
+      .replace(/\bne pr[ée]dit pas (?:ton avenir|l[’']avenir|le futur|des [ée]v[ée]nements)/giu, "")
+      .replace(/\b(?:pas une?|pas de|sans|aucune?)\s+pr[ée]dictions?\b/giu, "")
+      .replace(/\bne permet pas de pr[ée]dire (?:ton avenir|l[’']avenir)/giu, "");
     if (chercherInterdits(affirmations).length > 0 || chercherPredictions(affirmations).length > 0 || contientAttributionSensible(affirmations)) return null;
     if (/\b(diagnostic|bipolaire|schizophr[èe]ne|autiste|psychopathe|sociopathe|narcissique|suicidaire)\b|tu (?:vas|auras|seras) (?:mourir|malade|enceinte)|(?:tu es|tu souffres de) (?:d[ée]press|anxieu)|(?:certainement|factuellement|scientifiquement) (?:tu|vous)/iu.test(affirmations)) return null;
   }

@@ -48,7 +48,7 @@ describe("génération durable et contrôlée",()=>{
   it("une sortie rejetée reste mesurée,mais n'est pas persistée",async()=>{
     mocks.envoyer.mockResolvedValue({bloque:false,reponse:{texte:"invalide",tier:"fort",modele:"modele-effectif",usage:{tokensEntree:1,tokensSortie:2}}});
     await expect(genererLectureNumerologie(supabase,"moi")).rejects.toThrow("texte_refuse");
-    expect(mocks.metrer).toHaveBeenCalled();expect(mocks.terminer).toHaveBeenCalledWith("moi","bail",null);
+    expect(mocks.envoyer).toHaveBeenCalledTimes(2);expect(mocks.metrer).toHaveBeenCalledTimes(2);expect(mocks.terminer).toHaveBeenCalledWith("moi","bail",null);
   });
   it("une révocation en cours de génération empêche le dépôt",async()=>{
     mocks.droits.mockResolvedValue("consentement");
@@ -59,4 +59,14 @@ describe("génération durable et contrôlée",()=>{
     mocks.lire.mockResolvedValue(null);
     await expect(genererLectureNumerologie(supabase,"moi")).rejects.toThrow("lecture_perimee");
   });
+});
+
+
+it("corrects a rejected response once within the same reservation", async () => {
+  mocks.envoyer.mockResolvedValueOnce({bloque:false,reponse:{texte:"invalide",tier:"fort",modele:"modele-effectif",usage:{tokensEntree:1,tokensSortie:2}}});
+  expect((await genererLectureNumerologie(supabase,"moi")).statut).toBe("prete");
+  expect(mocks.commencer).toHaveBeenCalledTimes(1);
+  expect(mocks.envoyer).toHaveBeenCalledTimes(2);
+  expect(mocks.metrer).toHaveBeenLastCalledWith(expect.objectContaining({cleIdempotence:"numerologie:bail:correction"}));
+  expect(mocks.terminer).toHaveBeenCalledExactlyOnceWith("moi","bail",texte);
 });

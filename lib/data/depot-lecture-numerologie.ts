@@ -32,7 +32,12 @@ export async function commencerLectureNumerologie(supabase: SupabaseClient, util
     p_source: sourceNumerologie(calcul.entrees), p_annee: calcul.numerologie.anneeDeReference,
   });
   if (error) throw new Error("reservation_numerologie_indisponible");
-  return { reservation: data as {statut: "prete" | "en_cours" | "limite" | "reservee"; id?: string; jeton?: string}, numerologie: calcul.numerologie };
+  return { reservation: data as {statut: "prete" | "en_cours" | "patience" | "limite" | "reservee"; reessaiApres?: number; id?: string; jeton?: string}, numerologie: calcul.numerologie };
+}
+export async function lireEtatLectureNumerologie(supabase: SupabaseClient): Promise<{statut: "absente" | "prete" | "en_cours" | "patience" | "limite"; reessaiApres?: number}> {
+  const {data, error} = await supabase.rpc("etat_lecture_numerologie");
+  if (error) throw new Error("lecture_numerologie_indisponible");
+  return data;
 }
 export async function terminerLectureNumerologie(utilisatriceId: string, jeton: string, texte: TexteLectureNumerologie | null): Promise<void> {
   const {error} = await createSupabaseAdminClient().rpc("terminer_lecture_numerologie", {

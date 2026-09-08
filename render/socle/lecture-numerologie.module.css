@@ -13,23 +13,9 @@
 .texte { white-space: pre-line; overflow-wrap: anywhere; }
 .mention, .statut { color: var(--sur-papier-doux); }
 .statut:empty { display: none; }
-.bouton {
-  align-self: flex-start;
-  min-height: var(--cible-tactile);
-  padding: var(--esp-3) var(--esp-4);
-  border: 1px solid var(--bordure-forte);
-  border-radius: var(--carnet-rayon);
-  background: var(--papier);
-  color: var(--sur-papier);
-  font: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-.bouton:disabled { cursor: wait; color: var(--sur-papier-doux); }
-.bouton:focus-visible, .etoile:has(input:focus-visible) {
-  outline: 2px solid var(--bordure-forte);
-  outline-offset: var(--esp-1);
-}
+/* The button already displays progress; keep a separate live announcement for assistive tools. */
+.statut[data-attente="true"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.etoile:has(input:focus-visible) { outline: 2px solid var(--bordure-forte); outline-offset: var(--esp-1); }
 .questionnaire { margin: 0; padding: 0; border: 0; min-width: 0; }
 .questionnaire legend { margin-bottom: var(--esp-2); padding: 0; }
 .etoiles { display: flex; flex-wrap: wrap; gap: var(--esp-1); }

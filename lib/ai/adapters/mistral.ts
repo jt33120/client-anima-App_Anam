@@ -123,7 +123,7 @@ export class AdaptateurMistral implements AiPort {
       ...(req.capacite === "numerologie" ? { maxTokens: 1600, responseFormat: {type: "json_object" as const} } : {}),
     };
     const res = req.capacite === "numerologie"
-      ? await this.client.chat.complete(demande, {signal: AbortSignal.timeout(50_000), timeoutMs: 50_000, retries: {strategy: "none"}})
+      ? await this.client.chat.complete(demande, {signal: AbortSignal.timeout(20_000), timeoutMs: 20_000, retries: {strategy: "none"}})
       : await this.client.chat.complete(demande);
     return {
       texte: extraireTexte(res.choices?.[0]?.message?.content),

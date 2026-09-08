@@ -34,8 +34,11 @@ describe.sequential("numérologie RLS et cycle réel",()=>{
     r.forEach(v=>expect(v.error).toBeNull());
     expect(r.map(v=>v.data.statut).sort()).toEqual(["en_cours","reservee"]);
     const reservation=r.find(v=>v.data.statut==="reservee")!.data; id=reservation.id;
+    expect((await alice.client.rpc("etat_lecture_numerologie")).data).toEqual({statut:"en_cours",reessaiApres:3});
+    expect((await autre.client.rpc("etat_lecture_numerologie")).data).toEqual({statut:"absente"});
     expect((await terminer(alice,reservation.jeton)).error).toBeNull();
     expect((await commencer(alice)).data.statut).toBe("prete");
+    expect((await alice.client.rpc("etat_lecture_numerologie")).data).toEqual({statut:"prete"});
   });
   it("isole les lectures et interdit le texte client et les jetons",async()=>{
     expect((await lire(alice)).data).toHaveLength(1);
@@ -66,6 +69,10 @@ describe.sequential("numérologie RLS et cycle réel",()=>{
     expect((await alice.client.rpc("noter_lecture_numerologie",{p_id:id,p_note:5,p_partager:true})).error).not.toBeNull();
     const {data}=await admin.from("lecture_numerologie").select("portrait,note,partage_anam,essais,jeton").eq("utilisatrice_id",alice.id).single();
     expect(data).toMatchObject({portrait:null,note:null,partage_anam:false,essais:1,jeton:null});
+    const attente = await alice.client.rpc("etat_lecture_numerologie");
+    expect(attente.error).toBeNull(); expect(attente.data.statut).toBe("patience");
+    expect(attente.data.reessaiApres).toBeGreaterThan(0);
+    expect((await commencer(alice,"Louise Dupont")).data.statut).toBe("patience");
   });
   it("un résultat tardif ne ressuscite pas après modification de source",async()=>{
     const {data}=await commencer(autre); expect(data.statut).toBe("reservee");
@@ -75,6 +82,7 @@ describe.sequential("numérologie RLS et cycle réel",()=>{
   it("révocation interdit lecture,réservation et notation",async()=>{
     expect((await admin.from("consentement").update({revoked_at:new Date().toISOString()}).eq("utilisatrice_id",alice.id)).error).toBeNull();
     expect((await lire(alice)).data).toEqual([]); expect((await commencer(alice,"Louise Dupont")).error).not.toBeNull();
+    expect((await alice.client.rpc("etat_lecture_numerologie")).error).not.toBeNull();
     expect((await alice.client.rpc("noter_lecture_numerologie",{p_id:id,p_note:5,p_partager:true})).error).not.toBeNull();
   });
   it("la suppression du compte emporte aussi sa lecture",async()=>{

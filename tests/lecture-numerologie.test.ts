@@ -71,3 +71,16 @@ describe("lecture numérologique", () => {
     expect(partage).toContain("N’enregistre pas ce portrait");
   });
 });
+
+
+it.each([
+  "Cette lecture ne prédit pas ton avenir. Elle est symbolique et reste à confronter à ton vécu.",
+  "Ce portrait propose des pistes symboliques, pas une prédiction. Il reste à confronter à ton vécu.",
+  "Il ne s’agit pas de prédictions, seulement de pistes symboliques à confronter à ton vécu.",
+  "La numérologie ne permet pas de prédire l’avenir. Ton vécu reste le point de départ de cette réflexion.",
+])("accepts an explicit disclaimer without changing its meaning: %s", portrait => {
+  expect(validerLectureNumerologie(JSON.stringify({...texte, portrait}))?.portrait).toBe(portrait);
+});
+it("still rejects a prediction following a legitimate disclaimer", () => {
+  expect(validerLectureNumerologie(JSON.stringify({...texte, portrait: "Cette lecture ne prédit pas ton avenir. Tu rencontreras un partenaire cette année."}))).toBeNull();
+});
