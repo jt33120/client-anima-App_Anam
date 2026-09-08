@@ -1,6 +1,7 @@
 import { FUSEAU } from "./ordonnanceur";
 import { INVENTAIRE_EXPORT, titreDeSection } from "./inventaire-export";
 import * as copie from "./copie-mes-donnees";
+import { texteSansAnnotationPratique } from "./pratiques";
 
 /**
  * export-lisible.ts — LE DOCUMENT QU'ELLE OUVRE (Story 6.6, AC1 « dans un format lisible »).
@@ -163,7 +164,8 @@ function rendreJournal(rows: readonly Record<string, unknown>[]): string {
       morceaux.push(`<h3 class="jour">${echapper(jour ?? "Date inconnue")}</h3>`);
     }
     const qui = r.role === "anam" ? "Anam" : "Toi";
-    const contenu = typeof r.contenu === "string" ? r.contenu : "";
+    const brut = typeof r.contenu === "string" ? r.contenu : "";
+    const contenu = r.role === "anam" ? texteSansAnnotationPratique(brut) : brut;
     morceaux.push(
       `<article class="tour ${r.role === "anam" ? "anam" : "moi"}">` +
         `<p class="qui">${echapper(qui)}</p>` +

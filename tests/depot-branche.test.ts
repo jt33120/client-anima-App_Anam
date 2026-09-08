@@ -123,6 +123,22 @@ describe("depot-branche (4.6) — lecture arbre / échange source / renommage : 
     expect(rpc).toHaveBeenCalledWith("renommer_branche", { p_branche_id: "b1", p_nouveau_nom: "nouveau" });
   });
 
+  it("hides only the assistant's terminal practice annotation from source exchanges", async () => {
+    const lisible = "Tu peux essayer.\n\nPratique proposée : [Respirer doucement](/pratiques/respiration-douce)";
+    const annote = `${lisible}\n<!-- anam-pratique:v1:respiration-douce:${"a".repeat(64)} -->`;
+    rpc.mockResolvedValue({
+      data: [
+        { id: "a", role: "anam", contenu: annote, cree_le: "2026-09-08T10:00:00Z", est_cible: false },
+        { id: "u", role: "utilisatrice", contenu: annote, cree_le: "2026-09-08T10:01:00Z", est_cible: true },
+        { id: "a2", role: "anam", contenu: `${annote}\nUne autre phrase.`, cree_le: "2026-09-08T10:02:00Z", est_cible: false },
+      ],
+      error: null,
+    });
+    const messages = await creerDepotBranche().chargerEchangeSource({ extraitSourceId: "u" });
+    expect(messages.map((message) => message.contenu)).toEqual([lisible, annote, `${annote}\nUne autre phrase.`]);
+    expect(messages[0]).not.toHaveProperty("pratiqueId");
+  });
+
   it("[NFR-022] renommer : l'erreur ne porte que le code Postgres, jamais le nom art. 9", async () => {
     rpc.mockResolvedValue({ error: { code: "42501", message: "row-level security" } });
     let leve: unknown;

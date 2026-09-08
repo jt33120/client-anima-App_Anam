@@ -168,6 +168,23 @@ describe("[6.6/AC1] Les conversations se lisent comme des conversations", () => 
 });
 
 describe("[6.6/AC1] Les deux droits tiennent dans le même fichier", () => {
+  it("hides practice signatures from assistant prose while preserving user words and the complete JSON", () => {
+    const lisible = "Tu peux essayer.\n\nPratique proposée : [Respirer doucement](/pratiques/respiration-douce)";
+    const annote = `${lisible}\n<!-- anam-pratique:v1:respiration-douce:${"a".repeat(64)} -->`;
+    const document = doc({ entree_journal: [
+      { role: "anam", contenu: annote, cree_le: "2026-09-08T10:00:00Z" },
+      { role: "utilisatrice", contenu: annote, cree_le: "2026-09-08T10:01:00Z" },
+    ] });
+    const html = rendreExportLisible(document);
+    const tours = html.match(/<article class="tour (?:anam|moi)">[\s\S]*?<\/article>/g)!;
+    expect(tours).toHaveLength(2);
+    expect(tours[0]).toContain(echapper(lisible));
+    expect(tours[0]).not.toContain("anam-pratique:v1");
+    expect(tours[1]).toContain(echapper(annote));
+    const annexe = html.slice(html.indexOf('id="donnees-brutes">') + 'id="donnees-brutes">'.length, html.lastIndexOf("</script>"));
+    expect(JSON.parse(annexe)).toEqual(document);
+  });
+
   it("l'annexe JSON porte le document COMPLET, reprenable par une machine (art. 20)", () => {
     const html = rendreExportLisible(doc({ branche: [{ nom: "le déménagement" }] }));
     const brut = html.slice(

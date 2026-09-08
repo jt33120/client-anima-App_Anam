@@ -7,6 +7,7 @@
 
 /** L'état d'un tour d'Anam : en cours de flux, terminé proprement, ou échec (coupure sans `fin`). */
 export type EtatAnam = "flux" | "complet" | "echec";
+import type { PratiqueProposeeVue } from "./pratiques";
 
 /**
  * Une ressource d'aide telle que RENDUE dans le fil (Story 2.6). Type de VUE LOCAL : le rendu ne
@@ -32,6 +33,7 @@ export interface RepereJour {
 }
 
 export type Tour = (
+  | { readonly id: string; readonly role: "pratique"; readonly ancreId: string; readonly pratique: PratiqueProposeeVue }
   | { readonly id: string; readonly role: "utilisatrice"; readonly texte: string }
   | { readonly id: string; readonly role: "anam"; readonly texte: string; readonly etat: EtatAnam }
   | {
@@ -189,6 +191,8 @@ export interface TourHistorique {
   readonly role: "utilisatrice" | "anam";
   readonly texte: string;
   readonly separateurAvant?: boolean;
+  /** Recommandation authentifiée à la lecture serveur ; le texte seul n'ouvre aucune carte. */
+  readonly pratiqueId?: string;
 }
 
 /** Métadonnée interactive rattachée à LA ligne persistée qui porte sa phrase. */

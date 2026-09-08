@@ -35,6 +35,7 @@ interface TourOuverture {
   readonly role: "utilisatrice" | "anam";
   readonly texte: string;
   readonly separateurAvant?: boolean;
+  readonly pratiqueId?: string;
 }
 
 interface OuvertureLiee {
@@ -118,11 +119,12 @@ async function sessionAutorisee(): Promise<SessionOuverture> {
 function toursPourRendu(
   fil: Awaited<ReturnType<typeof lireFilRecent>>,
 ): readonly TourOuverture[] {
-  return fil.map(({ id, role, texte, separateurAvant }) => ({
+  return fil.map(({ id, role, texte, separateurAvant, pratiqueId }) => ({
     id,
     role,
     texte,
     ...(separateurAvant ? { separateurAvant: true as const } : {}),
+    ...(pratiqueId ? { pratiqueId } : {}),
   }));
 }
 

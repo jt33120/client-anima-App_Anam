@@ -6,7 +6,7 @@ import { LIEN_AJOUTER } from "@/lib/domain/copie-naissance";
  * pur : il nomme les destinations et les deux actions conditionnelles, sans lire le compte ni
  * décider d'une mise en page.
  */
-export type CleUniversMoi = "astrologie" | "numerologie" | "psychologie";
+export type CleUniversMoi = "astrologie" | "numerologie" | "psychologie" | "pratiques";
 
 export interface ActionUniversMoi {
   readonly libelle: string;
@@ -79,6 +79,13 @@ export function universMoi(
       accroche: "Ton ennéagramme et des repères dont la méthode reste visible.",
       url: "/psychologie",
       action: actionEnneagrammePour(statutEnneagramme),
+    },
+    {
+      cle: "pratiques",
+      titre: "Pratiques",
+      accroche: "Des exercices pour souffler, prendre conscience et avancer à ton rythme.",
+      url: "/pratiques",
+      action: null,
     },
   ] satisfies readonly UniversMoi[]);
 }

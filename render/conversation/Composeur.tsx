@@ -34,7 +34,9 @@ export default function Composeur({
   occupe,
   champRef,
   motifDesactive,
+  messageInitial = "",
 }: {
+  messageInitial?: string;
   onEnvoyer: (texte: string) => void;
   occupe: boolean;
   /** Réf du champ, détenue par le parent → permet de redéplacer le focus (après « Réessayer »). */
@@ -46,7 +48,13 @@ export default function Composeur({
    */
   motifDesactive?: string;
 }) {
-  const [valeur, setValeur] = useState("");
+  const [valeur, setValeur] = useState(messageInitial);
+  const dernierMessageInitial = useRef(messageInitial);
+  useEffect(() => {
+    if (dernierMessageInitial.current === messageInitial) return;
+    dernierMessageInitial.current = messageInitial;
+    if (messageInitial) setValeur((brouillon) => brouillon || messageInitial);
+  }, [messageInitial]);
   const palier = usePalier();
   const bloque = !!motifDesactive; // arrêt persistant (quota épuisé) — indépendant de `occupe`
   const motifRef = useRef<HTMLParagraphElement>(null);

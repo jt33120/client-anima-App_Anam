@@ -50,6 +50,8 @@ function fichiersTs(dir: string): string[] {
 // Le test « CHAQUE exclusion est nécessaire » ci-dessous interdit que cela se reproduise : une entrée
 // ajoutée ici doit PROUVER qu'elle protège d'un vrai match.
 const EXCLUS = new Set([
+  "lib/ai/outils-pratiques.ts", // instructions système inverses, jamais texte affiché
+
   "lib/safety/consigne-detresse.ts",
   "lib/domain/consigne-voix.ts",
   "lib/domain/consigne-bilan.ts", // consigne de génération du bilan (2.9) — lexique en instructions inverses

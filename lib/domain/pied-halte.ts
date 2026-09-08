@@ -44,6 +44,8 @@ export type IdHalte =
   | "memoire"
   | "mes-donnees"
   | "psychologie"
+  | "pratiques"
+  | "pratiques/[id]"
   | "reglages"
   | "reperes"
   | "socle"
@@ -132,6 +134,8 @@ const MENTION_DUE: Readonly<Record<IdHalte, { readonly mention: boolean; readonl
       motif:
         "le type retenu peut venir d’une hypothèse formulée par Anam ; les modules futurs restent explicitement séparés de cette origine",
     },
+    pratiques: { mention: false, motif: "un catalogue éditorial fixe de pratiques sourcées ; aucun contenu personnalisé produit par un modèle" },
+    "pratiques/[id]": { mention: false, motif: "des consignes éditoriales fixes et une note éphémère écrite par l’utilisatrice ; aucune génération" },
     abonnement: { mention: false, motif: "un état de contrat ; aucun texte produit" },
     "heure-naissance": { mention: false, motif: "un formulaire ; aucun texte produit" },
   });

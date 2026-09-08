@@ -162,6 +162,8 @@ export const ENTREES_MENU: readonly EntreeMenu[] = Object.freeze(
  * Toute halte du produit est soit dans `ENTREES_MENU`, soit ici avec un motif écrit.
  */
 export const HORS_MENU: Readonly<Record<string, string>> = Object.freeze({
+  pratiques: "univers accessible depuis l’accueil et Moi, ainsi que par les cartes d’Anam ; ce n’est pas un réglage de compte",
+  "pratiques/[id]": "exercice ouvert depuis le catalogue Pratiques ou une recommandation du chat",
   ancrages:
     "aucun ancrage n’est écrit (deferred-work.md:899-903) : une entrée qui mène toujours à « Anima n’a pas encore écrit d’ancrage » se lit comme une panne, la même phrase atteinte par URL se lit comme un état",
   "heure-naissance":

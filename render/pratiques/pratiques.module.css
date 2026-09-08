@@ -1,0 +1,41 @@
+.halte {
+  max-width: calc(var(--contenu-max) + var(--esp-9));
+  margin: 0 auto;
+  padding: var(--esp-7) var(--marge-mobile) var(--esp-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-6);
+  color: var(--texte);
+}
+.entete, .catalogue, .groupe, .lecteur, .panneau, .texteEntree, .reflexion, .repere {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  min-width: 0;
+}
+.halte h1, .halte h2, .halte h3, .halte p, .catalogue h2, .catalogue h3, .catalogue p, .lecteur h2, .lecteur p { margin: 0; }
+.entete h1 { text-wrap: balance; }
+.catalogue { gap: var(--esp-7); }
+.groupe { scroll-margin-block-start: var(--esp-5); }
+.intentions, .actions, .enteteEtape { display: flex; flex-wrap: wrap; align-items: center; gap: var(--esp-2) var(--esp-4); }
+.enteteEtape { justify-content: space-between; }
+.liste { margin: 0; padding: 0; list-style: none; }
+.entree { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--esp-3) var(--esp-5); padding-block: var(--esp-5); border-bottom: calc(var(--esp-1) / 4) solid var(--bordure); }
+.texteEntree { flex: 1 1 var(--carnet-auth); }
+.titreLien { color: var(--texte); text-decoration: none; }
+.titreLien:hover { text-decoration: underline; text-underline-offset: var(--esp-1); }
+.secondaire { color: var(--texte-doux); }
+.panneau, .repere { padding: var(--esp-5); border: calc(var(--esp-1) / 4) solid var(--bordure); border-radius: var(--carnet-rayon-lg); background: var(--surface); }
+.panneau { gap: var(--esp-5); }
+.repere { background: var(--carnet-sauge); }
+.lecteur { gap: var(--esp-5); }
+.consigne { white-space: pre-line; text-wrap: pretty; }
+.lien, .commande { display: inline-flex; align-items: center; gap: var(--esp-2); min-height: var(--cible-tactile); padding: var(--esp-2) 0; font: inherit; color: var(--accent); background: transparent; border: 0; text-align: start; cursor: pointer; text-decoration: underline; text-underline-offset: var(--esp-1); }
+.lien:focus-visible, .commande:focus-visible, .titreLien:focus-visible, .note:focus-visible, .titreEtape:focus-visible { outline: calc(var(--esp-1) / 2) solid var(--bordure-forte); outline-offset: var(--esp-1); }
+.minuteur { display: flex; flex-direction: column; align-items: flex-start; gap: var(--esp-2); border-inline-start: calc(var(--esp-1) / 2) solid var(--bordure-forte); padding-inline-start: var(--esp-4); }
+.temps { font-variant-numeric: tabular-nums; }
+.note { display: block; width: 100%; min-height: calc(var(--cible-tactile) * 2); resize: vertical; box-sizing: border-box; padding: var(--esp-3); border: calc(var(--esp-1) / 4) solid var(--bordure-forte); border-radius: var(--rayon-md); background: var(--fond); color: var(--texte); font: inherit; }
+.sources summary { display: list-item; width: fit-content; min-height: var(--cible-tactile); }
+.sources p { margin-top: var(--esp-3); }
+.sources ul { padding-inline-start: var(--esp-5); }
+.sources a { overflow-wrap: anywhere; }

@@ -1,13 +1,18 @@
+import LotusAttente from "./conversation/LotusAttente";
+import s from "./GlypheUnivers.module.css";
+
 /**
- * Le vocabulaire graphique partagé des trois univers.
+ * Le vocabulaire graphique partagé des univers.
  *
  * Ces tracés viennent de la porte canonique de la région d'accueil (« Aujourd’hui » depuis le
  * 2026-09-02, « Moi » avant). Ils restent décoratifs : le lien ou le
  * contrôle qui les accueille porte déjà son propre nom accessible.
  */
-export type CleGlypheUnivers = "astrologie" | "numerologie" | "psychologie";
+export type CleGlypheUnivers = "astrologie" | "numerologie" | "psychologie" | "pratiques";
 
 export default function GlypheUnivers({ cle }: { readonly cle: CleGlypheUnivers }) {
+  // Réutilise le lotus officiel du produit, immobile dans une porte de navigation.
+  if (cle === "pratiques") return <span className={s.lotus} aria-hidden><LotusAttente /></span>;
   if (cle === "astrologie") {
     return (
       <svg viewBox="0 0 64 64" aria-hidden>

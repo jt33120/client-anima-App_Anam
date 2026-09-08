@@ -35,7 +35,7 @@ export function toursApresRejeu(tours: readonly Tour[], idAnam: string): Tour[] 
       t.id !== idAnam &&
       // Seuls le bilan et le paywall partent avec leur ancre. Ni la carte (elle n'a pas d'ancre), ni
       // le bloc de ressources (il ne doit JAMAIS pouvoir quitter l'écran).
-      !((t.role === "bilan" || t.role === "paywall") && t.ancreId === idAnam),
+      !((t.role === "bilan" || t.role === "paywall" || t.role === "pratique") && t.ancreId === idAnam),
   );
 }
 

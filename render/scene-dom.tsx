@@ -35,6 +35,7 @@ import ArbreInteractif from "./arbre/ArbreInteractif";
 import Surimpression, { type CopieMenu } from "./surimpression";
 import { versHalte } from "@/lib/scene/retour-scene";
 import Conversation from "./conversation/Conversation";
+import type { PratiqueProposeeVue } from "./conversation/pratiques";
 import EchangeSource from "./conversation/EchangeSource";
 import Bibliotheque from "./accueil/Bibliotheque";
 import { libelleDateAccueil, type JourAccueil } from "./accueil/date";
@@ -53,6 +54,8 @@ import { useConversationViewport } from "./conversation/useConversationViewport"
 import GlypheUnivers from "./GlypheUnivers";
 
 export interface ProprietesSceneRendue {
+  pratiques?: readonly PratiqueProposeeVue[];
+  messagePratique?: string;
   /** Domain-projection serveur, en lecture seule (AD-7). Le rendu ne l'écrit jamais. */
   projection: ProjectionScene;
   /** Phrase statique du journal vide, décidée côté domaine et jamais persistée comme un tour. */
@@ -265,6 +268,8 @@ const CORPS: Record<IdRegion, string> = {
 };
 
 export default function SceneDom({
+  pratiques,
+  messagePratique,
   projection,
   accueilAnam,
   onReclamerOuvertureQuotidienne,
@@ -284,7 +289,7 @@ export default function SceneDom({
   const [etat, dispatch] = useReducer(
     reducteurVue,
     seuilDejaFranchi,
-    (franchi) => etatInitialPour(regionDOuverture(franchi)),
+    (franchi) => etatInitialPour(messagePratique ? "anam" : regionDOuverture(franchi)),
   );
   const region = etat.regionCourante;
   const viewportConversation = useConversationViewport(region === "anam");
@@ -343,7 +348,7 @@ export default function SceneDom({
   const [tourOuvert, setTourOuvert] = useState(false);
   const tourDejaOuvert = useRef(false);
   useEffect(() => {
-    if (!guide || tourDejaOuvert.current) return;
+    if (!guide || tourDejaOuvert.current || messagePratique) return;
     const params = new URLSearchParams(window.location.search);
     const demande = params.get("tour") === "1";
     const premiereArrivee = premierPassage?.du === true && region !== "seuil";
@@ -355,7 +360,7 @@ export default function SceneDom({
       const reste = params.toString();
       window.history.replaceState(null, "", reste ? `${window.location.pathname}?${reste}` : window.location.pathname);
     }
-  }, [guide, premierPassage, region]);
+  }, [guide, premierPassage, region, messagePratique]);
 
   /* ── LE GESTE : le doigt mène (voir le bloc « LE GLISSEMENT LATÉRAL » plus haut) ───────────── */
   const ordre = useMemo(() => REGIONS.map((r) => r.id), []);
@@ -810,6 +815,8 @@ export default function SceneDom({
                     L'échange source persisté se SUPERPOSE (AC4), puis le retour redonne le fil intact. */}
                 <div className={echangeExtrait ? s.masque : s.transparent}>
                   <Conversation
+                    pratiques={pratiques}
+                    messageInitial={messagePratique}
                     introduction={accueilAnam}
                     champRefExterne={composeurAnam}
                     onPreparation={setAnamPrepare}

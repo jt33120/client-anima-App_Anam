@@ -94,7 +94,7 @@ export interface ActionUniversVue {
 }
 
 export interface UniversVue {
-  readonly cle: "astrologie" | "numerologie" | "psychologie";
+  readonly cle: "astrologie" | "numerologie" | "psychologie" | "pratiques";
   readonly titre: string;
   readonly accroche: string;
   readonly url: string;

@@ -1,3 +1,4 @@
+import { PRATIQUES, pratiqueParId } from "@/lib/domain/pratiques";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import { etapeOnboardingPour } from "@/app/(auth)/etat-onboarding";
@@ -62,7 +63,9 @@ export const dynamic = "force-dynamic";
  * renvoie à sa halte, jamais l'inverse. La scène ici est encore un PROTOTYPE 2D (Story 1.2) —
  * la version formalisée (modèle/rendu séparés AD-7, doublage non-spatial, tokens) est la Story 1.7.
  */
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams?: Promise<{ pratique?: string }> } = {}) {
+  const pratiqueRetour = pratiqueParId((await searchParams)?.pratique);
+  const messagePratique = pratiqueRetour ? `J’aimerais parler de la pratique « ${pratiqueRetour.titre} ».` : undefined;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -162,6 +165,8 @@ export default async function Page() {
         copie={{ nom: NOM_PORTAIL, annonce: ANNONCE_PORTAIL }}
       />
       <SceneDom
+      pratiques={PRATIQUES.map(({ id, titre, description, dureeMinutes, type, href }) => ({ id, titre, description, dureeMinutes, type, href }))}
+      messagePratique={messagePratique}
       projection={projection}
       accueilAnam={ACCUEIL_ANAM}
       onReclamerOuvertureQuotidienne={reclamerOuvertureDuJour}

@@ -58,6 +58,19 @@ export interface MessageIa {
   content: string;
 }
 
+/** Provider-neutral function contract. Only the server grants these capabilities. */
+export interface OutilIa {
+  nom: string;
+  description: string;
+  parametres: Record<string, unknown>;
+}
+
+/** Untrusted provider output, validated by the owning application capability before use. */
+export interface AppelOutilIa {
+  nom: string;
+  arguments: unknown;
+}
+
 export interface RequeteIa {
   capacite: CapaciteIa;
   messages: MessageIa[];
@@ -69,6 +82,7 @@ export interface RequeteIa {
    * toujours 0 ; la Story 2.3 (pipeline sécurité) posera le vrai niveau.
    */
   niveauSecurite?: NiveauSecurite;
+  outils?: readonly OutilIa[];
 }
 
 export interface ReponseIa {
@@ -86,7 +100,9 @@ export interface ReponseIa {
  */
 export type EvenementIa =
   | { type: "delta"; texte: string }
-  | { type: "fin"; tier: TierIa; modele: string; usage: { tokensEntree: number; tokensSortie: number } };
+  /** Server-only output size for honest fallback metering if a tool-only stream aborts. */
+  | { type: "outil_delta"; caracteres: number }
+  | { type: "fin"; tier: TierIa; modele: string; usage: { tokensEntree: number; tokensSortie: number }; appelsOutils?: readonly AppelOutilIa[] };
 
 export interface AiPort {
   completer(req: RequeteIa): Promise<ReponseIa>;

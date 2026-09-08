@@ -29,6 +29,7 @@ export interface MessageEnvoi {
 }
 
 export interface RappelsFlux {
+  onPratique?: (pratiqueId: string) => void;
   /** Incrément de texte révélé (un ou plusieurs mots complets). Jamais caractère par caractère. */
   onMotsReveles: (mots: string) => void;
   /** Fin propre : le message complet, à annoncer UNE fois au lecteur d'écran (aria-atomic). */
@@ -79,6 +80,7 @@ export function useFluxAnam() {
       let motsBuffer = ""; // texte reçu, mot en cours pas encore révélé
       let revele = ""; // texte déjà révélé (= message complet à la fin)
       let finPropre = false;
+      let pratiqueProposee: string | null = null;
       let quotaRecu = false; // allocation épuisée (3.4) : terminal, mais ni succès ni échec re-tentable
       let premierMot = true;
       let lecteur: ReadableStreamDefaultReader<Uint8Array> | null = null;
@@ -132,6 +134,8 @@ export function useFluxAnam() {
             if (trame.t === "delta") {
               motsBuffer += trame.c;
               reveler(false);
+            } else if (trame.t === "pratique") {
+              pratiqueProposee ??= trame.pratiqueId;
             } else if (trame.t === "ressources") {
               // Bloc de détresse (2.6), NON terminal : on l'insère et on CONTINUE de lire les deltas.
               // Ne vole jamais le focus (le composeur reste au focus, AC2) — l'insertion est passive.
@@ -197,7 +201,10 @@ export function useFluxAnam() {
       // `avorte` (départ volontaire) et `quota` (allocation épuisée, 3.4) ne dispatchent AUCUN terminal :
       // le partiel/optimiste est géré par `onQuota` (déjà fauché dans la boucle) ou conservé tel quel.
       if (issue === "avorte" || issue === "quota") return;
-      if (issue === "fin") rappels.onFin(revele);
+      if (issue === "fin") {
+        if (pratiqueProposee) rappels.onPratique?.(pratiqueProposee);
+        rappels.onFin(revele);
+      }
       else rappels.onEchec(revele);
     },
     [interrompre],

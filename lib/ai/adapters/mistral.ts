@@ -145,6 +145,23 @@ export class AdaptateurMistral implements AiPort {
     const { tier, modele, messages } = this.preparer(req);
     let tokensEntree = 0;
     let tokensSortie = 0;
+    // The grant is checked again at the adapter boundary: a caller cannot enable tools on a
+    // safety or document request. Streamed arguments stay server-side and bounded until `fin`.
+    const outils = req.capacite === "echange" && (req.niveauSecurite ?? 0) === 0 ? req.outils : undefined;
+    const demande = {
+      model: modele,
+      messages,
+      ...(outils?.length ? {
+        tools: outils.map((outil) => ({
+          type: "function" as const,
+          function: { name: outil.nom, description: outil.description, parameters: outil.parametres },
+        })),
+        toolChoice: "auto" as const,
+        parallelToolCalls: false,
+      } : {}),
+    };
+    const appels = new Map<number, { nom: string; arguments: string; invalide: boolean }>();
+    let finNormale = false;
 
     // ⚠️ LA REPRISE S'ARRÊTE AU PREMIER FRAGMENT, ET C'EST TOUTE LA GARDE.
     //
@@ -158,16 +175,41 @@ export class AdaptateurMistral implements AiPort {
     // reprise n'a donc lieu que tant que RIEN n'a été émis, et une seule fois.
     let flux: Awaited<ReturnType<typeof this.client.chat.stream>>;
     try {
-      flux = await this.client.chat.stream({ model: modele, messages });
+      flux = await this.client.chat.stream(demande);
     } catch (e) {
       const classe = classerEchec(e);
       console.error("mistral/diffuser : ouverture du flux refusée", { classe, modele });
       if (classe !== "passager") throw e;
       await new Promise((r) => setTimeout(r, DELAI_REPRISE_MS));
-      flux = await this.client.chat.stream({ model: modele, messages });
+      flux = await this.client.chat.stream(demande);
     }
 
     for await (const evenement of flux) {
+      const choix = evenement.data.choices?.[0];
+      if (choix?.finishReason) finNormale = choix.finishReason === "tool_calls" || choix.finishReason === "stop";
+      if (outils?.length) {
+        let caracteres = 0;
+        for (const appel of choix?.delta?.toolCalls ?? []) {
+          const nom = appel.function?.name ?? "";
+          const args = appel.function?.arguments;
+          const fragment = typeof args === "string" ? args : args && typeof args === "object" ? JSON.stringify(args) : "";
+          caracteres += nom.length + fragment.length;
+          const index = appel.index ?? 0;
+          if (!Number.isInteger(index) || index < 0 || index >= 4) continue;
+          const courant = appels.get(index) ?? { nom: "", arguments: "", invalide: false };
+          if (courant.invalide) continue;
+          if (nom !== courant.nom) courant.nom += nom;
+          if (typeof args === "string") courant.arguments += args;
+          else if (args && typeof args === "object" && !courant.arguments) courant.arguments = JSON.stringify(args);
+          if (courant.nom.length > 128 || courant.arguments.length > 4096) {
+            courant.invalide = true;
+            courant.nom = "";
+            courant.arguments = "";
+          }
+          appels.set(index, courant);
+        }
+        if (caracteres) yield { type: "outil_delta", caracteres };
+      }
       // `delta.content` peut être `string` OU `ContentChunk[]` (type SDK) : extraire les DEUX,
       // sinon un delta structuré serait silencieusement perdu (revue 2.2).
       const texte = extraireTexte(evenement.data.choices?.[0]?.delta?.content);
@@ -180,6 +222,12 @@ export class AdaptateurMistral implements AiPort {
         tokensSortie = usage.completionTokens ?? tokensSortie;
       }
     }
-    yield { type: "fin", tier, modele, usage: { tokensEntree, tokensSortie } };
+    const appelsOutils = finNormale ? [...appels.values()]
+      .filter((appel) => !appel.invalide && outils?.some((outil) => outil.nom === appel.nom))
+      .map(({ nom, arguments: args }) => ({ nom, arguments: args })) : [];
+    yield {
+      type: "fin", tier, modele, usage: { tokensEntree, tokensSortie },
+      ...(appelsOutils.length ? { appelsOutils } : {}),
+    };
   }
 }

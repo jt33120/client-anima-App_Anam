@@ -41,6 +41,14 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("la garde passkey du proxy", () => {
+  it.each(["/pratiques", "/pratiques/pause-attention"])("conserve la destination privée %s derrière le verrou", async (path) => {
+    const response = await updateSession(requete(path));
+    expect(response.status).toBe(303);
+    const location = new URL(response.headers.get("location")!);
+    expect(location.pathname).toBe("/verrou");
+    expect(location.searchParams.get("vers")).toBe(path);
+  });
+
   it("redirige une page personnelle sans marqueur de cette session", async () => {
     const response = await updateSession(requete("/moi?onglet=socle"));
     expect(response.status).toBe(303);

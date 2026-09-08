@@ -16,6 +16,7 @@ import type { RessourceVue } from "./types";
  */
 export type TrameRecue =
   | { t: "delta"; c: string }
+  | { t: "pratique"; pratiqueId: string }
   | { t: "fin" }
   | { t: "erreur" }
   | { t: "ressources"; position: "avant" | "apres"; verifieLe: string; ressources: RessourceVue[] }
@@ -74,6 +75,11 @@ export function analyserTrame(ligne: string): TrameRecue | null {
     return { t: "delta", c: typeof c === "string" ? c : "" };
   }
   if (t === "fin") return { t: "fin" };
+  if (t === "pratique") {
+    const id = (obj as { pratiqueId?: unknown }).pratiqueId;
+    return typeof id === "string" && /^[a-z][a-z0-9-]{0,63}$/.test(id)
+      ? { t: "pratique", pratiqueId: id } : null;
+  }
   if (t === "erreur") return { t: "erreur" };
   if (t === "ressources") return analyserRessources(obj);
   if (t === "beat") return analyserBeat(obj);

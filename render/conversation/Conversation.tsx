@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import ApparitionAnam, { type Beat } from "./ApparitionAnam";
 import Composeur from "./Composeur";
 import Fil from "./Fil";
+import { AUCUNE_PRATIQUE, messagesDuFil, toursAvecPratiques, type PratiqueProposeeVue } from "./pratiques";
 import { useFluxAnam, type MessageEnvoi } from "./useFluxAnam";
 import { insererTour } from "./fil-ops";
 import { LIGNE_QUOTA_EPUISEE } from "./ligne-quota";
@@ -106,12 +107,8 @@ function cleDOuverture(o?: OuvertureData | null): string | null {
  * séance, pas du journal — les rejouer ferait réapparaître une carte d'abonnement à chaque
  * rechargement, ce qui est très exactement la relance que FR-034 interdit.
  */
-function toursDHistorique(historique?: readonly TourHistorique[]): Tour[] {
-  return (historique ?? []).map((t) =>
-    t.role === "anam"
-      ? ({ id: t.id, role: "anam", texte: t.texte, etat: "complet", separateurAvant: t.separateurAvant } as const)
-      : ({ id: t.id, role: "utilisatrice", texte: t.texte, separateurAvant: t.separateurAvant } as const),
-  );
+function toursDHistorique(historique?: readonly TourHistorique[], pratiques: readonly PratiqueProposeeVue[] = AUCUNE_PRATIQUE): Tour[] {
+  return toursAvecPratiques(historique ?? [], pratiques);
 }
 
 /** Le ou les tours à ajouter au fil pour cette ouverture. Vide s'il n'y a rien à ouvrir. */
@@ -181,10 +178,11 @@ export function fusionnerEntreeDuJour(
   precedents: readonly Tour[],
   historiqueServeur: readonly TourHistorique[],
   ouvertureDuJour: OuvertureLieeAuTour | null,
+  pratiques: readonly PratiqueProposeeVue[] = AUCUNE_PRATIQUE,
 ): Tour[] {
   const idsVus = new Set<string>();
   const serveur: Tour[] = [];
-  for (const retrouve of toursDHistorique(historiqueServeur)) {
+  for (const retrouve of toursDHistorique(historiqueServeur, pratiques)) {
     if (idsVus.has(retrouve.id)) continue;
     idsVus.add(retrouve.id);
 
@@ -255,6 +253,8 @@ export function fusionnerEntreeDuJour(
 }
 
 export default function Conversation({
+  pratiques = AUCUNE_PRATIQUE,
+  messageInitial,
   introduction,
   champRefExterne,
   onPreparation,
@@ -269,6 +269,8 @@ export default function Conversation({
   onSocleAnnonce,
 }: {
   /** Copie statique du journal vide, fournie par la page et jamais persistée. */
+  pratiques?: readonly PratiqueProposeeVue[];
+  messageInitial?: string;
   introduction?: string;
   /** Permet à la scène de focaliser le composeur dans le geste de navigation au pointeur. */
   champRefExterne?: RefObject<HTMLTextAreaElement | null>;
@@ -311,7 +313,7 @@ export default function Conversation({
   /** Appelé UNE FOIS quand la mention de complétion a réellement atteint l'écran. */
   onSocleAnnonce?: () => void;
 }) {
-  const [tours, setTours] = useState<Tour[]>(() => toursDHistorique(historique));
+  const [tours, setTours] = useState<Tour[]>(() => toursDHistorique(historique, pratiques));
   const toursCourants = useRef<readonly Tour[]>(tours);
   toursCourants.current = tours;
   const [ouvertureAffichee, setOuvertureAffichee] = useState<OuvertureData | null>(null);
@@ -490,7 +492,7 @@ export default function Conversation({
             ? resultat.ouverture
             : null;
         setTours((precedents) =>
-          fusionnerEntreeDuJour(precedents, resultat.tours, ouvertureLiee),
+          fusionnerEntreeDuJour(precedents, resultat.tours, ouvertureLiee, pratiques),
         );
         const ouvertureRendue = ouvertureLiee?.donnees ?? null;
         const cleOuverture = cleDOuverture(ouvertureRendue);
@@ -626,6 +628,7 @@ export default function Conversation({
       // `onFin` arriverait avec une chaîne VIDE et écraserait l'annonce a11y « Ta lecture est
       // écrite. » par du silence. Le drapeau vit dans la clôture du tour, comme `idBilanCourant`.
       let lectureRendue = false;
+      let titrePratique: string | null = null;
       envoisParTour.current.set(idAnam, { messages, jeton });
       setTours((prev) => [...prev, { id: idAnam, role: "anam", texte: "", etat: "flux" }]);
       setAnnonce("");
@@ -643,7 +646,7 @@ export default function Conversation({
               t.id === idAnam && t.role === "anam" ? { ...t, texte: complet, etat: "complet" } : t,
             ),
           );
-          setAnnonce(complet); // annonce a11y UNIQUE (aria-atomic), à la fin — SUCCÈS
+          setAnnonce(titrePratique ? `${complet} Pratique proposée : ${titrePratique}.` : complet); // annonce a11y UNIQUE (aria-atomic), à la fin — SUCCÈS
         },
         onEchec: () => {
           setTours((prev) =>
@@ -726,6 +729,15 @@ export default function Conversation({
           ]);
           setAnnonce("Ta lecture est écrite.");
         },
+        onPratique: (pratiqueId) => {
+          const pratique = pratiques.find((p) => p.id === pratiqueId);
+          if (!pratique) return;
+          titrePratique = pratique.titre;
+          const id = `pratique:${idAnam}`;
+          setTours((prev) => prev.some((t) => t.id === id) ? prev : insererTour(prev, idAnam, "apres", {
+            id, role: "pratique", ancreId: idAnam, pratique,
+          }));
+        },
         onQuota: () => {
           setTours((prev) => prev.filter((t) => t.id !== idAnam));
           setQuotaEpuise(true);
@@ -735,26 +747,12 @@ export default function Conversation({
         },
       });
     },
-    [envoyer],
+    [envoyer, pratiques],
   );
 
   const surEnvoi = useCallback(
     (texte: string) => {
-      const histo: MessageEnvoi[] = tours
-        // Garde de type : seuls les tours PORTEURS DE TEXTE entrent dans l'historique envoyé. Les blocs
-        // `ressource` et `bilan` (2.9, sans `texte`) en sont exclus — par le rôle, pas juste par Exclude.
-        .filter(
-          (t): t is Extract<Tour, { role: "utilisatrice" | "anam" | "lecture" }> =>
-            t.role === "utilisatrice" ||
-            (t.role === "anam" && t.etat === "complet") ||
-            // Story 5.8 — LA LECTURE ENTRE DANS L'HISTORIQUE, contrairement au bilan. Les deux sont
-            // des blocs document, mais le bilan CLÔT une séance (rien ne le suit) tandis que la
-            // lecture est suivie d'une conversation. Anam qui ne se souviendrait pas, au tour
-            // suivant, du texte qu'elle vient d'écrire serait un défaut visible à la première
-            // question — et « Mes lectures » est un document dont on reparle.
-            t.role === "lecture",
-        )
-        .map((t) => ({ role: t.role === "utilisatrice" ? "user" : "assistant", content: t.texte }));
+      const histo: MessageEnvoi[] = messagesDuFil(tours);
       // Nouveau tour LOGIQUE → nouveau jeton stable (3.4, AC1). Dans un handler d'événement (jamais au
       // rendu) → aucun risque de mismatch d'hydratation.
       const jeton = crypto.randomUUID();
@@ -912,6 +910,7 @@ export default function Conversation({
         </div>
       ) : null}
       <Composeur
+        messageInitial={messageInitial}
         onEnvoyer={surEnvoi}
         occupe={enCours || ouvertureBloquante}
         champRef={champRef}

@@ -244,13 +244,14 @@ describe("[5.6/T8] `app/page.tsx` lit le thème UNE FOIS et le passe à ses DEUX
   });
 });
 
-describe("[Aujourd’hui] les trois univers sont câblés depuis l’état réel", () => {
+describe("[Aujourd’hui] les univers sont câblés depuis l’état réel", () => {
   it("un compte sans résultat reçoit un CTA direct vers le questionnaire", async () => {
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     expect(b.univers.map((u) => u.cle)).toEqual([
       "astrologie",
       "numerologie",
       "psychologie",
+      "pratiques",
     ]);
     expect(b.univers.find((u) => u.cle === "psychologie")?.action).toEqual({
       libelle: "Passer mon test d’ennéagramme",
@@ -267,7 +268,7 @@ describe("[Aujourd’hui] les trois univers sont câblés depuis l’état réel
     });
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     expect(b.univers.find((u) => u.cle === "psychologie")?.action).toBeNull();
-    expect(b.univers).toHaveLength(3);
+    expect(b.univers).toHaveLength(4);
   });
 
   it("une tentative existante devient « Reprendre », jamais « Passer »", async () => {
@@ -335,7 +336,7 @@ describe("[E3-S5] l’heure manquante se lit sur le thème DÉJÀ lu, et jamais 
     lireThemeNatal.mockRejectedValue(new Error("timeout"));
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     expect(astrologie(b).action).toBeNull();
-    expect(b.univers, "la panne a emporté les portes").toHaveLength(3);
+    expect(b.univers, "la panne a emporté les portes").toHaveLength(4);
   });
 
   it("[LE BORD / DUR] panne du socle LUI-MÊME : rien, et le reste de l’accueil tient", async () => {
@@ -346,7 +347,7 @@ describe("[E3-S5] l’heure manquante se lit sur le thème DÉJÀ lu, et jamais 
     socleQuotidien.mockRejectedValueOnce(new Error("client"));
     const b = await lireBibliotheque(SUPABASE, UID, MAINTENANT, false);
     expect(astrologie(b).action).toBeNull();
-    expect(b.univers).toHaveLength(3);
+    expect(b.univers).toHaveLength(4);
     expect(b.cartes.map((c) => c.cle).sort(), "la panne a vidé l'accueil").toEqual([...CATALOGUE_CARTES].sort());
   });
 

@@ -15,6 +15,9 @@ import {
 } from "@/lib/ai/metrage";
 import { jetonTourValide } from "@/lib/ai/jeton-tour";
 import { ligneNdjson } from "@/lib/ai/flux-ndjson";
+import { OUTIL_PROPOSER_PRATIQUE, consignePratiques, resoudrePratiqueProposee } from "@/lib/ai/outils-pratiques";
+import type { Pratique } from "@/lib/domain/pratiques";
+import { signerRecommandationPratique } from "@/lib/data/recommandation-pratique";
 import { evaluerSecuriteDuTour, type ResultatSecurite } from "@/lib/safety/pipeline";
 import { journaliserAuditDetresse } from "@/lib/safety/journaliser-audit";
 import { creerDepotEpisode } from "@/lib/safety/depot-episode";
@@ -887,10 +890,14 @@ export async function POST(request: NextRequest) {
   // toujours. La règle — et ce qu'elle coûtait — est écrite dans `consigne-phase.ts`.
   const consignePhase = consignePhaseDuTour(arc, clotureAutorisee);
   const consigneDetresse = consigneReponse(securite.verdict);
+  // Only recommendations are granted on an ordinary, safe user turn. The request body cannot
+  // grant tools, and the same grant is checked when their untrusted results are resolved.
+  const pratiquesAutorisees = horsDetresse && capaciteGeneration === "echange" && !doitProduireBilan && dernierMessage?.role === "user";
+  const consigneOutils = pratiquesAutorisees ? consignePratiques() : null;
   // ⚠️ LA CARTE SE PLACE APRÈS LE CONTEXTE ET AVANT LA PHASE, ET CETTE PLACE EST UNE GARDE — la même
   // que celle du contexte, pour la même raison : ce qu'on lui APPREND ne peut jamais primer sur ce
   // qu'on lui INTERDIT. La détresse reste au plus près des messages, la voix reste en tête.
-  const prefixes = [consigneVoix, contexte, carte, consignePhase, consigneDetresse].filter(
+  const prefixes = [consigneVoix, contexte, carte, consigneOutils, consignePhase, consigneDetresse].filter(
     (c): c is MessageIa => c !== null,
   );
   const messagesReponse = prefixes.length ? [...prefixes, ...messages] : messages;
@@ -913,7 +920,10 @@ export async function POST(request: NextRequest) {
   // La RÉPONSE : `niveauSecurite ≥ 1` force le tier FORT (la réponse suit la détection, AD-5).
   let egress;
   try {
-    const requete: RequeteIa = { capacite: capaciteGeneration, messages: messagesReponse, contientArt9: true, niveauSecurite };
+    const requete: RequeteIa = {
+      capacite: capaciteGeneration, messages: messagesReponse, contientArt9: true, niveauSecurite,
+      ...(pratiquesAutorisees ? { outils: [OUTIL_PROPOSER_PRATIQUE] } : {}),
+    };
     egress = await diffuserSousEgressArt9({ supabase, adaptateur, requete });
   } catch (e) {
     console.error("anam/message : échec d’ouverture du flux", { nom: e instanceof Error ? e.name : "inconnu" });
@@ -950,7 +960,8 @@ export async function POST(request: NextRequest) {
     finRecu: null,
     aProduit: false,
     charsSortie: 0,
-    charsEntree: messages.reduce((n, m) => n + m.content.length, 0),
+    charsEntree: messagesReponse.reduce((n, m) => n + m.content.length, 0)
+      + (pratiquesAutorisees ? JSON.stringify(OUTIL_PROPOSER_PRATIQUE).length : 0),
     tierServeur,
     modeleServeur,
   };
@@ -968,6 +979,7 @@ export async function POST(request: NextRequest) {
       // dit, et celui que la troncature a coupé non plus. Poser l'accumulateur ici et pas dans la
       // boucle garantit aussi qu'un futur chemin d'émission de delta y tombera sans qu'on y pense.
       let ditParAnam = "";
+      let pratiqueProposee: Pratique | null = null;
       const emettre = (trame: Parameters<typeof ligneNdjson>[0]) => {
         if (trame.t === "delta") ditParAnam += trame.c;
         try {
@@ -1038,9 +1050,12 @@ export async function POST(request: NextRequest) {
               if (r.aEmettre) emettre({ t: "delta", c: r.aEmettre });
               if (r.tronque) voixTronquee = true;
             }
+          } else if (ev.type === "outil_delta") {
+            etat.charsSortie += ev.caracteres; // no arguments or provider metadata are emitted
           } else {
             const fin: FinFlux = { tier: ev.tier, modele: ev.modele, usage: ev.usage };
             etat.finRecu = fin; // source AUTORITAIRE du métrage (tier/modele/usage réels)
+            pratiqueProposee = resoudrePratiqueProposee(ev.appelsOutils, pratiquesAutorisees);
           }
         }
         if (!request.signal.aborted) {
@@ -1070,6 +1085,15 @@ export async function POST(request: NextRequest) {
           // FR-084 : « au-delà de trois phrases, c'est un défaut de génération » → manquement journalisé
           // (serveur uniquement, aucun art. 9 ni verbatim — patron du log d'erreur qui ne porte que `e.name`).
           if (voixTronquee) console.warn("anam/message : voix tronquée à 3 phrases (manquement de voix, FR-084)");
+          if (pratiqueProposee) {
+            // Native function calls can contain no prose. Keep a readable, journalled answer,
+            // and send only the trusted catalogue id through the public transport.
+            if (!ditParAnam.trim()) emettre({ t: "delta", c: "Si tu veux, tu peux essayer cette pratique, à ton rythme." });
+            emettre({ t: "pratique", pratiqueId: pratiqueProposee.id });
+          } else if (pratiquesAutorisees && etat.finRecu && !ditParAnam.trim()) {
+            // An invalid or incomplete tool-only response must not become an empty chat bubble.
+            emettre({ t: "delta", c: "Tu peux choisir une pratique dans l’espace Pratiques, à ton rythme." });
+          }
           // ── BILAN DE CLÔTURE (Story 2.9, AC2) — passe FORT séparée, registre document ─────────────
           // Le bilan « reprend ses mots, en clair » : généré À PART (consigne document, capacité
           // `synthese` → tier fort AD-5), HORS troncature 3 phrases, dans une trame `bilan` dédiée
@@ -1133,7 +1157,10 @@ export async function POST(request: NextRequest) {
           // en échec sera remplacé par son rejeu, à l'écran comme au journal.
           if (ditParAnam) {
             try {
-              await consignerTourAnam(user.id, cleIdempotence, ditParAnam);
+              const contenuJournal = pratiqueProposee
+                ? signerRecommandationPratique(ditParAnam, user.id, cleIdempotence, pratiqueProposee)
+                : ditParAnam;
+              await consignerTourAnam(user.id, cleIdempotence, contenuJournal);
             } catch (e) {
               // Jamais une panne de tour : la réponse a déjà été lue (voir `depot-tour-anam.ts`).
               console.error("anam/message : tour d’Anam non gravé", { nom: e instanceof Error ? e.name : "inconnu" });

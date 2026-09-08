@@ -1,4 +1,6 @@
 import type { MessageIa } from "@/lib/ai/port";
+import type { Facteur, Position } from "./big-five";
+import { FACTEUR_LIBELLE, POSITION_LIBELLE } from "./big-five-items";
 
 /**
  * contexte-anam.ts — CE QU'ANAM SAIT DE LA PERSONNE À QUI ELLE PARLE (QA manuelle du 2026-08-20).
@@ -38,6 +40,12 @@ export interface BrancheConnue {
   readonly enPleineLumiere: boolean;
 }
 
+/** Retained questionnaire axes only; a failed read is never evidence of an absent result. */
+export type ReperesBigFiveContexte =
+  | { readonly statut: "calcule"; readonly facteurs: readonly { readonly facteur: Facteur; readonly position: Position }[] }
+  | { readonly statut: "absent" }
+  | { readonly statut: "indisponible" };
+
 export interface MatiereContexte {
   readonly prenom: string | null;
   /** « Soleil en Balance », « Lune en Poissons »… Déjà mis en mots par la couche de lecture. */
@@ -51,6 +59,8 @@ export interface MatiereContexte {
   readonly premiereFois: boolean;
   /** Only the current symbolic portrait rated 5 and explicitly shared, never factual memory. */
   readonly portraitNumerologie?: string | null;
+  /** Only the chat reader supplies these internal questionnaire results, never raw answers. */
+  readonly bigFive?: ReperesBigFiveContexte;
 }
 
 /**
@@ -100,6 +110,23 @@ export function consigneContexte(m: MatiereContexte): MessageIa {
       `Une hypothèse de type a été posée avec elle : ${m.typePressenti}. C’est une hypothèse ` +
         "réfutable, déjà énoncée. Tu ne la reposes pas et tu ne la traites pas comme un fait.",
     );
+  }
+
+  if (m.bigFive?.statut === "calcule") {
+    l.push("", "Ses repères issus du questionnaire Big Five interne d’Anam :");
+    l.push(listeSobre(m.bigFive.facteurs.map(({ facteur, position }) =>
+      `${FACTEUR_LIBELLE[facteur]} : ${POSITION_LIBELLE[position]}`,
+    )));
+    l.push(
+      "Ces positions proviennent de ses réponses à une version interne dont la validation psychométrique n’est pas établie. " +
+      "Ne la présente pas comme un instrument validé ni comme un test IPIP. Ces repères ne sont ni un diagnostic ni des faits définitifs sur elle. " +
+      "Tu peux l’aider à les confronter à son vécu si elle souhaite en parler ; elle peut les nuancer ou ne pas s’y reconnaître. " +
+      "Ne déduis aucun trouble, score, percentile ou niveau de progression. Ne récite pas ces résultats spontanément.",
+    );
+  } else if (m.bigFive?.statut === "absent") {
+    l.push("", "Aucun résultat Big Five n’est enregistré. Cela ne dit pas si elle a commencé un questionnaire. N’invente aucun résultat et ne la relance pas pour le compléter.");
+  } else if (m.bigFive?.statut === "indisponible") {
+    l.push("", "Les résultats Big Five sont indisponibles pour ce tour. Tu ne sais pas s’il en existe : ne prétends pas qu’elle n’a pas passé le questionnaire, ne lui demande pas de le refaire pour cette raison et n’invente aucune position.");
   }
 
   if (m.branches.length > 0) {

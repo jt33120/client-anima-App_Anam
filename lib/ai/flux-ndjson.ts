@@ -13,6 +13,7 @@
  */
 export type TrameClient =
   | { t: "delta"; c: string }
+  | { t: "pratique"; pratiqueId: string }
   | { t: "fin" }
   | { t: "erreur" }
   /**

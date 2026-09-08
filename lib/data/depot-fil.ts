@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { estLeJourParis } from "@/lib/domain/ouverture-seance";
+import { lireRecommandationPratique } from "./recommandation-pratique";
 
 /**
  * depot-fil.ts — LE FIL RETROUVÉ AU RECHARGEMENT (QA tour 1, T3).
@@ -46,6 +47,8 @@ export interface TourFil {
   readonly id: string;
   readonly role: "utilisatrice" | "anam";
   readonly texte: string;
+  /** Verified server recommendation, never inferred from an assistant's or user's prose. */
+  readonly pratiqueId?: string;
   /**
    * L'instant du tour, en ISO. ⚠️ IL ÉTAIT DÉJÀ LU PAR LA REQUÊTE ET JETÉ À LA CONSTRUCTION — et
    * son absence a coûté cher : sans lui, la seule question qu'on pouvait poser au fil était « es-tu
@@ -85,7 +88,8 @@ export const FIL_FENETRE_HEURES = 24;
  * lecture ne sont pas le même ordre.
  */
 /**
- * Une ligne de base → un tour, ou `null` si elle est inexploitable. PURE, et exportée EXPRÈS.
+ * Une ligne de base → un tour, ou `null` si elle est inexploitable. Exportée pour ses tests ; la
+ * vérification optionnelle d'une recommandation utilise le secret serveur, sans accès réseau.
  *
  * ⚠️ ELLE VIVAIT EN LIGNE DANS `lireFilRecent`, donc derrière une base — donc intestable sans elle,
  * donc non gardée. La campagne de mutation l'a dit : retirer le contrôle de `cree_le` ne faisait
@@ -101,10 +105,13 @@ export function tourDepuisLigne(l: Record<string, unknown> | null | undefined): 
   if (typeof l?.id !== "string" || typeof l?.contenu !== "string") return null;
   if (l.role !== "utilisatrice" && l.role !== "anam") return null;
   if (typeof l.cree_le !== "string" || l.cree_le.length === 0) return null;
+  const recommandation = l.role === "anam"
+    ? lireRecommandationPratique(l.contenu, l.utilisatrice_id, l.cle_tour)
+    : { texte: l.contenu };
   return {
     id: identiteTourFil(l.role, l.cle_tour, l.id),
     role: l.role,
-    texte: l.contenu,
+    ...recommandation,
     creeLe: l.cree_le,
   };
 }
@@ -129,7 +136,7 @@ export async function lireFilRecent(
   const depuis = new Date(maintenant.getTime() - FIL_FENETRE_HEURES * 3_600_000).toISOString();
   const { data, error } = await supabase
     .from("entree_journal")
-    .select("id, role, contenu, cree_le, cle_tour")
+    .select("id, role, contenu, cree_le, cle_tour, utilisatrice_id")
     .gte("cree_le", depuis)
     .order("cree_le", { ascending: false })
     .limit(FIL_ENTREES_MAX);
@@ -175,7 +182,7 @@ export async function lireFilDepuis(
 ): Promise<readonly TourFil[]> {
   let requete = supabase
     .from("entree_journal")
-    .select("id, role, contenu, cree_le, cle_tour")
+    .select("id, role, contenu, cree_le, cle_tour, utilisatrice_id")
     .order("cree_le", { ascending: true })
     .limit(plafond);
   if (depuisIso) requete = requete.gt("cree_le", depuisIso);

@@ -5,6 +5,7 @@ import { creerDepotBranche } from "@/lib/data/depot-branche";
 import { lireFaitsRetenus } from "@/lib/data/lire-memoire";
 import type { FaitRetenu } from "@/lib/domain/memoire-retenue";
 import { lireEnneagramme } from "@/lib/data/lire-enneagramme";
+import { lireBigFive } from "@/lib/data/lire-big-five";
 import { lireThemeNatal } from "@/lib/data/depot-theme-natal";
 import type { ThemeNatal } from "@/lib/astro/theme-natal";
 import { placer } from "@/lib/astro/theme-natal";
@@ -135,11 +136,19 @@ export async function lireContexteAnam(
   supabase: SupabaseClient,
   utilisatriceId: string,
 ): Promise<MatiereContexte> {
-  const [matiere, lecture] = await Promise.all([
+  const [matiere, lecture, bigFive] = await Promise.all([
     lireMatiere(supabase, utilisatriceId, lireSocle(supabase, utilisatriceId)),
     lireLectureNumerologie(supabase, utilisatriceId).catch(() => null),
+    lireBigFive(supabase, utilisatriceId).catch(() => ({ statut: "indisponible" as const, raison: "lecture_impossible" as const })),
   ]);
-  return { ...matiere, portraitNumerologie: lecture?.note === 5 && lecture.partageAnam ? lecture.portrait : null };
+  return {
+    ...matiere,
+    portraitNumerologie: lecture?.note === 5 && lecture.partageAnam ? lecture.portrait : null,
+    // Only the validated axes enter the prompt: no tentative, raw answers or corpus prose.
+    bigFive: bigFive.statut === "calcule"
+      ? { statut: "calcule", facteurs: bigFive.facteurs.map(({ facteur, position }) => ({ facteur, position })) }
+      : { statut: bigFive.raison === "sans_resultat" ? "absent" : "indisponible" },
+  };
 }
 
 /**

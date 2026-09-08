@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/data/supabase/server";
 import type { EtatBranche } from "@/lib/scene/projection";
+import { texteSansAnnotationPratique } from "@/lib/domain/pratiques";
 
 /**
  * Dépôt de la BRANCHE (Story 4.5 + 4.6) sous JWT utilisatrice. La RLS + le write-gate + les gardes (AD-17 à la
@@ -91,7 +92,7 @@ export function creerDepotBranche(client?: SupabaseClient): DepotBranche {
       return (data ?? []).map((r: Record<string, unknown>) => ({
         id: r.id as string,
         role: r.role as "utilisatrice" | "anam",
-        contenu: r.contenu as string,
+        contenu: r.role === "anam" ? texteSansAnnotationPratique(r.contenu as string) : r.contenu as string,
         creeLe: r.cree_le as string,
         estCible: Boolean(r.est_cible),
       }));
