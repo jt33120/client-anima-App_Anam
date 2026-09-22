@@ -1,3 +1,4 @@
+import EnteteSocle from "@/render/socle/EnteteSocle";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import FicheArbreDeVie from "@/render/arbre-de-vie/FicheArbreDeVie";
@@ -173,5 +174,5 @@ createRoot(document.getElementById("root")!).render(<>
   <ThemeCarnetDocument />
   <RequestedTree />
   {isArbreDeVie ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{arbre.TITRE_HALTE}</h1><FicheArbreDeVie fiche={ficheArbre} copie={texteArbre}/></main>
-   : isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : <PreviewScene/>}
+   : isSocle ? <main className={halte.halte}><RetourScene url="/"/><EnteteSocle titre={mode === "astrologie" ? "Astrologie" : "Numérologie"} porteArbre={mode === "numerologie" ? texteSocle.porteArbreDeVie : undefined}/><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : <PreviewScene/>}
 </>);

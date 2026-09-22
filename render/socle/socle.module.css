@@ -935,3 +935,63 @@
 .repereNombre > .etiquette { grid-column: 1 / -1; }
 
 .section .devoilement > summary { min-height: var(--cible-tactile); }
+
+/* L'accès illustré reste à droite du titre, y compris sur téléphone. */
+.enteteHalte {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+.enteteHalte:has(.apercuArbre) .titreHalte {
+  font-size: var(--numerologie-titre);
+  min-width: 0;
+}
+
+.apercuArbre {
+  display: flex;
+  flex: 0 0 var(--numerologie-apercu-largeur);
+  flex-direction: column;
+  align-items: center;
+  min-height: var(--cible-tactile);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
+  overflow: hidden;
+  background: var(--papier);
+  color: var(--sur-papier);
+  text-decoration: none;
+}
+
+.imageArbre {
+  display: block;
+  width: 100%;
+  height: var(--numerologie-apercu-hauteur);
+  object-fit: cover;
+  object-position: center;
+}
+
+.libelleArbre {
+  padding: var(--esp-2) var(--esp-1);
+  font-size: var(--carnet-petit);
+  line-height: var(--carnet-line);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.apercuArbre:hover {
+  border-color: var(--accent);
+}
+
+.apercuArbre:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 3px;
+}
+
+:global([data-a11y="contraste"]) .imageArbre {
+  display: none;
+}
+
+@media (prefers-contrast: more) {
+  .imageArbre { display: none; }
+}

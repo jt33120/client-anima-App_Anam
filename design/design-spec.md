@@ -154,3 +154,17 @@ Les actions vers la conversation ouvrent un brouillon modifiable, jamais un envo
 Le formulaire des repères conserve ses mots en cas de refus ou de conflit, sans stockage navigateur.
 Réutiliser les tokens, BoutonLotus et les liens existants ; aucun nouvel asset. Vérifier les états
 vide, chargé, indisponible et dense à 390, 768 et 1440 pixels, puis recapturer après critique.
+
+## Arbre de vie numérologique — 2026-09-22
+
+La fiche réutilise la planche céleste `public/marque/croissance/32.webp`, déjà présente dans
+la collection de croissance, comme illustration symbolique fixe (aucun stade personnel déduit).
+Le même asset compose l'accès cliquable à droite du titre Numérologie, en remplacement du lien
+au bas de la carte. Les sept nombres restent des liens HTML vers les sections existantes,
+sur des surfaces opaques de la palette du carnet. Leurs cibles gardent au moins 44 px.
+Le contraste renforcé retire l'illustration et conserve tous les liens. Aucun mouvement ajouté.
+
+Validation locale sur le harnais synthétique : Chromium et WebKit à 320/390/768/1440 px,
+accès clavier depuis le titre, sept ancres atteignables, cibles >= 44 px sans chevauchement,
+absence de prénom et contraste renforcé. Aucun débordement ni erreur JavaScript sur ces vues.
+129 tests ciblés, TypeScript, lint ciblé et parité des tokens passent. Aucun déploiement effectué.

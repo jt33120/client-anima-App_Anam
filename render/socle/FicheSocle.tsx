@@ -176,8 +176,6 @@ function SectionNumerologie({
         </details>
       )}
 
-      {/* En DERNIER, et après la méthode : l'arbre de vie se lit quand on a déjà vu ses nombres. */}
-      <Lien reparation={copie.porteArbreDeVie} />
     </section>
   );
 }
@@ -384,7 +382,6 @@ function SectionAstrologie({
           </div>
         </details>
       )}
-
     </section>
   );
 }

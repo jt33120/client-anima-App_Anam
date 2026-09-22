@@ -34,6 +34,7 @@ import {
   PORTE_ARBRE_DE_VIE,
 } from "@/lib/domain/copie-socle";
 import { MESSAGE_TYPE_SANS_TEXTE } from "@/lib/domain/enneagramme-items";
+import EnteteSocle from "@/render/socle/EnteteSocle";
 import FicheSocle from "@/render/socle/FicheSocle";
 import s from "@/render/socle/socle.module.css";
 import PiedHalte from "@/render/PiedHalte";
@@ -199,9 +200,10 @@ export default async function Page({
   return (
     <main className={s.halte}>
       <RetourScene url={urlRetourScene(await searchParams)} />
-      <h1 className={`t-titre ${s.titreHalte}`}>
-        {mode === "astrologie" ? "Astrologie" : mode === "numerologie" ? "Numérologie" : TITRE_HALTE}
-      </h1>
+      <EnteteSocle
+        titre={mode === "astrologie" ? "Astrologie" : mode === "numerologie" ? "Numérologie" : TITRE_HALTE}
+        porteArbre={mode === "numerologie" ? PORTE_ARBRE_DE_VIE : undefined}
+      />
 
       <FicheSocle
         fiche={fiche}

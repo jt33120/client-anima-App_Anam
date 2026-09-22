@@ -85,12 +85,10 @@ describe("[LE CŒUR] le contrat d'ancre : chaque pastille mène quelque part", (
 
   it("le dessin est annoncé comme une image, et rien dedans ne se tabule", () => {
     const { container } = dessiner(vue(COMPLET));
-    const svg = container.querySelector("svg")!;
-    expect(svg.getAttribute("role")).toBe("img");
-    expect(svg.querySelector("title")?.textContent).toBe(copie.TITRE_SCHEMA);
-    expect(svg.querySelector("desc")?.textContent).toBe(copie.DESCRIPTION_SCHEMA);
-    expect(svg.querySelectorAll("[tabindex]")).toHaveLength(0);
-    expect(svg.querySelectorAll("a, button")).toHaveLength(0);
+    const dessin = container.querySelector('[role="img"]')!;
+    expect(dessin.getAttribute("aria-label")).toBe(`${copie.TITRE_SCHEMA}. ${copie.DESCRIPTION_SCHEMA}`);
+    expect(dessin.querySelector("img")?.getAttribute("alt")).toBe("");
+    expect(dessin.querySelectorAll("[tabindex], a, button")).toHaveLength(0);
   });
 });
 
@@ -166,7 +164,7 @@ describe("[FR-050] une absence se dit, elle ne se creuse pas", () => {
   it("sans date de naissance, AUCUN arbre n'est dessiné", () => {
     // Un arbre affiché vide se lirait comme une perte de données, pas comme un parcours inachevé.
     const { container } = dessiner(vue(null, copie.NAISSANCE_ABSENTE));
-    expect(container.querySelector("svg"), "un arbre vide a été dessiné").toBeNull();
+    expect(container.querySelector("figure"), "un arbre vide a été dessiné").toBeNull();
     expect(container.textContent).toContain(copie.NAISSANCE_ABSENTE);
     expect(container.querySelector(`a[href="${copie.PORTE_NAISSANCE.url}"]`)).not.toBeNull();
   });

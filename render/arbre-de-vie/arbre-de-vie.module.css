@@ -8,7 +8,7 @@
  *
  * ⚠️ UN APLAT SOUS TOUT TEXTE, JAMAIS UN VOILE FLOU. Le trait du dessin peut se contenter d'un
  * contraste de 3 pour 1 (c'est un objet graphique) ; le texte d'une pastille, non. D'où l'encre
- * `--sur-accent` sur l'aplat `--accent`, mesurée à plus de dix pour un dans `app/styles/tokens.ts`.
+ * `--sur-papier` sur l'aplat `--papier`, mesurée à plus de dix pour un dans `app/styles/tokens.ts`.
  */
 
 .contenu {
@@ -43,56 +43,16 @@
   margin: 0;
   padding: 0;
   width: 100%;
-  max-width: 24rem;
+  max-width: var(--numerologie-arbre-largeur);
   align-self: center;
 }
 
-/*
- * `height: auto` et aucune hauteur imposée : le SVG garde le rapport de son `viewBox`, donc aucun
- * letterboxing, donc les pourcentages des prises tombent exactement là où la géométrie les place.
- */
 .schema {
   display: block;
   width: 100%;
   height: auto;
-}
-
-.racines {
-  fill: none;
-  stroke: var(--arbre-tronc);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-
-.tronc {
-  fill: var(--arbre-tronc);
-  stroke: none;
-}
-
-.ecorce {
-  fill: none;
-  stroke: var(--arbre-branche);
-  stroke-width: 1.2;
-  stroke-linecap: round;
-}
-
-.branches {
-  fill: none;
-  stroke: var(--arbre-branche);
-  stroke-width: 4;
-  stroke-linecap: round;
-}
-
-.feuillage {
-  fill: var(--arbre-feuillage);
-  stroke: none;
-}
-
-.cime {
-  fill: none;
-  stroke: var(--arbre-feuillage);
-  stroke-width: 2;
-  stroke-linecap: round;
+  border-radius: var(--carnet-rayon-lg);
+  mask-image: var(--numerologie-arbre-masque);
 }
 
 .prises {
@@ -116,11 +76,12 @@
   gap: 1px;
   min-inline-size: var(--cible-tactile);
   min-height: var(--cible-tactile);
-  max-inline-size: 5.5rem;
+  max-inline-size: var(--numerologie-repere-largeur);
   padding: var(--esp-1) var(--esp-3);
+  border: 1px solid var(--bordure-forte);
   border-radius: var(--rayon-lg);
-  background: var(--accent);
-  color: var(--sur-accent);
+  background: var(--papier);
+  color: var(--sur-papier);
   text-align: center;
   text-decoration: none;
 }
@@ -130,19 +91,12 @@
   outline-offset: 2px;
 }
 
-/*
- * ⚠️ DEUX CLASSES, ET C'EST LA CORRECTION. Mesuré au navigateur le 2026-09-21 : `t-meta` fixe
- * `color: var(--texte-doux)`, une encre claire faite pour le fond de nuit — sur l'aplat clair de la
- * pastille, le nom de la partie devenait illisible. À spécificité égale, c'est l'ordre des feuilles
- * qui tranchait, et il ne tranchait pas dans notre sens. Deux classes reprennent la main.
- *
- * Le nom PEUT tenir sur deux lignes : « Première racine » débordait de la pilule, hors de l'aplat,
- * donc sans contraste garanti. Il s'enroule maintenant à l'intérieur.
- */
+/* Deux classes préservent l'encre sur papier face aux utilitaires typographiques.
+ * Les noms longs restent sur deux lignes à l'intérieur de la cible. */
 .pastille .valeurPastille,
 .pastille .intitulePastille {
   display: block;
-  color: var(--sur-accent);
+  color: var(--sur-papier);
   white-space: normal;
   line-height: 1.15;
 }
@@ -292,8 +246,16 @@
   color: var(--sur-papier-doux);
 }
 
-@media (min-width: 48rem) {
-  .figure {
-    max-width: 28rem;
-  }
+.pastille:hover,
+.pastille:focus-visible {
+  background: var(--surface-elevee);
+  border-color: var(--accent);
+}
+
+:global([data-a11y="contraste"]) .schema {
+  visibility: hidden;
+}
+
+@media (prefers-contrast: more) {
+  .schema { visibility: hidden; }
 }

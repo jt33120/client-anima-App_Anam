@@ -1,29 +1,10 @@
 import s from "./arbre-de-vie.module.css";
-import {
-  ANCRES,
-  BRANCHES,
-  CADRE,
-  CIME,
-  ECORCE,
-  FEUILLES,
-  RACINES,
-  TRONC,
-  ancreDeLaPastille,
-} from "./geometrie";
+import Image from "next/image";
+import { ANCRES, ancreDeLaPastille } from "./geometrie";
+import { ILLUSTRATION_ARBRE_DE_VIE } from "./illustration";
 import type { PastilleVue } from "./types";
 
-/**
- * SchemaArbre.tsx — LE DESSIN, ET SES SEPT PRISES.
- *
- * Composant SERVEUR, sans état : il n'y a rien à sélectionner ici, seulement sept liens vers sept
- * sections plus bas. Le SVG est MUET (`role="img"` + un titre et une description descendus par la
- * page) ; les prises sont du HTML par-dessus, pour qu'elles tiennent 44 px à toutes les échelles.
- * Le raisonnement complet est dans `geometrie.ts`.
- *
- * ⚠️ AUCUNE ANIMATION, AUCUN `filter`, AUCUNE OMBRE PORTÉE. Un flou plein écran a fait tomber cette
- * application à quatre images par seconde le 2026-08-20 ; la règle qui en est sortie vaut pour tout
- * le produit et pas seulement pour la scène. Ici le dessin est statique de toute façon.
- */
+/** Illustration statique et sept liens HTML : cibles tactiles indépendantes de l'image. */
 export default function SchemaArbre({
   pastilles,
   titre,
@@ -35,43 +16,16 @@ export default function SchemaArbre({
 }) {
   return (
     <figure className={s.figure}>
-      <svg
-        className={s.schema}
-        viewBox={`0 0 ${CADRE.largeur} ${CADRE.hauteur}`}
-        preserveAspectRatio="xMidYMid meet"
-        role="img"
-        aria-labelledby="arbre-schema-titre arbre-schema-description"
-      >
-        <title id="arbre-schema-titre">{titre}</title>
-        <desc id="arbre-schema-description">{description}</desc>
-
-        <g aria-hidden className={s.racines}>
-          {RACINES.map((d) => (
-            <path key={d} d={d} />
-          ))}
-        </g>
-        <g aria-hidden className={s.tronc}>
-          <path d={TRONC} />
-        </g>
-        <g aria-hidden className={s.ecorce}>
-          {ECORCE.map((d) => (
-            <path key={d} d={d} />
-          ))}
-        </g>
-        <g aria-hidden className={s.branches}>
-          {BRANCHES.map((d) => (
-            <path key={d} d={d} />
-          ))}
-        </g>
-        <g aria-hidden className={s.feuillage}>
-          {FEUILLES.map(([x, y]) => (
-            <ellipse key={`${x}-${y}`} cx={x} cy={y} rx="9" ry="5" />
-          ))}
-        </g>
-        <g aria-hidden className={s.cime}>
-          <path d={CIME} />
-        </g>
-      </svg>
+      <div role="img" aria-label={`${titre}. ${description}`}>
+        <Image
+          className={s.schema}
+          src={ILLUSTRATION_ARBRE_DE_VIE}
+          alt=""
+          width={1024}
+          height={1536}
+          sizes="(max-width: 600px) 100vw, 576px"
+        />
+      </div>
 
       {/* ⚠️ L'ORDRE DU DOM EST CELUI DU RÉCIT, du sol vers la cime, et c'est aussi celui des
           sections plus bas : un parcours au clavier lit la même histoire que l'œil (WCAG 2.4.3).
