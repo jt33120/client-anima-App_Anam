@@ -27,10 +27,13 @@ export interface ProprietesFormulaireNom {
   readonly labelPrenom: string;
   readonly labelNomComplet: string;
   readonly aideNomComplet: string;
+  readonly labelPrenomDeNaissance: string;
+  readonly aidePrenomDeNaissance: string;
   readonly previent: string;
   readonly actionEnregistrer: string;
   readonly prenom: string;
   readonly nomComplet: string;
+  readonly prenomDeNaissance: string;
   readonly enregistrer: (precedent: EtatNom, donnees: FormData) => Promise<EtatNom>;
 }
 
@@ -51,6 +54,16 @@ export default function FormulaireNom(p: ProprietesFormulaireNom) {
           <span className="t-meta">{p.labelNomComplet}</span>
           <input className={s.select} name="nom_complet" defaultValue={p.nomComplet} maxLength={200} />
           <span className={`t-meta ${s.description}`}>{p.aideNomComplet}</span>
+        </label>
+        <label className={s.champHeure}>
+          <span className="t-meta">{p.labelPrenomDeNaissance}</span>
+          <input
+            className={s.select}
+            name="prenom_de_naissance"
+            defaultValue={p.prenomDeNaissance}
+            maxLength={200}
+          />
+          <span className={`t-meta ${s.description}`}>{p.aidePrenomDeNaissance}</span>
         </label>
 
         {/* ⚠️ L'AVERTISSEMENT EST AVANT LE BOUTON, PAS APRÈS. Changer le nom complet recalcule trois

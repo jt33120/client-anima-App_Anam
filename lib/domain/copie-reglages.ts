@@ -31,6 +31,20 @@ export const NOM_DESCRIPTION =
 export const LABEL_PRENOM = "Prénom";
 export const LABEL_NOM_COMPLET = "Prénoms et nom de naissance";
 export const AIDE_NOM_COMPLET = "Tous tes prénoms suivis de ton nom de naissance, une seule fois. Tu peux laisser ce champ vide ou l’effacer.";
+
+/**
+ * ⚠️ UN TROISIÈME CHAMP, ET CE N'EST PAS UNE REDONDANCE (2026-09-21).
+ *
+ * Le champ au-dessus demande les prénoms ET le nom, ensemble, parce que les trois nombres du socle
+ * les comptent ensemble. L'arbre de vie, lui, compte les prénoms SEULS pour ses branches : il faut
+ * donc savoir où ils s'arrêtent, et aucune machine ne peut le deviner sur « Jean-Marc Van der
+ * Berg ». D'où une saisie, et pas une devinette.
+ *
+ * L'aide dit « recopie-les » plutôt que « ressaisis-les » : c'est exactement le même texte que
+ * celui déjà tapé juste au-dessus, et le dire évite la question « pourquoi deux fois ? ».
+ */
+export const LABEL_PRENOM_DE_NAISSANCE = "Prénoms de naissance";
+export const AIDE_PRENOM_DE_NAISSANCE = "Tes prénoms de naissance seuls, sans le nom de famille. Ce sont les mêmes que dans le champ au-dessus, et ils servent aux branches de ton arbre de vie. Tu peux laisser ce champ vide.";
 export const ACTION_ENREGISTRER = "Enregistrer";
 export const NOM_ENREGISTRE = "C’est enregistré.";
 export const NOM_VIDE = "Il faut un prénom, même un surnom, même une initiale.";

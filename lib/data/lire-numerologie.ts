@@ -5,6 +5,7 @@ import {
   type EntreesNumerologie,
   type Numerologie,
 } from "@/lib/astro/numerologie";
+import type { EntreesArbre } from "@/lib/astro/arbre-de-vie";
 
 /**
  * lire-numerologie.ts — LA NUMÉROLOGIE DE L'UTILISATRICE COURANTE (Story 5.2, T5).
@@ -71,7 +72,12 @@ export type ResultatNumerologie =
 interface LigneIdentite {
   date_naissance: string | null;
   nom_complet: string | null;
+  prenom_de_naissance: string | null;
 }
+
+export type ResultatEntreesArbre =
+  | { readonly statut: "lu"; readonly entrees: EntreesArbre }
+  | { readonly statut: "indisponible"; readonly raison: RaisonNumerologieIndisponible };
 
 /**
  * L'année civile courante à Paris. Extraite via `Intl` — le passage à l'heure d'hiver et le décalage
@@ -99,25 +105,54 @@ export async function lireNumerologie(
   utilisatriceId: string,
   maintenant: Date,
 ): Promise<ResultatNumerologie> {
+  const lecture = await lireEntreesArbre(supabase, utilisatriceId);
+  if (lecture.statut === "indisponible") return lecture;
+
+  // ⚠️ LE PRÉNOM DE NAISSANCE N'ENTRE PAS DANS LES SIX NOMBRES. Il est lu par la requête commune,
+  // mais on le laisse tomber ici : `EntreesNumerologie` ne le porte pas, et le nom complet contient
+  // déjà les prénoms — les additionner compterait le prénom deux fois. C'est la même règle que
+  // `prenom`, pour une raison différente : celui-là est une donnée d'adresse, celui-ci est déjà là.
+  const entrees: EntreesNumerologie = {
+    date: lecture.entrees.date,
+    nomComplet: lecture.entrees.nomComplet,
+  };
+  return {
+    statut: "calcule",
+    entrees,
+    numerologie: calculerNumerologie(entrees, anneeCouranteParis(maintenant)),
+  };
+}
+
+/**
+ * Les entrées de calcul, SANS HORLOGE — la lecture que partagent les six nombres et l'arbre de vie.
+ *
+ * ⚠️ AUCUNE ANNÉE DE RÉFÉRENCE ICI, ET C'EST LE POINT. L'année personnelle est le seul nombre du
+ * produit qui bouge dans le temps ; l'arbre de vie, lui, ne bouge jamais. Lui faire traverser un
+ * `Date` pour qu'il n'en fasse rien l'obligerait à en dépendre au type, puis un jour au comportement.
+ *
+ * Une seule requête, et le commentaire sur `prenom` ne vit qu'à un endroit : `utilisatrice.prenom`
+ * n'est PAS lu — c'est une donnée d'adresse (comment Anam la nomme), possiblement un diminutif,
+ * jamais une entrée de calcul. `prenom_de_naissance`, lui, est demandé pour ça et pour rien d'autre.
+ */
+export async function lireEntreesArbre(
+  supabase: SupabaseClient,
+  utilisatriceId: string,
+): Promise<ResultatEntreesArbre> {
   const { data, error } = await supabase
     .from("utilisatrice")
-    .select("date_naissance, nom_complet")
+    .select("date_naissance, nom_complet, prenom_de_naissance")
     .eq("id", utilisatriceId)
     .maybeSingle<LigneIdentite>();
 
   if (error) return { statut: "indisponible", raison: "lecture_impossible" };
   if (!data?.date_naissance) return { statut: "indisponible", raison: "naissance_absente" };
 
-  // `prenom` n'est PAS lu : c'est une donnée d'adresse (comment Anam la nomme), jamais une entrée de
-  // calcul. Le concaténer au nom complet — qui contient déjà les prénoms — compterait le prénom deux
-  // fois et rendrait le nombre d'expression faux, sans que rien ne le signale.
-  const entrees: EntreesNumerologie = {
-    date: data.date_naissance,
-    nomComplet: data.nom_complet,
-  };
   return {
-    statut: "calcule",
-    entrees,
-    numerologie: calculerNumerologie(entrees, anneeCouranteParis(maintenant)),
+    statut: "lu",
+    entrees: {
+      date: data.date_naissance,
+      nomComplet: data.nom_complet,
+      prenomDeNaissance: data.prenom_de_naissance,
+    },
   };
 }

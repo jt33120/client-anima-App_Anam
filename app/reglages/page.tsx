@@ -113,9 +113,13 @@ export default async function PageReglages({
     // illisible n'empêche ni de régler son rythme, ni d'arrêter les courriels.
     supabase
       .from("utilisatrice")
-      .select("prenom, nom_complet")
+      .select("prenom, nom_complet, prenom_de_naissance")
       .eq("id", user.id)
-      .maybeSingle<{ prenom: string | null; nom_complet: string | null }>(),
+      .maybeSingle<{
+        prenom: string | null;
+        nom_complet: string | null;
+        prenom_de_naissance: string | null;
+      }>(),
   ]);
   const courrielsArretes = Boolean(courriel?.refuse_le);
   const clesAcces = passkeysActives() ? await listerPasskeys() : [];
@@ -134,10 +138,13 @@ export default async function PageReglages({
         labelPrenom={copie.LABEL_PRENOM}
         labelNomComplet={copie.LABEL_NOM_COMPLET}
         aideNomComplet={copie.AIDE_NOM_COMPLET}
+        labelPrenomDeNaissance={copie.LABEL_PRENOM_DE_NAISSANCE}
+        aidePrenomDeNaissance={copie.AIDE_PRENOM_DE_NAISSANCE}
         previent={copie.NOM_PREVIENT_LES_NOMBRES}
         actionEnregistrer={copie.ACTION_ENREGISTRER}
         prenom={identite?.prenom ?? ""}
         nomComplet={identite?.nom_complet ?? ""}
+        prenomDeNaissance={identite?.prenom_de_naissance ?? ""}
         enregistrer={enregistrerNom}
       />
 

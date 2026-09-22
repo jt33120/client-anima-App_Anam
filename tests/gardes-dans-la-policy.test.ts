@@ -414,6 +414,28 @@ describe("[NON-RÉGRESSION] les neuf colonnes re-grantées couvrent exactement l
     expect(error).toBeNull();
   });
 
+  it("prénom de naissance (0102) : écrit par sa propriétaire, lisible par elle", async () => {
+    // La dixième colonne, arrivée le 2026-09-21 pour les branches de l'arbre de vie. Elle a eu
+    // besoin de SES PROPRES `grant` : sur `utilisatrice`, `authenticated` ne détient aucun
+    // privilège de table, donc une colonne neuve n'hérite de rien. L'écriture ET la lecture sont
+    // vérifiées : un `grant update` sans `grant select` rendrait un champ qu'on remplit et qui
+    // revient vide au rechargement, et l'action ne signalerait rien.
+    const u = await creerCompte("nr-prenom-naissance", false);
+    const { error } = await u.client
+      .from("utilisatrice")
+      .update({ prenom_de_naissance: "Milian" })
+      .eq("id", u.id);
+    expect(error, "écriture du prénom de naissance").toBeNull();
+
+    const relu = await u.client
+      .from("utilisatrice")
+      .select("prenom_de_naissance")
+      .eq("id", u.id)
+      .maybeSingle<{ prenom_de_naissance: string | null }>();
+    expect(relu.error, "lecture du prénom de naissance").toBeNull();
+    expect(relu.data?.prenom_de_naissance).toBe("Milian");
+  });
+
   it("heure de naissance (5.3) : heure + lieu + latitude + longitude + fuseau", async () => {
     const u = await creerCompte("nr-heure");
     await consentir(u.id);

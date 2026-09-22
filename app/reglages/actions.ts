@@ -177,12 +177,16 @@ const MAX_NOM_COMPLET = 200;
 /**
  * Changer son nom (retour du 2026-08-23 ; déménagé de `/profil` vers `/reglages` le 2026-08-25).
  *
- * ⚠️ AUCUNE MIGRATION N'A ÉTÉ NÉCESSAIRE, ET C'EST LA 0041 QU'IL FAUT REMERCIER. `prenom` et
- * `nom_complet` figurent déjà dans le `grant update (…)` colonne par colonne posé là-bas : la
- * garde d'écriture vit dans la POLICY, pas ici, et cette action ne peut donc pas toucher une
- * colonne qu'on ne lui a pas ouverte — ni `date_naissance`, ni `mineur_detecte`, ni l'échéance de
- * suppression. C'est exactement ce que la doctrine du dépôt appelle une garde qui ne dépend pas de
- * la discipline de l'appelant (AD-12).
+ * ⚠️ DEUX DES TROIS CHAMPS N'ONT DEMANDÉ AUCUNE MIGRATION, ET C'EST LA 0041 QU'IL FAUT REMERCIER.
+ * `prenom` et `nom_complet` figurent déjà dans le `grant update (…)` colonne par colonne posé
+ * là-bas : la garde d'écriture vit dans la POLICY, pas ici, et cette action ne peut donc pas
+ * toucher une colonne qu'on ne lui a pas ouverte — ni `date_naissance`, ni `mineur_detecte`, ni
+ * l'échéance de suppression. C'est exactement ce que la doctrine du dépôt appelle une garde qui ne
+ * dépend pas de la discipline de l'appelant (AD-12).
+ *
+ * `prenom_de_naissance` est arrivé le 2026-09-21 et a demandé la sienne (`0102`), pour la même
+ * raison retournée : sur cette table, `authenticated` ne détient AUCUN privilège de table, donc une
+ * colonne neuve n'hérite de rien. Il a fallu lui ouvrir la lecture et l'écriture nommément.
  *
  * ⚠️ ET LE THÈME NATAL NE BOUGE PAS. La 0039 dit que l'empreinte d'entrées ne couvre QUE les
  * entrées astronomiques : changer un nom ne déclenche aucun recalcul de ciel. Les NOMBRES, eux,
@@ -191,9 +195,18 @@ const MAX_NOM_COMPLET = 200;
 export async function enregistrerNom(_precedent: EtatNom, donnees: FormData): Promise<EtatNom> {
   const prenom = String(donnees.get("prenom") ?? "").trim();
   const nomComplet = String(donnees.get("nom_complet") ?? "").trim();
+  // Les prénoms de NAISSANCE, seuls — les branches de l'arbre de vie les comptent sans le nom de
+  // famille, et on ne peut pas les extraire de `nom_complet` sans deviner où ils s'arrêtent.
+  // Facultatifs comme le nom complet : vides, les branches disent leur absence et proposent ce
+  // formulaire. Mêmes bornes que le nom complet, pour qu'il n'y ait pas deux règles à retenir.
+  const prenomDeNaissance = String(donnees.get("prenom_de_naissance") ?? "").trim();
 
   if (prenom.length === 0) return { statut: "erreur", message: copieNom.NOM_VIDE };
-  if (prenom.length > MAX_PRENOM || nomComplet.length > MAX_NOM_COMPLET) {
+  if (
+    prenom.length > MAX_PRENOM ||
+    nomComplet.length > MAX_NOM_COMPLET ||
+    prenomDeNaissance.length > MAX_NOM_COMPLET
+  ) {
     return { statut: "erreur", message: copieNom.NOM_TROP_LONG };
   }
 
@@ -205,7 +218,11 @@ export async function enregistrerNom(_precedent: EtatNom, donnees: FormData): Pr
 
   const { error } = await supabase
     .from("utilisatrice")
-    .update({ prenom, nom_complet: nomComplet.length > 0 ? nomComplet : null })
+    .update({
+      prenom,
+      nom_complet: nomComplet.length > 0 ? nomComplet : null,
+      prenom_de_naissance: prenomDeNaissance.length > 0 ? prenomDeNaissance : null,
+    })
     .eq("id", user.id);
 
   // ⚠️ ON NE JOURNALISE PAS LE CONTENU. Un prénom est une donnée personnelle ; le code d'erreur
