@@ -21,6 +21,7 @@ const mantra = await import("../lib/corpus/mantra.ts");
 const enneagramme = await import("../lib/corpus/enneagramme.ts");
 const horoscope = await import("../lib/corpus/horoscope.ts");
 const numerologie = await import("../lib/corpus/numerologie.ts");
+const arbreDeVie = await import("../lib/corpus/arbre-de-vie.ts");
 const ancrage = await import("../lib/corpus/ancrage.ts");
 const description = await import("../lib/corpus/description-cartes.ts");
 const jeu = await import("../lib/tirage/jeu.ts");
@@ -52,6 +53,13 @@ const DOMAINES = [
     cles: numerologie.CLES_NUMEROLOGIE,
     quand: "La carte « Tes nombres », sous les chiffres déjà calculés et affichés.",
     contrainte: "Les nombres sont calculés et visibles. Le texte les habite, il ne les répète pas.",
+  },
+  {
+    titre: "L'arbre de vie",
+    cles: arbreDeVie.CLES_ARBRE_DE_VIE,
+    quand: "La halte « Ton arbre de vie », sous le dessin et les nombres déjà calculés.",
+    contrainte:
+      "La première phrase nomme la famille ET le nombre (« Ta racine 3 … », « Ton défi 4 … »), deux à quatre phrases, 360 signes au plus. Une RACINE se lit sous deux positions (le jour, le mois) : le texte ne doit désigner ni l'une ni l'autre. Un DÉFI se lit sous quatre rangs, même règle. Une QUALITÉ absente n'est pas un manque de valeur : son texte doit dire l'absence sans en faire un reproche.",
   },
   {
     titre: "Les ancrages",

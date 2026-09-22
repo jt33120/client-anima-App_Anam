@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { chercherInterdits } from "@/lib/domain/lexique-interdit";
 import { chercherPredictions } from "@/lib/domain/marqueurs-prediction";
 import { modulesImportes, viseLeDossier } from "./_imports";
+import { defautsDeStructure as defautsDeForme, LONGUEUR_MAX_LECTURE } from "./_forme-corpus";
 import {
   clesEcrites,
   clesNonEcrites,
@@ -75,12 +76,16 @@ describe("[AD-1/DUR] lib/corpus est une couche PURE", () => {
     // ⚠️ UN COMPTE EXACT, JAMAIS `toBeGreaterThan`. Relâcher cette assertion pour faire passer une
     // story est précisément la façon dont les gardes meurent : un corpus ajouté sans être inscrit
     // ici échapperait à TOUTES les gardes de ce fichier sans que rien ne rougisse.
-    expect(FICHIERS_CORPUS.length, "aucun fichier trouvé dans lib/corpus — garde vide").toBe(10);
+    expect(FICHIERS_CORPUS.length, "aucun fichier trouvé dans lib/corpus — garde vide").toBe(11);
     expect(FICHIERS_CORPUS).toContain("lib/corpus/port.ts");
     // 2026-08-23 — les textes de DÉPART, écrits sur décision de Julian en attendant Anima. Ils
     // vivent ici, donc sous les mêmes gardes que le reste : voix, prédiction, pureté.
     expect(FICHIERS_CORPUS).toContain("lib/corpus/textes-de-base.ts");
     expect(FICHIERS_CORPUS).toContain("lib/corpus/numerologie.ts");
+    // 2026-09-21 — l'arbre de vie est de la numérologie : même port, mêmes gardes, même table de
+    // textes. Le compte ci-dessus passe de dix à onze parce qu'un fichier est arrivé, pas parce
+    // qu'une assertion gênait.
+    expect(FICHIERS_CORPUS).toContain("lib/corpus/arbre-de-vie.ts");
     // Story 5.4 — les deux corpus du socle quotidien vivent sous EXACTEMENT les mêmes gardes.
     expect(FICHIERS_CORPUS).toContain("lib/corpus/mantra.ts");
     expect(FICHIERS_CORPUS).toContain("lib/corpus/horoscope.ts");
@@ -510,36 +515,17 @@ const FAMILLE_DANS_LA_PHRASE: Readonly<Record<NomNombre, string>> = Object.freez
   annee_personnelle: "année personnelle",
 });
 
-/** « Beaucoup plus concis » : la borne est nommée, mesurée en points de code, pas en octets. */
-const LONGUEUR_MAX_LECTURE = 360;
-
-function premierePhrase(texte: string): string {
-  return texte.split(/(?<=[.!?])\s+/)[0] ?? "";
-}
-
-function nombreDePhrases(texte: string): number {
-  return texte.split(/[.!?]+(?:\s+|$)/).filter((p) => p.trim().length > 0).length;
-}
-
-/** Les défauts de forme d'une lecture — vide si elle a la structure demandée. Écrit UNE fois. */
+/**
+ * ⚠️ LA RÈGLE ELLE-MÊME A DÉMÉNAGÉ DANS `tests/_forme-corpus.ts` LE 2026-09-21, ET SON CONTRÔLE EST
+ * RESTÉ ICI. L'arbre de vie ajoute dix familles qui l'exigent à l'identique ; la recopier aurait
+ * fait vivre à deux endroits les corrections Unicode du 2026-09-02, qui sont exactement ce qu'on ne
+ * veut pas voir diverger. Le `describe` ci-dessous est inchangé, y compris ses quatorze chaînes
+ * fabriquées : c'est LUI qui prouve que les détecteurs mordent, et il ne déménage nulle part.
+ *
+ * Ce qui reste ici est l'adaptateur des six familles du socle vers un libellé.
+ */
 function defautsDeStructure(nombre: NomNombre, valeur: number, texte: string): string[] {
-  const defauts: string[] = [];
-  const attendu = new RegExp(`\\b${FAMILLE_DANS_LA_PHRASE[nombre]} ${valeur}\\b`, "i");
-  if (!attendu.test(premierePhrase(texte))) {
-    defauts.push(`(a) la première phrase ne dit pas « ${FAMILLE_DANS_LA_PHRASE[nombre]} ${valeur} »`);
-  }
-  if (/[—–]/.test(texte)) defauts.push("(b) tiret cadratin ou demi-cadratin");
-  const longueur = [...texte].length;
-  if (longueur > LONGUEUR_MAX_LECTURE) defauts.push(`(c) ${longueur} caractères, plus de ${LONGUEUR_MAX_LECTURE}`);
-  const phrases = nombreDePhrases(texte);
-  if (phrases < 2 || phrases > 4) defauts.push(`(c) ${phrases} phrase(s), il en faut deux à quatre`);
-  // Frontières UNICODE : `\b` est ASCII et laissait passer « fêtes », « bâton », « têtes » comme
-  // des « tes »/« ton » (revue du 2026-09-02). L'apostrophe typographique compte comme lettre
-  // (« t’attend » n'est pas « ta »).
-  if (!/(?<![\p{L}’])(?:tu|ton|ta|tes)(?![\p{L}])/iu.test(texte)) defauts.push("(d) aucun tutoiement");
-  // « rendez-VOUS » n'est pas un vouvoiement — même précaution que `qa-visuelle-19-aout.test.ts`.
-  if (/(?<![\p{L}-])(?:vous|vos|votre)(?![\p{L}])/iu.test(texte)) defauts.push("(d) vouvoiement");
-  return defauts;
+  return defautsDeForme(FAMILLE_DANS_LA_PHRASE[nombre], valeur, texte);
 }
 
 describe("[2026-08-31 / retour du fondateur] les 69 lectures ont la structure demandée", () => {

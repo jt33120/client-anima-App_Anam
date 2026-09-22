@@ -11,6 +11,7 @@ import { CORPUS_HUMAN_DESIGN } from "@/lib/corpus/human-design";
 import { CORPUS_DESCRIPTION_CARTES } from "@/lib/corpus/description-cartes";
 import { ANCRAGES } from "@/lib/corpus/ancrage";
 import { CORPUS_SENS_CARTES } from "@/lib/lecture/sens-cartes";
+import { CORPUS_ARBRE_DE_VIE } from "@/lib/corpus/arbre-de-vie";
 
 /**
  * corpus-etat.test.ts — LE TABLEAU D'ÉTAT DES CORPUS EST CALCULÉ, PLUS JAMAIS RECOPIÉ (2026-08-25).
@@ -49,6 +50,7 @@ const RECENSES: readonly Corpus[] = [
   CORPUS_DESCRIPTION_CARTES,
   ANCRAGES,
   CORPUS_SENS_CARTES,
+  CORPUS_ARBRE_DE_VIE,
 ];
 
 const compte = (c: Corpus) => {

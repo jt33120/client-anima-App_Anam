@@ -1,6 +1,6 @@
 # Cahier de rédaction du corpus — pour Anima
 
-**190 créneaux**, engendrés depuis le code et jamais recopiés à la main : cette liste EST
+**301 créneaux**, engendrés depuis le code et jamais recopiés à la main : cette liste EST
 celle que l'application attend. Un créneau absent d'ici n'existe pas ; un créneau présent est un
 endroit où l'écran affiche aujourd'hui « Anima n'a pas encore écrit cette carte ».
 
@@ -430,7 +430,7 @@ chacun rend une journée non vide pour tout le monde à la fois.
 
 **Où ça paraît.** La carte « Tes nombres », sous les chiffres déjà calculés et affichés.
 
-**Ce qui contraint le texte.** Les nombres sont calculés et visibles. Le texte s’ouvre sur ce que le nombre symbolise (« Ton chemin de vie 7 symbolise… »), puis parle à la personne, au tutoiement, en deux à quatre phrases, sans tiret cadratin (retour du fondateur du 2026-08-31, livré le 2026-09-02 ; la charpente est gardée par `tests/corpus-architecture.test.ts`, bloc « [2026-08-31] »). Ceci remplace l’ancienne consigne « le texte les habite, il ne les répète pas ».
+**Ce qui contraint le texte.** Les nombres sont calculés et visibles. Le texte les habite, il ne les répète pas.
 
 ### `chemin_de_vie:1`
 
@@ -477,6 +477,42 @@ chacun rend une journée non vide pour tout le monde à la fois.
 
 
 ### `chemin_de_vie:33`
+
+
+
+### `annee_personnelle:1`
+
+
+
+### `annee_personnelle:2`
+
+
+
+### `annee_personnelle:3`
+
+
+
+### `annee_personnelle:4`
+
+
+
+### `annee_personnelle:5`
+
+
+
+### `annee_personnelle:6`
+
+
+
+### `annee_personnelle:7`
+
+
+
+### `annee_personnelle:8`
+
+
+
+### `annee_personnelle:9`
 
 
 
@@ -672,39 +708,455 @@ chacun rend une journée non vide pour tout le monde à la fois.
 
 
 
-### `annee_personnelle:1`
+---
+
+## L'arbre de vie — 111 créneaux
+
+**Où ça paraît.** La halte « Ton arbre de vie », sous le dessin et les nombres déjà calculés.
+
+**Ce qui contraint le texte.** La première phrase nomme la famille ET le nombre (« Ta racine 3 … », « Ton défi 4 … »), deux à quatre phrases, 360 signes au plus. Une RACINE se lit sous deux positions (le jour, le mois) : le texte ne doit désigner ni l'une ni l'autre. Un DÉFI se lit sous quatre rangs, même règle. Une QUALITÉ absente n'est pas un manque de valeur : son texte doit dire l'absence sans en faire un reproche.
+
+### `arbre_racine:1`
 
 
 
-### `annee_personnelle:2`
+### `arbre_racine:2`
 
 
 
-### `annee_personnelle:3`
+### `arbre_racine:3`
 
 
 
-### `annee_personnelle:4`
+### `arbre_racine:4`
 
 
 
-### `annee_personnelle:5`
+### `arbre_racine:5`
 
 
 
-### `annee_personnelle:6`
+### `arbre_racine:6`
 
 
 
-### `annee_personnelle:7`
+### `arbre_racine:7`
 
 
 
-### `annee_personnelle:8`
+### `arbre_racine:8`
 
 
 
-### `annee_personnelle:9`
+### `arbre_racine:9`
+
+
+
+### `arbre_tronc:1`
+
+
+
+### `arbre_tronc:2`
+
+
+
+### `arbre_tronc:3`
+
+
+
+### `arbre_tronc:4`
+
+
+
+### `arbre_tronc:5`
+
+
+
+### `arbre_tronc:6`
+
+
+
+### `arbre_tronc:7`
+
+
+
+### `arbre_tronc:8`
+
+
+
+### `arbre_tronc:9`
+
+
+
+### `arbre_ecorce:1`
+
+
+
+### `arbre_ecorce:2`
+
+
+
+### `arbre_ecorce:3`
+
+
+
+### `arbre_ecorce:4`
+
+
+
+### `arbre_ecorce:5`
+
+
+
+### `arbre_ecorce:6`
+
+
+
+### `arbre_ecorce:7`
+
+
+
+### `arbre_ecorce:8`
+
+
+
+### `arbre_ecorce:9`
+
+
+
+### `arbre_branches:1`
+
+
+
+### `arbre_branches:2`
+
+
+
+### `arbre_branches:3`
+
+
+
+### `arbre_branches:4`
+
+
+
+### `arbre_branches:5`
+
+
+
+### `arbre_branches:6`
+
+
+
+### `arbre_branches:7`
+
+
+
+### `arbre_branches:8`
+
+
+
+### `arbre_branches:9`
+
+
+
+### `arbre_branches:11`
+
+
+
+### `arbre_branches:22`
+
+
+
+### `arbre_branches:33`
+
+
+
+### `arbre_feuilles:1`
+
+
+
+### `arbre_feuilles:2`
+
+
+
+### `arbre_feuilles:3`
+
+
+
+### `arbre_feuilles:4`
+
+
+
+### `arbre_feuilles:5`
+
+
+
+### `arbre_feuilles:6`
+
+
+
+### `arbre_feuilles:7`
+
+
+
+### `arbre_feuilles:8`
+
+
+
+### `arbre_feuilles:9`
+
+
+
+### `arbre_feuilles:11`
+
+
+
+### `arbre_feuilles:22`
+
+
+
+### `arbre_feuilles:33`
+
+
+
+### `arbre_cime:1`
+
+
+
+### `arbre_cime:2`
+
+
+
+### `arbre_cime:3`
+
+
+
+### `arbre_cime:4`
+
+
+
+### `arbre_cime:5`
+
+
+
+### `arbre_cime:6`
+
+
+
+### `arbre_cime:7`
+
+
+
+### `arbre_cime:8`
+
+
+
+### `arbre_cime:9`
+
+
+
+### `arbre_cime:11`
+
+
+
+### `arbre_cime:22`
+
+
+
+### `arbre_cime:33`
+
+
+
+### `arbre_dynamique:1`
+
+
+
+### `arbre_dynamique:2`
+
+
+
+### `arbre_dynamique:3`
+
+
+
+### `arbre_dynamique:4`
+
+
+
+### `arbre_dynamique:5`
+
+
+
+### `arbre_dynamique:6`
+
+
+
+### `arbre_dynamique:7`
+
+
+
+### `arbre_dynamique:8`
+
+
+
+### `arbre_dynamique:9`
+
+
+
+### `arbre_dynamique:11`
+
+
+
+### `arbre_dynamique:22`
+
+
+
+### `arbre_dynamique:33`
+
+
+
+### `arbre_defi:0`
+
+
+
+### `arbre_defi:1`
+
+
+
+### `arbre_defi:2`
+
+
+
+### `arbre_defi:3`
+
+
+
+### `arbre_defi:4`
+
+
+
+### `arbre_defi:5`
+
+
+
+### `arbre_defi:6`
+
+
+
+### `arbre_defi:7`
+
+
+
+### `arbre_defi:8`
+
+
+
+### `arbre_qualite:1:absente`
+
+
+
+### `arbre_qualite:1:discrete`
+
+
+
+### `arbre_qualite:1:marquee`
+
+
+
+### `arbre_qualite:2:absente`
+
+
+
+### `arbre_qualite:2:discrete`
+
+
+
+### `arbre_qualite:2:marquee`
+
+
+
+### `arbre_qualite:3:absente`
+
+
+
+### `arbre_qualite:3:discrete`
+
+
+
+### `arbre_qualite:3:marquee`
+
+
+
+### `arbre_qualite:4:absente`
+
+
+
+### `arbre_qualite:4:discrete`
+
+
+
+### `arbre_qualite:4:marquee`
+
+
+
+### `arbre_qualite:5:absente`
+
+
+
+### `arbre_qualite:5:discrete`
+
+
+
+### `arbre_qualite:5:marquee`
+
+
+
+### `arbre_qualite:6:absente`
+
+
+
+### `arbre_qualite:6:discrete`
+
+
+
+### `arbre_qualite:6:marquee`
+
+
+
+### `arbre_qualite:7:absente`
+
+
+
+### `arbre_qualite:7:discrete`
+
+
+
+### `arbre_qualite:7:marquee`
+
+
+
+### `arbre_qualite:8:absente`
+
+
+
+### `arbre_qualite:8:discrete`
+
+
+
+### `arbre_qualite:8:marquee`
+
+
+
+### `arbre_qualite:9:absente`
+
+
+
+### `arbre_qualite:9:discrete`
+
+
+
+### `arbre_qualite:9:marquee`
 
 
 

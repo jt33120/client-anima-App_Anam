@@ -75,7 +75,21 @@ document faux avait arrêté un travail. C'est pour ça que ce tableau est déso
 | Ancrages · `ancrages` | 24 | **24** | — |
 | Description des cartes · `description-cartes` | 21 | **0** | 5.7 |
 | Sens des cartes · `sens-cartes` | 21 | **0** | 5.7, ramené de 24 à 21 en 5.10 |
-| **Total** | **264** | **222** | |
+| Arbre de vie · `arbre-de-vie` | 111 | **111** | 2026-09-21 |
+| **Total** | **375** | **333** | |
+
+L'arbre de vie, 111 créneaux : racine 9, tronc 9, écorce 9, branches 12, feuilles 12, cime 12,
+dynamique 12, défi 9, qualité 27 (neuf familles de lettres × trois paliers). Le chemin de vie n'en
+ajoute aucun — il délègue aux douze déjà écrits de la numérologie, parce qu'un même nombre ne peut
+pas porter deux textes à deux endroits du produit.
+
+⚠️ **Les 111 sont des textes de DÉPART, et la relecture d'Anima reste due.** Même décision que le
+2026-08-23 pour les 222 autres : le rapport type qu'elle a fourni ne couvre qu'une vingtaine de
+créneaux (les valeurs d'UNE personne), et attendre les quatre-vingt-dix autres aurait laissé l'écran
+vide pendant des mois. Ils tiennent aux trois conditions qui ont rendu la première décision
+acceptable : aucun n'est signé, ils vivent tous dans un seul fichier qu'elle peut vider ou remplacer
+clé par clé, et ils passent les mêmes contrôles que le reste (voix, prédiction, forme, apostrophes).
+Son cahier reste à jour : `npm run corpus:cahier`.
 
 **Ce qui reste à écrire, et par qui.** Les 42 créneaux non écrits sont les deux corpus du jeu de
 cartes, et ils relèvent d'Anima seule (FR-054, FR-086) : c'est un travail d'ÉCRITURE, pas de code.
