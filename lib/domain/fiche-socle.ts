@@ -446,7 +446,12 @@ export function sectionNombres(
   });
 }
 
-const ARCHETYPE_NOMBRE: Readonly<Record<number, string>> = Object.freeze({
+/**
+ * ⚠️ EXPORTÉE LE 2026-09-21 POUR L'ARBRE DE VIE. Ses sept clés portent les MÊMES nombres que le
+ * socle, et un 7 ne peut pas s'appeler « Recherche de sens » sur un écran et autrement sur l'autre.
+ * Une seconde table aurait divergé à la première retouche.
+ */
+export const ARCHETYPE_NOMBRE: Readonly<Record<number, string>> = Object.freeze({
   1: "Élan",
   2: "Lien",
   3: "Expression",

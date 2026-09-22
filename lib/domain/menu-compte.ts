@@ -175,6 +175,8 @@ export const HORS_MENU: Readonly<Record<string, string>> = Object.freeze({
     "elle CORRIGE le socle : elle vit sous la halte « Ton socle », au contact du manque qu’elle répare (amendement du 2026-08-25, §1)",
   enneagramme:
     "même raison que l’heure de naissance : c’est une porte du socle, pas une entrée de compte",
+  "arbre-de-vie":
+    "une porte de l’univers Numérologie, atteinte depuis la halte de ses nombres : la lister ici la rendrait plus proéminente que les six nombres dont elle prolonge la lecture",
   // Les deux modules livrés le 2026-09-03 s'atteignent par la halte « Psychologie », qui est
   // elle-même hors menu pour la raison écrite juste en dessous. Les lister ici les rendrait plus
   // proéminents que l'univers qui les contient, et le menu de compte redeviendrait un sommaire du

@@ -23,6 +23,7 @@ import {
   RESUME_DETAIL_HEURE,
   TITRE_DETAIL_POSITIONS,
   CIEL_DU_JOUR_NON_ECRIT,
+  PORTE_ARBRE_DE_VIE,
 } from "@/lib/domain/copie-socle";
 import { MESSAGE_TYPE_SANS_TEXTE, MESSAGE_TYPE_ABSENT } from "@/lib/domain/enneagramme-items";
 import { MESSAGE_SANS_HEURE, OU_TROUVER_SON_HEURE, BULLE_SANS_HEURE } from "@/lib/domain/message-sans-heure";
@@ -70,6 +71,7 @@ const COPIE = {
   resumeDetailHeure: RESUME_DETAIL_HEURE,
   titreDetailPositions: TITRE_DETAIL_POSITIONS,
   cielDuJourNonEcrit: CIEL_DU_JOUR_NON_ECRIT,
+  porteArbreDeVie: PORTE_ARBRE_DE_VIE,
 };
 
 const complete = ficheSocle(

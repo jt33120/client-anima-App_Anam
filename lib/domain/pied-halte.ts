@@ -36,6 +36,7 @@ export { URL_AIDE, MENTION_IA, URL_TRANSPARENCE };
 export type IdHalte =
   | "abonnement"
   | "ancrages"
+  | "arbre-de-vie"
   | "big-five"
   | "enneagramme"
   | "human-design"
@@ -88,6 +89,15 @@ const MENTION_DUE: Readonly<Record<IdHalte, { readonly mention: boolean; readonl
     synthese: {
       mention: true,
       motif: "la synthèse périodique est écrite par le modèle fort (4.9)",
+    },
+    "arbre-de-vie": {
+      mention: false,
+      motif:
+        "les sept clés, la dynamique de vie et les quatre défis sont CALCULÉS depuis sa naissance " +
+        "et son nom (FR-047), et les textes viennent du corpus d’Anima : aucun modèle n’écrit sur " +
+        "cette page. Même régime que /human-design et /big-five, et pour la même raison exactement " +
+        "— Anam n’y formule aucune hypothèse. Le jour où une lecture générée paraîtrait ici, ce " +
+        "verdict bascule AVANT elle",
     },
     enneagramme: {
       mention: true,

@@ -12,6 +12,7 @@ Open `http://127.0.0.1:4179/`. The regular scene navigation opens Anam and Mon �
 
 - `/socle?univers=astrologie`
 - `/socle?univers=numerologie`
+- `/arbre-de-vie` — la halte de l'arbre de vie, sur le vecteur du rapport d'Anima (12 juillet 2018). Ajoute `?arbreState=sans-prenom` pour voir l'absence de prénoms de naissance et son lien de réparation.
 - `/?view=seuil`
 - `/?state=empty` for unwritten daily content and an empty tree/conversation
 - `/?state=error` for a failed daily-library read

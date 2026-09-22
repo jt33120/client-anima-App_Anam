@@ -44,6 +44,18 @@ export const URL_CORRIGER_LE_NOM: PorteSocle = Object.freeze({
   url: "/reglages",
 });
 
+/**
+ * ⚠️ ELLE N'EST PAS DANS `PORTES_DU_SOCLE`, ET C'EST LA MÊME RAISON QUI LES SÉPARE (2026-09-21).
+ *
+ * Les portes du socle RÉPARENT quelque chose (une heure, un nom, un type) et ne paraissent qu'en
+ * mode « tout ». Celle-ci PROLONGE, et elle n'a de sens que dans l'univers Numérologie : elle se
+ * pose donc au contact des nombres, là où quelqu'un vient de les lire.
+ */
+export const PORTE_ARBRE_DE_VIE: PorteSocle = Object.freeze({
+  libelle: "Ton arbre de vie",
+  url: "/arbre-de-vie",
+});
+
 export const URL_AJOUTER_SON_HEURE: PorteSocle = Object.freeze({
   libelle: "Ton heure de naissance",
   url: "/heure-naissance",

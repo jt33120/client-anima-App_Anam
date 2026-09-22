@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import FicheArbreDeVie from "@/render/arbre-de-vie/FicheArbreDeVie";
+import type { CopieArbreDeVieVue, FicheArbreDeVieVue } from "@/render/arbre-de-vie/types";
+import { ficheArbreDeVie } from "@/lib/domain/fiche-arbre-de-vie";
+import * as arbre from "@/lib/domain/copie-arbre-de-vie";
 import SceneDom from "@/render/scene-dom";
 import FicheSocle, { type ProprietesFicheSocle } from "@/render/socle/FicheSocle";
 import RetourScene from "@/render/RetourScene";
@@ -88,6 +92,7 @@ const texteSocle: ProprietesFicheSocle["copie"] = {
   titreMethodeNumerologie: copie.TITRE_METHODE_NUMEROLOGIE,
   titreLectureNumerologie: copie.TITRE_LECTURE_NUMEROLOGIE,
   titreCiel: copie.TITRE_CIEL,
+  porteArbreDeVie: copie.PORTE_ARBRE_DE_VIE,
   titreAngles: copie.TITRE_ANGLES,
   titreMaisons: copie.TITRE_MAISONS,
   titreType: copie.TITRE_TYPE,
@@ -130,11 +135,43 @@ function PreviewScene() {
 />
   </>;
 }
+// ── L'ARBRE DE VIE (2026-09-21) ────────────────────────────────────────────────────────────────
+// Même discipline que la fiche du socle : on part du DOMAINE RÉEL, avec le vecteur du rapport
+// d'Anima (« Milian », 12 juillet 2018), et pas d'un faux modèle de vue. Ce qui se voit ici est ce
+// que la halte affiche.
+const ficheArbre = ficheArbreDeVie(
+  params.get("arbreState") === "sans-prenom"
+    ? { date: "2018-07-12", nomComplet: "Milian Dupont" }
+    : { date: "2018-07-12", nomComplet: "Milian Dupont", prenomDeNaissance: "Milian" },
+  null,
+) as unknown as FicheArbreDeVieVue;
+const texteArbre: CopieArbreDeVieVue = {
+  surtitre: arbre.SURTITRE,
+  introduction: arbre.INTRODUCTION,
+  distinction: arbre.DISTINCTION_AVEC_L_EVOLUTION,
+  titreSchema: arbre.TITRE_SCHEMA,
+  descriptionSchema: arbre.DESCRIPTION_SCHEMA,
+  titreTriangle: arbre.TITRE_TRIANGLE,
+  introductionTriangle: arbre.INTRODUCTION_TRIANGLE,
+  titreComportement: arbre.TITRE_COMPORTEMENT,
+  introductionComportement: arbre.INTRODUCTION_COMPORTEMENT,
+  titreDynamique: arbre.TITRE_DYNAMIQUE,
+  titreDefis: arbre.TITRE_DEFIS,
+  introductionDefis: arbre.INTRODUCTION_DEFIS,
+  titreQualites: arbre.TITRE_QUALITES,
+  introductionQualites: arbre.INTRODUCTION_QUALITES,
+  titreCheminDeVie: arbre.TITRE_CHEMIN_DE_VIE,
+  titreMethode: arbre.TITRE_METHODE,
+  texteNonEcrit: arbre.TEXTE_NON_ECRIT,
+};
+
+const isArbreDeVie = window.location.pathname === "/arbre-de-vie";
 const isSocle = window.location.pathname === "/socle";
 const mode = params.get("univers") === "numerologie" ? "numerologie" : "astrologie";
 createRoot(document.getElementById("root")!).render(<>
   {params.has("portail") && <PortailAnam copie={{ nom: NOM_PORTAIL, annonce: ANNONCE_PORTAIL }} />}
   <ThemeCarnetDocument />
   <RequestedTree />
-  {isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : <PreviewScene/>}
+  {isArbreDeVie ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{arbre.TITRE_HALTE}</h1><FicheArbreDeVie fiche={ficheArbre} copie={texteArbre}/></main>
+   : isSocle ? <main className={halte.halte}><RetourScene url="/"/><h1 className={`t-titre ${halte.titreHalte}`}>{mode === "astrologie" ? "Astrologie" : "Numérologie"}</h1><FicheSocle fiche={fiche} copie={texteSocle} mode={mode}/></main> : <PreviewScene/>}
 </>);

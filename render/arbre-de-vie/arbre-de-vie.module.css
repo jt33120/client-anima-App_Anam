@@ -1,0 +1,299 @@
+/*
+ * arbre-de-vie.module.css — LA HALTE « TON ARBRE DE VIE ».
+ *
+ * ⚠️ AUCUN `filter`, AUCUN `backdrop-filter`, AUCUNE `box-shadow`, AUCUN `drop-shadow`, AUCUN
+ * `mix-blend-mode`. La règle vient d'une mesure : un flou plein écran a fait tomber l'application à
+ * quatre images par seconde contre vingt-cinq, le 2026-08-20. Elle vaut pour tout le produit, même
+ * sur une page statique comme celle-ci — un jour quelqu'un y ajoutera une transition.
+ *
+ * ⚠️ UN APLAT SOUS TOUT TEXTE, JAMAIS UN VOILE FLOU. Le trait du dessin peut se contenter d'un
+ * contraste de 3 pour 1 (c'est un objet graphique) ; le texte d'une pastille, non. D'où l'encre
+ * `--sur-accent` sur l'aplat `--accent`, mesurée à plus de dix pour un dans `app/styles/tokens.ts`.
+ */
+
+.contenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-6);
+  width: 100%;
+  min-width: 0;
+}
+
+.surtitre {
+  margin: 0;
+  color: var(--texte-doux);
+}
+
+.introduction {
+  max-width: var(--mesure);
+  margin: 0;
+  color: var(--texte);
+}
+
+.distinction {
+  max-width: var(--mesure);
+  margin: 0;
+  color: var(--texte-doux);
+}
+
+/* ── LE DESSIN ET SES PRISES ───────────────────────────────────────────────────────────────── */
+
+.figure {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 24rem;
+  align-self: center;
+}
+
+/*
+ * `height: auto` et aucune hauteur imposée : le SVG garde le rapport de son `viewBox`, donc aucun
+ * letterboxing, donc les pourcentages des prises tombent exactement là où la géométrie les place.
+ */
+.schema {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.racines {
+  fill: none;
+  stroke: var(--arbre-tronc);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.tronc {
+  fill: var(--arbre-tronc);
+  stroke: none;
+}
+
+.ecorce {
+  fill: none;
+  stroke: var(--arbre-branche);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.branches {
+  fill: none;
+  stroke: var(--arbre-branche);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.feuillage {
+  fill: var(--arbre-feuillage);
+  stroke: none;
+}
+
+.cime {
+  fill: none;
+  stroke: var(--arbre-feuillage);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.prises {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prise {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.pastille {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-inline-size: var(--cible-tactile);
+  min-height: var(--cible-tactile);
+  max-inline-size: 5.5rem;
+  padding: var(--esp-1) var(--esp-3);
+  border-radius: var(--rayon-lg);
+  background: var(--accent);
+  color: var(--sur-accent);
+  text-align: center;
+  text-decoration: none;
+}
+
+.pastille:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-offset: 2px;
+}
+
+/*
+ * ⚠️ DEUX CLASSES, ET C'EST LA CORRECTION. Mesuré au navigateur le 2026-09-21 : `t-meta` fixe
+ * `color: var(--texte-doux)`, une encre claire faite pour le fond de nuit — sur l'aplat clair de la
+ * pastille, le nom de la partie devenait illisible. À spécificité égale, c'est l'ordre des feuilles
+ * qui tranchait, et il ne tranchait pas dans notre sens. Deux classes reprennent la main.
+ *
+ * Le nom PEUT tenir sur deux lignes : « Première racine » débordait de la pilule, hors de l'aplat,
+ * donc sans contraste garanti. Il s'enroule maintenant à l'intérieur.
+ */
+.pastille .valeurPastille,
+.pastille .intitulePastille {
+  display: block;
+  color: var(--sur-accent);
+  white-space: normal;
+  line-height: 1.15;
+}
+
+/* ── LES SECTIONS ──────────────────────────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon-lg);
+  background: var(--papier);
+  color: var(--sur-papier);
+}
+
+.titreSection,
+.introductionSection {
+  margin: 0;
+}
+
+.introductionSection {
+  max-width: var(--mesure);
+}
+
+.partie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding-top: var(--esp-3);
+  border-top: 1px solid var(--bordure);
+}
+
+/*
+ * ⚠️ UN APLAT, PAS UNE ANIMATION. Arriver sur une ancre doit se voir ; le faire avec un fondu ou un
+ * déplacement rendrait la cible mouvante pour qui a demandé moins de mouvement.
+ */
+.partie:target {
+  background: var(--surface);
+  border-radius: var(--rayon);
+  padding: var(--esp-3);
+}
+
+.intitule,
+.archetype,
+.role,
+.origine,
+.texte,
+.nonEcrit,
+.manque {
+  margin: 0;
+}
+
+/*
+ * ⚠️ PAS DE `summary` DANS CE SÉLECTEUR, ET C'EST DÉLIBÉRÉ. `color` s'hérite : le `summary` d'un
+ * pli prend celle de `.section` sans qu'on la lui redise. Le nommer ici ferait de ce bloc une
+ * « commande » aux yeux de `tests/cible-tactile.test.ts`, qui exigerait alors `--cible-tactile`
+ * dans un bloc qui ne parle que de couleur — et la garde deviendrait une formalité à recopier.
+ */
+.section :is(.intitule, .texte, .nonEcrit, .manque, .titreSection, .introductionSection) {
+  color: var(--sur-papier);
+}
+
+.section :is(.archetype, .role, .origine) {
+  color: var(--sur-papier-doux);
+}
+
+.nombre {
+  font-variant-numeric: tabular-nums;
+}
+
+.texte {
+  max-width: var(--mesure);
+}
+
+.reparation {
+  align-self: flex-start;
+  min-height: var(--cible-tactile);
+  display: inline-flex;
+  align-items: center;
+  color: var(--sur-papier);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/*
+ * ⚠️ UN SEUL ANNEAU DE FOCUS DANS TOUT LE PRODUIT. Il se DÉCLARE avec `--bordure-forte`, et seule
+ * sa COULEUR se corrige sur une surface claire, par `outline-color`. Redéclarer un anneau complet
+ * avec une autre encre en crée un deuxième, qui a l'air identique et qui dérivera au premier
+ * changement de jeton ; `tests/qa-visuelle-19-aout.test.ts` le refuse, et c'est ainsi que
+ * `socle.module.css` s'y prend déjà.
+ */
+.reparation:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-color: var(--sur-papier);
+  outline-offset: 2px;
+}
+
+/* ── LES PLIS ──────────────────────────────────────────────────────────────────────────────── */
+
+.devoilement {
+  border-top: 1px solid var(--bordure);
+}
+
+.devoilement > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--cible-tactile);
+  padding: var(--esp-2) 0;
+  cursor: pointer;
+}
+
+/*
+ * L'encre de l'anneau se corrige DANS LE MÊME BLOC, jamais dans un second sélecteur plus spécifique :
+ * `.section .devoilement > summary` serait une RACINE de plus aux yeux de `tests/cible-tactile.test.ts`,
+ * qui exigerait alors la cible tactile dans un bloc qui ne parle que de couleur. Tous les plis de cette
+ * halte vivent sur une surface claire, donc une seule correction suffit.
+ */
+.devoilement > summary:focus-visible {
+  outline: 2px solid var(--bordure-forte);
+  outline-color: var(--sur-papier);
+  outline-offset: 2px;
+}
+
+.entete {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.methode {
+  border: 1px solid var(--bordure);
+  border-radius: var(--carnet-rayon-lg);
+  padding: 0 var(--esp-5) var(--esp-4);
+  background: var(--papier);
+  color: var(--sur-papier);
+}
+
+.listeMethode {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  margin: 0;
+  padding-left: var(--esp-5);
+  color: var(--sur-papier-doux);
+}
+
+@media (min-width: 48rem) {
+  .figure {
+    max-width: 28rem;
+  }
+}

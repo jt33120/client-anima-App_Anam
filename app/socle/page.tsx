@@ -31,6 +31,7 @@ import {
   RESUME_DETAIL_HEURE,
   TITRE_DETAIL_POSITIONS,
   CIEL_DU_JOUR_NON_ECRIT,
+  PORTE_ARBRE_DE_VIE,
 } from "@/lib/domain/copie-socle";
 import { MESSAGE_TYPE_SANS_TEXTE } from "@/lib/domain/enneagramme-items";
 import FicheSocle from "@/render/socle/FicheSocle";
@@ -231,6 +232,7 @@ export default async function Page({
           resumeDetailHeure: RESUME_DETAIL_HEURE,
           titreDetailPositions: TITRE_DETAIL_POSITIONS,
           cielDuJourNonEcrit: CIEL_DU_JOUR_NON_ECRIT,
+          porteArbreDeVie: PORTE_ARBRE_DE_VIE,
         }}
       />
 

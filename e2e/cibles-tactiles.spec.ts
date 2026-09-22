@@ -86,7 +86,11 @@ test.describe("Les cibles tactiles, mesurées rendues", () => {
     await ouvrirUnCompteNeuf(page);
 
     const fautives: string[] = [];
-    for (const chemin of ["/", "/memoire", "/reglages", "/mes-donnees", "/abonnement", "/aide"]) {
+    // ⚠️ `/arbre-de-vie` EST DANS LA LISTE, ET IL FALLAIT L'Y METTRE À LA MAIN. Cette boucle
+    // énumère ses routes : une halte qui n'y figure pas n'est JAMAIS mesurée, et ses cibles
+    // peuvent passer sous le plancher sans que rien ne rougisse. Ses sept prises sont posées en
+    // pourcentage par-dessus un dessin, donc c'est exactement le genre d'écran qui dérive.
+    for (const chemin of ["/", "/arbre-de-vie", "/memoire", "/reglages", "/mes-donnees", "/abonnement", "/aide"]) {
       await page.goto(chemin);
       const petites = tropPetites(await mesurerLesCommandes(page));
       if (petites.length) fautives.push(`── ${chemin}\n${rapport(petites)}`);

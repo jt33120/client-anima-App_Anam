@@ -176,7 +176,8 @@ function SectionNumerologie({
         </details>
       )}
 
-
+      {/* En DERNIER, et après la méthode : l'arbre de vie se lit quand on a déjà vu ses nombres. */}
+      <Lien reparation={copie.porteArbreDeVie} />
     </section>
   );
 }
@@ -411,6 +412,13 @@ export interface ProprietesFicheSocle {
     readonly resumeDetailHeure: string;
     readonly titreDetailPositions: string;
     readonly cielDuJourNonEcrit: string;
+    /**
+     * ⚠️ UNE PORTE QUI PROLONGE, PAS UNE QUI RÉPARE (2026-09-21). Les trois `portes` de la fiche
+     * corrigent un manque et vivent en mode « tout » ; celle-ci mène à une lecture de plus et n'a
+     * de sens qu'ici, au contact des nombres qu'elle prolonge. Elle descend en propriété plutôt
+     * que par `FicheSocleVue` : la frontière gardée n'a pas à bouger pour un lien.
+     */
+    readonly porteArbreDeVie: ReparationVue;
   };
 }
 
