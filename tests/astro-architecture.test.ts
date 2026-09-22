@@ -85,6 +85,9 @@ describe("[AD-6/DUR] la frontière de déterminisme : lib/astro ne connaît aucu
     expect(FICHIERS_ASTRO).toContain("lib/astro/adapters/lieux-france.ts");
     // Story 5.4 — le socle QUOTIDIEN (ciel du jour, configurations) est du calcul comme le reste.
     expect(FICHIERS_ASTRO).toContain("lib/astro/quotidien.ts");
+    // 2026-09-21 — l'arbre de vie. Même couche, mêmes gardes, et une propriété EN PLUS : il n'a
+    // aucune dépendance au temps, pas même un entier d'année comme l'année personnelle.
+    expect(FICHIERS_ASTRO).toContain("lib/astro/arbre-de-vie.ts");
   });
 
   it("aucun module de lib/astro n'importe @/lib/ai — le socle est calculé, jamais généré", () => {

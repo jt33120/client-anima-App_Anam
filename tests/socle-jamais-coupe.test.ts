@@ -402,6 +402,11 @@ describe("[T6-1 / AC4] les items FR-055 qui EXISTENT : aucun chemin premium ne l
       "lib/corpus/port.ts",
       "lib/corpus/numerologie.ts",
       "lib/data/lire-numerologie.ts",
+      // 2026-09-21 — l'arbre de vie est de la numérologie, donc du même socle gratuit. Il faut
+      // l'inscrire À LA MAIN : cette liste est codée en dur (comme celle de `garde-commerciale`),
+      // elle ne se découvre pas toute seule, et un fichier oublié ici passerait au vert sans que
+      // FR-055 soit prouvé pour lui.
+      "lib/astro/arbre-de-vie.ts",
     ];
     // PRÉSENCE D'ABORD : on prouve qu'on lit bien des fichiers qui calculent et servent vraiment la
     // numérologie — sans quoi « aucun mot premium » serait vrai d'un fichier vide ou inexistant.
