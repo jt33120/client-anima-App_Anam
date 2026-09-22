@@ -171,7 +171,13 @@ export function valeurLettre(lettre: string): number {
   return (code % 9) + 1;
 }
 
-function sommeLettres(lettres: string): number {
+/**
+ * ⚠️ EXPORTÉE DEPUIS LE 2026-09-21, ET C'EST LE POINT DE LA MODIFICATION. `lib/astro/arbre-de-vie.ts`
+ * compte les lettres d'un prénom de naissance. Sans cet export il aurait recopié cette boucle —
+ * donc recopié `valeurLettre`, donc fait vivre deux fois la table de Pythagore. Une table recopiée
+ * diverge à la première correction ; la périodicité de 9 n'a pas besoin d'un second exemplaire.
+ */
+export function sommeLettres(lettres: string): number {
   let somme = 0;
   for (const l of lettres) somme += valeurLettre(l);
   return somme;
@@ -270,7 +276,7 @@ export interface TraceNumerologie {
 // Les calculs
 // ══════════════════════════════════════════════════════════════════════════════════════════════
 
-interface DateEclatee {
+export interface DateEclatee {
   readonly jour: number;
   readonly mois: number;
   readonly annee: number;
@@ -282,8 +288,14 @@ interface DateEclatee {
  * ⚠️ Surtout PAS `new Date(chaine)` : `new Date("1970-11-28")` est interprété en UTC, et
  * `.getDate()` rendrait 27 pour quiconque vit à l'ouest de Greenwich. La date de naissance est une
  * date CIVILE, pas un instant — elle n'a pas de fuseau et ne doit jamais en traverser un.
+ *
+ * ⚠️ EXPORTÉE DEPUIS LE 2026-09-21. `lib/astro/arbre-de-vie.ts` a besoin du jour, du mois et de
+ * l'année SÉPARÉMENT (les deux racines, l'écorce, la dynamique et les quatre défis les lisent un à
+ * un). Sans cet export il aurait réécrit ce contrôle de format, donc réintroduit la porte par
+ * laquelle `new Date(chaine)` revient un jour, et avec elle le décalage d'un jour à l'ouest de
+ * Greenwich que ce commentaire existe pour empêcher.
  */
-function eclaterDate(iso: string): DateEclatee {
+export function eclaterDate(iso: string): DateEclatee {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
   if (!m) throw new Error("numerologie : date attendue au format AAAA-MM-JJ");
   const annee = Number(m[1]);
