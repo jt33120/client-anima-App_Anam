@@ -355,3 +355,69 @@ describe("[revue 2.8] l'émoji : on déclare ce qu'on accepte, pas ce qu'on refu
     }
   });
 });
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+
+describe("[2026-09-21] pronostic social et attribution familiale — le trou mesuré sur un vrai rapport", () => {
+  /**
+   * ⚠️ CE BLOC VIENT D'UNE MESURE, PAS D'UNE CRAINTE.
+   *
+   * En préparant l'arbre de vie, on a passé les deux détecteurs du produit sur treize phrases
+   * RÉELLES d'un rapport de numérologie professionnel. Onze sont passées VERTES : le détecteur de
+   * prédiction épargne délibérément le conditionnel, et aucune ne porte de mot clinique. La CI
+   * aurait donné un feu vert à des phrases qu'aucun humain n'aurait laissé passer en les lisant.
+   *
+   * Les deux familles ajoutées ici ferment les deux registres les plus graves de ce lot : annoncer
+   * un destin social, et affirmer un fait sur l'histoire familiale de quelqu'un.
+   */
+  it("[CONTRÔLE POSITIF] les phrases qui passaient sont désormais attrapées", () => {
+    const passaient = [
+      "vous risqueriez une chute financière et sociale",
+      "Tu peux rencontrer des problèmes avec la justice",
+      "Tu es bourreau ou victime",
+      "tu deviendrais un arriviste sans scrupule",
+      "Tes parents voulaient un garçon",
+      "Tes parents ont perdu un enfant avant ta naissance",
+      "Ton père t’a abandonnée",
+      "Ta mère ne t’a pas reconnue",
+      "Tu es un accident, arrivé trop tôt",
+      "Tu n’étais pas désirée",
+    ];
+    for (const phrase of passaient) {
+      expect(chercherInterdits(phrase).length, `« ${phrase} » passe encore`).toBeGreaterThan(0);
+    }
+  });
+
+  it("[CONTRÔLE NÉGATIF] Anam garde le droit de PARLER de ces sujets", () => {
+    /**
+     * ⚠️ LA PARTIE QUI COMPTE VRAIMENT. Ce lexique tourne EN DIRECT sur la parole d'Anam
+     * (`controle-sortie.ts`) : un motif trop large ne produit pas un faux positif en CI, il
+     * MUSELLE Anam au milieu d'une conversation où quelqu'un lui confie quelque chose de lourd.
+     *
+     * C'est pour ça qu'on ne bannit ni « alcool », ni « drogue », ni « dépendance », ni « justice »
+     * seuls : la différence entre « tu auras des problèmes avec la justice » et « tu me dis que
+     * cette procédure t'épuise » n'est pas le vocabulaire, c'est qui affirme quoi.
+     */
+    const legitimes = [
+      "Tu me dis que cette procédure de justice t’épuise, et je t’entends.",
+      "Tes parents comptent beaucoup pour toi, tu viens de le dire.",
+      "Ton père t’accompagne à ce rendez-vous, c’est ce que tu racontais.",
+      "Tu as parlé d’une chute de motivation cette semaine.",
+      "Ta mère et toi vous voyez le dimanche.",
+      "Il y a eu un accident sur la route ce matin.",
+      "Ce que tu as désiré l’an dernier a peut-être changé de forme.",
+    ];
+    for (const phrase of legitimes) {
+      expect(chercherInterdits(phrase), `faux positif : « ${phrase} »`).toEqual([]);
+    }
+  });
+
+  it("les deux familles sont nommées dans le verdict, pas noyées dans « medical »", () => {
+    // Le message d'échec doit dire LEQUEL des deux registres a été franchi : « pronostic_social »
+    // et « attribution_familiale » se réparent par des gestes d'écriture différents.
+    expect(chercherInterdits("une chute financière t’attend")[0]?.famille).toBe("pronostic_social");
+    expect(chercherInterdits("Tes parents voulaient un garçon")[0]?.famille).toBe(
+      "attribution_familiale",
+    );
+  });
+});

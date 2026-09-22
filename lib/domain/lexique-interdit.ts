@@ -45,7 +45,14 @@ import { decoderEntites, normaliserTexte, UN_MOT_INTERCALE } from "./normalisati
  */
 
 /** Famille d'un interdit — sert aux messages d'échec parlants et au filtrage par contrôle. */
-export type FamilleInterdit = "medical" | "soigner" | "formulation" | "affect" | "emoji";
+export type FamilleInterdit =
+  | "medical"
+  | "soigner"
+  | "formulation"
+  | "affect"
+  | "emoji"
+  | "pronostic_social"
+  | "attribution_familiale";
 
 export interface Interdit {
   famille: FamilleInterdit;
@@ -236,6 +243,46 @@ const MOTIFS_LEXICAUX: Array<{ famille: FamilleInterdit; motif: RegExp }> = [
   // (trois mots), « très bien ». L'énumération d'origine (`totalement |vraiment `) n'en couvrait
   // que deux, choisis à la main.
   { famille: "affect", motif: /\bje comprends (?:[a-z']+ ){0,3}ce que tu (?:vis|traverses)\b/g },
+
+  // ── PRONOSTIC SOCIAL (2026-09-21) — un destin social, légal ou financier annoncé comme un fait ──
+  //
+  // ⚠️ CETTE FAMILLE VIENT D'UN DOSSIER MESURÉ, PAS D'UNE CRAINTE. En préparant l'arbre de vie, on a
+  // passé les deux détecteurs du produit sur treize phrases réelles d'un rapport de numérologie
+  // professionnel. ONZE SONT PASSÉES VERTES, dont :
+  //
+  //     « Vous êtes bourreau ou victime »
+  //     « vous risqueriez une chute financière et sociale »
+  //     « Vous pouvez rencontrer des problèmes avec la justice »
+  //
+  // Le détecteur de prédiction épargne délibérément le conditionnel, et aucune de ces phrases ne
+  // porte de mot clinique. Elles auraient donc franchi la CI et se seraient affichées.
+  //
+  // ⚠️ ET C'EST POURQUOI LES MOTIFS SONT ÉTROITS. Ce lexique tourne EN DIRECT sur la parole d'Anam
+  // (`lib/domain/controle-sortie.ts`) : bannir « alcool », « drogue » ou « dépendance » l'empêcherait
+  // de RÉPONDRE à quelqu'un qui lui en parle, ce qui serait bien pire que le défaut qu'on ferme. On
+  // ne bannit donc que des locutions entières, qui n'ont aucun emploi légitime dans cette voix.
+  { famille: "pronostic_social", motif: /\bchute (?:financiere|sociale)\b/g },
+  { famille: "pronostic_social", motif: /\b(?:problemes?|ennuis?|demeles) avec la justice\b/g },
+  { famille: "pronostic_social", motif: /\bbourreau ou victime\b/g },
+  { famille: "pronostic_social", motif: /\barriviste(?:s)?\b/g },
+
+  // ── ATTRIBUTION FAMILIALE (2026-09-21) — un fait sur sa famille, que le produit ne sait pas ────
+  //
+  // Le même rapport écrit, à partir d'un calcul sur un nom : « Vos parents voulaient un garçon et
+  // vous êtes une fille », « l'un de vos parents vous a abandonné », « Vos parents ont perdu un
+  // enfant avant votre naissance ». Ce ne sont pas des hypothèses symboliques, ce sont des
+  // AFFIRMATIONS sur l'histoire familiale de quelqu'un que le produit n'a jamais rencontré — et
+  // elles touchent exactement les endroits où une personne est le plus vulnérable.
+  //
+  // Là encore, des locutions entières et ancrées : « tes parents » seul est du français ordinaire
+  // qu'Anam doit pouvoir employer quand c'est LA PERSONNE qui en parle la première.
+  {
+    famille: "attribution_familiale",
+    motif: /\btes parents (?:voulaient|ont perdu|t'ont|ne t'ont|n'ont pas)\b/g,
+  },
+  { famille: "attribution_familiale", motif: /\b(?:ton|ta) (?:pere|mere) (?:t'a|ne t'a)\b/g },
+  { famille: "attribution_familiale", motif: /\btu es un accident\b/g },
+  { famille: "attribution_familiale", motif: /\btu n'etais pas desiree?\b/g },
 ];
 
 // ── L'ÉMOJI : ON DÉCLARE CE QU'ON ACCEPTE, PAS CE QU'ON REFUSE (revue du 2026-08-12) ──────────
